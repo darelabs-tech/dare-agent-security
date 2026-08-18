@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use DARE Agent Security in research or publications, please cite this project."
+title: "DARE Agent Security"
+type: software
+authors:
+  - family-names: "de Oliveira"
+    given-names: "Wanderson Leandro"
+organization:
+  name: "DARE Labs"
+repository-code: "https://github.com/darelabs-tech/darelabs-tech-dare-agent-security"
+license: "Apache-2.0"
+version: "0.0.0-pre-alpha"
+date-released: "2026-08-18"
