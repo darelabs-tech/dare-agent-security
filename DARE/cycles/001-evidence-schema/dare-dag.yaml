@@ -1,0 +1,75 @@
+title: "DARE Agent Security Cycle 001 - Evidence Schema"
+version: "1.0.0"
+cycle: "001-evidence-schema"
+issue: 2
+source_design: "DESIGN.md"
+source_blueprint: "BLUEPRINT.md"
+source_tasks: "TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_protocol_specific_core_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Bootstrap Rust workspace and evidence crate"
+    depends_on: []
+    complexity: LOW
+    subtask_prompt: "Execute task-001 exactly as defined in TASKS.md; establish the minimal Rust workspace and isolated dare-security-evidence crate without introducing future product layers."
+  - id: task-002
+    title: "Implement canonical evidence types and wire enums"
+    depends_on: [task-001]
+    complexity: HIGH
+    subtask_prompt: "Execute task-002 exactly as defined in TASKS.md; implement the canonical Rust evidence model and deterministic wire enums while preserving the approved generic contract."
+  - id: task-003
+    title: "Define canonical JSON Schema v1"
+    depends_on: [task-002]
+    complexity: HIGH
+    subtask_prompt: "Execute task-003 exactly as defined in TASKS.md; create the strict, versioned JSON Schema v1 that independently validates the public evidence contract."
+  - id: task-004
+    title: "Implement schema versioning and semantic validation"
+    depends_on: [task-002]
+    complexity: HIGH
+    subtask_prompt: "Execute task-004 exactly as defined in TASKS.md; implement fail-closed major-version handling and typed semantic validation for evidence invariants."
+  - id: task-005
+    title: "Implement redaction safety and secret-safe errors"
+    depends_on: [task-002]
+    complexity: HIGH
+    subtask_prompt: "Execute task-005 exactly as defined in TASKS.md; enforce redaction metadata, forbid raw credential fields, and ensure validation errors never echo rejected secrets."
+  - id: task-006
+    title: "Implement deterministic outcome comparison and verdict consistency"
+    depends_on: [task-002, task-004]
+    complexity: HIGH
+    subtask_prompt: "Execute task-006 exactly as defined in TASKS.md; implement protocol-neutral deterministic comparison and reject contradictory verdict records."
+  - id: task-007
+    title: "Publish PASS/FAIL/INCONCLUSIVE/ERROR synthetic fixtures"
+    depends_on: [task-003, task-004, task-005, task-006]
+    complexity: MED
+    subtask_prompt: "Execute task-007 exactly as defined in TASKS.md; publish only synthetic canonical evidence fixtures for all four verdict states."
+  - id: task-008
+    title: "Implement contract, round-trip and negative security tests"
+    depends_on: [task-003, task-004, task-005, task-006, task-007]
+    complexity: HIGH
+    subtask_prompt: "Execute task-008 exactly as defined in TASKS.md; prove public fixture compatibility and negative security invariants with deterministic tests."
+  - id: task-009
+    title: "Add CI quality gates and evidence contract documentation"
+    depends_on: [task-008]
+    complexity: MED
+    subtask_prompt: "Execute task-009 exactly as defined in TASKS.md; add minimal Rust/contract CI gates and public documentation without implementing future product GitHub Actions."
+  - id: task-010
+    title: "Prove Cycle 001 evidence contract end to end"
+    depends_on: [task-009]
+    complexity: HIGH
+    subtask_prompt: "Execute task-010 exactly as defined in TASKS.md; run the final Cycle 001 proof without adding new scope, and require every approved architecture/security gate to pass."

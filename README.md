@@ -79,7 +79,9 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Bootstrap / pre-alpha
+**Stage:** Bootstrap / pre-alpha — Cycle 001 evidence contract in progress
+
+The public v1 evidence schema lives at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json). Synthetic fixtures are in [`examples/evidence/`](examples/evidence/). The Rust kernel is `crates/dare-security-evidence` ([README](crates/dare-security-evidence/README.md)). Validate the JSON contract locally from the committed schema; do not fetch `$id` from the network.
 
 Current priorities:
 

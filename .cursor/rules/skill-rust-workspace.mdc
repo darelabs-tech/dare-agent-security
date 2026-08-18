@@ -1,0 +1,312 @@
+---
+description: Decisão e migração de Cargo workspace multi-crate para projetos Rust/Axum. Use durante design/blueprint para decidir o layout, ou quando um projeto single-crate cresceu além do que comporta confortavelmente.
+globs: src/**/*.rs,Cargo.toml,DARE/DESIGN.md,DARE/BLUEPRINT.md
+alwaysApply: false
+---
+
+# Skill: Rust workspace — single-crate vs multi-crate
+
+Esta skill cobre dois cenários relacionados:
+
+- **Cenário A** — você está gerando `DESIGN.md`/`BLUEPRINT.md` de um projeto
+  Rust/Axum e precisa decidir desde já se ele nasce single-crate ou em
+  workspace.
+- **Cenário B** — o projeto Rust **já existe** em single-crate e cresceu ao
+  ponto de doer (compilação lenta, fronteiras arquiteturais erodindo,
+  workers acoplados ao API server). Você precisa propor um plano de
+  migração para workspace.
+
+A regra geral: **comece simples, migre quando os critérios objetivos
+abaixo aparecerem.** Workspace é a estrutura idiomática Rust para projetos
+maduros, mas é overengineering para o "hello world".
+
+---
+
+## Cenário A — Decisão na fase Design/Blueprint
+
+Antes de escrever o BLUEPRINT da stack `rust-axum`, decida: single-crate
+ou workspace? Os critérios são objetivos:
+
+### Comece **single-crate** quando TODOS forem verdadeiros
+
+- Apenas **1 binário** (HTTP server).
+- Estimativa de **< 30 arquivos `.rs`** no `src/`.
+- **1–2 sistemas externos** (apenas DB; ou DB + cache).
+- **Equipe ≤ 2 devs** trabalhando ativamente.
+- Nenhum requisito de deploy independente para subcomponentes.
+
+### Comece **workspace multi-crate** quando QUALQUER um for verdadeiro
+
+- **≥ 2 binários** previstos (API + worker; API + admin; API + CLI).
+- **Múltiplos sistemas externos** (3+: PG + Redis + Rabbit + Qdrant +
+  Neo4j + …).
+- **Deploy independente** desejado (workers em pods separados no k8s,
+  scaling independente).
+- **Fronteiras arquiteturais** críticas (domain puro sem HTTP/DB; SDK que
+  vai virar crate público; biblioteca de cliente compartilhada com outras
+  apps).
+- **Equipe ≥ 3 devs** trabalhando em módulos diferentes em paralelo.
+
+### Layout convencional para workspace
+
+Use o prefixo do projeto (`<p>`) como namespace de todos os crates — por
+exemplo `wa-` para uma `wa-business-api`, `agent-` para um `agent-ai`,
+`chat-` para um `chat-service`.
+
+```
+projeto/
+├── Cargo.toml                          # workspace root, deps centralizadas
+├── docker-compose.yml
+├── Dockerfile
+├── crates/
+│   ├── <p>-domain/         (lib)       # entities puras: structs, errors, types
+│   ├── <p>-config/         (lib)       # AppConfig::from_env()
+│   ├── <p>-db/             (lib)       # sqlx pool, migrations
+│   ├── <p>-cache/          (lib)       # redis/moka (se houver)
+│   ├── <p>-queue/          (lib)       # lapin/kafka (se houver)
+│   ├── <p>-crypto/         (lib)       # bcrypt, jwt, aes (se aplicável)
+│   ├── <p>-meta-client/    (lib)       # cliente externo (Meta API, Stripe…)
+│   ├── <p>-services/       (lib)       # business logic, sem HTTP
+│   ├── <p>-api/            (bin + lib) # HTTP server (handlers, router, mw)
+│   ├── <p>-worker-<X>/     (bin)       # 1 binário por tipo de worker
+│   ├── <p>-admin/          (bin)       # CLI admin (se houver)
+│   └── <p>-e2e/            (tests)     # integration tests cross-crate
+└── xtask/                              # scripts de build/dev em Rust
+```
+
+Granularidade: **um crate por bounded context**, não por arquivo. Resista
+ao "crate util" / "crate common" — vira lixeira.
+
+### Template de `Cargo.toml` raiz (workspace)
+
+```toml
+[workspace]
+resolver = "2"
+members = [
+    "crates/<p>-domain",
+    "crates/<p>-config",
+    "crates/<p>-db",
+    "crates/<p>-services",
+    "crates/<p>-api",
+    "crates/<p>-worker-x",
+    "crates/<p>-e2e",
+    "xtask",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "Proprietary"
+
+[workspace.dependencies]
+# Runtime
+tokio = { version = "1.40", features = ["full"] }
+async-trait = "0.1"
+
+# Web
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace", "timeout"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Database
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "uuid", "chrono", "migrate"] }
+
+# Errors / observability
+thiserror = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Types
+uuid = { version = "1.10", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+```
+
+Cada crate filho herda via `version.workspace = true` e
+`<dep> = { workspace = true }` — assim você atualiza axum/tokio/etc. em
+**uma linha** no root.
+
+### Diagrama no BLUEPRINT.md
+
+Sempre desenhe o grafo de dependências em Mermaid. Exemplo:
+
+```mermaid
+graph TD
+    api[<p>-api]
+    admin[<p>-admin]
+    worker[<p>-worker-flow]
+    services[<p>-services]
+    db[<p>-db]
+    cache[<p>-cache]
+    queue[<p>-queue]
+    domain[<p>-domain]
+
+    api --> services
+    admin --> services
+    worker --> services
+    services --> db
+    services --> cache
+    services --> queue
+    services --> domain
+    db --> domain
+```
+
+Regras de seta:
+- **`<p>-domain` no fundo:** ninguém depende para baixo dele.
+- **`<p>-services` no meio:** depende de domain/db/cache/queue, NUNCA de api.
+- **Binários (api, admin, worker) no topo:** dependem de services, nunca
+  um do outro.
+
+---
+
+## Cenário B — Migração de single-crate para workspace
+
+Use quando você herda um projeto single-crate maduro e percebe que está
+apertando.
+
+### Sintomas objetivos de "hora de migrar"
+
+- `src/` tem **> 30 arquivos `.rs`** ou **> 6 subpastas top-level**.
+- Existem múltiplos "domínios verticais" misturados (`handlers`, `services`,
+  `repositories`, `workers`, `integrators`, `mcp`, `acp`, `skills`, `tools`…).
+- Workers usam `tokio::spawn` no mesmo processo do API server (não
+  conseguem escalar independente).
+- `cargo build` incremental > 10s.
+- Múltiplas pessoas mexem no mesmo crate, gerando conflitos de merge
+  frequentes.
+- Quer expor parte do código (cliente, SDK) como crate publicável.
+
+### Plano de migração em 4 PRs
+
+Migração **incremental**, NUNCA big-bang. Cada PR deve passar build/test
+no fim e ser deployável.
+
+#### PR 1 — Workers (mais isolados, menor risco)
+
+```
+src/workers/                  →  crates/<p>-worker-<nome>/
+                                 ├── Cargo.toml
+                                 └── src/main.rs       (era workers/<nome>.rs)
+```
+
+- Cada `tokio::spawn(worker_x)` que estava no `main.rs` da API vira um
+  **binário próprio**.
+- O API server **para de fazer `start_workers()`** — workers sobem como
+  processo independente.
+- `docker-compose.yml` ganha um `service` novo por worker, com `command:
+  ["./<p>-worker-<nome>"]`.
+- Em produção (k8s), cada worker vira um Deployment com seu próprio
+  scaling.
+
+#### PR 2 — Integrators (clientes externos)
+
+```
+src/integrators/{llm, neo4j, qdrant}.rs  →  crates/<p>-integrators/src/lib.rs
+```
+
+- Tudo que fala com o mundo externo (LLM, Neo4j, Qdrant, Stripe, Meta,
+  …) vira lib.
+- API e workers passam a importar via `<p>-integrators = { path = "../<p>-integrators" }`.
+- `<p>-integrators` NÃO depende de domain/services — é folha do grafo, só
+  conhece os tipos de request/response da API externa.
+
+#### PR 3 — Domain (entidades puras)
+
+```
+src/models/                              \
+src/dto/                                  →  crates/<p>-domain/src/lib.rs
+src/error.rs (parte que é DomainError)   /
+```
+
+- `<p>-domain` tem **dependências MÍNIMAS** no Cargo.toml: apenas `serde`,
+  `uuid`, `chrono`, `thiserror`. Nada de axum, sqlx, redis.
+- Force a regra fazendo `cargo build -p <p>-domain` falhar se alguém
+  importar HTTP/DB.
+- API, services, workers, integrators todos passam a usar
+  `<p>-domain = { path = "../<p>-domain" }` em vez de `crate::models::`.
+
+#### PR 4 — API e raiz do workspace
+
+```
+Cargo.toml (raiz)             →  vira [workspace] puro, sem [package]
+src/ (resto)                  →  crates/<p>-api/src/
+                                 ├── main.rs
+                                 ├── lib.rs
+                                 ├── handlers/
+                                 ├── routes.rs
+                                 └── middleware/
+```
+
+- `Cargo.toml` raiz só tem `[workspace]`, `[workspace.package]`,
+  `[workspace.dependencies]`, e `[profile.*]`.
+- API (binário principal) vai pra `crates/<p>-api/`.
+- Centralize todas as deps em `workspace.dependencies` — cada crate herda
+  com `<dep> = { workspace = true }`.
+
+### Validação após CADA PR
+
+```bash
+cargo build --workspace --all-targets
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+```
+
+Mais o smoke E2E do projeto (subir compose, hitar `/healthz`, login,
+operação CRUD básica). Se algum quebrar, o PR está incompleto.
+
+### Antipatterns ao migrar
+
+| Antipattern | Por que evitar |
+|-------------|----------------|
+| Big-bang (1 PR mexe em tudo) | Impossível revisar; impossível reverter; quebra histórico do git blame |
+| Crate `common` / `shared` / `utils` | Vira lixeira; ninguém sabe onde colocar; viola SRP |
+| Crate por arquivo (granularidade demais) | 50 crates de 100 linhas cada vai parar a build |
+| Refactor de lógica + migração no mesmo PR | Não dá pra revisar; bug fica escondido |
+| Mover testes em PR separado | Crate sem test em produção é bug em standby |
+| Não atualizar `xtask`/scripts CI | Pipeline quebra; deploy vira pesadelo |
+
+### Tradução de imports
+
+| Antes (single-crate) | Depois (workspace) |
+|----------------------|--------------------|
+| `use crate::models::User;` | `use <p>_domain::User;` |
+| `use crate::services::auth::login;` | `use <p>_services::auth::login;` |
+| `use crate::handlers::health::router;` | `use crate::handlers::health::router;` *(stay — está dentro do mesmo crate)* |
+| `use crate::integrators::llm::Gemini;` | `use <p>_integrators::llm::Gemini;` |
+
+Note os hifens viram underlines (Cargo names → Rust idents).
+
+---
+
+## Quando NÃO migrar
+
+- Projeto < 30 arquivos com 1 binário e 1 dev → single-crate é mais
+  simples, manutenção é trivial.
+- Você está no meio de um sprint crítico → migração é refactor estrutural,
+  não combina com prazo.
+- Não há sinais reais de dor (build < 5s, sem conflitos, sem segundo
+  binário planejado).
+
+A migração tem custo. Faça quando o ganho compensar.
+
+## Checklist final (qualquer cenário)
+
+- [ ] Critérios objetivos de decisão documentados no BLUEPRINT
+- [ ] Lista de crates com responsabilidade de cada um
+- [ ] Diagrama Mermaid do grafo de dependências
+- [ ] `Cargo.toml` workspace com `workspace.dependencies` centralizadas
+- [ ] `<p>-domain` sem dependência de framework HTTP/DB
+- [ ] Cada binário com `[[bin]]` e `path = "src/main.rs"` no seu Cargo.toml
+- [ ] Migração planejada em PRs incrementais, não big-bang
+- [ ] Ralph Loop verde após cada PR (`cargo build/test/clippy --workspace`)

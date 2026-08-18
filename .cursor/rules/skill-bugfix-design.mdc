@@ -1,0 +1,51 @@
+---
+description: Diagnostica bugs em projetos existentes e planeja correcoes cirurgicas usando o Metodo DARE. Ensina a IA a encontrar a causa raiz, avaliar riscos de regressao e planejar a correcao minima necessaria.
+globs: *
+---
+
+# Skill: Bugfix Design para Projetos Existentes
+
+## Objetivo
+Esta skill ensina você (a IA) a diagnosticar um bug relatado em um projeto existente, encontrar a **causa raiz** e planejar uma correção cirúrgica que resolva o problema sem introduzir novos erros.
+
+## Quando Usar
+- Quando o usuário relata um bug ou comportamento inesperado no sistema.
+- Quando o comando `/generate-bugfix-design` for invocado.
+
+## Como Diagnosticar o Bug
+
+O diagnóstico é a etapa mais crítica. Uma correção sem diagnóstico adequado apenas esconde o sintoma.
+
+**Entenda o Relato Completo:** Antes de analisar o código, entenda claramente qual é o comportamento atual vs o esperado. Se o usuário não forneceu um stack trace ou log, pergunte por ele.
+
+**Localize a Área Afetada:** Identifique os controllers, services, queries ou componentes que estão envolvidos no fluxo que apresenta o erro.
+
+**Encontre a Causa Raiz:** Não trate o sintoma. Descubra *por que* o erro acontece. As causas mais comuns são:
+
+| Tipo de Causa | Exemplos |
+|---------------|---------|
+| **Lógica de Negócio** | Condição incorreta, cálculo errado |
+| **Banco de Dados** | Query N+1, deadlock, dados inconsistentes |
+| **Validação** | Input não validado, tipo incorreto |
+| **Concorrência** | Race condition, falta de lock |
+| **Segurança** | Injeção de SQL, XSS, IDOR |
+
+## Como Gerar o Design do Bugfix
+
+O documento `DARE/DESIGN-Bugfix-[Nome].md` deve ser **cirúrgico e preciso**. Ele descreve o problema, a causa raiz e o plano de correção mínimo necessário.
+
+| Seção | Conteúdo |
+|-------|----------|
+| **Descrição** | Comportamento atual vs esperado |
+| **Causa Raiz** | Explicação técnica do porquê ocorre |
+| **Arquivos a Modificar** | Lista exata de arquivos que serão alterados |
+| **Riscos** | O que mais pode quebrar com a correção |
+| **Plano de Ação** | Passos cirúrgicos da correção |
+| **Testes** | Validation Gates + Testes de Regressão |
+
+## Regras de Ouro
+
+1. **Seja Cirúrgico:** A correção deve ser o menor código possível para resolver o problema sem efeitos colaterais.
+2. **Causa Raiz:** Nunca trate apenas o sintoma. Se a causa raiz não for corrigida, o bug voltará.
+3. **Evite Regressão:** Sempre mapeie os riscos da correção e planeje testes de regressão para eles.
+4. **Adicione Testes:** Se o bug ocorreu, é porque faltava um teste. A correção DEVE incluir um novo teste que falharia com o código antigo e passa com o novo código.

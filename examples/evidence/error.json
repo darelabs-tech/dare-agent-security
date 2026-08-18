@@ -1,0 +1,68 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/evidence",
+    "version": "1.0.0"
+  },
+  "id": "urn:uuid:00000000-0000-4000-8000-000000000104",
+  "vector": {
+    "id": "SYNTHETIC-GENERIC-PERMIT-001",
+    "version": "1.0.0",
+    "name": "synthetic permit integrity"
+  },
+  "target": {
+    "type": "synthetic-service",
+    "id": "synthetic-payment-mcp",
+    "name": "synthetic payment lab"
+  },
+  "preconditions": [
+    {
+      "id": "pre-1",
+      "description": "synthetic lab is isolated",
+      "satisfied": true
+    }
+  ],
+  "operation": {
+    "kind": "authorization.check",
+    "name": "transfer",
+    "resource": "payments"
+  },
+  "authorization_context": {
+    "principal_id": "principal-synthetic-001",
+    "agent_id": "agent-synthetic-001",
+    "authn_method": "mtls",
+    "policy_id": "policy-synthetic-001",
+    "policy_version": "1.0.0"
+  },
+  "expected": {
+    "description": "transfer must be denied"
+  },
+  "observed": {
+    "description": "synthetic lab collector timed out before an authorization decision was recorded",
+    "source": "FIXTURE"
+  },
+  "verdict": "ERROR",
+  "standards": [
+    {
+      "organization": "Example",
+      "standard": "Synthetic Controls",
+      "version": "1",
+      "control": "SC-01"
+    }
+  ],
+  "hashes": [
+    {
+      "algorithm": "sha256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE_REQUIRED",
+    "fields": []
+  },
+  "timestamps": {
+    "started_at": "2026-01-15T10:00:00Z",
+    "observed_at": "2026-01-15T10:00:01Z",
+    "recorded_at": "2026-01-15T10:00:02Z"
+  }
+}

@@ -1,0 +1,63 @@
+---
+description: Camada semântica da extração de DNA do projeto. Roda depois do comando `dare dna` e transforma os fatos de convenção em regras acionáveis no DARE/PROJECT-DNA.md, para o agente seguir o padrão da casa em projetos legados.
+globs: DARE/PROJECT-DNA.md,DARE/dna-facts.json
+alwaysApply: false
+---
+
+# Skill: DNA — Convenções do Projeto (brownfield)
+
+Camada **semântica** da extração de DNA. Roda **depois** do comando `dare dna`, que já varreu o código
+e extraiu os fatos de convenção. Sua função é **transformar fatos em regras acionáveis** — o "como esse
+codebase faz as coisas" que uma nova feature deve respeitar.
+
+> Pré-requisito: rodar `dare dna` antes (gera `DARE/PROJECT-DNA.md` e `DARE/dna-facts.json`).
+> Se não existirem, peça para rodar `dare dna` primeiro.
+
+## Quando usar
+
+- Projeto **legado** que vai adotar o DARE para novas features, sem reescrever o existente.
+- Acabou de rodar `dare dna` e o `PROJECT-DNA.md` tem seções `<!-- AGENT -->` em aberto.
+
+## O que fazer
+
+### 1. Carregar os fatos (não re-varrer tudo)
+- Leia `DARE/dna-facts.json` — fonte determinística (tooling, naming, camadas, testes, libs, commits).
+- Abra **2-5 arquivos representativos por camada** (controller, service, model, teste) para inferir o
+  que o CLI não detecta (tratamento de erro, validação, estilo de teste).
+
+### 2. Preencher `DARE/PROJECT-DNA.md`
+Substitua cada `<!-- AGENT: ... -->`:
+- **Convenções de Nomenclatura** — confirme o estilo + exceções.
+- **Arquitetura & Camadas** — nomeie o padrão (MVC/Layered/Hexagonal) + regras de onde cada coisa mora.
+- **Padrões de Teste** — onde ficam, naming, assertions reais, mocks/fixtures.
+- **Tratamento de Erros & Validação** — como erros são tratados e inputs validados (exemplos reais).
+- **Regras de Ouro** — o que SEMPRE e NUNCA fazer neste codebase.
+- **⚠️ Incertezas** — convenções ambíguas que o humano precisa decidir.
+
+**Não toque** nos fatos determinísticos do CLI (tooling, tabela de naming, libs).
+
+### 3. Apresentar ao usuário
+Resumo: arquitetura nomeada, regras de ouro, inconsistências. O `PROJECT-DNA.md` vira referência para
+`skill-feature-design` e `skill-execute` respeitarem o legado.
+
+## Regras de ouro
+
+1. **Descritivo, não aspiracional** — como o código É, não como deveria ser.
+2. **Exemplos reais** — cite arquivos/trechos do projeto.
+3. **Sinalize inconsistência** — não invente um padrão único onde o legado mistura.
+4. **Não re-varra** — os fatos já estão em `dna-facts.json`.
+5. **Preserve o determinístico** — não reescreva tooling/naming/libs do CLI.
+
+## Antipatterns
+
+| AP | Antipattern | Por quê |
+|---|---|---|
+| AP-01 | Documentar o padrão "ideal" em vez do real | Código gerado sai fora do estilo do legado |
+| AP-02 | Forçar padrão único onde o legado é inconsistente | Esconde a realidade |
+| AP-03 | Reescrever os fatos determinísticos do CLI | Quebra a fonte de verdade |
+| AP-04 | Regras vagas ("siga boas práticas") | Inúteis — o valor está no específico |
+| AP-05 | Ignorar os testes existentes | Nova feature nasce inconsistente |
+
+---
+
+Skill MIT — parte do DARE Method. DNA do projeto (brownfield). Pareia com o comando `dare dna`.

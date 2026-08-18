@@ -1,0 +1,29 @@
+flowchart TD
+    T001[task-001<br/>Bootstrap Rust workspace and evidence crate]
+    T002[task-002<br/>Canonical evidence types and wire enums]
+    T003[task-003<br/>JSON Schema v1]
+    T004[task-004<br/>Versioning and semantic validation]
+    T005[task-005<br/>Redaction safety and secret-safe errors]
+    T006[task-006<br/>Outcome comparison and verdict consistency]
+    T007[task-007<br/>Synthetic verdict fixtures]
+    T008[task-008<br/>Contract and negative security tests]
+    T009[task-009<br/>CI gates and documentation]
+    T010[task-010<br/>End-to-end cycle proof]
+
+    T001 --> T002
+    T002 --> T003
+    T002 --> T004
+    T002 --> T005
+    T002 --> T006
+    T004 --> T006
+    T003 --> T007
+    T004 --> T007
+    T005 --> T007
+    T006 --> T007
+    T003 --> T008
+    T004 --> T008
+    T005 --> T008
+    T006 --> T008
+    T007 --> T008
+    T008 --> T009
+    T009 --> T010

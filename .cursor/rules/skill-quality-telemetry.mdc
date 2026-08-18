@@ -1,0 +1,248 @@
+---
+description: Coleta de métricas de qualidade e detecção de regressões em projetos DARE. Agrega métricas das skills filhas (dare-ax, dare-layered-design, etc.), persiste histórico em tmp/dare_metrics.json e detecta regressões contra baseline.
+globs: dare.config.yml,tmp/dare_metrics*.json,.github/workflows/dare-metrics.yml
+alwaysApply: false
+---
+
+# Skill: Quality Telemetry DARE
+
+Você é um engenheiro de plataforma especialista em observabilidade de qualidade. Esta skill agrega as métricas de todas as skills DARE aplicadas no projeto (ax, layered-design, llm-integration, frontend-design, realtime) e detecta regressões.
+
+## O que essa skill faz
+
+1. **Coleta** — roda collectors de cada skill filha em paralelo
+2. **Agrega** — junta tudo em um snapshot estruturado
+3. **Persiste** — `tmp/dare_metrics.json` (append-only)
+4. **Compara** — diff contra `tmp/dare_metrics_baseline.json`
+5. **Reporta** — markdown report no CI ou stdout
+6. **Bloqueia** — exit code ≠ 0 se regressão crítica detectada
+
+---
+
+## Arquitetura
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  collect.ts (orquestrador)                                  │
+└────────────────────────────────────────────────────────────┘
+              ↓ paralelo
+┌───────────────┬──────────────┬──────────────┬──────────────┐
+│ ax collector  │ layered      │ llm          │ realtime …   │
+└───────────────┴──────────────┴──────────────┴──────────────┘
+              ↓
+┌────────────────────────────────────────────────────────────┐
+│  Aggregator → snapshot { skill: { M-01: value, status } }   │
+└────────────────────────────────────────────────────────────┘
+              ↓
+┌────────────────────────────────────────────────────────────┐
+│  tmp/dare_metrics.json (append) + Regression detector       │
+└────────────────────────────────────────────────────────────┘
+              ↓
+┌────────────────────────────────────────────────────────────┐
+│  Reporter → markdown / JSON / GH Actions step summary       │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Métricas (da própria skill)
+
+| ID | Métrica | Como medir |
+|---|---|---|
+| M-01 | 100% dos builds incluem coleta | skill instalada = sempre true |
+| M-02 | 0 regressões passam despercebidas | `test -f tmp/dare_metrics_baseline.json` |
+| M-03 | Histórico mantido | `test -f tmp/dare_metrics.json` e tem N entradas |
+| M-04 | Workflow GH Actions existe | `test -f .github/workflows/dare-metrics.yml` |
+
+---
+
+## Configuração `dare.config.yml`
+
+```yaml
+telemetry:
+  skills:
+    - dare-ax
+    - dare-layered-design
+    - dare-llm-integration
+    - dare-frontend-design
+    - dare-realtime
+  output: tmp/dare_metrics.json
+  baseline: tmp/dare_metrics_baseline.json
+  fail_on_regression: true
+  regression_threshold_critical: 0.05  # ≥5% queda = CRITICAL
+  regression_threshold_warning: 0.01   # ≥1% queda = WARNING
+```
+
+---
+
+## Schema do snapshot
+
+```json
+{
+  "timestamp": "2026-05-26T10:30:00Z",
+  "commit": "1d4a1417",
+  "branch": "main",
+  "skills": {
+    "dare-ax": {
+      "M-01": { "value": 1.0, "status": "PASS", "details": "llms.txt válido" },
+      "M-02": { "value": 1.0, "status": "PASS" },
+      "M-03": { "value": 1.0, "status": "PASS" },
+      "M-04": { "value": 1.0, "status": "PASS" }
+    },
+    "dare-layered-design": {
+      "M-01": { "value": 0.95, "status": "PASS", "details": "19/20 services com teste" },
+      "M-02": { "value": 1.0, "status": "PASS" },
+      "M-03": { "value": 1.0, "status": "PASS" },
+      "M-04": { "value": 1.0, "status": "PASS" }
+    }
+  },
+  "summary": {
+    "totalMetrics": 24,
+    "passing": 23,
+    "failing": 1,
+    "warningRegressions": 0,
+    "criticalRegressions": 0
+  }
+}
+```
+
+---
+
+## Detecção de regressão
+
+Para cada métrica, comparar valor atual com `baseline`:
+
+| Mudança | Severidade | Ação |
+|---|---|---|
+| value caiu ≥ 5% | CRITICAL | exit 1 — bloqueia PR |
+| value caiu ≥ 1% e < 5% | WARNING | comentar no PR — não bloqueia |
+| value subiu | INFO | celebrar no report |
+| value igual | NEUTRAL | nenhuma |
+
+Configurar thresholds em `dare.config.yml`.
+
+---
+
+## Workflow GitHub Actions
+
+```yaml
+# .github/workflows/dare-metrics.yml
+name: DARE Metrics
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: pnpm install --frozen-lockfile
+      - name: Collect DARE metrics
+        run: pnpm dare metrics collect
+      - name: Compare against baseline
+        run: pnpm dare metrics compare
+        # exit 1 se regressão CRITICAL
+      - name: Upload metrics artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dare-metrics-${{ github.sha }}
+          path: tmp/dare_metrics*.json
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        run: pnpm dare metrics report --markdown >> $GITHUB_STEP_SUMMARY
+```
+
+---
+
+## Antipatterns
+
+| AP | Antipattern | Por que evitar |
+|---|---|---|
+| AP-01 | Coletar sem baseline | Não dá pra detectar regressão |
+| AP-02 | Histórico não versionado | Perde contexto histórico |
+| AP-03 | Coletar mas não bloquear | CI vira teatro |
+| AP-04 | Baseline desatualizado | Regressão real fica invisível |
+| AP-05 | Métricas opacas (sem `details`) | Difícil debugar quando falha |
+
+---
+
+## Custom collectors
+
+Para métricas específicas do projeto (cobertura, build time, lighthouse score, etc.), criar collector custom:
+
+```typescript
+// src/telemetry/coverage_collector.ts
+export const coverageCollector: DareCollector = {
+  name: 'project-coverage',
+  async collect() {
+    const cov = await readCoverageReport('coverage/coverage-summary.json');
+    return {
+      'CV-01': { value: cov.lines.pct / 100, status: cov.lines.pct > 80 ? 'PASS' : 'FAIL' },
+      'CV-02': { value: cov.branches.pct / 100, status: cov.branches.pct > 70 ? 'PASS' : 'FAIL' },
+    };
+  },
+};
+```
+
+Registrar em `dare.config.yml`:
+```yaml
+telemetry:
+  customCollectors:
+    - src/telemetry/coverage_collector.ts
+```
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+- Documentar quais métricas serão coletadas
+- Definir baselines de qualidade (cobertura ≥ X%, etc.)
+
+### Blueprint
+- Decidir frequência de baseline update (por release? por sprint?)
+- Thresholds CRITICAL e WARNING
+
+### Tasks
+- Task: instalar `@dare/quality-telemetry`
+- Task: configurar `dare.config.yml`
+- Task: rodar primeira coleta e capturar baseline
+- Task: adicionar workflow CI
+
+### Execute
+- Em cada PR, CI roda coleta + compare
+- Regressão CRITICAL = bloqueia merge
+- Regressão WARNING = comenta no PR
+
+---
+
+## Boas práticas
+
+1. **Baseline por release**, não por commit — evita "shift baseline" silencioso
+2. **Regressão = bloqueio**, não comentário ignorável
+3. **Exportar para Datadog/Grafana** após N coletas — visualizar tendência
+4. **Collectors paralelos** — total deve rodar em < 60s
+5. **Métricas com `details`** — quando falhar, fácil de debugar
+
+---
+
+## Checklist final
+
+- [ ] `@dare/quality-telemetry` instalada
+- [ ] `dare.config.yml` lista as skills a rastrear
+- [ ] Primeira coleta gerou `tmp/dare_metrics.json`
+- [ ] Baseline capturado em `tmp/dare_metrics_baseline.json`
+- [ ] Workflow `.github/workflows/dare-metrics.yml` existe
+- [ ] Thresholds CRITICAL/WARNING definidos
+- [ ] `fail_on_regression: true` em produção
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

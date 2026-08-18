@@ -1,0 +1,371 @@
+---
+description: Padrões DARE para APIs REST em Go + Gin (ou stdlib net/http) + sqlc + PostgreSQL. Handlers, services, repositories, middleware, validação via binding tags, JWT, rate limit, swag OpenAPI, testify + httptest.
+globs: **/*.go,go.mod,go.sum,sqlc.yaml,db/queries/*.sql
+alwaysApply: false
+---
+
+# Skill: Go/Gin API DARE
+
+Você é um desenvolvedor sênior Go especialista em APIs REST. Esta skill garante código **idiomático Go, com erros tipados, contexto sempre propagado, queries seguras via sqlc**, seguindo Layered Design DARE.
+
+## Stack canônica
+
+- **Go 1.22+** (`slog`, `errors.Is/As`, generics)
+- **Gin** (preferido) ou **stdlib net/http** (Go 1.22+ roteamento OK)
+- **sqlc** para queries seguras (gera código tipado de SQL)
+- **pgx v5** como driver Postgres
+- **go-playground/validator** (via Gin binding tags)
+- **golang-jwt/jwt v5**
+- **swaggo/swag** para OpenAPI
+- **testify** + **httptest**
+- **golangci-lint** + **govulncheck**
+
+---
+
+## Estrutura
+
+```
+.
+├── cmd/server/main.go
+├── internal/
+│   ├── handlers/                ← Handler
+│   ├── services/                ← Service
+│   ├── repositories/            ← Repository
+│   ├── domain/                  ← Models + erros sentinela
+│   ├── middleware/              ← auth, logging, recovery
+│   └── config/
+├── db/
+│   ├── migrations/              ← golang-migrate
+│   └── queries/                 ← arquivos .sql para sqlc
+├── sqlc.yaml
+└── docs/                        ← gerado pelo swag
+```
+
+---
+
+## Handlers
+
+```go
+package handlers
+
+import (
+    "errors"
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "myapp/internal/domain"
+    "myapp/internal/services"
+)
+
+type UserHandler struct {
+    register *services.RegisterUser
+}
+
+func NewUserHandler(r *services.RegisterUser) *UserHandler {
+    return &UserHandler{register: r}
+}
+
+// @Summary Create user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param user body CreateUserDTO true "user payload"
+// @Success 201 {object} UserResponse
+// @Failure 409
+// @Router /users [post]
+func (h *UserHandler) Create(c *gin.Context) {
+    var dto CreateUserDTO
+    if err := c.ShouldBindJSON(&dto); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    user, err := h.register.Execute(c.Request.Context(), dto.ToService())
+    if err != nil {
+        if errors.Is(err, domain.ErrUserAlreadyExists) {
+            c.JSON(http.StatusConflict, gin.H{"error": "USER_EXISTS"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "INTERNAL"})
+        return
+    }
+    c.JSON(http.StatusCreated, ToUserResponse(user))
+}
+```
+
+---
+
+## DTOs (binding tags)
+
+```go
+type CreateUserDTO struct {
+    Email    string `json:"email" binding:"required,email"`
+    Name     string `json:"name" binding:"required,min=1,max=255"`
+    Password string `json:"password" binding:"required,min=12"`
+}
+
+func (d CreateUserDTO) ToService() services.RegisterUserInput {
+    return services.RegisterUserInput{Email: d.Email, Name: d.Name, Password: d.Password}
+}
+
+type UserResponse struct {
+    ID        int64     `json:"id"`
+    Email     string    `json:"email"`
+    Name      string    `json:"name"`
+    CreatedAt time.Time `json:"createdAt"`
+}
+```
+
+---
+
+## Services
+
+```go
+type RegisterUser struct {
+    repo *repositories.UserRepository
+}
+
+type RegisterUserInput struct {
+    Email, Name, Password string
+}
+
+func (s *RegisterUser) Execute(ctx context.Context, in RegisterUserInput) (*domain.User, error) {
+    exists, err := s.repo.ExistsByEmail(ctx, in.Email)
+    if err != nil { return nil, err }
+    if exists { return nil, domain.ErrUserAlreadyExists }
+    return s.repo.Create(ctx, repositories.CreateUserParams{
+        Email: in.Email,
+        Name:  in.Name,
+        PasswordHash: hashPassword(in.Password),
+    })
+}
+```
+
+---
+
+## Repositories (sqlc)
+
+```sql
+-- db/queries/users.sql
+-- name: ExistsUserByEmail :one
+SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);
+
+-- name: CreateUser :one
+INSERT INTO users (email, name, password_hash)
+VALUES ($1, $2, $3)
+RETURNING id, email, name, created_at;
+```
+
+```go
+type UserRepository struct {
+    q *sqlc.Queries
+}
+
+func (r *UserRepository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
+    return r.q.ExistsUserByEmail(ctx, email)
+}
+```
+
+---
+
+## Domain
+
+```go
+package domain
+
+import (
+    "errors"
+    "time"
+)
+
+var (
+    ErrUserAlreadyExists = errors.New("user already exists")
+    ErrUserNotFound      = errors.New("user not found")
+)
+
+type User struct {
+    ID        int64
+    Email     string
+    Name      string
+    CreatedAt time.Time
+}
+```
+
+---
+
+## Middleware (JWT)
+
+```go
+func AuthRequired(secret []byte) gin.HandlerFunc {
+    return func(c *gin.Context) {
+        tokenStr := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+        token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (any, error) { return secret, nil })
+        if err != nil || !token.Valid {
+            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+            return
+        }
+        c.Set("user_id", token.Claims.(jwt.MapClaims)["sub"])
+        c.Next()
+    }
+}
+```
+
+---
+
+## Rate limiting
+
+```go
+import "github.com/gin-contrib/limit"
+
+router.Use(limit.MaxAllowed(20))   // global
+login := router.Group("/auth").Use(myRateLimiter("5/15m"))
+login.POST("/login", authHandler.Login)
+```
+
+---
+
+## OpenAPI (swag)
+
+```bash
+swag init -g cmd/server/main.go -o docs
+```
+
+```go
+// cmd/server/main.go
+// @title Projeto API
+// @version 1.0
+import _ "myapp/docs"
+import (
+    ginSwagger "github.com/swaggo/gin-swagger"
+    swaggerFiles "github.com/swaggo/files"
+)
+
+router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+router.GET("/openapi.json", func(c *gin.Context) {
+    c.File("docs/swagger.json")
+})
+```
+
+---
+
+## Config (env)
+
+```go
+type Config struct {
+    DatabaseURL string
+    JWTSecret   []byte
+}
+
+func Load() (*Config, error) {
+    return &Config{
+        DatabaseURL: os.Getenv("DATABASE_URL"),
+        JWTSecret:   []byte(os.Getenv("JWT_SECRET")),
+    }, nil
+}
+```
+
+---
+
+## Testes
+
+```go
+// Service unit
+func TestRegisterUser_DuplicateEmail(t *testing.T) {
+    repo := &mocks.UserRepository{}
+    repo.On("ExistsByEmail", mock.Anything, "jane@example.com").Return(true, nil)
+    svc := services.NewRegisterUser(repo)
+    _, err := svc.Execute(ctx, services.RegisterUserInput{Email: "jane@example.com"})
+    assert.ErrorIs(t, err, domain.ErrUserAlreadyExists)
+}
+
+// Handler via httptest
+func TestUserHandler_Create(t *testing.T) {
+    r := gin.New()
+    r.POST("/users", h.Create)
+    body := `{"email":"jane@example.com","name":"Jane","password":"longsecret123"}`
+    req := httptest.NewRequest("POST", "/users", strings.NewReader(body))
+    req.Header.Set("Content-Type", "application/json")
+    w := httptest.NewRecorder()
+    r.ServeHTTP(w, req)
+    assert.Equal(t, http.StatusCreated, w.Code)
+}
+```
+
+---
+
+## Antipatterns
+
+| AP | Antipattern | Correção |
+|---|---|---|
+| AP-01 | `database/sql` no handler | Repository + sqlc |
+| AP-02 | Validação manual | `binding:` tags + validator |
+| AP-03 | Lógica no handler | Service |
+| AP-04 | Retornar `db.User` direto | `UserResponse` DTO |
+| AP-05 | Secret hardcoded | `os.Getenv` ou viper |
+| AP-06 | Sem rate limit em login | middleware |
+| AP-07 | `panic` em handler | recovery middleware |
+| AP-08 | Context não propagado | sempre `ctx context.Context` |
+| AP-09 | SQL com `fmt.Sprintf` | sqlc / parametrizado |
+| AP-10 | `errors.New` espalhado | sentinela em `domain/errors.go` |
+
+---
+
+## Segurança
+
+- Senhas: `argon2.IDKey` (`golang.org/x/crypto/argon2`)
+- JWT: HS256 secret ≥ 32 bytes, ou RS256 par de chaves
+- Headers: `secure` middleware
+- CORS: `github.com/gin-contrib/cors` com origens específicas
+- Rate limit em login (5/15min)
+
+---
+
+## CI
+
+```bash
+go vet ./...
+golangci-lint run
+go test ./... -race -cover
+govulncheck ./...
+```
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+- Endpoints REST com método/path/auth
+- Schemas de input/output
+- Erros sentinela esperados
+
+### Blueprint
+- Estrutura `internal/{handlers,services,repositories,domain}`
+- `sqlc.yaml` configurado
+- Migrations `golang-migrate`
+
+### Tasks
+- Por feature: 5 tasks (Migration, sqlc query, Repository, Service, Handler+DTO)
+- Task de configuração middleware + swag + golangci-lint
+
+### Execute
+- Ralph Loop:
+  ```bash
+  go vet ./... && golangci-lint run && go test ./... -race && govulncheck ./...
+  ```
+
+---
+
+## Checklist final
+
+- [ ] Go 1.22+, golangci-lint configurado
+- [ ] sqlc gerando queries a partir de SQL
+- [ ] Handlers magros (apenas bind + chamada Service)
+- [ ] Services com `ctx context.Context` como 1º param
+- [ ] Erros sentinela em `domain/errors.go`
+- [ ] DTOs com `binding:` tags
+- [ ] JWT secret via env
+- [ ] Rate limit em login
+- [ ] OpenAPI gerado em `docs/swagger.json`
+- [ ] Cobertura ≥ 70%
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

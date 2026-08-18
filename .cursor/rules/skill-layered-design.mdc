@@ -1,0 +1,266 @@
+---
+description: Layered Design — enforce arquitetura estrita Handler→Service→Repository→Model em todos os projetos DARE, independente de linguagem. Inspirado em "Layered Design for Ruby on Rails Applications" de Vladimir Dementyev (Evil Martians).
+globs: **/*.rb,**/*.php,**/*.py,**/*.ts,**/*.tsx,**/*.js,**/*.rs,**/*.go,DARE/BLUEPRINT.md,DARE/DESIGN.md
+alwaysApply: false
+---
+
+# Skill: Layered Design DARE
+
+Você é um arquiteto de software especialista em **Layered Design**. Esta skill define o pipeline canônico DARE — **Handler → Service → Repository → Model** — e o aplica de forma agnóstica à linguagem.
+
+## Por que Layered Design
+
+Em projetos legados, o problema **#1** não é falta de testes — é mistura de camadas. Controller com SQL, Service que retorna `Response`, Model que dispara email. Resultado: nada é testável sem subir o framework inteiro.
+
+A solução é tornar **cada camada uma fronteira intransponível**, com responsabilidades claras e lint que falha o CI se alguém pular um nível.
+
+---
+
+## As 4 camadas
+
+```
+┌────────────────────────────────────────────┐
+│  Handler  (HTTP, gRPC, CLI, queue worker)  │  ← entrada
+└────────────────────────────────────────────┘
+                  ↓ chama
+┌────────────────────────────────────────────┐
+│  Service  (1 operação de negócio)          │  ← coração
+└────────────────────────────────────────────┘
+                  ↓ usa
+┌────────────────────────────────────────────┐
+│  Repository  (acesso a dados)              │  ← I/O
+└────────────────────────────────────────────┘
+                  ↓ retorna
+┌────────────────────────────────────────────┐
+│  Model  (entidade do domínio)              │  ← núcleo
+└────────────────────────────────────────────┘
+```
+
+### Handler — responsabilidades
+
+| Faz | Não faz |
+|---|---|
+| Recebe request (HTTP/gRPC/CLI/queue) | Acessa Repository direto |
+| Valida input (FormRequest/Pydantic/Zod/serde) | Contém lógica de negócio |
+| Chama **um** Service | Faz SQL ou query inline |
+| Formata e retorna response | Instancia Service com `new` (use injeção) |
+
+### Service — responsabilidades
+
+| Faz | Não faz |
+|---|---|
+| Implementa **uma** operação (`RegisterUser`) | Conhece HTTP (status, headers) |
+| Orquestra Repositories | Conhece framework web |
+| Valida regras de negócio | Faz SQL inline |
+| Lança exceções de domínio (`UserAlreadyExists`) | É uma God Class com 30 métodos |
+
+### Repository — responsabilidades
+
+| Faz | Não faz |
+|---|---|
+| Abstrai persistência (DB, cache, API externa) | Retorna HTTP status code |
+| Retorna Model ou primitivo | Lança exceções de domínio (retorna `Option`/`null`) |
+| Esconde SQL/HTTP externo | Contém regra de negócio |
+
+### Model — responsabilidades
+
+| Faz | Não faz |
+|---|---|
+| Representa entidade do domínio | Conhece HTTP/DB/framework |
+| Carrega invariantes (`Email` válido, `Money` ≥ 0) | Importa de Service/Repository/Handler |
+
+---
+
+## Métricas (todas verificáveis em CI)
+
+| ID | Métrica | Como medir |
+|---|---|---|
+| M-01 | 100% dos Services têm teste unitário (sem DB/HTTP real) | linter checa diretório `tests/services/` |
+| M-02 | 0% de chamadas Handler→Repository diretas | grep AST nos controllers |
+| M-03 | 100% dos Handlers usam injeção (sem `new Service()` inline) | grep nos controllers |
+| M-04 | 100% dos Repositories são agnósticos (não retornam HTTP status) | grep nos repositories |
+
+---
+
+## Antipatterns (CI falha se aparecer)
+
+| AP | Antipattern | Sinal | Correção |
+|---|---|---|---|
+| AP-01 | Handler→Repository direto | `controller.repo.find()` | Criar Service entre eles |
+| AP-02 | Service com SQL inline | `db.query("SELECT…")` em Service | Mover para Repository |
+| AP-03 | Repository lança exceção de domínio | `throw UserNotFound` em Repo | Retornar `null`/`Option`/`Maybe` |
+| AP-04 | Model importa Service | `Model.payment_service` | Refatorar — Service usa Model, não o inverso |
+| AP-05 | God Service (>20 métodos) | `UserService` com tudo | Quebrar em `RegisterUser`, `ResetPassword`, … |
+| AP-06 | Fat Controller (>100 linhas) | controller monstro | Mover lógica para Service |
+
+---
+
+## Tradução por linguagem/framework
+
+| Camada DARE | Laravel | NestJS | FastAPI | Rails | Rust/Axum | Go/Gin |
+|---|---|---|---|---|---|---|
+| Handler | `Http/Controllers/` | `*.controller.ts` | `routers/*.py` | `app/controllers/` | `handlers/*.rs` | `handlers/*.go` |
+| Service | `Services/` | `*.service.ts` | `services/*.py` | `app/services/` | `services/*.rs` | `services/*.go` |
+| Repository | `Repositories/` | `*.repository.ts` | `repositories/*.py` | `app/repositories/` | `repositories/*.rs` | `repositories/*.go` |
+| Model | `Models/` | `entities/*.ts` | `models/*.py` | `app/models/` | `domain/*.rs` | `models/*.go` |
+| Presenter (opcional) | `Resources/` | `dto/` | `schemas/` | `app/serializers/` | `presenters/*.rs` | `dto/*.go` |
+
+---
+
+## Exemplos por stack
+
+### Laravel
+
+```php
+// Handler
+class UserController {
+    public function __construct(private RegisterUser $service) {}
+
+    public function store(StoreUserRequest $req) {
+        $user = $this->service->execute($req->validated());
+        return new UserResource($user);
+    }
+}
+
+// Service
+class RegisterUser {
+    public function __construct(private UserRepository $repo) {}
+    public function execute(array $data): User {
+        if ($this->repo->existsByEmail($data['email'])) {
+            throw new UserAlreadyExistsException();
+        }
+        return $this->repo->create($data);
+    }
+}
+
+// Repository
+class UserRepository {
+    public function existsByEmail(string $email): bool { ... }
+    public function create(array $data): User { ... }
+}
+```
+
+### NestJS
+
+```typescript
+@Controller('users')
+export class UsersController {
+  constructor(private register: RegisterUser) {}
+
+  @Post()
+  async store(@Body() dto: CreateUserDto) {
+    return this.register.execute(dto);
+  }
+}
+
+@Injectable()
+export class RegisterUser {
+  constructor(private repo: UserRepository) {}
+
+  async execute(dto: CreateUserDto): Promise<User> {
+    if (await this.repo.existsByEmail(dto.email)) {
+      throw new UserAlreadyExistsError();
+    }
+    return this.repo.create(dto);
+  }
+}
+```
+
+### FastAPI
+
+```python
+# Handler
+@router.post("/users")
+async def store(payload: UserIn, service: RegisterUser = Depends()):
+    return await service.execute(payload)
+
+# Service
+class RegisterUser:
+    def __init__(self, repo: UserRepository = Depends()):
+        self.repo = repo
+    async def execute(self, payload: UserIn) -> User:
+        if await self.repo.exists_by_email(payload.email):
+            raise UserAlreadyExistsError()
+        return await self.repo.create(payload)
+```
+
+### Rust/Axum
+
+```rust
+// Handler
+async fn create_user(
+    State(svc): State<Arc<RegisterUser>>,
+    Json(input): Json<CreateUser>,
+) -> Result<Json<User>, AppError> {
+    let user = svc.execute(input).await?;
+    Ok(Json(user))
+}
+
+// Service
+pub struct RegisterUser {
+    repo: Arc<dyn UserRepository>,
+}
+impl RegisterUser {
+    pub async fn execute(&self, input: CreateUser) -> Result<User, DomainError> {
+        if self.repo.exists_by_email(&input.email).await? {
+            return Err(DomainError::UserAlreadyExists);
+        }
+        self.repo.create(input).await
+    }
+}
+```
+
+---
+
+## Cobertura de testes
+
+**Service = teste unitário rápido (mock do Repository):**
+
+```typescript
+describe('RegisterUser', () => {
+  it('falha se email já existe', async () => {
+    const repo = { existsByEmail: jest.fn().mockResolvedValue(true) };
+    const sut = new RegisterUser(repo as any);
+    await expect(sut.execute({email: 'x@y.com'})).rejects.toThrow();
+  });
+});
+```
+
+**Repository = teste de integração (subir Postgres real ou usar testcontainers).**
+
+**Handler = teste E2E HTTP (`supertest`, `httpx`, `reqwest`).**
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+
+DESIGN.md deve listar bounded contexts → cada um vira pasta de Services.
+
+### Blueprint
+
+BLUEPRINT.md deve ter diagrama das camadas com setas explícitas (Handler→Service→Repository→Model).
+
+### Tasks
+
+Cada feature gera 4 tasks mínimas: criar Model, criar Repository, criar Service (com teste unitário), criar Handler.
+
+### Execute
+
+Ralph Loop falha se grep detectar AP-01 a AP-06.
+
+---
+
+## Checklist final
+
+- [ ] Pastas mapeadas para as 4 camadas
+- [ ] Lint AP-01 a AP-06 no CI
+- [ ] Services 100% testados unitariamente (sem DB)
+- [ ] Repositories testados via integração (testcontainers)
+- [ ] Handlers magros (< 50 linhas)
+- [ ] Models sem dependência de framework
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

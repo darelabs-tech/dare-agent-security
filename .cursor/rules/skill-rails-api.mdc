@@ -1,0 +1,400 @@
+---
+description: Padrões DARE para APIs em Ruby on Rails 8 — API mode, ActiveRecord, Solid Queue, Solid Cable, Action Cable, strong parameters, services, serializers (Blueprinter/Alba), Devise/JWT, rack-attack, rswag/grape-swagger.
+globs: **/*.rb,Gemfile,Gemfile.lock,config/**/*.rb,db/**/*.rb,spec/**/*.rb,app/**/*.rb
+alwaysApply: false
+---
+
+# Skill: Rails 8 API DARE
+
+Você é um desenvolvedor sênior Ruby on Rails 8.x especializado em APIs. Esta skill garante código **idiomático Rails, com Layered Design, Solid Queue/Cable, serializers explícitos e auth/autz robustos**.
+
+## Stack canônica
+
+- **Ruby 3.3+**
+- **Rails 8.x** modo API (`rails new --api`)
+- **PostgreSQL 16**
+- **Solid Queue** — substitui Sidekiq, built-in Rails 8
+- **Solid Cable** — substitui Redis para Action Cable, built-in Rails 8
+- **Devise + devise-jwt** ou JWT puro
+- **Pundit** ou **CanCanCan**
+- **Blueprinter** ou **Alba** para serializers
+- **rack-attack** para rate limit
+- **rswag** para OpenAPI/Swagger
+- **RSpec + FactoryBot + Faker**
+- **Rubocop + rubocop-rails-omakase** (estilo oficial)
+- **bundler-audit**
+
+---
+
+## Layered Design em Rails
+
+| Camada DARE | Pasta Rails |
+|---|---|
+| Handler | `app/controllers/api/v1/` |
+| Service | `app/services/` (ou `app/interactors/`) |
+| Repository | `app/repositories/` (opcional em Rails) |
+| Model | `app/models/` |
+| Presenter | `app/blueprints/` ou `app/serializers/` |
+
+> Em Rails 8 API, Repositories são opcionais — ActiveRecord queries dentro de Services bem encapsulados é aceito.
+
+---
+
+## Controllers
+
+```ruby
+module Api
+  module V1
+    class UsersController < ApplicationController
+      before_action :authenticate_user!
+
+      def create
+        result = RegisterUser.new(user_params).call
+        if result.success?
+          render json: UserBlueprint.render(result.user), status: :created
+        else
+          render json: { error: result.error_code }, status: :conflict
+        end
+      end
+
+      private
+
+      def user_params
+        params.require(:user).permit(:email, :name, :password)
+      end
+    end
+  end
+end
+```
+
+Regras:
+- Apenas: autenticar → strong params → chamar Service → renderizar Blueprint
+- NUNCA: query AR no controller, lógica de negócio
+
+---
+
+## Services (Service Object)
+
+```ruby
+class RegisterUser
+  Result = Struct.new(:success?, :user, :error_code, keyword_init: true)
+
+  def initialize(params)
+    @params = params
+  end
+
+  def call
+    return Result.new(success?: false, error_code: 'USER_EXISTS') if User.exists?(email: @params[:email])
+    user = User.create!(@params)
+    Result.new(success?: true, user: user)
+  end
+end
+```
+
+Alternativa com gem `interactor`:
+
+```ruby
+class RegisterUser
+  include Interactor
+
+  def call
+    context.fail!(error_code: 'USER_EXISTS') if User.exists?(email: context.params[:email])
+    context.user = User.create!(context.params)
+  end
+end
+```
+
+---
+
+## Models
+
+```ruby
+class User < ApplicationRecord
+  has_secure_password
+
+  validates :email, presence: true, uniqueness: true, format: URI::MailTo::EMAIL_REGEXP
+  validates :name, presence: true
+  validates :password, length: { minimum: 12 }, if: :password_required?
+
+  has_many :sessions, dependent: :destroy
+  scope :active, -> { where(deleted_at: nil) }
+end
+```
+
+`has_secure_password` usa BCrypt (default). Para Argon2, troque para gem `argon2` + métodos customizados.
+
+---
+
+## Serializers (Blueprinter)
+
+```ruby
+class UserBlueprint < Blueprinter::Base
+  identifier :id
+  fields :email, :name
+
+  field :created_at do |user|
+    user.created_at.iso8601
+  end
+
+  view :extended do
+    fields :phone, :address
+  end
+end
+
+# Uso:
+UserBlueprint.render(user)
+UserBlueprint.render(users, view: :extended)
+```
+
+---
+
+## Auth (devise-jwt)
+
+```ruby
+# Gemfile
+gem 'devise'
+gem 'devise-jwt'
+
+# config/initializers/devise.rb
+config.jwt do |jwt|
+  jwt.secret = Rails.application.credentials.devise_jwt_secret_key!
+  jwt.dispatch_requests = [['POST', %r{^/api/v1/login$}]]
+  jwt.revocation_requests = [['DELETE', %r{^/api/v1/logout$}]]
+  jwt.expiration_time = 15.minutes.to_i
+end
+```
+
+Refresh token com rotação em tabela própria.
+
+---
+
+## Rate limit (rack-attack)
+
+```ruby
+# config/initializers/rack_attack.rb
+class Rack::Attack
+  throttle('login/ip', limit: 5, period: 15.minutes) do |req|
+    req.ip if req.path == '/api/v1/login' && req.post?
+  end
+
+  throttle('login/email', limit: 5, period: 15.minutes) do |req|
+    if req.path == '/api/v1/login' && req.post?
+      req.params['email'].to_s.downcase.gsub(/\s+/, '')
+    end
+  end
+
+  throttle('api/ip', limit: 100, period: 1.minute) do |req|
+    req.ip if req.path.start_with?('/api/')
+  end
+end
+```
+
+---
+
+## Solid Queue (jobs)
+
+```ruby
+class SendWelcomeEmailJob < ApplicationJob
+  queue_as :default
+
+  def perform(user_id)
+    user = User.find(user_id)
+    UserMailer.welcome(user).deliver_now
+  end
+end
+
+# config/queue.yml — Solid Queue default em Rails 8
+```
+
+---
+
+## Solid Cable + Action Cable
+
+```ruby
+class NotificationsChannel < ApplicationCable::Channel
+  def subscribed
+    stream_for current_user
+  end
+end
+
+# Broadcast em qualquer lugar
+NotificationsChannel.broadcast_to(user, type: 'message.sent.v1', payload: {...})
+
+# Connection auth
+class ApplicationCable::Connection < ActionCable::Connection::Base
+  identified_by :current_user
+
+  def connect
+    self.current_user = find_verified_user
+  end
+
+  private
+
+  def find_verified_user
+    if (user = decode_jwt(request.params[:token]))
+      user
+    else
+      reject_unauthorized_connection
+    end
+  end
+end
+```
+
+---
+
+## OpenAPI (rswag)
+
+```ruby
+# Gemfile
+group :development, :test do
+  gem 'rswag-specs'
+end
+
+# spec/integration/users_spec.rb
+require 'swagger_helper'
+
+RSpec.describe 'Users API', type: :request do
+  path '/api/v1/users' do
+    post 'Creates a user' do
+      tags 'Users'
+      consumes 'application/json'
+      parameter name: :user, in: :body, schema: {
+        type: :object,
+        properties: {
+          email: { type: :string },
+          name: { type: :string },
+          password: { type: :string, minLength: 12 },
+        },
+        required: %w[email name password],
+      }
+      response '201', 'user created' do ... end
+      response '409', 'duplicate email' do ... end
+    end
+  end
+end
+
+# rake rswag:specs:swaggerize → swagger/v1/swagger.yaml
+```
+
+Exportar para JSON e expor em `/openapi.json`.
+
+---
+
+## Testes RSpec
+
+```ruby
+# spec/services/register_user_spec.rb
+RSpec.describe RegisterUser do
+  let(:params) { { email: 'jane@example.com', name: 'Jane', password: 'longsecret123' } }
+
+  it 'cria usuário com sucesso' do
+    result = described_class.new(params).call
+    expect(result.success?).to be true
+    expect(result.user.email).to eq 'jane@example.com'
+  end
+
+  it 'falha se email já existe' do
+    User.create!(params)
+    result = described_class.new(params).call
+    expect(result.success?).to be false
+    expect(result.error_code).to eq 'USER_EXISTS'
+  end
+end
+
+# spec/requests/api/v1/users_spec.rb
+RSpec.describe 'POST /api/v1/users', type: :request do
+  let(:admin) { create(:user, :admin) }
+
+  it 'cria com sucesso' do
+    post '/api/v1/users',
+         params: { user: { email: 'jane@example.com', name: 'Jane', password: 'longsecret123' } },
+         headers: { 'Authorization' => "Bearer #{token_for(admin)}" }
+    expect(response).to have_http_status(:created)
+  end
+end
+```
+
+---
+
+## Antipatterns
+
+| AP | Antipattern | Correção |
+|---|---|---|
+| AP-01 | Query AR no controller | Service object |
+| AP-02 | Lógica no controller | Service object |
+| AP-03 | `render json: user` | Blueprinter/Alba |
+| AP-04 | Fat Model (>500 linhas) | Concerns + Services |
+| AP-05 | Skip strong params | `params.require(...).permit(...)` |
+| AP-06 | Sem rack-attack em login | rate limit obrigatório |
+| AP-07 | JWT secret em código | `Rails.application.credentials` |
+| AP-08 | Logs com PII | `filter_parameters` configurado |
+| AP-09 | N+1 sem `includes` | `bullet` gem em dev |
+| AP-10 | Sem `--api` no rails new | use modo API |
+
+---
+
+## Segurança
+
+- `has_secure_password` (BCrypt cost ≥ 12)
+- `force_ssl = true` em produção
+- `secure_headers` gem ou middleware nativo Rails 8
+- `rack-cors` com origens específicas
+- `filter_parameters` para `password`, `token`, `secret`, `ssn`
+- bundler-audit no CI
+
+---
+
+## CI
+
+```bash
+bundle exec rubocop
+bundle exec rspec
+bundle exec bundler-audit check --update
+bundle exec rails db:schema:dump
+```
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+- Listar endpoints REST com tags + métodos
+- Definir strong params por controller
+- Auth strategy (Devise/JWT)
+
+### Blueprint
+- Estrutura `controllers/api/v1/`, `services/`, `blueprints/`
+- Schema do banco (migrations)
+- Strategy de jobs (Solid Queue) e realtime (Solid Cable)
+
+### Tasks
+- Por feature: Migration, Model, Service, Controller, Blueprint, RSpec
+- Task de configuração rack-attack + filter_parameters
+- Task de OpenAPI com rswag
+
+### Execute
+- Ralph Loop:
+  ```bash
+  bundle exec rubocop && bundle exec rspec && bundle exec bundler-audit check
+  ```
+
+---
+
+## Checklist final
+
+- [ ] Ruby 3.3+, Rails 8.x modo API
+- [ ] Rubocop + rails-omakase configurado
+- [ ] Strong parameters em todos os controllers
+- [ ] Lógica em Services (não em controllers)
+- [ ] Blueprinter/Alba (não `render json: object`)
+- [ ] rack-attack para login + APIs públicas
+- [ ] `has_secure_password` (não senha plaintext)
+- [ ] JWT secret via credentials.yml.enc
+- [ ] `filter_parameters` configurado
+- [ ] Solid Queue para jobs (default Rails 8)
+- [ ] OpenAPI exportado via rswag
+- [ ] bundler-audit no CI
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.
