@@ -1,7 +1,7 @@
 # task-003 — Define canonical JSON Schema v1
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-002`
 > Complexity: HIGH
 
@@ -70,3 +70,9 @@ Plus schema self-validation using the selected local JSON Schema validator.
 - structural valid/invalid cases are tested;
 - the schema matches the approved Rust wire model;
 - no protocol/customer-specific coupling exists.
+
+## Execution result
+
+- Status: DONE
+- Files: `schemas/evidence/v1/evidence.schema.json`, `crates/dare-security-evidence/src/schema.rs`
+- Notes: local JSON Schema Draft 2020-12 with `$id` under darelabs.tech; `jsonschema` without default features (no reqwest); tests cover missing fields, invalid verdict, malformed digest/timestamp, unknown top-level fields.

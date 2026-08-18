@@ -1,7 +1,7 @@
 # task-007 — Publish PASS/FAIL/INCONCLUSIVE/ERROR synthetic fixtures
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-003`, `task-004`, `task-005`, `task-006`
 > Complexity: MED
 
@@ -60,3 +60,9 @@ cargo test --workspace
 - all four are synthetic and secret-free;
 - all four pass structural and semantic validation;
 - each fixture documents a distinct verdict meaning.
+
+## Execution result
+
+- Status: DONE
+- Files: `examples/evidence/{pass,fail,inconclusive,error}.json`, `crates/dare-security-evidence/tests/fixtures.rs`
+- Notes: synthetic-payment-mcp only; all four pass schema + semantic validation.

@@ -22,16 +22,16 @@
 
 | ID | Title | Status | Depends On | Complexity |
 |---|---|---|---|---|
-| task-001 | Bootstrap Rust workspace and evidence crate | PENDING | — | LOW |
-| task-002 | Implement canonical evidence types and wire enums | PENDING | task-001 | HIGH |
-| task-003 | Define canonical JSON Schema v1 | PENDING | task-002 | HIGH |
-| task-004 | Implement schema versioning and semantic validation | PENDING | task-002 | HIGH |
-| task-005 | Implement redaction safety and secret-safe errors | PENDING | task-002 | HIGH |
-| task-006 | Implement deterministic outcome comparison and verdict consistency | PENDING | task-002, task-004 | HIGH |
-| task-007 | Publish PASS/FAIL/INCONCLUSIVE/ERROR synthetic fixtures | PENDING | task-003, task-004, task-005, task-006 | MED |
-| task-008 | Implement contract, round-trip and negative security tests | PENDING | task-003, task-004, task-005, task-006, task-007 | HIGH |
-| task-009 | Add CI quality gates and evidence contract documentation | PENDING | task-008 | MED |
-| task-010 | Prove Cycle 001 evidence contract end to end | PENDING | task-009 | HIGH |
+| task-001 | Bootstrap Rust workspace and evidence crate | DONE | — | LOW |
+| task-002 | Implement canonical evidence types and wire enums | DONE | task-001 | HIGH |
+| task-003 | Define canonical JSON Schema v1 | DONE | task-002 | HIGH |
+| task-004 | Implement schema versioning and semantic validation | DONE | task-002 | HIGH |
+| task-005 | Implement redaction safety and secret-safe errors | DONE | task-002 | HIGH |
+| task-006 | Implement deterministic outcome comparison and verdict consistency | DONE | task-002, task-004 | HIGH |
+| task-007 | Publish PASS/FAIL/INCONCLUSIVE/ERROR synthetic fixtures | DONE | task-003, task-004, task-005, task-006 | MED |
+| task-008 | Implement contract, round-trip and negative security tests | DONE | task-003, task-004, task-005, task-006, task-007 | HIGH |
+| task-009 | Add CI quality gates and evidence contract documentation | DONE | task-008 | MED |
+| task-010 | Prove Cycle 001 evidence contract end to end | DONE | task-009 | HIGH |
 
 ## Phase A — Foundation
 

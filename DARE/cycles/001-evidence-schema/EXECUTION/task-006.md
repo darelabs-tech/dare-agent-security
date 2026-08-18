@@ -1,7 +1,7 @@
 # task-006 — Implement deterministic outcome comparison and verdict consistency
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-002`, `task-004`
 > Complexity: HIGH
 
@@ -64,3 +64,9 @@ cargo test --workspace
 - contradictory evidence cannot pass semantic validation;
 - all four verdict semantics are tested;
 - protocol-specific comparison remains outside the evidence crate.
+
+## Execution result
+
+- Status: DONE
+- Files: `crates/dare-security-evidence/src/comparison.rs`
+- Notes: `ExactOutcomeComparator`, `ComparisonResult`, `derive_verdict`, `apply_derived_verdict`; contradictory PASS and INCONCLUSIVE/ERROR masquerading as PASS/FAIL are rejected.

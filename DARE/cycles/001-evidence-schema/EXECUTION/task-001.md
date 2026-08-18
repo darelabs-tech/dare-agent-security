@@ -1,7 +1,7 @@
 # task-001 — Bootstrap Rust workspace and evidence crate
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: none
 > Complexity: LOW
 
@@ -65,3 +65,10 @@ cargo test --workspace
 - the evidence crate builds as a standalone library member;
 - all Rust gates pass;
 - no future-domain dependency has been introduced.
+
+## Execution result
+
+- Status: DONE
+- Files: `Cargo.toml`, `Cargo.lock`, `.gitignore`, `crates/dare-security-evidence/Cargo.toml`, `crates/dare-security-evidence/src/lib.rs`
+- Gates: `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` — pass
+- Notes: library-only workspace member; Apache-2.0 metadata; no protocol/network/database dependencies introduced.

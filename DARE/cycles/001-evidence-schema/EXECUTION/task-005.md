@@ -1,7 +1,7 @@
 # task-005 — Implement redaction safety and secret-safe errors
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-002`
 > Complexity: HIGH
 
@@ -58,3 +58,9 @@ cargo test --workspace
 - representative raw secret material is blocked/sanitized according to the public contract;
 - safe errors cannot leak rejected values;
 - tests clearly document the heuristic boundary.
+
+## Execution result
+
+- Status: DONE
+- Files: `crates/dare-security-evidence/src/redaction.rs`
+- Notes: redaction metadata coherence enforced; high-risk keys and bearer/PEM/JWT-like values rejected in generic maps; error Display never includes the rejected secret. Heuristics are defense-in-depth only.

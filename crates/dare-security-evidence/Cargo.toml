@@ -1,0 +1,19 @@
+[package]
+name = "dare-security-evidence"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Protocol-neutral, versioned security evidence kernel for DARE Agent Security"
+publish = false
+
+[lib]
+name = "dare_security_evidence"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+time = { workspace = true }
+jsonschema = { workspace = true }

@@ -1,7 +1,7 @@
 # task-002 — Implement canonical evidence types and wire enums
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-001`
 > Complexity: HIGH
 
@@ -93,3 +93,10 @@ cargo test --workspace
 - wire enum formats are stable and tested;
 - a representative `SecurityEvidence` record round-trips through JSON;
 - no MCP/customer/proprietary concept has leaked into the core model.
+
+## Execution result
+
+- Status: DONE
+- Files: `crates/dare-security-evidence/src/{lib.rs,model.rs,verdict.rs,version.rs,redaction.rs}`, workspace `serde`/`serde_json`/`time` deps
+- Gates: `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` (18 tests) — pass
+- Notes: stable uppercase wire enums; no implicit verdict default; `deny_unknown_fields` on the public record; IDs remain strings.

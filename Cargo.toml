@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = ["crates/dare-security-evidence"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "Apache-2.0"
+repository = "https://github.com/darelabs-tech/dare-agent-security"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+time = { version = "0.3", features = ["formatting", "macros", "parsing", "serde"] }
+jsonschema = { version = "0.37", default-features = false }

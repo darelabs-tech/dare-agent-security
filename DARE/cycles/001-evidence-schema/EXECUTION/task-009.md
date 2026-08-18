@@ -1,7 +1,7 @@
 # task-009 — Add CI quality gates and evidence contract documentation
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-008`
 > Complexity: MED
 
@@ -65,3 +65,9 @@ Confirm the workflow configuration invokes equivalent gates.
 - CI enforces the Cycle 001 Rust and contract gates;
 - evidence documentation is sufficient for an external implementer to locate and understand the v1 contract;
 - no unrelated product capability was introduced.
+
+## Execution result
+
+- Status: DONE
+- Files: `.github/workflows/ci.yml`, `crates/dare-security-evidence/README.md`, root `README.md` (schema pointer)
+- Notes: CI runs fmt/clippy/test; docs cover schema path, versioning, verdicts, redaction limits, offline validation.

@@ -1,6 +1,7 @@
 {
   "name": "dare-agent-security",
-  "structure": "unknown",
+  "structure": "backend",
+  "backend": "rust-axum",
   "ide": "cursor",
   "graphrag": "sqlite",
   "mcp": true,

@@ -1,7 +1,7 @@
 # task-008 — Implement contract, round-trip and negative security tests
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-003`, `task-004`, `task-005`, `task-006`, `task-007`
 > Complexity: HIGH
 
@@ -64,3 +64,9 @@ cargo test --workspace
 - all required invalid cases fail safely and intentionally;
 - round-trip compatibility is proven;
 - the suite can serve as a compatibility gate for later schema changes.
+
+## Execution result
+
+- Status: DONE
+- Files: `crates/dare-security-evidence/tests/{contract.rs,negative.rs,common/mod.rs}`
+- Notes: round-trip pipeline for all public fixtures; required negative cases fail on typed/schema reasons without echoing secrets.

@@ -1,7 +1,7 @@
 # task-010 — Prove Cycle 001 evidence contract end to end
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-009`
 > Complexity: HIGH
 
@@ -82,3 +82,11 @@ Do not mark Cycle 001 complete if any gate is bypassed, muted, skipped or weaken
 ## Done when
 
 Cycle 001 has reproducible evidence that the public v1 deterministic security evidence contract satisfies the approved Design, Blueprint, TASKS and security invariants end to end.
+
+## Execution result
+
+- Status: DONE
+- Files: `crates/dare-security-evidence/tests/e2e_proof.rs`
+- Gates: `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace`
+- Proofs: v1 validates; unknown major fails closed; contradictory PASS rejected; representative secrets rejected without echo; PASS/FAIL/INCONCLUSIVE/ERROR fixtures keep semantics; schema/docs/CI exist; no protocol-specific core coupling.
+- Cycle remains APPROVED FOR EXECUTION until human/DARE review marks the cycle DONE.

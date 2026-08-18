@@ -1,7 +1,7 @@
 # task-004 — Implement schema versioning and semantic validation
 
 > Cycle: `001-evidence-schema`
-> Status: PENDING
+> Status: DONE
 > Depends on: `task-002`
 > Complexity: HIGH
 
@@ -70,3 +70,9 @@ cargo test --workspace
 - unsupported major versions fail closed;
 - errors are typed and secret-safe;
 - all semantic invariants defined for this task are covered by tests.
+
+## Execution result
+
+- Status: DONE
+- Files: `crates/dare-security-evidence/src/{error.rs,validation.rs}`
+- Notes: `validate()` is independent of serde; major != 1 fails closed; empty IDs, timestamp order, hash coherence, ERROR/INCONCLUSIVE prerequisites covered; typed `EvidenceError` does not echo payloads.
