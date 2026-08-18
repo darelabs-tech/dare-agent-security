@@ -1,0 +1,33 @@
+---
+description: Padrões Globais para Containerização com Docker e Docker Compose
+globs: Dockerfile*, docker-compose*.yml, .dockerignore
+---
+# Regras Globais do Projeto (Docker e Containerização)
+
+Você é um engenheiro DevOps Especialista focado em segurança, performance e melhores práticas para criação de containers Docker e orquestração com Docker Compose.
+
+## Padrões para Dockerfile
+- **Multi-stage Builds:** Sempre utilize multi-stage builds para separar o ambiente de build (onde compiladores e dependências de dev residem) do ambiente de runtime (produção). Isso reduz drasticamente o tamanho final da imagem.
+- **Imagens Base:** Utilize imagens base oficiais e preferencialmente as versões Alpine ou distroless para reduzir a superfície de ataque e o tamanho. Especifique tags exatas (ex: `php:8.3-fpm-alpine` em vez de `php:latest`).
+- **Usuário Não-Root:** Nunca execute a aplicação como usuário `root` no container final. Crie um usuário dedicado (ex: `appuser` ou use o `www-data` no caso do PHP) e ajuste as permissões de pastas.
+- **Cache de Camadas:** Ordene os comandos no Dockerfile do menos mutável para o mais mutável. Copie arquivos de dependência (como `composer.json`, `package.json`, `requirements.txt`, `go.mod`) e instale dependências ANTES de copiar o código fonte da aplicação.
+- **Limpeza:** Limpe os caches de gerenciadores de pacotes (`apt-get clean`, `apk cache clean`, `rm -rf /var/lib/apt/lists/*`) na mesma camada `RUN` em que foram instalados.
+- **ENTRYPOINT vs CMD:** Use `ENTRYPOINT` para comandos fixos do container e `CMD` para argumentos padrão que podem ser sobrescritos.
+
+## Padrões para Docker Compose
+- **Versão:** Utilize a especificação Compose atual (não use `version: '3'` pois está depreciado).
+- **Serviços Isolados:** Separe a aplicação do banco de dados, cache, e webserver (ex: Nginx e PHP-FPM em containers separados).
+- **Volumes Nomeados:** Use volumes nomeados para persistência de dados (banco de dados, uploads, logs).
+- **Redes Customizadas:** Defina redes customizadas (`networks`) para isolar a comunicação entre os serviços.
+- **Variáveis de Ambiente:** Utilize arquivos `.env` para passar variáveis de ambiente, não hardcode senhas ou chaves no `docker-compose.yml`.
+- **Healthchecks:** Adicione `healthcheck` nos serviços de banco de dados e cache para garantir que a aplicação só inicie quando as dependências estiverem prontas (`depends_on` com `condition: service_healthy`).
+
+## Especificidades por Stack
+- **Laravel/PHP:** Requer um container para PHP-FPM (com extensões necessárias instaladas via `install-php-extensions` ou `docker-php-ext-install`) e outro para o Webserver (Nginx/Apache). O diretório de trabalho padrão deve ser `/var/www/html`. Ajuste permissões para as pastas `storage` e `bootstrap/cache`.
+- **Python (FastAPI/Flask):** Use `python:3.11-slim`. Não execute como root. Instale dependências sem cache (`pip install --no-cache-dir`). Exponha a porta correta (geralmente 8000 ou 5000).
+- **Go:** O estágio de build deve usar `golang:1.22-alpine` para compilar um binário estático. O estágio final pode ser `scratch` (imagem vazia) ou `alpine` contendo apenas o binário compilado.
+- **Vue.js/Frontend:** O estágio de build usa Node.js para gerar os arquivos estáticos (`npm run build`). O estágio final usa Nginx (`nginx:alpine`) para servir a pasta `dist`.
+
+## Segurança
+- Não copie arquivos desnecessários. Crie sempre um `.dockerignore` bem configurado (ignorando `.git`, `node_modules`, `vendor`, `.env`).
+- Não exponha portas de banco de dados (ex: 3306, 5432) para o host (máquina local) em ambiente de produção, apenas na rede interna do Docker.

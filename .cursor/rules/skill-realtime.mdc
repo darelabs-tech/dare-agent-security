@@ -1,0 +1,262 @@
+---
+description: Comunicação real-time (WebSocket, SSE) DARE-compliant — eventos tipados com JSON Schema, subscriptions autorizadas, reconexão com exponential backoff, e gerenciamento de subscriptions sem ghost listeners.
+globs: **/realtime/**,**/ws/**,**/socket*.ts,**/socket*.py,**/socket*.rs,**/cable/**,**/channels/**
+alwaysApply: false
+---
+
+# Skill: Realtime DARE
+
+Você é um especialista em comunicação real-time (WebSocket, SSE). Esta skill garante que toda integração real-time em projeto DARE seja **tipada, autorizada, reconectável e sem ghost listeners**.
+
+## Arquitetura recomendada
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Event Registry                                          │
+│  - Tipos de evento com schema JSON                       │
+│  - Versionamento (.v1, .v2…)                             │
+│  - Autorização declarada por evento                      │
+└─────────────────────────────────────────────────────────┘
+                       ↓
+┌─────────────────────────────────────────────────────────┐
+│  Subscription Manager                                    │
+│  - Map<connection_id, Set<event_type>>                   │
+│  - Cleanup garantido on disconnect                       │
+└─────────────────────────────────────────────────────────┘
+                       ↓
+┌─────────────────────────────────────────────────────────┐
+│  Reconnect Strategy                                      │
+│  - Exponential backoff (1s, 2s, 4s, 8s, max 30s)         │
+│  - Jitter para evitar thundering herd                    │
+│  - Resync de estado após reconectar                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Os 4 pilares
+
+### 1. Schema validation de eventos
+
+Todo evento WS/SSE tem schema JSON declarado:
+
+```typescript
+// src/realtime/event_registry.ts
+import { z } from 'zod';
+
+export const EventRegistry = {
+  'user.created.v1': {
+    schema: z.object({
+      id: z.string().uuid(),
+      email: z.string().email(),
+      createdAt: z.string().datetime(),
+    }),
+    requires: 'admin',
+  },
+  'message.sent.v1': {
+    schema: z.object({
+      conversationId: z.string().uuid(),
+      senderId: z.string().uuid(),
+      body: z.string().max(2000),
+      sentAt: z.string().datetime(),
+    }),
+    requires: 'participant',
+  },
+} as const;
+```
+
+Server valida antes de emitir, client valida antes de processar. Evento inválido = log + drop.
+
+### 2. Registro central de tipos
+
+Um único arquivo `event_registry.ts/py/rs`. Adicionar evento passa por PR explícito. Versionamento via sufixo `.v1`, `.v2`.
+
+### 3. Reconexão com exponential backoff
+
+```typescript
+export class ReconnectStrategy {
+  private attempt = 0;
+  constructor(private base = 1000, private max = 30_000) {}
+
+  next(): number {
+    const delay = Math.min(this.base * 2 ** this.attempt, this.max);
+    const jitter = Math.random() * 1000;
+    this.attempt++;
+    return delay + jitter;
+  }
+
+  reset() { this.attempt = 0; }
+}
+```
+
+Após reconectar, **resync de estado** — buscar eventos perdidos via REST ou pedir snapshot.
+
+### 4. Subscription manager (zero ghost listeners)
+
+```typescript
+export class SubscriptionManager {
+  private subs = new Map<string, Set<string>>();
+
+  subscribe(connId: string, event: string) {
+    if (!this.subs.has(connId)) this.subs.set(connId, new Set());
+    this.subs.get(connId)!.add(event);
+  }
+
+  unsubscribe(connId: string, event: string) {
+    this.subs.get(connId)?.delete(event);
+  }
+
+  // Cleanup SEMPRE on disconnect — sem exceção
+  onDisconnect(connId: string) {
+    this.subs.delete(connId);
+  }
+
+  metrics() {
+    return { connections: this.subs.size, totalSubs: [...this.subs.values()].reduce((s, set) => s + set.size, 0) };
+  }
+}
+```
+
+---
+
+## Métricas (verificáveis em CI/runtime)
+
+| ID | Métrica | Como medir |
+|---|---|---|
+| M-01 | 100% de event types com JSON Schema | grep no registry — todo evento tem `schema:` |
+| M-02 | 100% de subscriptions autorizadas | grep por `authorize(` antes de `subscribe(` |
+| M-03 | 0 ghost listeners após desconexão | métrica runtime `subs.size === 0` após disconnect |
+| M-04 | Reconnect strategy configurada | grep por `ReconnectStrategy` ou backoff manual |
+
+---
+
+## Antipatterns
+
+| AP | Antipattern | Sinal | Correção |
+|---|---|---|---|
+| AP-01 | Evento sem schema | `socket.emit('foo', anything)` | Adicionar schema no registry |
+| AP-02 | `socket.on(...)` sem cleanup | listener vive após disconnect | Usar SubscriptionManager |
+| AP-03 | Reconexão sem backoff | reconecta imediatamente em loop | Exponential + jitter |
+| AP-04 | Sem autorização de subscription | usuário ouve eventos cross-tenant | `authorize(user, event)` antes de `subscribe()` |
+| AP-05 | Broadcast sem filtro | `io.emit()` para todos | Rooms/channels por tenant |
+| AP-06 | Estado não recuperado | UI mostra dados stale | Resync via REST ou snapshot WS |
+
+---
+
+## Stack recomendada
+
+| Stack | WebSocket | SSE |
+|---|---|---|
+| Node | `socket.io`, `ws` | endpoint custom + `EventSource` no client |
+| Rails | Action Cable + Solid Cable | Rack streaming |
+| Rust/Axum | `tokio-tungstenite`, `axum::extract::ws` | `axum::response::sse::Sse` |
+| FastAPI | `fastapi.WebSocket` | `sse-starlette` (`EventSourceResponse`) |
+| Go | `gorilla/websocket`, `melody` | stdlib `http.Flusher` |
+| NestJS | `@nestjs/websockets` (Socket.io ou ws) | endpoint custom |
+
+---
+
+## Exemplo completo — Socket.io (Node)
+
+```typescript
+// Server
+io.on('connection', (socket) => {
+  socket.on('subscribe', ({ eventType }) => {
+    const entry = EventRegistry[eventType];
+    if (!entry) return socket.emit('error', { code: 'UNKNOWN_EVENT' });
+    if (!authorize(socket.data.user, entry.requires)) {
+      return socket.emit('error', { code: 'FORBIDDEN' });
+    }
+    subMgr.subscribe(socket.id, eventType);
+    socket.join(`event:${eventType}`);
+  });
+
+  socket.on('disconnect', () => {
+    subMgr.onDisconnect(socket.id); // cleanup SEMPRE
+  });
+});
+
+// Quando emitir um evento (de qualquer lugar)
+export function emit<E extends keyof typeof EventRegistry>(eventType: E, payload: unknown) {
+  const entry = EventRegistry[eventType];
+  const valid = entry.schema.safeParse(payload);
+  if (!valid.success) { log.error('invalid event payload', valid.error); return; }
+  io.to(`event:${eventType}`).emit(eventType, valid.data);
+}
+```
+
+```typescript
+// Client
+const socket = io(url);
+const strategy = new ReconnectStrategy();
+
+socket.on('connect', () => {
+  strategy.reset();
+  resyncState();
+});
+
+socket.on('disconnect', () => {
+  setTimeout(() => socket.connect(), strategy.next());
+});
+
+socket.on('message.sent.v1', (payload) => {
+  const valid = EventRegistry['message.sent.v1'].schema.safeParse(payload);
+  if (!valid.success) return log.warn('invalid event received', valid.error);
+  handleMessage(valid.data);
+});
+```
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+- Listar eventos WS/SSE necessários (formato `dominio.acao.vN`)
+- Autorização por evento
+- Estratégia de resync após reconect
+
+### Blueprint
+- Diagrama de event flow
+- Stack escolhida (WS lib + cliente)
+- Backoff configurado (base, max, jitter)
+
+### Tasks
+- Task: criar `event_registry.ts`
+- Task: implementar `SubscriptionManager`
+- Task: implementar `ReconnectStrategy`
+- Task: configurar autorização por evento
+- Task: instrumentar métrica de ghost listeners
+
+### Execute
+- Ralph Loop: grep falha se `socket.on` sem cleanup correspondente
+- Métrica runtime: `subMgr.metrics()` em endpoint `/internal/realtime/stats`
+
+---
+
+## Boas práticas
+
+1. **SSE para server→client unidirecional** — logs, métricas, dashboards
+2. **WebSocket para bidirectional** — chat, colaboração ao vivo
+3. **Heartbeat ping-pong** — detecta conexão zumbi (TCP OK, peer não responde)
+4. **Backpressure** — se client lento, drop eventos antigos para evitar OOM
+5. **Replay limitado** — guardar últimos N eventos por room (não histórico completo)
+6. **Versionar eventos** — `.v1`, `.v2` permite migração gradual
+7. **Logs estruturados** — emitir log por evento com tenant, user, eventType, success/fail
+
+---
+
+## Checklist final
+
+- [ ] `event_registry.ts/py/rs` com todos os event types
+- [ ] Cada evento tem schema JSON validado
+- [ ] Cada evento declara `requires:` (autorização)
+- [ ] `SubscriptionManager` com cleanup on disconnect
+- [ ] `ReconnectStrategy` no client com exponential backoff + jitter
+- [ ] Resync de estado pós-reconect (REST ou snapshot WS)
+- [ ] Validação de payload no server antes de emitir
+- [ ] Validação de payload no client antes de processar
+- [ ] Métrica de ghost listeners em endpoint `/internal/realtime/stats`
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

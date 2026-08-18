@@ -1,0 +1,281 @@
+---
+description: Guia DARE para desenvolvimento Leptos (Rust + WASM) — decisão CSR vs Fullstack, idioms 0.7, antipatterns, tipos compartilhados server+WASM com cfg_attr, workspace misto WASM+nativo, templates de tasks.
+globs: **/*.rs,Cargo.toml,.cargo/config.toml,Trunk.toml,Leptos.toml
+alwaysApply: false
+---
+
+# Skill: Rust/Leptos DARE
+
+Você é um especialista em Leptos 0.7+ (framework reativo Rust → WASM). Esta skill cobre **decisão de variante, idioms obrigatórios, antipatterns clássicos e estruturação de tipos compartilhados** entre server e WASM.
+
+---
+
+## 1. Decisão de variante: CSR vs Fullstack
+
+| Critério | CSR (trunk) | Fullstack (cargo-leptos) |
+|---|---|---|
+| SEO necessário | ❌ | ✅ |
+| Time-to-interactive crítico | ❌ | ✅ |
+| Dashboard interno / admin | ✅ | ✅ |
+| Backend Axum existente | indiferente | ✅ integração direta |
+| Simplicidade de deploy | ✅ arquivos estáticos | ⚠️ binário Axum |
+| Server functions (`#[server]`) | ❌ não existe | ✅ |
+
+**Regra de ouro:**
+- Atrás de login e SEO não importa → **CSR**
+- Precisa SEO, carregamento inicial rápido, server functions → **Fullstack**
+- Já tem Axum no monorepo → **Fullstack** (workspace unificado)
+
+---
+
+## 2. Ferramentas — nunca misturar
+
+| Variante | Build | Dev | Test |
+|---|---|---|---|
+| CSR | `trunk build --release` | `trunk serve` | `cargo test --workspace` |
+| Fullstack | `cargo leptos build --release` | `cargo leptos watch` | `cargo test --workspace` |
+
+> ⚠️ `cargo leptos test` **não existe**. Use `cargo test --workspace`.
+> ⚠️ Não use `trunk` para fullstack nem `cargo leptos` para CSR.
+
+---
+
+## 3. Idioms obrigatórios Leptos 0.7
+
+### Estado reativo
+
+```rust
+let (count, set_count) = signal(0);
+let doubled = move || count.get() * 2;     // derived (memo inline)
+
+// Estado complexo / compartilhado:
+let count = RwSignal::new(0);
+```
+
+### Dados assíncronos
+
+```rust
+// ✅ Resource — fetch declarativo, integra com Suspense
+let user = Resource::new(|| user_id(), |id| async move { fetch_user(id).await });
+
+view! {
+    <Suspense fallback=|| view! { <p>"Loading..."</p> }>
+        {move || user.get().map(|u| view! { <p>{u.name}</p> })}
+    </Suspense>
+}
+
+// ❌ Effect que faz fetch — re-executa em todo render
+Effect::new(move |_| { spawn_local(async { fetch_user(id).await }); });
+```
+
+### Mutações
+
+```rust
+let save = Action::new(|input: &String| {
+    let input = input.clone();
+    async move { api::save(input).await }
+});
+
+view! {
+    <button on:click=move |_| save.dispatch("hello".to_string())>"Save"</button>
+    <Show when=move || save.pending().get()><p>"Saving..."</p></Show>
+}
+```
+
+### Renderização condicional e listas
+
+```rust
+view! {
+    <Show when=move || logged_in.get() fallback=|| view! { <Login/> }>
+        <Dashboard/>
+    </Show>
+
+    <For
+        each=move || items.get()
+        key=|item| item.id
+        children=move |item| view! { <ItemRow item=item/> }
+    />
+}
+```
+
+### Server functions (fullstack only)
+
+```rust
+#[server(SaveUser, "/api")]
+pub async fn save_user(name: String) -> Result<User, ServerFnError> {
+    db::create_user(name).await.map_err(Into::into)
+}
+
+let save = ServerAction::<SaveUser>::new();
+```
+
+---
+
+## 4. Tipos compartilhados server + WASM
+
+```rust
+// crates/<p>-domain/src/lib.rs
+use serde::{Deserialize, Serialize};
+
+#[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]  // só no server
+#[derive(Clone, Debug, Serialize, Deserialize)]      // server + WASM
+pub struct SecurityEvent {
+    pub id: uuid::Uuid,
+    pub attack_type: String,
+    pub risk_score: f32,
+    pub blocked: bool,
+}
+```
+
+```toml
+# Cargo.toml do crate domain
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+uuid = { version = "1.10", features = ["v4", "serde"] }
+
+[dependencies.sqlx]
+version = "0.8"
+features = ["postgres", "runtime-tokio", "uuid"]
+optional = true
+
+[features]
+ssr = ["dep:sqlx"]
+```
+
+> O crate domain compila duas vezes: x86 (server, com sqlx) e wasm32 (client, sem sqlx). `cfg_attr` garante que `sqlx::FromRow` só aparece no server build.
+
+---
+
+## 5. Workspace misto (WASM + nativo)
+
+```toml
+# Cargo.toml do workspace
+[workspace]
+resolver = "2"
+members = [
+  "crates/<p>-core",       # lib nativa (x86)
+  "crates/<p>-server",     # bin nativo — Axum
+  "crates/<p>-web",        # bin+lib WASM — Leptos
+  "crates/<p>-cli",        # bin nativo
+]
+```
+
+```toml
+# crates/<p>-web/Cargo.toml
+[features]
+default = []
+hydrate = ["leptos/hydrate"]
+ssr = [
+  "dep:axum",
+  "dep:leptos_axum",
+  "dep:tokio",
+  "leptos/ssr",
+]
+```
+
+> ⚠️ **Antipattern crítico:** `[build] target = "wasm32-unknown-unknown"` no `.cargo/config.toml` raiz quebra todos os crates nativos. `cargo leptos` e `trunk` gerenciam o target WASM internamente — não interfira.
+
+---
+
+## 6. Antipatterns
+
+| Antipattern | Por quê | Alternativa |
+|---|---|---|
+| `wasm_bindgen` direto | Bypassa abstrações Leptos | APIs do Leptos (`web_sys` via feature) |
+| `panic!` em componentes | Derruba app sem `ErrorBoundary` | `Result<_, ServerFnError>` + `ErrorBoundary` |
+| `Effect` que faz fetch | Re-executa a cada render | `Resource::new()` |
+| `tokio::spawn` no client | `tokio` não existe no WASM | `spawn_local()` ou server function |
+| `std::thread` no client | Não existe no WASM | Signals para paralelismo reativo |
+| `cargo leptos test` | Comando inválido | `cargo test --workspace` |
+| `[build] target` global | Quebra crates nativos | Sem target global; cargo-leptos gerencia |
+| Múltiplos signals correlacionados | Render extra desnecessário | Derived signal (`move \|\| (a.get(), b.get())`) |
+
+---
+
+## 7. Templates de tasks DARE
+
+Cole no `DARE/dare-dag.yaml`:
+
+```yaml
+- id: leptos-001
+  title: "Workspace, AppShell e Router base"
+  description: |
+    Cargo workspace com resolver = "2".
+    App component com leptos_router::Router.
+    Layout base (header, main, footer). Rota "/" → HomePage.
+    Ralph Loop: cargo leptos build --release + cargo test --workspace + cargo clippy
+  depends_on: []
+
+- id: leptos-002
+  title: "Form com Action + server function"
+  description: |
+    #[server] fn para processar o form.
+    ActionForm ou Action manual.
+    Validar input no server (ServerFnError em erro).
+    Pending state com Action::pending() signal.
+  depends_on: [leptos-001]
+
+- id: leptos-003
+  title: "Lista paginada com Resource + Suspense"
+  description: |
+    Resource recebendo página como signal.
+    Envolver em Suspense com fallback loading.
+    ErrorBoundary para erros de fetch.
+    Paginação com For + key por ID.
+  depends_on: [leptos-001]
+```
+
+---
+
+## 8. Stack canônica
+
+| Camada | Cliente (WASM) | Server (Fullstack) |
+|---|---|---|
+| Framework | Leptos 0.7+ | Leptos 0.7 + leptos_axum |
+| Roteamento | leptos_router | (compartilhado) |
+| Estado server | Resource + Server Functions | sqlx + Axum |
+| Estilo | Tailwind | — |
+| Build | cargo-leptos / trunk | cargo-leptos |
+
+---
+
+## 9. Aplicação por fase DARE
+
+### Design
+- Decidir CSR vs Fullstack (tabela §1) e justificar
+- Listar componentes e server functions
+- Listar tipos compartilhados → crate `<p>-domain`
+
+### Blueprint
+- Tabela de componentes (nome, props, signals)
+- Lista de server functions com assinatura
+- Tipos no crate domain com features ssr/hydrate
+
+### Tasks
+- Use os templates de §7
+
+### Execute
+- Ralph Loop validation:
+  ```bash
+  cargo leptos build --release   # ou trunk build --release
+  cargo test --workspace
+  cargo clippy --workspace --all-targets -- -D warnings
+  ```
+
+---
+
+## Checklist final
+
+- [ ] Variante decidida (CSR ou Fullstack) e justificada no DESIGN.md
+- [ ] Workspace com `resolver = "2"` e crates separados
+- [ ] `<p>-domain` com tipos compartilhados e features `ssr`
+- [ ] Components usam Resource (não Effect) para fetch
+- [ ] Mutations usam Action / ServerAction
+- [ ] Server functions com `Result<_, ServerFnError>`
+- [ ] ErrorBoundary em torno de componentes assíncronos
+- [ ] Sem `[build] target` global no `.cargo/config.toml`
+- [ ] `cargo test --workspace` (não `cargo leptos test`)
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

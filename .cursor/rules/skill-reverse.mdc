@@ -1,0 +1,107 @@
+---
+description: Camada semântica da engenharia reversa (Fase 0 / brownfield). Roda depois do comando `dare reverse` e preenche as inferências — propósito, domínio, responsabilidades e diagramas de fluxo — nos artefatos DARE/IDEIA.md e DARE/REVERSE/module-*.md.
+globs: DARE/IDEIA.md,DARE/REVERSE/**
+alwaysApply: false
+---
+
+# Skill: Reverse — Engenharia Reversa (Fase 0)
+
+Esta skill é a **camada semântica** da engenharia reversa. Ela roda **depois** do comando
+`dare reverse`, que já varreu o código e gerou os esqueletos determinísticos. Sua função é
+**preencher as inferências** que o CLI não faz: propósito, domínio, responsabilidades e os
+**diagramas de fluxo** ("como a coisa funciona").
+
+> Pré-requisito: rodar `dare reverse` antes (gera `DARE/IDEIA.md`, `DARE/REVERSE/module-*.md`
+> e `DARE/REVERSE/reverse-facts.json`). Se não existirem, peça para rodar `dare reverse` primeiro.
+
+## Quando usar
+
+- O usuário quer entender / documentar um projeto **legado** antes de adotar o DARE.
+- Acabou de rodar `dare reverse` e os artefatos têm seções `<!-- AGENT: ... -->` em aberto.
+- O objetivo é gerar uma **pré-arquitetura** (`IDEIA.md`) que depois vira `DESIGN.md`.
+
+## Marcação de confiança (obrigatória)
+
+Ao preencher cada `<!-- AGENT -->`, marque **cada afirmação** com seu nível de confiança + evidência:
+
+- `- 🟢 <claim>. ` + `` `arquivo:linha` `` — **CONFIRMED**: evidência direta no código.
+- `- 🟡 <claim>. ` + `` `arquivo:linha` `` — **INFERRED**: padrão/dedução; pode estar errado.
+- `- 🔴 <claim>. → ver gaps.md` — **GAP**: não determinável pelo código.
+
+Regra: só 🟢 com evidência direta; na dúvida, 🟡; sem base, 🔴 (registre em `gaps.md`). Os fatos
+estruturais (caminho, LOC, deps) já vêm pré-marcados 🟢 pelo CLI — **não os altere**.
+
+## O que fazer
+
+### 1. Carregar os fatos (não re-varrer tudo)
+
+- Leia `DARE/REVERSE/reverse-facts.json` — fonte de fatos determinística (stack, módulos, LOC,
+  grafo de dependências). **Confie nela** para o inventário.
+- Para cada módulo, abra **2-5 arquivos representativos** (entrypoints, controllers, services,
+  models) — o suficiente para inferir responsabilidade e fluxo. Não leia o módulo inteiro.
+
+### 2. Preencher `DARE/IDEIA.md`
+
+Substitua cada bloco `<!-- AGENT: ... -->`:
+
+- **Propósito Inferido** — 2-4 frases: o que o software faz e por quê.
+- **Domínio & Conceitos** — entidades de negócio + glossário.
+- **Modelo de Dados (reconstruído)** — entidades, campos-chave, relacionamentos.
+- **Superfície de API** — endpoints inferidos de rotas/controllers.
+- **Fluxo do Sistema** — um `flowchart TD` Mermaid do caminho principal de request/dados
+  atravessando os módulos.
+- **⚠️ Incertezas / Gaps** — o que NÃO deu pra inferir + perguntas objetivas para o humano.
+
+**Não toque** no Mapa de Módulos nem na tabela (determinísticos, gerados pelo CLI).
+
+### 3. Preencher cada `DARE/REVERSE/module-*.md`
+
+- **Responsabilidade** — papel do módulo no sistema (1-3 frases).
+- **Superfície Pública** — o que expõe (funções/classes/endpoints/tipos).
+- **Como Funciona (fluxo)** — um `sequenceDiagram` Mermaid do fluxo típico
+  (entrypoint → service → repository → DB/externo).
+- **Dependências & Acoplamento** — comente o acoplamento e riscos (circular, hotspot HIGH).
+
+### 4. Apresentar ao usuário
+
+Resumo: propósito inferido, nº de módulos, principais incertezas. Reforce que o `IDEIA.md` é um
+**rascunho a validar** antes de promover a DESIGN.
+
+## Passo final — Gaps, Questions e Reviewer
+
+1. **`gaps.md`** — consolide os 🔴 classificados por severidade (crítico/moderado/cosmético/fora-escopo) + tratamento.
+2. **`questions.md`** — perguntas objetivas ao humano.
+3. **Reviewer** — releia os arquivos-chave e rebaixe claims sem evidência (🟢→🟡 ou 🟡→🔴).
+4. **Rode `dare reverse --report`** — gera `confidence-report.md` + `traceability/code-spec-matrix.md` (índice determinístico).
+
+## Modo `--deep` (Fase 3)
+
+Se `dare reverse --deep` foi usado, complete os artefatos extras em `DARE/REVERSE/`:
+- **`erd.md`** — entidades extraídas pelo CLI (🟢); complete relações não-explícitas (🟡).
+- **`domain-rules.md`** — regras de negócio (validações, invariantes, cálculos), 🟢/🟡/🔴.
+- **`state-machines.md`** — `stateDiagram-v2` por entidade/fluxo (estados/transições reais).
+- **`permissions.md`** — papéis, recursos e regras de autorização.
+- **`c4/c4-context.md`** e **`c4/c4-container.md`** — atores/externos e containers (component = mapa de módulos).
+
+## Regras de ouro
+
+1. **Não invente** — fluxo não-claro vira 🔴 (gap), não chute.
+2. **Fidelidade ao código real** — descreva o que o código faz, não o que deveria fazer.
+3. **Diagramas enxutos** — legibilidade acima de exaustividade.
+4. **Não re-varra** — os fatos já estão em `reverse-facts.json`.
+5. **Preserve o determinístico** — nunca edite o Mapa de Módulos/tabela/grafo do CLI.
+
+## Antipatterns
+
+| AP | Antipattern | Por quê |
+|---|---|---|
+| AP-01 | Inventar endpoints/entidades inexistentes | Polui a pré-arquitetura com ficção |
+| AP-02 | Reescrever a tabela de módulos do CLI | Quebra a fonte determinística |
+| AP-03 | `sequenceDiagram` gigante e ilegível | Anula o propósito do diagrama |
+| AP-04 | Pular a seção de Incertezas | Remove o ponto de validação humana |
+| AP-05 | Ler o projeto inteiro arquivo a arquivo | Desperdiça contexto; os fatos já estão no JSON |
+| AP-06 | Marcar tudo 🟢 sem evidência `file:line` | Infla a confiança e engana o humano |
+
+---
+
+Skill MIT — parte do DARE Method. Fase 0 (brownfield). Pareia com o comando `dare reverse`.

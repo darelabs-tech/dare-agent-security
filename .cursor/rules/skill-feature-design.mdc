@@ -1,0 +1,43 @@
+---
+description: Analisa projetos existentes para planejar a adicao de novas features usando o Metodo DARE. Ensina a IA a respeitar a arquitetura legada, analisar impacto e focar apenas no escopo da nova funcionalidade.
+globs: *
+---
+
+# Skill: Feature Design para Projetos Existentes
+
+## Objetivo
+Esta skill ensina você (a IA) a analisar o contexto de um projeto que já existe e planejar a inserção de uma **nova feature** de forma segura, isolada e respeitando os padrões já estabelecidos.
+
+## Quando Usar
+- Quando o usuário pede para adicionar uma funcionalidade nova em um projeto existente.
+- Quando o comando `/generate-feature-design` for invocado.
+
+## Como Analisar o Projeto Existente
+
+O primeiro passo é sempre entender o que já existe antes de propor qualquer coisa nova.
+
+**Identifique a Stack e Arquitetura:** Leia os arquivos de configuração do projeto (`composer.json`, `package.json`, etc.) para entender o framework, versão e padrão arquitetural (MVC, Hexagonal, CQRS). Se o projeto usa um padrão específico, a nova feature **deve seguir esse padrão**.
+
+**Analise o Banco de Dados:** Leia as migrations ou esquemas existentes para entender as tabelas relacionadas à feature solicitada. Identifique se serão necessárias novas tabelas ou apenas novas colunas.
+
+**Verifique Dependências Chave:** Entenda quais bibliotecas de terceiros já estão em uso (ex: Sanctum para auth, Spatie para permissões) e que podem ser aproveitadas pela nova feature.
+
+## Como Gerar o Design da Feature
+
+O documento `DARE/DESIGN-Feature-[Nome].md` deve ser **focado e conciso**. Ele não descreve o sistema inteiro, apenas o impacto da nova feature.
+
+| Seção | Conteúdo |
+|-------|----------|
+| **Contexto** | Como a feature se conecta ao que já existe |
+| **Novos Arquivos** | Controllers, Models, Services a serem criados |
+| **Arquivos Modificados** | O que muda no código legado |
+| **Banco de Dados** | Novas tabelas ou colunas |
+| **Segurança** | Proteções OWASP específicas para a feature |
+| **Restrições** | O que não pode ser tocado |
+
+## Regras de Ouro
+
+1. **Siga o Padrão Local:** Se o projeto usa um padrão antigo ou específico, adapte a feature a ele, a menos que o usuário solicite refatoração explícita.
+2. **Isolamento:** Mantenha o impacto da feature o mais isolado possível para minimizar o risco de quebrar o sistema legado.
+3. **Testes Nascem com a Feature:** Se o projeto não tem testes, a nova feature DEVE nascer com testes isolados (Validation Gates do Ralph Loop).
+4. **Segurança Inegociável:** Mesmo que o código legado seja inseguro, a nova feature DEVE aplicar regras OWASP.

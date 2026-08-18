@@ -1,0 +1,156 @@
+---
+description: Rastreamento de Tokens e Modelos do Cursor utilizados em cada etapa do DARE
+globs: DARE/*.md, DARE/EXECUTION/*.md
+---
+# Rastreamento de Telemetria (Cursor - Tokens e Modelos)
+
+Você é um especialista em monitoramento e observabilidade. Seu objetivo é rastrear e registrar o consumo de tokens e modelos de IA em cada etapa do Método DARE para fins de auditoria, monitoramento de performance e análise de uso. O Cursor é a IA utilizada (por compliance), então registre qual modelo do Cursor foi usado (GPT-4, Claude, Gemini, etc).
+
+## Modelos Disponíveis no Cursor
+
+O Cursor suporta múltiplos modelos de IA. Registre qual foi utilizado em cada etapa:
+
+| Modelo | Provedor | Características | Melhor Para |
+|--------|----------|-----------------|------------|
+| GPT-4 Turbo | OpenAI | Rápido e versátil | Tarefas gerais, código |
+| Claude 3.5 Sonnet | Anthropic | Análise profunda | Análise complexa, segurança |
+| Gemini 2.0 Flash | Google | Ultra rápido | Tarefas simples, processamento rápido |
+| Modelos Locais | Customizados | Privacidade total | Dados sensíveis |
+
+## Estrutura de Rastreamento
+
+Cada etapa do DARE deve registrar as seguintes informações em um arquivo de telemetria:
+
+### Arquivo de Telemetria: `DARE/TELEMETRY.md`
+
+Este arquivo centraliza todas as métricas de consumo. Ele deve ser atualizado ao final de cada comando executado.
+
+```markdown
+# Telemetria do Projeto: [Nome do Projeto]
+
+## Resumo Executivo
+- **Projeto:** [Nome]
+- **Data de Início:** [Data]
+- **Tokens Totais Processados:** [Número] (monitoramento de uso)
+- **IA Utilizada:** Cursor (por compliance)
+- **Modelos do Cursor Utilizados:** [Lista de modelos]
+- **Tempo Total de Execução:** [Tempo]
+
+## Detalhamento por Etapa
+
+### 1. Design (`/generate-design`)
+- **Data/Hora:** [Timestamp]
+- **Modelo do Cursor:** GPT-4 Turbo (ou Claude, Gemini)
+- **Tokens Estimados:** 7,390
+- **Tempo de Execução:** 45 segundos
+- **Comando Executado:** `/generate-design "Criar API de autenticação"`
+- **Observações:** [Qualidade da resposta, ajustes necessários, etc]
+
+### 2. Blueprint (`/generate-blueprint`)
+- **Data/Hora:** [Timestamp]
+- **Modelo do Cursor:** GPT-4 Turbo (ou Claude, Gemini)
+- **Tokens Estimados:** 21,373
+- **Tempo de Execução:** 2 minutos
+- **Arquivo Processado:** DARE/DESIGN.md
+- **Observações:** [Qualidade da arquitetura, ajustes necessários, etc]
+
+### 3. Tasks (`/generate-tasks`)
+- **Data/Hora:** [Timestamp]
+- **Modelo do Cursor:** GPT-4 Turbo (ou Claude, Gemini)
+- **Tokens Estimados:** 33,912
+- **Tempo de Execução:** 3 minutos 20 segundos
+- **Arquivo Processado:** DARE/BLUEPRINT.md
+- **Tasks Geradas:** 12
+- **Observações:** [Qualidade das tasks, clareza das especificações, etc]
+
+### 4. Execute Tasks (`/execute-task`)
+- **Task 001: Migration de Users**
+  - Data/Hora: [Timestamp]
+  - Modelo do Cursor: GPT-4 Turbo (ou Claude, Gemini)
+  - Tokens Estimados: 7,801
+  - Tempo: 1 minuto 30 segundos
+  - Tentativas (Ralph Loop): 1
+  - Status: ✓ Sucesso
+
+- **Task 002: AuthController**
+  - Data/Hora: [Timestamp]
+  - Modelo do Cursor: GPT-4 Turbo (ou Claude, Gemini)
+  - Tokens Estimados: 11,357
+  - Tempo: 2 minutos
+  - Tentativas (Ralph Loop): 2
+  - Status: ✓ Sucesso
+
+[... mais tasks ...]
+
+## Análise de Tokens Processados
+
+| Etapa | Tokens Estimados | % do Total | Tempo Total |
+|-------|------------------|-----------|-------------|
+| Design | 7,390 | 5% | 45 seg |
+| Blueprint | 21,373 | 15% | 2 min |
+| Tasks | 33,912 | 24% | 3 min 20 seg |
+| Execute (12 tasks) | 85,234 | 56% | 25 min |
+| **TOTAL** | **147,909** | **100%** | **~31 min** |
+
+## Modelos do Cursor Utilizados
+
+- **GPT-4 Turbo:** 147,909 tokens (100%)
+- **Claude 3.5 Sonnet:** 0 tokens (0%)
+- **Gemini 2.0 Flash:** 0 tokens (0%)
+```
+
+## Instruções para Rastreamento Manual
+
+Após executar cada comando DARE, adicione uma entrada em `DARE/TELEMETRY.md`:
+
+1. **Após `/generate-design`:**
+   - Procure na barra de status do Cursor pelo modelo utilizado
+   - Anote o tempo de execução
+   - Adicione uma entrada na seção "Design"
+
+2. **Após `/generate-blueprint`:**
+   - Repita o processo acima
+   - Adicione uma entrada na seção "Blueprint"
+
+3. **Após `/generate-tasks`:**
+   - Adicione uma entrada na seção "Tasks"
+   - Inclua o número de tasks geradas
+
+4. **Após cada `/execute-task`:**
+   - Adicione uma entrada na seção "Execute Tasks"
+   - Inclua o status (Sucesso/Falha)
+   - Se falhou, anote quantas tentativas foram necessárias (Ralph Loop)
+
+## Capturando Informações do Cursor
+
+O Cursor exibe informações sobre o modelo e tokens utilizados. Procure por:
+
+**Na barra de status (canto inferior direito):**
+- Ícone do modelo (ex: GPT-4, Claude, Gemini)
+- Informações de tempo de resposta
+
+**No histórico de conversa:**
+- Clique no ícone de informações da resposta
+- Veja detalhes do modelo utilizado
+- Tempo de processamento
+
+**Exemplo de informação exibida:**
+```
+Model: GPT-4 Turbo
+Time: 2.3s
+Tokens: ~12,345 (estimado)
+```
+
+Copie estas informações e adicione ao `DARE/TELEMETRY.md`.
+
+## Otimizações Recomendadas
+
+1. **Escolher o Modelo Certo:** Use GPT-4 para tarefas complexas, Claude para tarefas de análise, Gemini para processamento rápido.
+
+2. **Reutilizar Contexto:** Se você rodar `/execute-task` múltiplas vezes na mesma sessão do Composer, o contexto é reutilizado, economizando processamento.
+
+3. **Revisar Antes de Executar:** Revisar o Blueprint antes de gerar tasks economiza tokens desnecessários.
+
+4. **Agrupar Tasks:** Execute tasks relacionadas na mesma conversa do Composer para reutilizar contexto.
+
+5. **Monitorar Tentativas (Ralph Loop):** Se uma task requer muitas tentativas, pode indicar que a especificação precisa ser mais clara.

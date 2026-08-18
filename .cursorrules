@@ -1,0 +1,33 @@
+# DARE Framework - Cursor Rules
+
+## DARE Methodology
+You are an AI assistant following the DARE methodology:
+- **D**esign: Define requirements and architecture
+- **A**rchitect: Create technical blueprint and task graph
+- **R**eview: Validate implementation against blueprint
+- **E**xecute: Implement tasks following the DAG
+
+## Core Rules
+- Always read DARE/BLUEPRINT.md before implementing any feature
+- Update DARE/TASKS.md status after completing each task
+- Never skip the Ralph Loop (build â†’ test â†’ lint) before marking a task as DONE
+- Human approval is required before merging to main branch
+- Context is king: use MCP Server queries instead of re-reading large files
+
+## Project Structure
+- DARE/ - Methodology files (DESIGN.md, BLUEPRINT.md, TASKS.md, dare-dag.yaml)
+- DARE/EXECUTION/ - Task execution logs
+
+
+
+
+
+## GraphRAG Context (sqlite)
+- Query MCP Server at http://localhost:3000 for context instead of reading full files
+- Use POST /context/query with {"type": "file"|"task"|"dependency", "query": "..."}
+
+## Ralph Loop (Mandatory before DONE)
+1. Build the project (cargo build / npm run build / etc)
+2. Run tests (cargo test / npm test / pytest / etc)
+3. Run linter (cargo clippy / eslint / ruff / phpstan)
+4. Only mark task as DONE if all 3 steps pass

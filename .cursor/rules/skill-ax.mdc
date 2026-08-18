@@ -1,0 +1,263 @@
+---
+description: Agent Experience (AX) — codifica padrões para desenvolvimento assistido por IA em três planos (Discovery, Usage, Defense). Garante que todo projeto DARE exponha sinais estruturados (llms.txt, OpenAPI, --json, rate limit) que agentes de código precisam.
+globs: llms.txt,openapi.json,public/openapi.json,README.md,.env.example,DARE/DESIGN.md
+alwaysApply: false
+---
+
+# Skill: Agent Experience (AX) DARE
+
+Você é um especialista em integração entre projetos e agentes de código (Claude Code, Cursor, Antigravity, MCP servers). Esta skill define o **padrão AX DARE** que todo projeto novo deve seguir e contra o qual todo projeto existente deve ser auditado.
+
+## Por que AX é design-first
+
+Projetos podem ter código correto e arquitetura limpa mas **carecer de sinais estruturados** para agentes:
+- Sem `llms.txt`, o agente precisa adivinhar a estrutura
+- Sem OpenAPI, o agente faz parsing regex de docs HTML
+- Sem `--json` no CLI, o agente lida com tabelas ASCII coloridas
+- Sem rate limit, um prompt mal feito vira DDoS
+
+A skill `dare-ax` codifica três planos:
+
+| Plano | Pergunta que responde |
+|---|---|
+| **Discovery** | "Como o agente acha o que precisa?" |
+| **Usage** | "Como o agente opera sem refactor desnecessário?" |
+| **Defense** | "Como o projeto resiste a prompts ruins?" |
+
+---
+
+## Plano 1 — Discovery
+
+### `llms.txt` na raiz (obrigatório)
+
+Arquivo público com a "ficha técnica" do projeto. Formato livre mas seções fixas:
+
+```
+# <nome-do-projeto>
+
+> <descrição em 1-2 frases — o que é, qual problema resolve>
+
+## Stack
+- <linguagem + framework>
+- <banco>
+- <cache, fila, etc.>
+
+## Bootstrap
+- `make setup` — instala deps + sobe Postgres/Redis local
+- `make dev`   — sobe aplicação
+- `make test`  — roda suite
+
+## Endpoints
+- `GET  /healthz` — liveness
+- `GET  /openapi.json` — spec completa
+- `POST /api/login` — autenticação
+...
+
+## CLI (se aplicável)
+- `<bin> users create --email <e> --json`
+- `<bin> migrate run --json`
+
+## Docs internas
+- DARE/DESIGN.md — requisitos
+- DARE/BLUEPRINT.md — arquitetura
+- docs/RUNBOOK.md — operações
+```
+
+**Critério objetivo:** o arquivo deve ser navegável em < 2 minutos por um agente.
+
+### Estrutura previsível
+
+| Pasta | Conteúdo |
+|---|---|
+| `src/` ou `crates/<projeto>-*/` | código de produção |
+| `tests/` | testes (mirror de `src/` quando possível) |
+| `docs/` | documentação humana extensa |
+| `DARE/` | DESIGN.md, BLUEPRINT.md, EXECUTION/, dare-dag.yaml |
+| `infra/` ou `deploy/` | Dockerfile, compose, k8s manifests |
+
+Nomes esotéricos (`thing/`, `stuff/`, `misc/`) — proibidos.
+
+---
+
+## Plano 2 — Usage
+
+### `openapi.json` (HTTP)
+
+Toda API HTTP deve expor spec OpenAPI 3.x em `/openapi.json` ou `public/openapi.json`.
+
+| Stack | Como gerar |
+|---|---|
+| FastAPI | Automático (Pydantic models) |
+| NestJS | `@nestjs/swagger` decorators |
+| Laravel | `darkaonline/l5-swagger` |
+| Rails | `grape-swagger` ou `rswag` |
+| Rust/Axum | `utoipa` + `utoipa-swagger-ui` |
+| Go/Gin | `swaggo/swag` |
+
+**Antipattern:** escrever OpenAPI à mão em YAML — desatualiza no primeiro PR.
+
+### CLI com `--json`
+
+Todo comando de CLI exposto a humanos deve ter alternativa machine-readable:
+
+```bash
+# Para humanos
+$ dare metrics
+┌──────┬──────────┐
+│ ID   │ Status   │
+├──────┼──────────┤
+│ M-01 │ PASS     │
+└──────┴──────────┘
+
+# Para agentes
+$ dare metrics --json
+{"metrics":[{"id":"M-01","status":"PASS","value":1.0}]}
+```
+
+Regras:
+- JSON puro em stdout, sem cores ANSI, sem prompt
+- Exit code 0 em sucesso, ≠ 0 em erro
+- Schema documentado em `llms.txt`
+
+### `.env.example` versionado
+
+Sempre commitado, com **chaves e tipos**, sem valores reais:
+
+```
+DATABASE_URL=postgres://user:password@localhost:5432/dbname
+REDIS_URL=redis://localhost:6379/0
+JWT_SECRET=replace-with-256-bit-random-string
+STRIPE_SECRET_KEY=sk_test_xxx
+```
+
+`.env` real fica no `.gitignore`.
+
+---
+
+## Plano 3 — Defense
+
+### Rate limit
+
+Endpoint público sem rate limit = vulnerável. Use o middleware da stack:
+
+| Stack | Middleware típico |
+|---|---|
+| Rails | `rack-attack` |
+| Node/Express | `express-rate-limit` |
+| NestJS | `@nestjs/throttler` |
+| FastAPI | `slowapi` |
+| Rust/Axum | `tower-governor` |
+| Go/Gin | `gin-contrib/limit` ou middleware custom |
+| Laravel | `ThrottleRequests` middleware (nativo) |
+
+**Padrão recomendado:**
+- Login: 5 req / 15 min por IP + por usuário
+- API autenticada geral: 100 req / min por usuário
+- API pública: 30 req / min por IP
+
+### Validação de input
+
+Sempre no servidor, mesmo que o frontend valide:
+
+| Stack | Tooling |
+|---|---|
+| Laravel | FormRequest classes |
+| FastAPI | Pydantic models |
+| Node | Zod, class-validator |
+| Rust/Axum | `serde` + `validator` crate |
+| Rails | strong params + ActiveModel validations |
+| Go | `go-playground/validator` |
+
+### Secrets só via env
+
+Nada de `password = "..."` no código. Configure scanner no CI:
+
+```bash
+pip install detect-secrets
+detect-secrets scan > .secrets.baseline
+```
+
+### `llms.txt` sem secrets
+
+`llms.txt` é público — o scanner do CI deve bloquear commits onde apareçam:
+- `api_key=`, `password=`, `DATABASE_URL=postgres://user:pwd@`
+- `Bearer ...`, `Authorization: ...`
+- Chaves PEM, AWS access keys, GCP service account JSON inline
+
+---
+
+## Métricas obrigatórias (CI)
+
+| ID | Métrica | Comando de validação |
+|---|---|---|
+| M-01 | `llms.txt` existe e é válido (sem secrets, seções obrigatórias) | `dare ax validate --llms` |
+| M-02 | `openapi.json` ou `public/openapi.json` existe | `test -f public/openapi.json \|\| test -f openapi.json` |
+| M-03 | CLI suporta `--json` | `cli --help \| grep -- '--json'` |
+| M-04 | Rate limit configurado | grep pelo middleware da stack |
+
+Falha M-01 ou M-04 em produção = release bloqueado.
+
+---
+
+## Antipatterns
+
+| AP | Antipattern | Por que evitar |
+|---|---|---|
+| AP-01 | Docs fora do código | Divergem rapidamente |
+| AP-02 | OpenAPI escrito à mão | Desatualiza no primeiro PR |
+| AP-03 | CLI sem `--json` | Agentes fazem regex no output, frágil |
+| AP-04 | Rate limit em dev, faltando em prod | Endpoint vira target de abuse |
+| AP-05 | `llms.txt` com secrets | Credenciais em repositório público |
+| AP-06 | CORS `*` em produção | Origem qualquer permitida |
+| AP-07 | Validação só em API, esquecida em CLI | Agentes usam ambos |
+| AP-08 | Configs opcionais sem default | Agentes precisam de defaults previsíveis |
+
+---
+
+## Aplicação por fase DARE
+
+### Design (`/generate-design`)
+
+DESIGN.md deve ter seção **## Agent Experience (AX)** com:
+- Como o projeto será descoberto por agentes
+- Quais CLIs/endpoints expostos terão `--json`/OpenAPI
+- Estratégia de rate limit para endpoints públicos
+
+### Blueprint (`/generate-blueprint`)
+
+BLUEPRINT.md deve listar:
+- Geração automática de OpenAPI (qual tooling)
+- Middleware de rate limit por endpoint
+- Estratégia de logging estruturado (JSON)
+
+### Tasks (`/generate-tasks`)
+
+Crie tasks dedicadas:
+- "Gerar `llms.txt`"
+- "Expor OpenAPI em /openapi.json"
+- "Adicionar `--json` ao CLI"
+- "Configurar rate limit em endpoints públicos"
+
+### Execute (`/execute-task`)
+
+Em qualquer task que mexa em endpoint HTTP ou comando CLI, valide:
+- OpenAPI atualizado?
+- `--json` disponível?
+- Rate limit aplicado?
+
+---
+
+## Checklist final
+
+- [ ] `llms.txt` na raiz com seções obrigatórias
+- [ ] OpenAPI 3.x gerado a partir do código
+- [ ] Todos os CLIs aceitam `--json`
+- [ ] Rate limit em todos os endpoints públicos
+- [ ] `.env.example` versionado sem valores reais
+- [ ] Scanner de secrets no CI
+- [ ] Seção AX em DESIGN.md
+- [ ] Métricas M-01 a M-04 verificáveis em CI
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

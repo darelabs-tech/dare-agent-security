@@ -1,0 +1,295 @@
+---
+description: Integração segura e eficiente com LLMs (Gemini, Claude, OpenAI, Ollama) em projetos DARE. Fornece LLMProvider abstraction, cache TTL, rate limit via token bucket, prompts versionados e validação de output via JSON Schema.
+globs: prompts/**/*.md,**/llm*.ts,**/llm*.py,**/llm*.rs,**/llm*.go,**/providers/**
+alwaysApply: false
+---
+
+# Skill: LLM Integration DARE
+
+Você é um especialista em integração com LLMs. Esta skill garante que toda chamada a LLM em projeto DARE seja **abstraída, cacheada, rate-limited, validada e defendida contra prompt injection**.
+
+## Arquitetura recomendada
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Handler / Service de negócio                        │
+└──────────────────────────────────────────────────────┘
+                       ↓ injeta
+┌──────────────────────────────────────────────────────┐
+│  LLMProvider (interface)                             │
+│  ├── GeminiProvider                                  │
+│  ├── ClaudeProvider                                  │
+│  ├── OpenAIProvider                                  │
+│  └── OllamaProvider (local)                          │
+└──────────────────────────────────────────────────────┘
+                       ↓ wrap
+┌──────────────────────────────────────────────────────┐
+│  Cache (TTL) + RateLimit (token bucket) + Schema     │
+└──────────────────────────────────────────────────────┘
+                       ↓
+┌──────────────────────────────────────────────────────┐
+│  HTTP call externo                                   │
+└──────────────────────────────────────────────────────┘
+```
+
+## Os 5 pilares
+
+### 1. LLMProvider abstraction
+
+Nunca chame SDK direto em Handler ou Service de negócio.
+
+```typescript
+// ❌ Errado
+class SummaryService {
+  async run(text: string) {
+    const client = new GoogleGenAI({ apiKey: 'xxx' });
+    return client.generateContent({ contents: text });
+  }
+}
+
+// ✅ Certo
+class SummaryService {
+  constructor(private llm: LLMProvider) {}
+  async run(text: string) {
+    return this.llm.complete({
+      promptId: 'summarize-v1',
+      input: { text },
+      schema: SummarySchema,
+    });
+  }
+}
+```
+
+### 2. Cache em memória com TTL
+
+Key = `hash(promptId + input + model)`. TTL configurável (default 1h).
+
+**AP-02:** sem cache = custo explode em loops + latência ruim.
+
+### 3. Rate limit via token bucket
+
+| Provider | Limite típico |
+|---|---|
+| Gemini Free | 15 RPM, 1M tokens/dia |
+| Claude tier 1 | 50 RPM |
+| OpenAI tier 1 | 500 RPM |
+| Ollama local | sem limite, latência alta |
+
+Token bucket por provider, configurado em `app.config`.
+
+### 4. Prompts versionados
+
+Prompts vivem em `prompts/<id>.v<n>.md`:
+
+```markdown
+---
+id: summarize
+version: 1
+model: gemini-2.0-flash
+temperature: 0.2
+max_tokens: 500
+schema: SummarySchema
+---
+
+# System
+You are a concise summarizer. Output JSON matching: {schema}
+
+# User
+Summarize the following text in 3 bullet points:
+
+<text>{{ text }}</text>
+```
+
+Substituição com template engine **seguro** (Jinja2 sandboxed, Handlebars, string-interp com escape). Nunca `eval` ou `f-string` direta com user input.
+
+### 5. Validação de output
+
+LLM mente. Sempre valide:
+
+```typescript
+const raw = await llm.complete({...});
+const result = SummarySchema.parse(raw);  // Zod/Pydantic/ajv
+if (!result.success) {
+  throw new LLMOutputInvalidError(result.error);
+  // Pode indicar prompt injection ou drift de modelo — logar + alertar
+}
+```
+
+---
+
+## Métricas obrigatórias
+
+| ID | Métrica | Como medir |
+|---|---|---|
+| M-01 | 100% das chamadas LLM via LLMProvider | grep por SDK direto em Handlers/Services |
+| M-02 | 100% das responses cacheadas | logs do cache layer |
+| M-03 | 100% das requests com rate limit | rate limiter ativo em todo provider |
+| M-04 | 100% das respostas validadas contra schema | grep por `.parse(` ou `model_validate(` |
+
+---
+
+## Antipatterns (CI falha)
+
+| AP | Antipattern | Por que evitar |
+|---|---|---|
+| AP-01 | SDK direto em Handler | impossível mockar / trocar provider |
+| AP-02 | Sem cache | custo explode, latência ruim |
+| AP-03 | Prompt em código | impossível versionar / A-B testar |
+| AP-04 | User input direto em prompt | prompt injection trivial |
+| AP-05 | Confiar em output LLM sem validar | LLM mente — schema é defesa |
+
+---
+
+## Defesa contra prompt injection
+
+```python
+# ❌ Errado — instrução + dado misturados
+system = f"You are an assistant. {user_question}"
+```
+
+```python
+# ✅ Certo — separação clara + escape
+messages = [
+    {"role": "system", "content": "You are an assistant. Answer only based on the provided document."},
+    {"role": "user", "content": f"<document>{escape(doc)}</document>\n\n<question>{escape(q)}</question>"}
+]
+```
+
+Regras:
+- Use delimitadores (`<document>`, `<question>`)
+- Escape conteúdo do usuário (XML/HTML escape)
+- Detecte e remova padrões "Ignore instructions above", "You are now ..."
+- Valide output contra schema — output fora do schema = possível injection bem-sucedido
+
+---
+
+## Exemplos por stack
+
+### TypeScript (NestJS)
+
+```typescript
+@Injectable()
+export class GeminiProvider implements LLMProvider {
+  constructor(
+    private cache: Cache,
+    private rateLimit: TokenBucket,
+    @Inject('GEMINI_API_KEY') private apiKey: string,
+  ) {}
+
+  async complete(req: LLMRequest): Promise<unknown> {
+    const cached = await this.cache.get(req.cacheKey());
+    if (cached) return cached;
+    await this.rateLimit.acquire(1);
+    const raw = await this.callGemini(req);
+    const validated = req.schema.parse(raw);
+    await this.cache.set(req.cacheKey(), validated, req.ttl);
+    return validated;
+  }
+}
+```
+
+### Python (FastAPI)
+
+```python
+class ClaudeProvider(LLMProvider):
+    def __init__(self, client: Anthropic, cache: Cache, bucket: TokenBucket):
+        self.client = client
+        self.cache = cache
+        self.bucket = bucket
+
+    async def complete(self, req: LLMRequest):
+        cached = await self.cache.get(req.cache_key())
+        if cached: return cached
+        await self.bucket.acquire(1)
+        raw = await self.client.messages.create(...)
+        validated = req.schema.model_validate(raw.content[0].text)
+        await self.cache.set(req.cache_key(), validated.model_dump(), req.ttl)
+        return validated
+```
+
+### Rust/Axum
+
+```rust
+pub struct GeminiProvider {
+    client: reqwest::Client,
+    cache: Arc<dyn Cache>,
+    bucket: Arc<TokenBucket>,
+}
+
+#[async_trait]
+impl LLMProvider for GeminiProvider {
+    async fn complete<T: DeserializeOwned + JsonSchema>(&self, req: LLMRequest<T>) -> Result<T> {
+        if let Some(cached) = self.cache.get(&req.cache_key()).await? {
+            return Ok(cached);
+        }
+        self.bucket.acquire(1).await?;
+        let raw = self.call_gemini(&req).await?;
+        let validated: T = serde_json::from_value(raw)?;
+        self.cache.set(&req.cache_key(), &validated, req.ttl).await?;
+        Ok(validated)
+    }
+}
+```
+
+---
+
+## Observabilidade obrigatória
+
+Logue estruturado por chamada:
+
+```json
+{
+  "promptId": "summarize",
+  "version": 1,
+  "model": "gemini-2.0-flash",
+  "cacheHit": false,
+  "tokensIn": 1342,
+  "tokensOut": 287,
+  "estimatedCostUsd": 0.0021,
+  "latencyMs": 850,
+  "schemaValid": true
+}
+```
+
+Não logue: prompt completo (privacidade), output completo (PII), API keys.
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+- Listar quais LLMs serão usados (provider, modelo)
+- Estimar volume de calls/dia → ajustar rate limit
+- Definir prompts iniciais com schema
+
+### Blueprint
+- Diagrama da camada LLM (provider, cache, rate limit)
+- Estratégia de fallback (primary → secondary)
+- Estratégia de versionamento de prompts
+
+### Tasks
+- Task dedicada: "Criar LLMProvider + cache + rate limit"
+- Task por prompt: "Extrair prompt X para `prompts/x.v1.md`"
+- Task de validação: "Adicionar schema Zod/Pydantic para cada prompt"
+
+### Execute
+- Ralph Loop: grep falha se SDK direto em Service/Handler
+- Métricas M-01 a M-04 reportadas em cada PR
+
+---
+
+## Checklist final
+
+- [ ] Interface `LLMProvider` definida
+- [ ] Pelo menos 1 provider implementado
+- [ ] Cache em memória com TTL configurado
+- [ ] Token bucket configurado por provider
+- [ ] Todos os prompts em `prompts/<id>.v<n>.md`
+- [ ] Schema para cada prompt
+- [ ] Validação de output em todo chamador
+- [ ] Logs estruturados com tokens + custo
+- [ ] Defesa contra prompt injection em prompts com user input
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.

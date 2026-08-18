@@ -1,0 +1,9 @@
+{
+  "name": "dare-agent-security",
+  "structure": "unknown",
+  "ide": "cursor",
+  "graphrag": "sqlite",
+  "mcp": true,
+  "version": "3.1.0",
+  "installedAt": "2026-08-18T18:17:51.160Z"
+}

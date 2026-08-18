@@ -1,0 +1,245 @@
+---
+description: Diretrizes de Segurança — OWASP Top 10, Supply Chain, Segredos e Dependências Vulneráveis para todas as fases do DARE
+globs: *.md, *.php, *.py, *.go, *.vue, *.js, *.ts, *.rs, *.toml, *.yaml, *.yml
+---
+
+# Diretrizes de Segurança DARE
+
+Você é um Especialista em AppSec. Garanta que **Design → Blueprint → Tasks → Execução** sigam rigorosamente as práticas a seguir.
+
+---
+
+## Aplicação nas Fases do DARE
+
+### Fase 1 — Design (`/generate-design` / `/dare-design`)
+
+- **Requisitos de segurança obrigatórios** (seção RS-*):
+  - RS-01: validação de entrada (OWASP A03)
+  - RS-02: hash de senhas / proteção de dados sensíveis (OWASP A02)
+  - RS-03: controle de acesso por recurso (OWASP A01)
+  - RS-04: auditoria de dependências sem CVE HIGH/CRITICAL (OWASP A06)
+  - RS-05: secrets via variáveis de ambiente — nunca em código
+- Identifique vetores de ataque na ideia inicial e adicione mitigações em **Riscos**
+
+### Fase 2 — Architect (`/generate-blueprint` / `/dare-blueprint`)
+
+- Endpoints da API: inclua coluna `Auth` (JWT/apiKey/público) e middleware de rate limiting
+- Modelo de dados: marque campos sensíveis (PII, tokens, hashes) e como são protegidos
+- Fases do plano: inclua **Fase N-1 = Auditoria de Segurança e Dependências** com critério de DONE explícito
+- Validation gates por stack devem incluir o comando de auditoria de dependências
+
+### Fase 3 — Tasks (`/generate-tasks`)
+
+- Toda task que adiciona dependência externa → validation gate inclui `npm audit` / `cargo audit` / `pip-audit` / `composer audit`
+- Crie task dedicada para: headers de segurança HTTP, rate limiting, scan de secrets
+- Seção "Considerações de Segurança" obrigatória em cada `EXECUTION/task-*.md`
+
+### Fase 4 — Execute (`/execute-task`)
+
+Aplique as proteções abaixo ao implementar qualquer código.
+
+---
+
+## OWASP Top 10 — Implementação
+
+### A01 — Broken Access Control
+
+- Verifique permissão no **recurso**, não só na rota: `user.can('update', post)` / `authorize('update', $post)` / `check_permission(user, resource)`
+- Princípio do menor privilégio: tokens têm escopos mínimos necessários
+- Nunca exponha IDs sequenciais em URLs para recursos privados — use UUID ou ULID
+- Multi-tenant: **sempre** filtre por `tenant_id` / `org_id` em toda query
+
+```ts
+// ✅ certo — verifica ownership antes de retornar
+const post = await db.post.findFirst({ where: { id, authorId: session.userId } });
+if (!post) throw new ForbiddenError();
+
+// ❌ errado — qualquer usuário autenticado acessa qualquer post
+const post = await db.post.findUnique({ where: { id } });
+```
+
+### A02 — Cryptographic Failures
+
+- Senhas: **Argon2id** (preferido) ou Bcrypt (min cost 12) — nunca MD5/SHA1/SHA256 para senhas
+- Dados sensíveis em repouso: criptografar PII com AES-256-GCM
+- Dados em trânsito: HTTPS obrigatório; HSTS header em produção
+- Nunca logue senha, token, chave de API, número de cartão, CPF completo
+- JWT: assine com RS256 (chave assimétrica) para tokens públicos; HS256 + segredo forte (≥ 256 bits) para internos
+
+```rust
+// ✅ Rust — Argon2 via argon2 crate
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+let hash = Argon2::default().hash_password(password.as_bytes(), &salt)?;
+```
+
+### A03 — Injection
+
+**SQL Injection:**
+```python
+# ✅ SQLAlchemy — parametrizado
+result = db.execute(select(User).where(User.email == email))
+
+# ❌ nunca
+db.execute(f"SELECT * FROM users WHERE email = '{email}'")
+```
+
+**Command Injection:**
+```go
+// ✅ Go — lista de args, não shell string
+cmd := exec.Command("convert", inputFile, outputFile)
+
+// ❌ nunca
+exec.Command("sh", "-c", "convert "+userInput)
+```
+
+**XSS:** escape de saída no frontend; `Content-Security-Policy` no backend; evite `innerHTML` / `dangerouslySetInnerHTML` com dados do usuário.
+
+**Prompt Injection (IA):** se o projeto processa entradas de usuários em prompts LLM:
+- Separe instrução do sistema e dados do usuário por delimitadores claros
+- Valide e sanitize a entrada antes de inserir no prompt
+- Nunca confie em output do LLM como código a ser executado sem sandboxing
+
+### A04 — Insecure Design
+
+- Valide **no servidor** sempre, mesmo que o frontend já valide
+- Allowlists > blocklists para validação de campos, tipos de arquivo, domínios
+- Implemente rate limiting antes de qualquer lógica de negócio em endpoints públicos
+
+### A05 — Security Misconfiguration
+
+- Stack traces e erros detalhados: **apenas em desenvolvimento** — produção retorna mensagem genérica
+- Headers de segurança obrigatórios em produção:
+  ```
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Content-Security-Policy: default-src 'self'
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  ```
+- CORS: nunca `Access-Control-Allow-Origin: *` para endpoints autenticados
+- Desabilite métodos HTTP desnecessários (TRACE, OPTIONS em APIs simples)
+
+### A06 — Vulnerable and Outdated Components ← **crítico para Ralph Loop**
+
+**Comandos de auditoria por stack:**
+
+```bash
+# Node.js / npm — rodar antes de todo commit com novas deps
+npm audit --audit-level=high
+npm audit fix                      # corrige automaticamente quando possível
+
+# Rust / Cargo
+cargo install cargo-audit          # uma vez
+cargo audit                        # detecta CVEs no RustSec Advisory DB
+cargo update                       # bumpa versões compatíveis
+
+# Python
+pip install pip-audit
+pip-audit                          # CVEs via OSV + PyPI
+pip-audit --fix                    # auto-fix quando possível
+
+# PHP / Composer
+composer audit                     # nativo desde Composer 2.4
+composer update --with-all-dependencies [pacote]  # fix pontual
+
+# Go
+go list -json -m all | nancy sleuth  # ou govulncheck
+govulncheck ./...                   # ferramenta oficial Google
+
+# Docker images
+docker scout cves [imagem]          # se Docker Scout disponível
+```
+
+**Critério inegociável:** nenhuma dependência com CVE de nível **HIGH** ou **CRITICAL** pode entrar em produção sem justificativa documentada e plano de upgrade.
+
+### A07 — Authentication Failures
+
+- Rate limiting no endpoint de login: máx 5 tentativas / 15 min por IP + por usuário
+- Tokens JWT: `exp` máx 15 min para access token; refresh token com rotação
+- Logout: invalide refresh token no servidor (não confie só no lado cliente)
+- Senhas: mínimo 12 caracteres; bloquear senhas da lista HaveIBeenPwned
+- MFA: ofereça TOTP (RFC 6238) para contas com acesso a dados sensíveis
+
+### A08 — Software and Data Integrity
+
+- Valide assinatura / checksum de artefatos externos antes de usar
+- Nunca confie em dados enviados pelo cliente para decisões de autorização
+- CI/CD: pins de versão em actions (`actions/checkout@v4` não `@main`)
+- Lockfiles (`package-lock.json`, `Cargo.lock`, `poetry.lock`) devem ser commitados
+
+### A09 — Security Logging and Monitoring
+
+Logue (estruturado JSON, sem dados sensíveis):
+- Autenticação: login OK/FAIL, logout, refresh, MFA challenge
+- Autorização: acesso negado (403) com recurso e userId
+- Erros 5xx em produção com trace-id (sem stack trace completo)
+- Operações destrutivas: delete, disable, role change
+
+Nunca logue: senhas, tokens, chaves de API, números de cartão, CPF/SSN completo.
+
+### A10 — SSRF
+
+- Se a aplicação faz requisições para URLs fornecidas pelo usuário:
+  - Valide contra allowlist de domínios
+  - Bloqueie IPs privados (`127.x`, `10.x`, `172.16-31.x`, `192.168.x`, `169.254.x`)
+  - Bloqueie acesso a metadados de cloud (`169.254.169.254`)
+  - Use timeout agressivo (máx 5s) e sem redirects automáticos
+
+---
+
+## Segredos e Supply Chain
+
+### Nunca em código
+
+```bash
+# Padrões proibidos em commits — configure pre-commit hook ou git-secrets:
+password = "..."
+api_key = "..."
+secret_key = "..."
+AWS_SECRET_ACCESS_KEY = "..."
+DATABASE_URL = "postgres://user:password@..."
+```
+
+### Gestão de segredos
+
+- Desenvolvimento: arquivo `.env` (no `.gitignore`) com `.env.example` sem valores reais
+- CI/CD: variáveis de ambiente ou secrets do pipeline (GitHub Actions Secrets, etc.)
+- Produção: vault (HashiCorp Vault, AWS Secrets Manager, GCP Secret Manager)
+- Rotação: tokens de serviço rotacionados a cada 90 dias
+
+### Verificação pre-commit (recomendado)
+
+```bash
+# Instalar detect-secrets
+pip install detect-secrets
+detect-secrets scan > .secrets.baseline
+detect-secrets audit .secrets.baseline
+
+# Ou git-secrets
+git secrets --install
+git secrets --register-aws
+```
+
+---
+
+## Validation Gates de Segurança no Ralph Loop
+
+Adicione ao ciclo de cada task que mexe em dependências ou configuração:
+
+```bash
+# 1. Auditoria de dependências (obrigatório se houve mudança em deps)
+npm audit --audit-level=high         # Node
+cargo audit                          # Rust
+pip-audit                            # Python
+composer audit                       # PHP
+
+# 2. Scan de secrets (obrigatório em tasks de config/infra/CI)
+detect-secrets scan --baseline .secrets.baseline
+
+# 3. Headers de segurança (para tasks de configuração de servidor)
+# Verificar manualmente ou com curl:
+curl -I https://staging.example.com | grep -E "Strict-Transport|X-Frame|X-Content|Content-Security"
+```
+
+> **Gate obrigatório:** CVE HIGH/CRITICAL nas dependências = task **FAILED** até corrigi-las.

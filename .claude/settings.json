@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(npm run build)",
+      "Bash(npm test)",
+      "Bash(npx eslint src)",
+      "Read(DARE/**)",
+      "Write(DARE/**)",
+      "Read(src/**)",
+      "Write(src/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"âœ… File saved. Remember to run Ralph Loop: npm run build && npm test && npx eslint src\""
+          }
+        ]
+      }
+    ]
+  }
+}

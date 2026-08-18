@@ -1,0 +1,221 @@
+---
+description: Como construir e executar grafos de tasks (DAG) do método DARE com paralelismo lógico via dare-dag.yaml. O Cursor é o executor; o CLI dare é orquestrador.
+globs: DARE/dare-dag.yaml,DARE/EXECUTION/**,DARE/.canvas.md
+alwaysApply: false
+---
+
+# Skill: DAG Task Runner
+
+## Quando usar
+
+- O `BLUEPRINT.md` foi aprovado e você precisa decompor em tasks executáveis
+- O usuário pediu para começar a execução do DAG
+- Existe `DARE/dare-dag.yaml` e você precisa entender, executar ou modificar
+- Aparece o canvas `DARE/.canvas.md` durante uma execução
+
+## Quem executa o quê
+
+> **Você (Cursor) é o executor. O CLI `dare` é orquestrador.**
+
+- A IDE em que você roda já está autenticada na conta do usuário
+- Você lê o `dare-dag.yaml` e as specs em `DARE/EXECUTION/task-*.md`
+- Você executa cada task — escreve código, roda testes, faz lint
+- Depois de cada task, você chama o CLI para registrar o resultado:
+  - `dare execute --complete <task-id> --output "<resumo>"`
+  - `dare execute --fail <task-id> --reason "<mensagem>"`
+- O CLI atualiza o canvas e popula o `dare-graph` automaticamente
+
+**Não há API key. Não há custo extra de tokens. Você usa o plano da IDE.**
+
+## O que é o DAG do DARE
+
+`DARE/dare-dag.yaml` é o **plano de execução**: um grafo direcionado acíclico
+em que cada nó é uma task atômica e as arestas são `depends_on`. O CLI ordena
+topologicamente (Kahn's algorithm) e indica em que ordem você deve executar.
+Tasks no mesmo rank podem rodar em paralelo (logicamente — você decide se
+literalmente fan-out ou roda uma após a outra).
+
+```
+rank 0:  task-001    task-002      ←  podem rodar juntas (sem depends_on)
+rank 1:  task-003 (deps: 001, 002) ←  só após rank 0
+rank 2:  task-004 (deps: 003)
+```
+
+## Schema canônico do `dare-dag.yaml`
+
+```yaml
+title: "<Nome do projeto> - Development Tasks"
+version: "1.0.0"
+
+limits:
+  parent_context_chars: 2000   # snippet de cada output de pai injetado no filho
+  task_output_chars: 4000      # cap do output capturado por task
+  timeout_seconds: 600         # apenas referência; quem aborta é você
+
+# Mapeamento complexity → modelo (referencial — você usa o modelo da sua IDE)
+models:
+  cursor:      { HIGH: gpt-5.3-codex,     MED: composer-2,       LOW: auto-low }
+  claude:      { HIGH: claude-sonnet-4-5, MED: claude-haiku-4,   LOW: claude-haiku-4 }
+  antigravity: { HIGH: gemini-2.5-pro,    MED: gemini-2.5-flash, LOW: gemini-2.5-flash }
+
+tasks:
+  - id: task-001
+    title: "Setup project structure"
+    depends_on: []
+    complexity: LOW
+    spec_file: EXECUTION/task-001.md
+    subtask_prompt: |
+      <prompt completamente self-contained>
+```
+
+## Loop de execução
+
+```
+1. dare execute --next
+   ↓ imprime prompts das tasks ready (rank atual)
+2. Para cada prompt:
+     - leia spec_file se houver
+     - implemente
+3. dare execute --complete <id> --output "<resumo + arquivos tocados>"
+     ↓ o CLI roda o RALPH LOOP automático (build → test → lint)
+     ↓ se passar: task vira DONE
+     ↓ se falhar: task vira FAILED com stderr capturado; corrija e retente
+4. Volte ao passo 1 até não haver mais tasks ready
+```
+
+> **Ralph Loop é AUTOMÁTICO e OBRIGATÓRIO.** Você NÃO roda build/test/lint
+> manualmente — o `dare execute --complete` faz isso. Se algum gate falhar,
+> a task NÃO vai para DONE; vai para FAILED. Você corrige o código e tenta
+> de novo (`dare execute --complete <id>` outra vez, ou `--reset` antes se
+> precisar zerar histórico).
+>
+> **Não existe flag para pular o Ralph Loop.** Toda task passa pelos 3 gates
+> da stack do projeto.
+
+Comandos úteis:
+
+```bash
+dare execute --next                                # próximas tasks ready (rank atual)
+dare execute --complete task-001 --output "..."    # marca DONE
+dare execute --fail task-002 --reason "..."        # marca FAILED + cascade-skip
+dare execute --reset task-002                      # volta para PENDING (retry)
+dare execute --status                              # snapshot do canvas
+```
+
+## Regras inegociáveis ao construir o DAG
+
+### 1. `id` em kebab-case e único
+`task-001`, `auth-jwt`, `db-migrations`. Sem espaços nem maiúsculas.
+
+### 2. `depends_on` mínimo — maximize paralelismo
+Só adicione dependência quando a task filha **literalmente não pode começar**
+sem o output da pai (arquivo, schema, decisão exportada).
+
+| Cenário | Dep? |
+|---------|------|
+| B precisa do arquivo que A criou | sim |
+| B precisa de uma decisão tomada em A | sim |
+| B faz coisa similar a A mas independente | não |
+| Pesquisa/leitura sem efeito colateral | não — fan out wide |
+| Testes do módulo X | sim — depende da implementação |
+| Docs do módulo X | sim — depende da implementação |
+
+Cadeia linear `001 → 002 → 003 → ...` é antipattern. Reanalise.
+
+### 3. `complexity` é referência (não custo real para você)
+| Nível | Quando usar |
+|-------|-------------|
+| `LOW`  | Setup, scaffolding, docs simples, leitura/pesquisa |
+| `MED`  | Implementação direta, refactors, testes unitários |
+| `HIGH` | Lógica de negócio crítica, segurança, integrações |
+
+Como você usa o plano da IDE, `complexity` virou principalmente um sinal para
+você priorizar atenção/cuidado, não para escolher modelo.
+
+### 4. `subtask_prompt` totalmente self-contained
+Sua sessão futura recebe o prompt + snippets de até 2000 chars dos outputs
+dos pais (via `dare execute --next`). Não vale "como combinamos antes".
+Tudo o que precisa estar no prompt ou virá pelos pais.
+
+### 5. Output cap de 4000 chars
+Se uma task gera muito, escreva em arquivo (permanece no FS) e faça o
+`--output` do `dare execute --complete` ser um resumo curto + caminhos dos
+arquivos criados.
+
+### 6. Cada task tem spec em `EXECUTION/task-<id>.md`
+Spec detalhada com: objetivo, arquivos a criar/modificar, validation gates,
+testes esperados. O `subtask_prompt` referencia `spec_file` para você ler na
+hora de executar.
+
+## Geração: o que o `/generate-tasks` deve produzir
+
+Sempre os **três artefatos juntos**:
+
+1. **`DARE/TASKS.md`** — tabela master para humanos
+2. **`DARE/dare-dag.yaml`** — grafo executável
+3. **`DARE/EXECUTION/task-<id>.md`** — uma spec por task
+
+Os três precisam estar consistentes (mesmos `id`s, mesmos `depends_on`,
+mesma `complexity`). Inconsistência aqui quebra a execução.
+
+## Canvas ao vivo (`DARE/.canvas.md`)
+
+O CLI reescreve `DARE/.canvas.md` a cada `dare execute --complete/--fail`:
+
+```
+| ID       | Title              | Status        | Duration | Tokens |
+|----------|--------------------|---------------|----------|--------|
+| task-001 | Setup structure    | ✅ DONE       | 1240ms   | 850    |
+| task-002 | DB schema          | 🔄 RUNNING    | -        | -      |
+| task-003 | Core endpoints     | ⏳ PENDING    | -        | -      |
+```
+
+Status: `PENDING` ⏳ · `RUNNING` 🔄 · `DONE` ✅ · `FAILED` ❌ · `SKIPPED` ⏭️
+
+`SKIPPED` é automático quando uma dependência falha — você não precisa fazer
+nada; o CLI cuida do cascade.
+
+## Erros comuns ao construir DAG
+
+| Erro | Sintoma | Como corrigir |
+|------|---------|---------------|
+| Ciclo em `depends_on` | `Circular dependency detected: <id>` | Reveja, retire a aresta cíclica |
+| `id` duplicado | Comportamento indefinido | Renomeie |
+| `depends_on` aponta para `id` inexistente | `Task not found: <id>` | Corrija nome |
+| Tudo em rank 0 | Conflito de escrita no mesmo arquivo | Adicione `depends_on` quando há contenção |
+| Cadeia linear longa | Sem ganho de paralelismo | Reveja se as deps são reais |
+
+## Antipatterns que você NÃO deve criar
+
+- ❌ Task chamada **"Ralph Loop final"**, **"Hardening final"**, **"QA final"**
+  — Ralph Loop roda automaticamente em cada `--complete`. Não é uma task.
+- ❌ Tests com `assertTrue(true)` ou equivalentes — o gate `test` vai rodar
+  de verdade. Placeholder não engana o CLI; só atrasa o ciclo.
+- ❌ "Setup project structure" como primeira task quando o ambiente ainda
+  não foi containerizado — sem container/runtime, o Ralph Loop não roda.
+
+## Ordem recomendada das primeiras tasks
+
+1. **Containerize app** (Dockerfile + docker-compose + healthcheck) — sem
+   isso o Ralph Loop não tem onde rodar
+2. **Database schema** (migrations + factories)
+3. **Core endpoints / componentes**
+4. **Auth / autorização**
+5. **Test suite real** (com assertions de verdade)
+
+A task de container/compose pode estar em **outra ordem** se o projeto já
+vive em um container do monorepo, ou se a stack não precisa de DB. Mas
+quase sempre é uma das primeiras — nunca a última.
+
+## Checklist antes de aprovar um DAG
+
+- [ ] Pelo menos 2 tasks no rank 0
+- [ ] Cada `subtask_prompt` é executável sem contexto adicional
+- [ ] Tasks de teste/doc dependem da implementação correspondente
+- [ ] `complexity` reflete o esforço real (não tudo HIGH)
+- [ ] `id` em kebab-case e único
+- [ ] Sem ciclos
+- [ ] **Sem task de "Ralph Loop final"** — Ralph Loop é gate por task
+- [ ] **Tests com assertions reais** — placeholder quebra o gate `test`
+- [ ] Container/runtime resolvido cedo, não na última task
+- [ ] `TASKS.md` + `dare-dag.yaml` + `EXECUTION/task-*.md` consistentes

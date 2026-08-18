@@ -1,31 +1,152 @@
 # /dare-execute
 
-Execute one approved DARE task using the Ralph Loop.
+Executa uma task específica do `DARE/dare-dag.yaml` seguindo o Ralph Loop.
 
-Read `DARE/AGENT-WORKFLOW.md` first. Resolve the active cycle, then read the Product Design, cycle Approval (when present), cycle Design, Blueprint, Tasks, DAG and the selected `EXECUTION/<task-id>.md`.
+## Como usar
 
-For the current approved round, use `DARE/cycles/001-evidence-schema/` only if repository state still identifies it as active.
-
-## Execution
-
-1. Resolve `$ARGUMENTS` to a task id.
-2. Verify all `depends_on` tasks are actually DONE.
-3. Implement only the approved task specification; do not redesign the cycle.
-4. Add real tests for required behavior and edge cases.
-5. Execute every task-specific validation gate and repeat fixes until green.
-6. For Rust, baseline gates are:
-
-```bash
-cargo fmt --all --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
+```
+/dare-execute task-001
+/dare-execute task-003 --force
 ```
 
-7. Run additional schema, fixture, security, redaction and dependency gates required by the task.
-8. Perform semantic/anti-stub review before marking DONE.
-9. Preserve the approved task specification and append a clearly separated execution-result section rather than replacing it.
-10. Report changed files, tests, validation results and the next dependency-ready task.
+## O que fazer
 
-Never weaken tests/security invariants to make a gate pass. Never add raw credentials to evidence/errors. Stop and return for human DARE Review if implementation requires architecture changes, scope expansion, weakened security properties, ambiguous IP/public boundaries or an unapproved task split.
+### 1. Leia `DARE/BLUEPRINT.md` — obrigatório
+
+Antes de qualquer implementação. Foque em:
+- Stack técnica e versões (seção 2)
+- Validation gates da stack (seção 7)
+- Controles de segurança mapeados (seção 8)
+
+### 2. Leia a task em `DARE/dare-dag.yaml` e `DARE/EXECUTION/task-<id>.md`
+
+- `subtask_prompt` — instrução self-contained da task
+- `complexity` — LOW/MED/HIGH (define rigor do Ralph Loop)
+- `depends_on` — verifique status antes de executar
+- Spec em `EXECUTION/task-<id>.md` — objetivo, arquivos, validation gates
+
+### 3. Verifique dependências
+
+- Todas as tasks em `depends_on` devem ter status `DONE` em `DARE/TASKS.md`
+- Se alguma estiver `PENDING` → alerte o usuário (a menos que `--force`)
+- Se alguma estiver `FAILED` → recuse executar e informe
+
+### 4. Implemente a task
+
+- Siga padrões do `CLAUDE.md` e da spec em `EXECUTION/task-<id>.md`
+- Crie/modifique arquivos conforme seção "Arquivos a criar/modificar"
+- Implemente testes com assertions reais (não `assertTrue(true)`)
+- Aplique os controles de segurança listados na seção 5 da spec
+
+### 5. Execute o Ralph Loop (obrigatório antes de DONE)
+
+Se qualquer etapa falhar, leia o erro, corrija e reexecute. **Não marque DONE sem todos os gates verdes.**
+
+#### 5.1 Build
+```bash
+# Rust: cargo build
+# Node: npm run build
+# Python: python -m py_compile **/*.py  (ou mypy para tipo)
+# PHP: php artisan config:cache
+# Go: go build ./...
+```
+
+#### 5.2 Test
+```bash
+# Rust: cargo test --workspace
+# Node: npm test
+# Python: pytest
+# PHP: php artisan test
+# Go: go test ./...
+```
+
+#### 5.3 Lint
+```bash
+# Rust: cargo clippy -- -D warnings
+# Node: npx eslint src --max-warnings=0
+# Python: ruff check .
+# PHP: ./vendor/bin/phpstan analyse
+# Go: golangci-lint run
+```
+
+#### 5.4 Auditoria de Dependências
+
+**Execute SEMPRE que esta task adicionar ou atualizar dependências externas.**
+
+```bash
+# Node.js / npm
+npm audit --audit-level=high
+# Se houver vulnerabilidades corrigíveis:
+npm audit fix
+
+# Rust / Cargo
+cargo audit
+# Para auto-fix (bumpa versões compatíveis):
+cargo update  # depois verificar Cargo.lock
+
+# Python / pip
+pip-audit
+# Para instalar: pip install pip-audit
+# Fix: atualizar versão no requirements.txt / pyproject.toml
+
+# PHP / Composer
+composer audit
+# Fix: composer update --with-all-dependencies [pacote]
+```
+
+> **Gate obrigatório:** a task só pode ser marcada como DONE se não houver CVE de nível HIGH ou CRITICAL nas dependências do projeto. CVEs de nível MODERATE devem ser documentados com justificativa se não puderem ser corrigidos imediatamente.
+
+#### 5.5 Verificação de Secrets (para tasks que mexem em configuração ou CI)
+
+```bash
+# Verificar se não há secrets hardcoded antes de commitar
+# Procurar padrões comuns:
+grep -rn "password\s*=\s*['\"][^'\"]" src/ || true
+grep -rn "api_key\s*=\s*['\"][^'\"]" src/ || true
+grep -rn "secret\s*=\s*['\"][^'\"]" src/ || true
+# Use git-secrets ou trufflehog se disponível no projeto
+```
+
+### 6. Atualize `DARE/TASKS.md`
+
+Mude o status para `DONE` e adicione duração se souber.
+
+### 7. Crie artifact em `DARE/EXECUTION/task-<id>.md`
+
+```markdown
+# Task <id>: <título>
+
+## Status: ✅ DONE
+## Duração: <estimativa>
+
+## Arquivos criados/modificados
+- path/to/file1.ts
+- path/to/file2.test.ts
+
+## Testes
+- ✅ test_should_x_when_y
+- ✅ test_should_return_401_when_unauthenticated
+
+## Ralph Loop
+- ✅ Build
+- ✅ Test
+- ✅ Lint
+- ✅ Auditoria de deps (se aplicável)
+
+## Segurança
+- ✅ Input validation aplicada
+- ✅ Autenticação/autorização verificada
+- ✅ Sem secrets em código
+```
+
+### 8. Sugira a próxima task disponível
+
+Liste as tasks com `depends_on` satisfeito e status `PENDING`. Indique qual rodar com `/dare-execute <id>`.
+
+## Modo Paralelo
+
+```bash
+dare execute --parallel --runner claude
+```
 
 $ARGUMENTS

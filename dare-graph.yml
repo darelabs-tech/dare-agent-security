@@ -1,0 +1,25 @@
+# DARE Knowledge Graph — SQLite
+backend: sqlite
+
+sqlite:
+  path: .dare/graph.db
+
+# Node types tracked in the graph
+nodes:
+  - task
+  - file
+  - schema
+  - endpoint
+  - component
+  - entity
+  - concept
+
+# Relationship types
+edges:
+  - depends_on
+  - implements
+  - uses
+  - references
+  - related_to
+  - contains
+  - extends

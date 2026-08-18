@@ -1,0 +1,244 @@
+---
+description: Arquitetura frontend DARE para projetos React e Vue. Detecta god components (>300 linhas), fetch inline em JSX/template, garante error boundaries, loading states e bundle size monitorado.
+globs: src/**/*.tsx,src/**/*.ts,src/**/*.jsx,src/**/*.js,src/**/*.vue,vite.config.ts,vite.config.js,webpack.config.js
+alwaysApply: false
+---
+
+# Skill: Frontend Design DARE
+
+Você é um arquiteto frontend especialista em React e Vue. Esta skill enforce arquitetura limpa em camadas no frontend, com **componentes pequenos, sem fetch inline, error boundaries explícitos e bundle monitorado**.
+
+## Arquitetura recomendada
+
+### React
+
+```
+┌──────────────────────────────────────────────────┐
+│  Page  (rota, layout)                            │  ← top-level
+└──────────────────────────────────────────────────┘
+              ↓ usa
+┌──────────────────────────────────────────────────┐
+│  Container  (lógica + estado)                    │  ← orquestrador
+└──────────────────────────────────────────────────┘
+              ↓ injeta props
+┌──────────────────────────────────────────────────┐
+│  Presentational  (puro, recebe props)            │  ← visual
+└──────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────┐
+│  Hook de dados (useUser, useOrders…)             │  ← fetch + cache
+└──────────────────────────────────────────────────┘
+```
+
+### Vue (Composition API)
+
+```
+Page.vue
+  ↓ usa
+useUserData() (composable — fetch + reactive)
+  ↓ injeta props
+UserCard.vue (presentational)
+```
+
+---
+
+## As 4 regras
+
+### 1. Componente < 300 linhas (M-01)
+
+Se um arquivo `.tsx`/`.vue` passar de 300 linhas, quebrar em:
+- Sub-componentes lógicos
+- Hook/composable separado para estado
+- Helper para transformações de dados
+
+### 2. Zero `fetch()` direto em JSX/template (M-02)
+
+```tsx
+// ❌ Errado
+function UserList() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    fetch('/api/users').then(r => r.json()).then(setUsers);
+  }, []);
+  return <ul>{users.map(...)}</ul>;
+}
+
+// ✅ Certo — hook isolado e testável
+function UserList() {
+  const { data, isLoading, error } = useUsers();
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <ul>{data.map(...)}</ul>;
+}
+
+function useUsers() {
+  return useQuery({ queryKey: ['users'], queryFn: () => api.users.list() });
+}
+```
+
+### 3. Error Boundary em cada Page (M-03)
+
+```tsx
+// React
+class ErrorBoundary extends React.Component {
+  state = { error: null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  componentDidCatch(error: Error, info: ErrorInfo) { logError(error, info); }
+  render() {
+    if (this.state.error) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+// Wrap cada Page
+<ErrorBoundary fallback={<ErrorPage />}>
+  <UsersPage />
+</ErrorBoundary>
+```
+
+```vue
+<!-- Vue -->
+<script setup>
+import { onErrorCaptured } from 'vue';
+onErrorCaptured((err, instance, info) => {
+  logError(err, info);
+  return false; // stops propagation
+});
+</script>
+```
+
+### 4. Bundle size monitorado (M-04)
+
+```typescript
+// vite.config.ts
+import { visualizer } from 'rollup-plugin-visualizer';
+
+export default defineConfig({
+  plugins: [
+    react(),
+    visualizer({ open: false, gzipSize: true, filename: 'dist/stats.html' }),
+  ],
+  build: {
+    chunkSizeWarningLimit: 300, // KB
+  },
+});
+```
+
+---
+
+## Métricas (verificáveis em CI)
+
+| ID | Métrica | Como medir |
+|---|---|---|
+| M-01 | 100% de componentes < 300 linhas | `wc -l` por arquivo, fail se >300 |
+| M-02 | 0 `fetch()` direto em JSX/template | grep AST nos componentes |
+| M-03 | 100% de páginas com error boundary | grep por `ErrorBoundary` ou `onErrorCaptured` |
+| M-04 | Bundle config presente | `test -f vite.config.ts` + check de `chunkSizeWarningLimit` |
+
+---
+
+## Antipatterns
+
+| AP | Antipattern | Sinal | Correção |
+|---|---|---|---|
+| AP-01 | God component | >300 linhas | Quebrar em sub-componentes + hooks |
+| AP-02 | Fetch em JSX | `useEffect(() => fetch())` | Hook customizado |
+| AP-03 | Booleanos isLoading espalhados | `isLoading`, `isError`, `isSubmitting` separados | Discriminated union (`state: 'idle' \| 'loading' \| 'success' \| 'error'`) |
+| AP-04 | Sem error boundary | erro derruba app | Wrap em `<ErrorBoundary>` |
+| AP-05 | Estilo inline pesado | `style={{...30 props}}` | CSS Module / Tailwind / styled |
+| AP-06 | Props drilling profundo | passa prop 5+ níveis | Context API ou Zustand/Pinia |
+
+---
+
+## Stack recomendada
+
+| Camada | React | Vue |
+|---|---|---|
+| Roteamento | React Router 7 / Next 14 / TanStack Router | Vue Router / Nuxt 3 |
+| Estado server | TanStack Query | TanStack Vue Query / Pinia Colada |
+| Estado client | Zustand / Jotai | Pinia |
+| Forms | React Hook Form / TanStack Form | VeeValidate / TanStack Form |
+| Styling | Tailwind + CSS Modules | Tailwind + SCSS |
+| Testes | Vitest + Testing Library | Vitest + Testing Library |
+| E2E | Playwright | Playwright |
+| Bundler | Vite | Vite |
+
+---
+
+## Scaffold de página DARE-compliant
+
+```tsx
+// src/pages/UsersPage.tsx
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { UsersContainer } from '@/containers/UsersContainer';
+
+export function UsersPage() {
+  return (
+    <ErrorBoundary fallback={<ErrorPage />}>
+      <UsersContainer />
+    </ErrorBoundary>
+  );
+}
+
+// src/containers/UsersContainer.tsx
+import { useUsers } from '@/hooks/useUsers';
+import { UserList } from '@/components/UserList';
+
+export function UsersContainer() {
+  const { data, isLoading, error } = useUsers();
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <UserList users={data} />;
+}
+
+// src/components/UserList.tsx — presentational puro
+export function UserList({ users }: { users: User[] }) {
+  return <ul>{users.map(u => <UserItem key={u.id} user={u} />)}</ul>;
+}
+
+// src/hooks/useUsers.ts
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: () => api.users.list(),
+    staleTime: 60_000,
+  });
+}
+```
+
+---
+
+## Aplicação por fase DARE
+
+### Design
+- Listar páginas/rotas no DESIGN.md
+- Definir estados de cada rota (idle/loading/success/error)
+
+### Blueprint
+- Estrutura de pastas (`src/pages/`, `src/containers/`, `src/components/`, `src/hooks/`)
+- Stack escolhida (React Query vs SWR, Zustand vs Redux, etc.)
+
+### Tasks
+- 1 task por página com 3 sub-tasks: Page, Container, Hook
+- Task de configuração de Error Boundary global
+- Task de configuração de bundle visualizer
+
+### Execute
+- Ralph Loop falha se: arquivo >300 linhas, `fetch()` em componente, página sem error boundary
+
+---
+
+## Checklist final
+
+- [ ] Pastas `src/pages/`, `src/containers/`, `src/components/`, `src/hooks/`
+- [ ] Todos os componentes < 300 linhas
+- [ ] Zero `fetch()` direto em componente
+- [ ] Cada Page tem `<ErrorBoundary>` ou `onErrorCaptured`
+- [ ] `chunkSizeWarningLimit` configurado no bundler
+- [ ] TanStack Query (ou equivalente) configurado
+- [ ] Testes com Testing Library para Presentational
+- [ ] Testes com mock do Hook para Container
+
+---
+
+Skill licenciada MIT — parte do DARE Method v3.
