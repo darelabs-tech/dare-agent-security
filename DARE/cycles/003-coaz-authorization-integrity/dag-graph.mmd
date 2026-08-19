@@ -1,0 +1,34 @@
+flowchart TD
+  T001[task-001 Reconcile baseline + standards]
+  T002[task-002 Vector/result contracts]
+  T003[task-003 Canonicalization]
+  T004[task-004 Binding engine]
+  T005[task-005 Projectors]
+  T006[task-006 Deterministic PDP]
+  T007[task-007 Mutation + sink]
+  T008[task-008 Vectors 001-007]
+  T009[task-009 Evidence bridge]
+  T010[task-010 validate CLI]
+  T011[task-011 E2E integrity proof]
+  T012[task-012 Docs + final proof]
+
+  T001 --> T002
+  T001 --> T003
+  T003 --> T004
+  T001 --> T005
+  T003 --> T005
+  T004 --> T006
+  T005 --> T006
+  T003 --> T007
+  T004 --> T007
+  T002 --> T008
+  T004 --> T008
+  T005 --> T008
+  T006 --> T008
+  T007 --> T008
+  T002 --> T009
+  T008 --> T009
+  T008 --> T010
+  T009 --> T010
+  T010 --> T011
+  T011 --> T012

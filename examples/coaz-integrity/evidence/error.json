@@ -1,0 +1,138 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/evidence",
+    "version": "1.0.0"
+  },
+  "id": "urn:uuid:501e1b5e-a964-5dc4-8de2-f04a7db15040",
+  "vector": {
+    "id": "COAZ-INTEGRITY-ERROR-SAMPLE",
+    "version": "1.0.0",
+    "name": "rental.quote integrity (COAZ-INTEGRITY-ERROR-SAMPLE)"
+  },
+  "target": {
+    "type": "synthetic-service",
+    "id": "synthetic-coaz-integrity-lab",
+    "name": "synthetic COAZ integrity lab",
+    "software": "dare-coaz-integrity",
+    "software_version": "0.1.0",
+    "protocol": "mcp",
+    "protocol_version": "2026-07-28"
+  },
+  "preconditions": [
+    {
+      "id": "synthetic-only",
+      "description": "vector executes against built-in synthetic fixtures only",
+      "satisfied": true
+    },
+    {
+      "id": "tools-call-scope",
+      "description": "executable scope is limited to MCP tools/call",
+      "satisfied": true
+    }
+  ],
+  "operation": {
+    "kind": "authorization.integrity",
+    "name": "rental.quote",
+    "resource": "tools/call",
+    "arguments_digest": {
+      "algorithm": "sha256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "authorization_context": {
+    "principal_id": "subject-synthetic-001",
+    "agent_id": "agent-synthetic-001",
+    "policy_id": "default-tools-call",
+    "policy_version": "1.0.0"
+  },
+  "expected": {
+    "description": "integrity vector must evaluate authorization-to-execution binding"
+  },
+  "observed": {
+    "description": "harness infrastructure failure (HARNESS_ERROR)",
+    "source": "FIXTURE"
+  },
+  "verdict": "ERROR",
+  "standards": [
+    {
+      "organization": "OpenID AuthZEN",
+      "standard": "Authorization API",
+      "version": "1.0",
+      "control": "OpenID AuthZEN|Authorization API|1.0"
+    },
+    {
+      "organization": "COAZ",
+      "standard": "Framework",
+      "version": "1.0 Draft 1",
+      "control": "COAZ|Framework|1.0 Draft 1"
+    },
+    {
+      "organization": "COAZ-MCP",
+      "standard": "Binding",
+      "version": "1.0 Draft 1",
+      "control": "COAZ-MCP|Binding|1.0 Draft 1|Â§9 PEP Behavior"
+    },
+    {
+      "organization": "COAZ-MCP",
+      "standard": "Binding",
+      "version": "1.0 Draft 1",
+      "control": "COAZ-MCP|Binding|1.0 Draft 1|Â§11.5 Mapping Integrity"
+    },
+    {
+      "organization": "OpenID AuthZEN",
+      "standard": "COAZ-MCP authorization-to-execution binding",
+      "version": "proposal",
+      "control": "openid/authzen#603",
+      "url": "openid/authzen#603"
+    },
+    {
+      "organization": "MCP",
+      "standard": "Model Context Protocol",
+      "version": "2026-07-28",
+      "control": "MCP|Model Context Protocol|2026-07-28|tools/call semantics"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "vector-result",
+      "uri_or_path": "examples/coaz-integrity/evidence/error-source.json",
+      "digest": {
+        "algorithm": "sha256",
+        "value": "38ada75a2adefed04ea4e7305c6200829cf14251688e03d83324a9444363a2d0"
+      },
+      "media_type": "application/json",
+      "redacted": false
+    }
+  ],
+  "hashes": [
+    {
+      "algorithm": "sha256",
+      "value": "38ada75a2adefed04ea4e7305c6200829cf14251688e03d83324a9444363a2d0"
+    }
+  ],
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE_REQUIRED",
+    "fields": []
+  },
+  "timestamps": {
+    "started_at": "2026-08-19T12:00:00Z",
+    "observed_at": "2026-08-19T12:00:01Z",
+    "recorded_at": "2026-08-19T12:00:02Z"
+  },
+  "extensions": {
+    "dare.coaz.integrity": {
+      "binding_changed": false,
+      "expected_enforcement": "FORWARD_WITH_EXISTING_PERMIT",
+      "integrity_verdict": "ERROR",
+      "mutation_kind": "NONE",
+      "observed_enforcement": "HARNESS_ERROR",
+      "reevaluated": false,
+      "reference_mode": "SECURE_REEVALUATE",
+      "result_artifact_path": "examples/coaz-integrity/evidence/error-source.json",
+      "result_digest": "38ada75a2adefed04ea4e7305c6200829cf14251688e03d83324a9444363a2d0",
+      "standards_schema_version": "1.0.0",
+      "vector_id": "COAZ-INTEGRITY-ERROR-SAMPLE"
+    }
+  }
+}

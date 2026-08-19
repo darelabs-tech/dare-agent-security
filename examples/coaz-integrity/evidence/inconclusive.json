@@ -1,0 +1,140 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/evidence",
+    "version": "1.0.0"
+  },
+  "id": "urn:uuid:93f84737-3cc1-5dd2-a76c-24dd3c320ff9",
+  "vector": {
+    "id": "COAZ-INTEGRITY-INCONCLUSIVE-SAMPLE",
+    "version": "1.0.0",
+    "name": "rental.quote integrity (COAZ-INTEGRITY-INCONCLUSIVE-SAMPLE)"
+  },
+  "target": {
+    "type": "synthetic-service",
+    "id": "synthetic-coaz-integrity-lab",
+    "name": "synthetic COAZ integrity lab",
+    "software": "dare-coaz-integrity",
+    "software_version": "0.1.0",
+    "protocol": "mcp",
+    "protocol_version": "2026-07-28"
+  },
+  "preconditions": [
+    {
+      "id": "synthetic-only",
+      "description": "vector executes against built-in synthetic fixtures only",
+      "satisfied": true
+    },
+    {
+      "id": "tools-call-scope",
+      "description": "executable scope is limited to MCP tools/call",
+      "satisfied": true
+    }
+  ],
+  "operation": {
+    "kind": "authorization.integrity",
+    "name": "rental.quote",
+    "resource": "tools/call",
+    "arguments_digest": {
+      "algorithm": "sha256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "authorization_context": {
+    "principal_id": "subject-synthetic-001",
+    "agent_id": "agent-synthetic-001",
+    "policy_id": "default-tools-call",
+    "policy_version": "1.0.0"
+  },
+  "expected": {
+    "decision": "ALLOW",
+    "result": "FORWARD_WITH_EXISTING_PERMIT",
+    "description": "deterministic enforcement projection was insufficient for PASS/FAIL"
+  },
+  "observed": {
+    "description": "projection was inconclusive (INCONCLUSIVE_PROJECTION)",
+    "source": "FIXTURE"
+  },
+  "verdict": "INCONCLUSIVE",
+  "standards": [
+    {
+      "organization": "OpenID AuthZEN",
+      "standard": "Authorization API",
+      "version": "1.0",
+      "control": "OpenID AuthZEN|Authorization API|1.0"
+    },
+    {
+      "organization": "COAZ",
+      "standard": "Framework",
+      "version": "1.0 Draft 1",
+      "control": "COAZ|Framework|1.0 Draft 1"
+    },
+    {
+      "organization": "COAZ-MCP",
+      "standard": "Binding",
+      "version": "1.0 Draft 1",
+      "control": "COAZ-MCP|Binding|1.0 Draft 1|Â§9 PEP Behavior"
+    },
+    {
+      "organization": "COAZ-MCP",
+      "standard": "Binding",
+      "version": "1.0 Draft 1",
+      "control": "COAZ-MCP|Binding|1.0 Draft 1|Â§11.5 Mapping Integrity"
+    },
+    {
+      "organization": "OpenID AuthZEN",
+      "standard": "COAZ-MCP authorization-to-execution binding",
+      "version": "proposal",
+      "control": "openid/authzen#603",
+      "url": "openid/authzen#603"
+    },
+    {
+      "organization": "MCP",
+      "standard": "Model Context Protocol",
+      "version": "2026-07-28",
+      "control": "MCP|Model Context Protocol|2026-07-28|tools/call semantics"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "vector-result",
+      "uri_or_path": "examples/coaz-integrity/evidence/inconclusive-source.json",
+      "digest": {
+        "algorithm": "sha256",
+        "value": "51202c0dd0b5883c5b94edf23c40751fe20fdbdf6dd887f1ab317d754167a340"
+      },
+      "media_type": "application/json",
+      "redacted": false
+    }
+  ],
+  "hashes": [
+    {
+      "algorithm": "sha256",
+      "value": "51202c0dd0b5883c5b94edf23c40751fe20fdbdf6dd887f1ab317d754167a340"
+    }
+  ],
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE_REQUIRED",
+    "fields": []
+  },
+  "timestamps": {
+    "started_at": "2026-08-19T12:00:00Z",
+    "observed_at": "2026-08-19T12:00:01Z",
+    "recorded_at": "2026-08-19T12:00:02Z"
+  },
+  "extensions": {
+    "dare.coaz.integrity": {
+      "binding_changed": false,
+      "expected_enforcement": "FORWARD_WITH_EXISTING_PERMIT",
+      "integrity_verdict": "INCONCLUSIVE",
+      "mutation_kind": "NONE",
+      "observed_enforcement": "INCONCLUSIVE_PROJECTION",
+      "reevaluated": false,
+      "reference_mode": "SECURE_REEVALUATE",
+      "result_artifact_path": "examples/coaz-integrity/evidence/inconclusive-source.json",
+      "result_digest": "51202c0dd0b5883c5b94edf23c40751fe20fdbdf6dd887f1ab317d754167a340",
+      "standards_schema_version": "1.0.0",
+      "vector_id": "COAZ-INTEGRITY-INCONCLUSIVE-SAMPLE"
+    }
+  }
+}

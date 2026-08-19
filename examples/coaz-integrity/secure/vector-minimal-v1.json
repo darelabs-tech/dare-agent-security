@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0.0",
+  "vector_id": "COAZ-INTEGRITY-001",
+  "title": "unchanged tools/call after permit",
+  "standards": {
+    "schema_version": "1.0.0",
+    "references": [
+      {
+        "family": "OpenID AuthZEN",
+        "document": "Authorization API",
+        "version": "1.0",
+        "status": "NORMATIVE"
+      },
+      {
+        "family": "COAZ",
+        "document": "Framework",
+        "version": "1.0 Draft 1",
+        "status": "DRAFT"
+      },
+      {
+        "family": "COAZ-MCP",
+        "document": "Binding",
+        "version": "1.0 Draft 1",
+        "status": "DRAFT",
+        "section": "Â§9 PEP Behavior"
+      },
+      {
+        "family": "COAZ-MCP",
+        "document": "Binding",
+        "version": "1.0 Draft 1",
+        "status": "DRAFT",
+        "section": "Â§11.5 Mapping Integrity"
+      },
+      {
+        "family": "OpenID AuthZEN",
+        "document": "COAZ-MCP authorization-to-execution binding",
+        "version": "proposal",
+        "status": "OPEN_PROPOSAL",
+        "upstream_issue": "openid/authzen#603"
+      },
+      {
+        "family": "MCP",
+        "document": "Model Context Protocol",
+        "version": "2026-07-28",
+        "status": "NORMATIVE",
+        "section": "tools/call semantics"
+      }
+    ],
+    "executable_scope": {
+      "mcp_method_scope": "tools/call",
+      "lifecycle_skew_note": "COAZ-MCP Draft 1 lifecycle examples may differ from MCP 2026-07-28; Cycle 003 vectors execute only tools/call against the repository MCP revision."
+    }
+  },
+  "initial_operation": {
+    "method": "tools/call",
+    "params": {
+      "arguments": {
+        "customer_id": "cust-synthetic-001",
+        "daily_rate": 50,
+        "days": 3,
+        "vehicle_id": "vehicle-synthetic-001"
+      },
+      "name": "rental.quote"
+    }
+  },
+  "trusted_context": {
+    "subject_id": "subject-synthetic-001",
+    "agent_id": "agent-synthetic-001",
+    "claims": {
+      "role": "standard"
+    }
+  },
+  "projector_fixture": {
+    "id": "default-tools-call"
+  },
+  "pdp_fixture": {
+    "id": "synthetic-rental-policy-v1"
+  },
+  "mutation": {
+    "kind": "NONE"
+  },
+  "expected": {
+    "enforcement": "FORWARD_WITH_EXISTING_PERMIT"
+  },
+  "safety": {
+    "synthetic_only": true,
+    "reference_mode": "SECURE_REEVALUATE"
+  }
+}

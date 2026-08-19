@@ -141,7 +141,7 @@ Do not solve an architectural ambiguity by silently inventing a new design.
 At the time this workflow was installed, the approved execution round is:
 
 ```text
-DARE/cycles/001-evidence-schema/
+DARE/cycles/003-coaz-authorization-integrity/
 ```
 
 Always verify repository state before assuming this remains the active cycle.

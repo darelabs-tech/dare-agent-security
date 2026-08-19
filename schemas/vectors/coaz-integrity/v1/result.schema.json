@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/vectors/coaz-integrity/v1/result.schema.json",
+  "title": "COAZ-MCP Authorization Integrity Vector Result v1",
+  "description": "Versioned execution result for an authorization-integrity vector. No raw access tokens, Authorization headers, API keys or private keys.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "vector_id",
+    "standards",
+    "initial_operation",
+    "initial_projection",
+    "initial_binding",
+    "initial_decision",
+    "mutation",
+    "final_operation",
+    "final_projection",
+    "final_binding",
+    "enforcement_trace",
+    "sink_receipt",
+    "expected",
+    "observed",
+    "verdict",
+    "redaction",
+    "started_at",
+    "finished_at"
+  ],
+  "properties": {
+    "schema_version": { "$ref": "#/$defs/schemaVersion" },
+    "vector_id": { "$ref": "#/$defs/vectorId" },
+    "standards": { "$ref": "#/$defs/standardsSnapshot" },
+    "initial_operation": { "$ref": "#/$defs/mcpOperation" },
+    "initial_projection": { "$ref": "#/$defs/authorizationProjection" },
+    "initial_binding": { "$ref": "#/$defs/authorizationBinding" },
+    "initial_decision": { "$ref": "#/$defs/authorizationDecision" },
+    "mutation": { "$ref": "#/$defs/integrityMutation" },
+    "final_operation": { "$ref": "#/$defs/mcpOperation" },
+    "final_projection": { "$ref": "#/$defs/authorizationProjection" },
+    "final_binding": { "$ref": "#/$defs/authorizationBinding" },
+    "enforcement_trace": { "$ref": "#/$defs/enforcementTrace" },
+    "sink_receipt": { "$ref": "#/$defs/sinkReceipt" },
+    "expected": { "$ref": "#/$defs/vectorExpectation" },
+    "observed": { "$ref": "#/$defs/observedEnforcement" },
+    "verdict": { "$ref": "#/$defs/integrityVerdict" },
+    "redaction": { "$ref": "#/$defs/redactionMetadata" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "vectorId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^COAZ-INTEGRITY-[0-9]{3}$"
+    },
+    "standardsSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "references", "executable_scope"],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/schemaVersion" },
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/standardReference" }
+        },
+        "executable_scope": { "$ref": "#/$defs/executableScopeNote" }
+      }
+    },
+    "standardReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "document", "version", "status"],
+      "properties": {
+        "family": { "type": "string", "minLength": 1 },
+        "document": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "status": {
+          "type": "string",
+          "enum": ["NORMATIVE", "DRAFT", "OPEN_PROPOSAL"]
+        },
+        "section": { "type": "string", "minLength": 1 },
+        "upstream_issue": { "type": "string", "minLength": 1 }
+      }
+    },
+    "executableScopeNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mcp_method_scope", "lifecycle_skew_note"],
+      "properties": {
+        "mcp_method_scope": { "type": "string", "minLength": 1 },
+        "lifecycle_skew_note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mcpOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "params"],
+      "properties": {
+        "method": { "type": "string", "minLength": 1 },
+        "params": { "$ref": "#/$defs/canonicalValue" }
+      }
+    },
+    "trustedAuthorizationContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_id", "claims"],
+      "properties": {
+        "subject_id": { "type": "string", "minLength": 1 },
+        "agent_id": { "type": "string", "minLength": 1 },
+        "claims": { "$ref": "#/$defs/canonicalValue" }
+      }
+    },
+    "canonicalValue": {
+      "description": "Project-owned normalized JSON-like value. No credential-bearing keys.",
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "string" },
+        { "type": "number" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/canonicalValue" }
+        },
+        {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/canonicalValue" },
+          "propertyNames": { "$ref": "#/$defs/safePropertyName" }
+        }
+      ]
+    },
+    "safePropertyName": {
+      "type": "string",
+      "not": {
+        "pattern": "(?i)(password|secret|token|api[_-]?key|private[_-]?key|authorization|bearer)"
+      }
+    },
+    "mappingIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "digest"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "id": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "minLength": 1 },
+        "digest": { "$ref": "#/$defs/sha256Digest" }
+      }
+    },
+    "authorizationProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mapping",
+        "mapped_inputs",
+        "trusted_inputs",
+        "authzen_request"
+      ],
+      "properties": {
+        "mapping": { "$ref": "#/$defs/mappingIdentity" },
+        "mapped_inputs": { "$ref": "#/$defs/canonicalValue" },
+        "trusted_inputs": { "$ref": "#/$defs/canonicalValue" },
+        "authzen_request": { "$ref": "#/$defs/canonicalValue" }
+      }
+    },
+    "authorizationBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "digest"],
+      "properties": {
+        "algorithm": { "type": "string", "minLength": 1 },
+        "digest": { "$ref": "#/$defs/sha256Digest" }
+      }
+    },
+    "authorizationDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_id", "decision", "bound_to"],
+      "properties": {
+        "decision_id": { "type": "string", "minLength": 1 },
+        "decision": {
+          "type": "string",
+          "enum": ["PERMIT", "DENY"]
+        },
+        "bound_to": { "$ref": "#/$defs/authorizationBinding" }
+      }
+    },
+    "integrityMutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "TOOL_NAME",
+            "MAPPED_ARGUMENT",
+            "METHOD",
+            "MAPPED_TRUSTED_CONTEXT",
+            "JSON_REORDER_ONLY",
+            "UNMAPPED_FIELD"
+          ]
+        },
+        "detail": { "type": "string", "minLength": 1 }
+      }
+    },
+    "enforcementTrace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference_mode", "binding_changed", "reevaluated"],
+      "properties": {
+        "reference_mode": {
+          "type": "string",
+          "enum": ["SECURE_REEVALUATE", "SECURE_REFUSE", "VULNERABLE_REUSE"]
+        },
+        "binding_changed": { "type": "boolean" },
+        "reevaluated": { "type": "boolean" }
+      }
+    },
+    "sinkReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forwarded", "operation_method", "operation_name"],
+      "properties": {
+        "forwarded": { "type": "boolean" },
+        "operation_method": { "type": "string", "minLength": 1 },
+        "operation_name": { "type": "string", "minLength": 1 },
+        "params_digest": { "$ref": "#/$defs/sha256Digest" },
+        "sequence": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "vectorExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enforcement"],
+      "properties": {
+        "enforcement": { "$ref": "#/$defs/expectedEnforcement" }
+      }
+    },
+    "expectedEnforcement": {
+      "type": "string",
+      "enum": [
+        "FORWARD_WITH_EXISTING_PERMIT",
+        "REEVALUATE_OR_REFUSE",
+        "PERMIT_REMAINS_BOUND"
+      ]
+    },
+    "observedEnforcement": {
+      "type": "string",
+      "enum": [
+        "FORWARDED_WITH_EXISTING_PERMIT",
+        "FORWARDED_AFTER_REEVALUATION",
+        "REFUSED_AFTER_BINDING_CHANGE",
+        "DENIED_AFTER_REEVALUATION",
+        "FORWARDED_WITH_STALE_PERMIT",
+        "NO_FORWARD_INITIAL_DENY",
+        "INCONCLUSIVE_PROJECTION",
+        "HARNESS_ERROR"
+      ]
+    },
+    "integrityVerdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR"]
+    },
+    "redactionMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applied", "strategy"],
+      "properties": {
+        "applied": { "type": "boolean" },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "NONE_REQUIRED",
+            "REMOVE",
+            "MASK",
+            "HASH",
+            "TOKENIZE",
+            "MIXED"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "sha256Digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

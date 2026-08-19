@@ -1,0 +1,133 @@
+title: "DARE Agent Security Cycle 003 - COAZ Authorization Integrity"
+version: "1.0.0"
+cycle: "003-coaz-authorization-integrity"
+issue: 4
+source_design: "DARE/cycles/003-coaz-authorization-integrity/DESIGN.md"
+source_blueprint: "DARE/cycles/003-coaz-authorization-integrity/BLUEPRINT.md"
+source_tasks: "DARE/cycles/003-coaz-authorization-integrity/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Reconcile Cycle 002 interfaces and pin standards snapshot"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 003 task-001 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-001.md.
+      Inspect merged Cycle 002 crates/CLI/lab/redaction APIs. Reuse existing interfaces; do not duplicate discovery/CLI/lab crates.
+      Pin standards metadata: AuthZEN 1.0, COAZ Framework Draft 1, COAZ-MCP Draft 1, MCP 2026-07-28, openid/authzen#603 (open proposal).
+      Document actual integration paths for tasks 002–012. Scope executable vectors to tools/call.
+
+  - id: task-002
+    title: "Implement portable vector and result contracts"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 003 task-002 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-002.md.
+      Create schemas/vectors/coaz-integrity/v1/ and Rust models. Offline JSON Schema validation; semantic fail-closed; no credential fields.
+
+  - id: task-003
+    title: "Implement semantic normalization and canonicalization"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 003 task-003 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-003.md.
+      Deterministic canonical form/digest over normalized JSON-like values. Object reorder/format equality; mapped-value inequality.
+
+  - id: task-004
+    title: "Implement authorization binding engine"
+    depends_on: [task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 003 task-004 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-004.md.
+      BindingMaterialV1 + SHA-256 binding over method, operation name, mapping identity, mapped inputs/trusted inputs, AuthZEN projection digest.
+
+  - id: task-005
+    title: "Implement authorization projectors and synthetic mappings"
+    depends_on: [task-001, task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 003 task-005 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-005.md.
+      Projector trait + default tools/call and declared rental.quote reference projectors. Deterministic; no general CEL engine.
+
+  - id: task-006
+    title: "Implement deterministic PDP and bound decision model"
+    depends_on: [task-004, task-005]
+    complexity: MED
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 003 task-006 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-006.md.
+      In-process fixture policy; bound decision model; permit/deny deterministic and bound to evaluated projection.
+
+  - id: task-007
+    title: "Implement controlled mutation stage and synthetic sink"
+    depends_on: [task-003, task-004]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 003 task-007 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-007.md.
+      Explicit mutation enum + in-process execution sink. No external side effects; every forward traceable to decision/binding.
+
+  - id: task-008
+    title: "Implement COAZ-INTEGRITY-001 through 007 and runner"
+    depends_on: [task-002, task-004, task-005, task-006, task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 003 task-008 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-008.md.
+      Five issue #603 vectors + two semantic controls (006 order/format, 007 unmapped field). Secure PASS; vulnerable stale-permit FAIL.
+
+  - id: task-009
+    title: "Implement Cycle 001 evidence bridge"
+    depends_on: [task-002, task-008]
+    complexity: MED
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 003 task-009 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-009.md.
+      Emit valid SecurityEvidence v1 per vector result. COAZ details in extensions only; evidence crate unchanged.
+
+  - id: task-010
+    title: "Integrate validate coaz-integrity CLI"
+    depends_on: [task-008, task-009]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 003 task-010 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-010.md.
+      validate coaz-integrity: --fixture, --all, --json, --reference-mode vulnerable. Synthetic fixtures only; stable exit codes.
+
+  - id: task-011
+    title: "Add secure vulnerable E2E proof and negative tests"
+    depends_on: [task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 003 task-011 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-011.md.
+      Prove stale-permit FAIL and secure modes cannot forward stale permits. Negative security tests mandatory.
+
+  - id: task-012
+    title: "Documentation CI final proof and upstream package"
+    depends_on: [task-011]
+    complexity: MED
+    spec_file: DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 003 task-012 exactly as defined in DARE/cycles/003-coaz-authorization-integrity/EXECUTION/task-012.md.
+      Map Design acceptance criteria to PROOF.md; docs, CI gates, cargo audit; neutral upstream contribution vectors prepared.

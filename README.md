@@ -79,9 +79,9 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Pre-alpha — Cycle 002 passive MCP discovery is usable against the synthetic lab
+**Stage:** Pre-alpha — Cycle 002 passive MCP discovery and Cycle 003 COAZ integrity vectors are usable against synthetic fixtures
 
-Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: a passive inventory of an operator-supplied MCP target. Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: a passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors for COAZ-MCP (built-in synthetic fixtures only). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
 
 ### Discover quick start
 
@@ -94,6 +94,24 @@ cargo run -p dare-agent-security -- discover --stdio --json -- target/debug/synt
 ```
 
 Human mode writes a baseline summary to stdout. `--json` writes one Inventory v1 object to stdout (diagnostics on stderr). See [docs/synthetic-lab.md](docs/synthetic-lab.md) for Streamable HTTP loopback and [crates/dare-mcp-discovery/README.md](crates/dare-mcp-discovery/README.md) for crate architecture.
+
+### Validate coaz-integrity quick start
+
+Run all seven built-in authorization-integrity vectors (secure reference PEP, synthetic fixtures only):
+
+```bash
+cargo build -p dare-agent-security
+cargo run -p dare-agent-security -- validate coaz-integrity --all
+cargo run -p dare-agent-security -- validate coaz-integrity --fixture COAZ-INTEGRITY-003 --json
+```
+
+Secure mode expects verdict `PASS` (exit 0). To prove stale-permit forwarding on mutation vectors, use the intentionally vulnerable reference mode (exit 2):
+
+```bash
+cargo run -p dare-agent-security -- validate coaz-integrity --all --reference-mode vulnerable
+```
+
+See [docs/coaz-integrity.md](docs/coaz-integrity.md) for the vector matrix, standards snapshot, and upstream contribution package.
 
 ### Exit codes
 
@@ -118,7 +136,7 @@ Current priorities:
 
 1. keep the Cycle 001 evidence contract stable;
 2. finish human review/merge of Cycle 002 discovery;
-3. implement deterministic COAZ-MCP/AuthZEN conformance vectors (Cycle 003);
+3. human review of Cycle 003 COAZ authorization-integrity vectors and upstream package;
 4. publish the first reproducible benchmark methodology;
 5. integrate with CI through a GitHub Action for authorized environments.
 
