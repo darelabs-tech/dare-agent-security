@@ -1,0 +1,166 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/discovery",
+    "version": "1.0.0"
+  },
+  "generated_at": "2026-08-18T15:00:00Z",
+  "completeness": "COMPLETE",
+  "target": {
+    "id": "synthetic-rental-mcp",
+    "display_name": "synthetic rental lab",
+    "endpoint_fingerprint": "mcp.example.test/mcp"
+  },
+  "protocol": {
+    "revision": "2026-07-28",
+    "negotiated": true,
+    "client_name": "dare-agent-security",
+    "client_version": "0.1.0"
+  },
+  "transport": {
+    "kind": "STREAMABLE_HTTP",
+    "identity": "mcp.example.test/mcp"
+  },
+  "server": {
+    "name": "synthetic-rental-mcp",
+    "version": "1.0.0",
+    "title": "Synthetic Rental MCP"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "resource_templates": true,
+    "prompts": true
+  },
+  "auth": {
+    "state": "OBSERVED",
+    "mechanism": "NONE_OBSERVED"
+  },
+  "tools": [
+    {
+      "name": "customer.lookup",
+      "title": "Lookup vehicle holder",
+      "description": "Read synthetic reservation holder metadata.",
+      "input_schema_digest": {
+        "alg": "sha256",
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "vehicle_id": { "type": "string" }
+        }
+      },
+      "annotations": {
+        "read_only_hint": true,
+        "destructive_hint": false,
+        "idempotent_hint": true,
+        "open_world_hint": false
+      },
+      "classification": {
+        "class": "READ_ONLY",
+        "source": "PROTOCOL_ANNOTATION",
+        "rationale_code": "PROTOCOL_READ_ONLY_HINT",
+        "heuristic_indicators": ["read_only_hint"]
+      }
+    },
+    {
+      "name": "legacy.ambiguous",
+      "description": "Undocumented legacy helper with insufficient metadata.",
+      "classification": {
+        "class": "UNKNOWN",
+        "source": "INSUFFICIENT_METADATA",
+        "rationale_code": "INSUFFICIENT_METADATA",
+        "heuristic_indicators": []
+      }
+    },
+    {
+      "name": "reservation.delete",
+      "title": "Delete reservation",
+      "description": "Permanently remove a synthetic reservation.",
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": true,
+        "idempotent_hint": true,
+        "open_world_hint": false
+      },
+      "classification": {
+        "class": "DESTRUCTIVE",
+        "source": "PROTOCOL_ANNOTATION",
+        "rationale_code": "PROTOCOL_DESTRUCTIVE_HINT",
+        "heuristic_indicators": ["destructive_hint"]
+      }
+    },
+    {
+      "name": "reservation.update",
+      "title": "Update reservation",
+      "description": "Change dates on a synthetic reservation.",
+      "annotations": {
+        "read_only_hint": false,
+        "destructive_hint": false,
+        "idempotent_hint": false,
+        "open_world_hint": false
+      },
+      "classification": {
+        "class": "STATE_CHANGING",
+        "source": "PROTOCOL_ANNOTATION",
+        "rationale_code": "PROTOCOL_STATE_CHANGING",
+        "heuristic_indicators": []
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "synthetic://fleet/catalog",
+      "name": "fleet-catalog",
+      "description": "Synthetic fleet catalog.",
+      "mime_type": "application/json"
+    },
+    {
+      "uri": "synthetic://reservation/policy",
+      "name": "reservation-policy",
+      "description": "Synthetic reservation policy document.",
+      "mime_type": "text/plain"
+    }
+  ],
+  "resource_templates": [
+    {
+      "uri_template": "synthetic://vehicle/{id}",
+      "name": "vehicle",
+      "description": "Synthetic vehicle record template."
+    }
+  ],
+  "prompts": [
+    {
+      "name": "booking-summary",
+      "title": "Booking summary",
+      "description": "Summarize a synthetic reservation."
+    },
+    {
+      "name": "fleet-support",
+      "title": "Fleet support",
+      "description": "Draft a synthetic fleet support reply."
+    }
+  ],
+  "indicators": [
+    {
+      "id": "MCP-DISCOVERY-001",
+      "code": "PROTOCOL_NEGOTIATED",
+      "message": "MCP revision 2026-07-28 was negotiated."
+    }
+  ],
+  "warnings": [],
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE"
+  },
+  "hashes": [
+    {
+      "alg": "sha256",
+      "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "scanner": {
+    "name": "dare-agent-security",
+    "version": "0.1.0"
+  }
+}

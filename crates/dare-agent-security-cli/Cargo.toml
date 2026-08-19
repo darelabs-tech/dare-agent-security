@@ -1,0 +1,24 @@
+[package]
+name = "dare-agent-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "CLI for DARE Agent Security"
+publish = false
+
+[[bin]]
+name = "dare-agent-security"
+path = "src/main.rs"
+
+[dependencies]
+clap = { workspace = true }
+dare-mcp-discovery = { path = "../dare-mcp-discovery" }
+serde_json = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[dev-dependencies]
+dare-mcp-discovery = { path = "../dare-mcp-discovery" }
+serde_json = { workspace = true }

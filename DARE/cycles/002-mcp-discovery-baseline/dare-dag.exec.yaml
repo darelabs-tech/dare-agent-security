@@ -1,0 +1,135 @@
+title: "DARE Agent Security Cycle 002 - Passive MCP Discovery Baseline"
+version: "1.0.0"
+cycle: "002-mcp-discovery-baseline"
+issue: 3
+source_design: "DARE/cycles/002-mcp-discovery-baseline/DESIGN.md"
+source_blueprint: "DARE/cycles/002-mcp-discovery-baseline/BLUEPRINT.md"
+source_tasks: "DARE/cycles/002-mcp-discovery-baseline/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Bootstrap discovery and CLI crates"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 002 task-001 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-001.md.
+      Create crates/dare-mcp-discovery (lib) and crates/dare-agent-security-cli (bin dare-agent-security).
+      Dependency direction: CLI -> discovery -> dare-security-evidence. Evidence must not depend on the new crates.
+      No protocol logic, no stubs, no DB/SaaS, no proprietary imports.
+
+  - id: task-002
+    title: "Implement Discovery Inventory v1 model and JSON Schema"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 002 task-002 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-002.md.
+      Own only inventory/schema files: crates/dare-mcp-discovery/src/inventory*.rs, schemas/discovery/v1/, examples/discovery/.
+      Do not implement policy/MCP client logic.
+
+  - id: task-003
+    title: "Implement passive MCP method policy"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 002 task-003 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-003.md.
+      Own only policy files: crates/dare-mcp-discovery/src/policy*.rs and policy tests.
+      Do not implement inventory schema or MCP SDK adapter.
+
+  - id: task-004
+    title: "Implement version-aware MCP client adapter"
+    depends_on: [task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 002 task-004 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-004.md.
+      Wrap rmcp behind project-owned interfaces. No SDK types in public inventory.
+
+  - id: task-005
+    title: "Implement bounded enumeration engine"
+    depends_on: [task-002, task-004]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 002 task-005 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-005.md.
+      Bounded pagination; never dereference resource URIs or external $ref.
+
+  - id: task-006
+    title: "Implement deterministic tool classification"
+    depends_on: [task-002]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 002 task-006 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-006.md.
+      Classes READ_ONLY/STATE_CHANGING/DESTRUCTIVE/UNKNOWN. Ambiguity => UNKNOWN.
+
+  - id: task-007
+    title: "Implement redaction and target/auth sanitization"
+    depends_on: [task-002, task-004]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 002 task-007 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-007.md.
+      Canary secrets must never appear in inventory, evidence, stdout, stderr or errors.
+
+  - id: task-008
+    title: "Implement Cycle 001 evidence bridge"
+    depends_on: [task-002, task-003, task-006, task-007]
+    complexity: MED
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 002 task-008 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-008.md.
+      Emit SecurityEvidence v1 without modifying the evidence schema. Keep evidence crate MCP-agnostic.
+
+  - id: task-009
+    title: "Build deterministic synthetic MCP lab"
+    depends_on: [task-004, task-005, task-006]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 002 task-009 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-009.md.
+      labs/synthetic-mcp with synthetic-only data, mixed capabilities, pagination and method tracing.
+
+  - id: task-010
+    title: "Implement dare-agent-security discover CLI"
+    depends_on: [task-005, task-006, task-007, task-008]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 002 task-010 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-010.md.
+      stdio/URL modes, human and JSON output, stable exit codes. No raw credential flags.
+
+  - id: task-011
+    title: "Add integration matrix and passive-safety proof"
+    depends_on: [task-009, task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 002 task-011 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-011.md.
+      Prove set(methods_received_by_lab) subset_of Cycle002Allowlist and absence of tools/call, resources/read, prompts/get.
+
+  - id: task-012
+    title: "Documentation CI compatibility matrix and final proof"
+    depends_on: [task-011]
+    complexity: MED
+    spec_file: DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 002 task-012 exactly as defined in DARE/cycles/002-mcp-discovery-baseline/EXECUTION/task-012.md.
+      Map every Design acceptance criterion to concrete tests/files/results.

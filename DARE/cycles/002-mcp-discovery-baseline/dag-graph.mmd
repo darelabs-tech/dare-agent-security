@@ -1,0 +1,36 @@
+flowchart TD
+  T001[task-001 Bootstrap crates]
+  T002[task-002 Inventory v1]
+  T003[task-003 Passive policy]
+  T004[task-004 MCP adapter]
+  T005[task-005 Bounded enumeration]
+  T006[task-006 Classification]
+  T007[task-007 Redaction]
+  T008[task-008 Evidence bridge]
+  T009[task-009 Synthetic lab]
+  T010[task-010 discover CLI]
+  T011[task-011 E2E passive proof]
+  T012[task-012 Final proof + docs]
+
+  T001 --> T002
+  T001 --> T003
+  T003 --> T004
+  T002 --> T005
+  T004 --> T005
+  T002 --> T006
+  T002 --> T007
+  T004 --> T007
+  T002 --> T008
+  T003 --> T008
+  T006 --> T008
+  T007 --> T008
+  T004 --> T009
+  T005 --> T009
+  T006 --> T009
+  T005 --> T010
+  T006 --> T010
+  T007 --> T010
+  T008 --> T010
+  T009 --> T011
+  T010 --> T011
+  T011 --> T012
