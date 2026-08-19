@@ -1,0 +1,27 @@
+# Reference secure trace — COAZ-INTEGRITY-001
+# Unchanged tools/call after permit (PASS)
+
+vector_id:          COAZ-INTEGRITY-001
+reference_mode:     SECURE_REEVALUATE
+mutation:           NONE
+
+initial_operation:
+  method: tools/call
+  tool:   rental.quote
+  args:   daily_rate=50, days=3 (synthetic)
+
+authorization:
+  initial_decision: PERMIT
+  initial_binding:  A
+
+post_permit:
+  final_binding:    A  (unchanged)
+
+enforcement:
+  observed:         FORWARDED_WITH_EXISTING_PERMIT
+  sink.forwarded:   true
+
+verdict:            PASS
+
+# Full machine-readable result:
+# examples/coaz-integrity/secure/result-pass-v1.json

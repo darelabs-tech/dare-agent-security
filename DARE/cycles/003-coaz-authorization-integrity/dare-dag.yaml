@@ -1,0 +1,96 @@
+version: 1
+cycle:
+  id: "003"
+  name: "coaz-authorization-integrity"
+  issue: 4
+  status: "approved"
+  depends_on_cycles:
+    - "001"
+    - "002"
+
+gates:
+  - "cargo fmt --all --check"
+  - "cargo clippy --workspace --all-targets -- -D warnings"
+  - "cargo test --workspace"
+
+invariants:
+  - "stale permit forwarding after mapping-relevant semantic change MUST verdict FAIL"
+  - "semantic equality MUST NOT be raw JSON byte equality"
+  - "vulnerable reference mode MUST be synthetic-only"
+  - "raw credentials MUST NOT be serialized or echoed"
+  - "Cycle 001 evidence schema MUST remain COAZ/MCP agnostic"
+  - "upstream issue #603 MUST be represented as proposal/open issue until status changes"
+
+tasks:
+  task-001:
+    title: "Reconcile Cycle 002 interfaces and pin standards snapshot"
+    status: "DONE"
+    complexity: "MEDIUM"
+    depends_on: []
+    spec_file: "EXECUTION/task-001.md"
+  task-002:
+    title: "Implement portable vector and result contracts"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-001"]
+    spec_file: "EXECUTION/task-002.md"
+  task-003:
+    title: "Implement semantic normalization and canonicalization"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-001"]
+    spec_file: "EXECUTION/task-003.md"
+  task-004:
+    title: "Implement authorization binding engine"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-003"]
+    spec_file: "EXECUTION/task-004.md"
+  task-005:
+    title: "Implement authorization projectors and synthetic mappings"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-001", "task-003"]
+    spec_file: "EXECUTION/task-005.md"
+  task-006:
+    title: "Implement deterministic PDP and bound decision model"
+    status: "DONE"
+    complexity: "MEDIUM"
+    depends_on: ["task-004", "task-005"]
+    spec_file: "EXECUTION/task-006.md"
+  task-007:
+    title: "Implement controlled mutation stage and synthetic sink"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-003", "task-004"]
+    spec_file: "EXECUTION/task-007.md"
+  task-008:
+    title: "Implement COAZ-INTEGRITY-001 through 007 and runner"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-002", "task-004", "task-005", "task-006", "task-007"]
+    spec_file: "EXECUTION/task-008.md"
+  task-009:
+    title: "Implement Cycle 001 evidence bridge"
+    status: "DONE"
+    complexity: "MEDIUM"
+    depends_on: ["task-002", "task-008"]
+    spec_file: "EXECUTION/task-009.md"
+  task-010:
+    title: "Integrate validate coaz-integrity CLI"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-008", "task-009"]
+    spec_file: "EXECUTION/task-010.md"
+  task-011:
+    title: "Add secure vulnerable E2E proof and negative tests"
+    status: "DONE"
+    complexity: "HIGH"
+    depends_on: ["task-010"]
+    spec_file: "EXECUTION/task-011.md"
+  task-012:
+    title: "Documentation CI final proof and upstream package"
+    status: "DONE"
+    complexity: "MEDIUM"
+    depends_on: ["task-011"]
+    spec_file: "EXECUTION/task-012.md"

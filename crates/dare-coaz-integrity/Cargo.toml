@@ -1,0 +1,24 @@
+[package]
+name = "dare-coaz-integrity"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "COAZ-MCP authorization-to-execution integrity harness for DARE Agent Security"
+publish = false
+
+[lib]
+name = "dare_coaz_integrity"
+path = "src/lib.rs"
+
+[dependencies]
+dare-security-evidence = { path = "../dare-security-evidence" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+jsonschema = { workspace = true }
+time = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

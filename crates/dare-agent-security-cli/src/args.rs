@@ -3,9 +3,9 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 
-use crate::exit_code::AFTER_HELP;
+use crate::exit_code::{AFTER_HELP, COAZ_INTEGRITY_AFTER_HELP};
 
 /// DARE Agent Security CLI.
 #[derive(Debug, Parser)]
@@ -26,6 +26,53 @@ pub struct Cli {
 pub enum Command {
     /// Discover an explicit MCP target without invoking tools or reading contents.
     Discover(DiscoverArgs),
+    /// Run offline authorization-integrity validation harnesses.
+    Validate {
+        #[command(subcommand)]
+        command: ValidateSubcommand,
+    },
+}
+
+/// Offline validation subcommands.
+#[derive(Debug, Subcommand)]
+pub enum ValidateSubcommand {
+    /// Validate built-in COAZ authorization-integrity vectors (Cycle 003).
+    #[command(name = "coaz-integrity", after_help = COAZ_INTEGRITY_AFTER_HELP)]
+    CoazIntegrity(CoazIntegrityArgs),
+}
+
+/// `dare-agent-security validate coaz-integrity` options.
+#[derive(Debug, Args)]
+#[command(after_help = COAZ_INTEGRITY_AFTER_HELP)]
+pub struct CoazIntegrityArgs {
+    /// Run all built-in COAZ-INTEGRITY fixtures in stable id order.
+    #[arg(long, conflicts_with = "fixture")]
+    pub all: bool,
+
+    /// Run one built-in fixture by id (for example `COAZ-INTEGRITY-003`).
+    #[arg(long, value_name = "COAZ-INTEGRITY-NNN", conflicts_with = "all")]
+    pub fixture: Option<String>,
+
+    /// Write machine-readable vector result JSON only to stdout. Diagnostics go to stderr.
+    #[arg(long)]
+    pub json: bool,
+
+    /// Reference PEP mode override. `vulnerable` works only with built-in synthetic fixtures.
+    #[arg(long, value_enum, value_name = "MODE")]
+    pub reference_mode: Option<ReferenceModeArg>,
+
+    /// Write vector result and Cycle 001 evidence JSON files into this directory.
+    #[arg(long, value_name = "PATH")]
+    pub evidence_dir: Option<PathBuf>,
+}
+
+/// CLI reference PEP mode override.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum ReferenceModeArg {
+    /// Secure re-evaluation (default).
+    Secure,
+    /// Intentionally vulnerable stale-permit forwarding for synthetic proof fixtures.
+    Vulnerable,
 }
 
 /// `dare-agent-security discover` options.

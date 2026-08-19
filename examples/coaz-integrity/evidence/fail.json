@@ -1,0 +1,146 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/evidence",
+    "version": "1.0.0"
+  },
+  "id": "urn:uuid:752e3b95-967a-58be-80c5-c4d901e47b0a",
+  "vector": {
+    "id": "COAZ-INTEGRITY-003",
+    "version": "1.0.0",
+    "name": "rental.quote integrity (COAZ-INTEGRITY-003)"
+  },
+  "target": {
+    "type": "synthetic-service",
+    "id": "synthetic-coaz-integrity-lab",
+    "name": "synthetic COAZ integrity lab",
+    "software": "dare-coaz-integrity",
+    "software_version": "0.1.0",
+    "protocol": "mcp",
+    "protocol_version": "2026-07-28"
+  },
+  "preconditions": [
+    {
+      "id": "synthetic-only",
+      "description": "vector executes against built-in synthetic fixtures only",
+      "satisfied": true
+    },
+    {
+      "id": "tools-call-scope",
+      "description": "executable scope is limited to MCP tools/call",
+      "satisfied": true
+    }
+  ],
+  "operation": {
+    "kind": "authorization.integrity",
+    "name": "rental.quote",
+    "resource": "tools/call",
+    "arguments_digest": {
+      "algorithm": "sha256",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "authorization_context": {
+    "principal_id": "subject-synthetic-001",
+    "agent_id": "agent-synthetic-001",
+    "policy_id": "default-tools-call",
+    "policy_version": "1.0.0"
+  },
+  "expected": {
+    "decision": "ALLOW",
+    "result": "REEVALUATE_OR_REFUSE",
+    "description": "observed enforcement FORWARDED_WITH_STALE_PERMIT violated expectation REEVALUATE_OR_REFUSE"
+  },
+  "observed": {
+    "decision": "DENY",
+    "result": "FORWARDED_WITH_STALE_PERMIT",
+    "description": "observed enforcement FORWARDED_WITH_STALE_PERMIT violated expectation REEVALUATE_OR_REFUSE",
+    "source": "FIXTURE"
+  },
+  "verdict": "FAIL",
+  "severity": {
+    "level": "MEDIUM",
+    "rationale": "observed enforcement FORWARDED_WITH_STALE_PERMIT violated expectation REEVALUATE_OR_REFUSE"
+  },
+  "standards": [
+    {
+      "organization": "OpenID AuthZEN",
+      "standard": "Authorization API",
+      "version": "1.0",
+      "control": "OpenID AuthZEN|Authorization API|1.0"
+    },
+    {
+      "organization": "COAZ",
+      "standard": "Framework",
+      "version": "1.0 Draft 1",
+      "control": "COAZ|Framework|1.0 Draft 1"
+    },
+    {
+      "organization": "COAZ-MCP",
+      "standard": "Binding",
+      "version": "1.0 Draft 1",
+      "control": "COAZ-MCP|Binding|1.0 Draft 1|Â§9 PEP Behavior"
+    },
+    {
+      "organization": "COAZ-MCP",
+      "standard": "Binding",
+      "version": "1.0 Draft 1",
+      "control": "COAZ-MCP|Binding|1.0 Draft 1|Â§11.5 Mapping Integrity"
+    },
+    {
+      "organization": "OpenID AuthZEN",
+      "standard": "COAZ-MCP authorization-to-execution binding",
+      "version": "proposal",
+      "control": "openid/authzen#603",
+      "url": "openid/authzen#603"
+    },
+    {
+      "organization": "MCP",
+      "standard": "Model Context Protocol",
+      "version": "2026-07-28",
+      "control": "MCP|Model Context Protocol|2026-07-28|tools/call semantics"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "vector-result",
+      "uri_or_path": "examples/coaz-integrity/vulnerable/result-stale-permit-fail-v1.json",
+      "digest": {
+        "algorithm": "sha256",
+        "value": "1d0b8ffa22545dbf642619cbea3d72a2051e9e4778c476840ab4c90dadf10d5e"
+      },
+      "media_type": "application/json",
+      "redacted": false
+    }
+  ],
+  "hashes": [
+    {
+      "algorithm": "sha256",
+      "value": "1d0b8ffa22545dbf642619cbea3d72a2051e9e4778c476840ab4c90dadf10d5e"
+    }
+  ],
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE_REQUIRED",
+    "fields": []
+  },
+  "timestamps": {
+    "started_at": "2026-08-19T12:00:00Z",
+    "observed_at": "2026-08-19T12:00:01Z",
+    "recorded_at": "2026-08-19T12:00:02Z"
+  },
+  "extensions": {
+    "dare.coaz.integrity": {
+      "binding_changed": true,
+      "expected_enforcement": "REEVALUATE_OR_REFUSE",
+      "integrity_verdict": "FAIL",
+      "mutation_kind": "MAPPED_ARGUMENT",
+      "observed_enforcement": "FORWARDED_WITH_STALE_PERMIT",
+      "reevaluated": false,
+      "reference_mode": "VULNERABLE_REUSE",
+      "result_artifact_path": "examples/coaz-integrity/vulnerable/result-stale-permit-fail-v1.json",
+      "result_digest": "1d0b8ffa22545dbf642619cbea3d72a2051e9e4778c476840ab4c90dadf10d5e",
+      "standards_schema_version": "1.0.0",
+      "vector_id": "COAZ-INTEGRITY-003"
+    }
+  }
+}

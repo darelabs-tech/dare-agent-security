@@ -1,0 +1,31 @@
+# Reference vulnerable trace — COAZ-INTEGRITY-003
+# Mapped argument changed after permit (FAIL in vulnerable mode)
+
+vector_id:          COAZ-INTEGRITY-003
+reference_mode:     VULNERABLE_REUSE_PERMIT
+mutation:           MAPPED_ARGUMENT (daily_rate 50 -> 5000)
+
+initial_operation:
+  method: tools/call
+  tool:   rental.quote
+  args:   daily_rate=50 (synthetic)
+
+authorization:
+  initial_decision: PERMIT
+  initial_binding:  A
+
+post_permit:
+  final_binding:    B  (B != A)
+
+enforcement:
+  observed:         FORWARDED_WITH_STALE_PERMIT
+  sink.forwarded:   true
+
+verdict:            FAIL
+
+# This trace proves the authorization-to-execution integrity failure:
+#   permit(binding=A) forwarded after final_binding=B
+
+# Secure reference modes MUST NOT produce this trace.
+# Full machine-readable result:
+# examples/coaz-integrity/vulnerable/result-stale-permit-fail-v1.json

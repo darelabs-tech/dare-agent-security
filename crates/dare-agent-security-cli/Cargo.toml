@@ -14,11 +14,13 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { workspace = true }
+dare-coaz-integrity = { path = "../dare-coaz-integrity" }
 dare-mcp-discovery = { path = "../dare-mcp-discovery" }
 serde_json = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 [dev-dependencies]
+dare-coaz-integrity = { path = "../dare-coaz-integrity" }
 dare-mcp-discovery = { path = "../dare-mcp-discovery" }
 serde_json = { workspace = true }

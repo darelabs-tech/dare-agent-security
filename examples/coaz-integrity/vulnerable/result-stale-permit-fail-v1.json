@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0.0",
+  "vector_id": "COAZ-INTEGRITY-003",
+  "standards": {
+    "schema_version": "1.0.0",
+    "references": [
+      {
+        "family": "OpenID AuthZEN",
+        "document": "Authorization API",
+        "version": "1.0",
+        "status": "NORMATIVE"
+      },
+      {
+        "family": "COAZ",
+        "document": "Framework",
+        "version": "1.0 Draft 1",
+        "status": "DRAFT"
+      },
+      {
+        "family": "COAZ-MCP",
+        "document": "Binding",
+        "version": "1.0 Draft 1",
+        "status": "DRAFT",
+        "section": "Â§9 PEP Behavior"
+      },
+      {
+        "family": "COAZ-MCP",
+        "document": "Binding",
+        "version": "1.0 Draft 1",
+        "status": "DRAFT",
+        "section": "Â§11.5 Mapping Integrity"
+      },
+      {
+        "family": "OpenID AuthZEN",
+        "document": "COAZ-MCP authorization-to-execution binding",
+        "version": "proposal",
+        "status": "OPEN_PROPOSAL",
+        "upstream_issue": "openid/authzen#603"
+      },
+      {
+        "family": "MCP",
+        "document": "Model Context Protocol",
+        "version": "2026-07-28",
+        "status": "NORMATIVE",
+        "section": "tools/call semantics"
+      }
+    ],
+    "executable_scope": {
+      "mcp_method_scope": "tools/call",
+      "lifecycle_skew_note": "COAZ-MCP Draft 1 lifecycle examples may differ from MCP 2026-07-28; Cycle 003 vectors execute only tools/call against the repository MCP revision."
+    }
+  },
+  "initial_operation": {
+    "method": "tools/call",
+    "params": {
+      "arguments": {
+        "customer_id": "cust-synthetic-001",
+        "daily_rate": 50,
+        "days": 3,
+        "vehicle_id": "vehicle-synthetic-001"
+      },
+      "name": "rental.quote"
+    }
+  },
+  "initial_projection": {
+    "mapping": {
+      "kind": "default",
+      "id": "default-tools-call",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "mapped_inputs": {
+      "customer_id": "cust-synthetic-001",
+      "daily_rate": 50,
+      "days": 3,
+      "vehicle_id": "vehicle-synthetic-001"
+    },
+    "trusted_inputs": {
+      "agent_id": "agent-synthetic-001",
+      "subject_id": "subject-synthetic-001"
+    },
+    "authzen_request": {
+      "action": {
+        "name": "invoke"
+      },
+      "resource": {
+        "id": "rental.quote",
+        "type": "mcp-tool"
+      },
+      "subject": {
+        "id": "subject-synthetic-001",
+        "type": "user"
+      }
+    }
+  },
+  "initial_binding": {
+    "algorithm": "coaz-binding-v1",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "initial_decision": {
+    "decision_id": "decision-synthetic-001",
+    "decision": "PERMIT",
+    "bound_to": {
+      "algorithm": "coaz-binding-v1",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "mutation": {
+    "kind": "MAPPED_ARGUMENT",
+    "detail": "daily_rate 50 -> 5000"
+  },
+  "final_operation": {
+    "method": "tools/call",
+    "params": {
+      "arguments": {
+        "customer_id": "cust-synthetic-001",
+        "daily_rate": 50,
+        "days": 3,
+        "vehicle_id": "vehicle-synthetic-001"
+      },
+      "name": "rental.quote"
+    }
+  },
+  "final_projection": {
+    "mapping": {
+      "kind": "default",
+      "id": "default-tools-call",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "mapped_inputs": {
+      "customer_id": "cust-synthetic-001",
+      "daily_rate": 50,
+      "days": 3,
+      "vehicle_id": "vehicle-synthetic-001"
+    },
+    "trusted_inputs": {
+      "agent_id": "agent-synthetic-001",
+      "subject_id": "subject-synthetic-001"
+    },
+    "authzen_request": {
+      "action": {
+        "name": "invoke"
+      },
+      "resource": {
+        "id": "rental.quote",
+        "type": "mcp-tool"
+      },
+      "subject": {
+        "id": "subject-synthetic-001",
+        "type": "user"
+      }
+    }
+  },
+  "final_binding": {
+    "algorithm": "coaz-binding-v1",
+    "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "enforcement_trace": {
+    "reference_mode": "VULNERABLE_REUSE",
+    "binding_changed": true,
+    "reevaluated": false
+  },
+  "sink_receipt": {
+    "forwarded": true,
+    "operation_method": "tools/call",
+    "operation_name": "rental.quote",
+    "params_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sequence": 1
+  },
+  "expected": {
+    "enforcement": "REEVALUATE_OR_REFUSE"
+  },
+  "observed": "FORWARDED_WITH_STALE_PERMIT",
+  "verdict": "FAIL",
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE_REQUIRED",
+    "fields": []
+  },
+  "started_at": "2026-08-19T12:00:00Z",
+  "finished_at": "2026-08-19T12:00:01Z"
+}
