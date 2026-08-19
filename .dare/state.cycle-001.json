@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-18T19:16:24.519Z",
+  "tasks": {
+    "task-001": {
+      "status": "DONE",
+      "output": "Bootstrapped Apache-2.0 Cargo workspace with isolated library crate crates/dare-security-evidence. Files: Cargo.toml, Cargo.lock, crates/dare-security-evidence/{Cargo.toml,src/lib.rs}, .gitignore. Gates passed: cargo fmt, clippy -D warnings, cargo test. No protocol/network/database deps.",
+      "duration": 796
+    },
+    "task-002": {
+      "status": "DONE",
+      "output": "Implemented canonical SecurityEvidence model and bounded wire enums (PASS/FAIL/INCONCLUSIVE/ERROR, severity, redaction, decisions). Files: crates/dare-security-evidence/src/{lib.rs,model.rs,verdict.rs,version.rs,redaction.rs}. serde round-trip, unknown-field and invalid-enum tests pass. No MCP/customer/credential fields in the core model.",
+      "duration": 684
+    },
+    "task-003": {
+      "status": "DONE",
+      "output": "Published schemas/evidence/v1/evidence.schema.json (Draft 2020-12, additionalProperties false, local jsonschema validation without network). Tests: valid record, missing field, invalid verdict, malformed digest/timestamp, unknown top-level field.",
+      "duration": 1980
+    },
+    "task-004": {
+      "status": "DONE",
+      "output": "Added typed EvidenceError and validate() for major-version fail-closed, non-empty IDs, timestamp order, hash coherence, INCONCLUSIVE/ERROR prerequisites, namespaced extensions. Errors do not echo payloads.",
+      "duration": 1104
+    },
+    "task-005": {
+      "status": "DONE",
+      "output": "Enforced redaction metadata coherence and high-risk key/value heuristics on generic maps. Representative password/token/api_key/private_key/authorization inputs are rejected; error Display never contains the secret.",
+      "duration": 1015
+    },
+    "task-006": {
+      "status": "DONE",
+      "output": "ExactOutcomeComparator, ComparisonResult, derive_verdict/apply_derived_verdict. Contradictory PASS and INCONCLUSIVE/ERROR masquerading as PASS/FAIL are rejected. Protocol-specific comparison remains outside the crate.",
+      "duration": 1370
+    },
+    "task-007": {
+      "status": "DONE",
+      "output": "Published synthetic examples/evidence/{pass,fail,inconclusive,error}.json for synthetic-payment-mcp. All four pass JSON Schema and semantic validation.",
+      "duration": 1194
+    },
+    "task-008": {
+      "status": "DONE",
+      "output": "Added tests/contract.rs and tests/negative.rs: public fixture round-trip pipeline plus required negative cases (unsupported major, missing vector id, contradictory PASS, ERROR without context, timestamp order, secret-like authorization, invalid verdict, malformed digest, unknown field).",
+      "duration": 1184
+    },
+    "task-009": {
+      "status": "DONE",
+      "output": "Added .github/workflows/ci.yml (fmt/clippy/test) and crates/dare-security-evidence/README.md covering schema path, versioning, verdicts, redaction limits, offline validation. Linked from root README.",
+      "duration": 1394
+    },
+    "task-010": {
+      "status": "DONE",
+      "output": "e2e_proof.rs covers v1 validate, fail-closed major, contradictory PASS, secret rejection without echo, all four fixture semantics, CI/docs presence, no MCP core coupling. cargo fmt/clippy/test green.",
+      "duration": 1135
+    }
+  }
+}

@@ -79,18 +79,48 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Bootstrap / pre-alpha — Cycle 001 evidence contract in progress
+**Stage:** Pre-alpha — Cycle 002 passive MCP discovery is usable against the synthetic lab
 
-The public v1 evidence schema lives at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json). Synthetic fixtures are in [`examples/evidence/`](examples/evidence/). The Rust kernel is `crates/dare-security-evidence` ([README](crates/dare-security-evidence/README.md)). Validate the JSON contract locally from the committed schema; do not fetch `$id` from the network.
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: a passive inventory of an operator-supplied MCP target. Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+
+### Discover quick start
+
+Build the synthetic lab, then scan it over stdio. The scanner never interpolates a shell; the program after `--` is `argv[0]`.
+
+```bash
+cargo build -p synthetic-mcp
+cargo run -p dare-agent-security -- discover --stdio -- target/debug/synthetic-mcp
+cargo run -p dare-agent-security -- discover --stdio --json -- target/debug/synthetic-mcp
+```
+
+Human mode writes a baseline summary to stdout. `--json` writes one Inventory v1 object to stdout (diagnostics on stderr). See [docs/synthetic-lab.md](docs/synthetic-lab.md) for Streamable HTTP loopback and [crates/dare-mcp-discovery/README.md](crates/dare-mcp-discovery/README.md) for crate architecture.
+
+### Exit codes
+
+`discover` uses stable numeric codes documented in [`crates/dare-agent-security-cli/EXIT.md`](crates/dare-agent-security-cli/EXIT.md) and in `--help`:
+
+| Code | Meaning |
+|------|---------|
+| 0 | Complete success |
+| 1 | Scanner execution error |
+| 2 | Partial or inconclusive result |
+| 3 | Unsupported or refused target |
+
+### Passive boundary
+
+Default discovery is **list-only**. It may send `server/discover` (MCP `2026-07-28`) or the explicit legacy `initialize` / `notifications/initialized` handshake (MCP `2024-11-05`), plus `tools/list`, `resources/list`, `resources/templates/list`, and `prompts/list`. It does **not** invoke `tools/call`, `resources/read`, or `prompts/get`. See [docs/passive-policy.md](docs/passive-policy.md).
+
+### No credential flags
+
+There are no `--token`, `--password`, or `--credential` flags. HTTP targets are HTTPS-only; credentials in the URL are refused. Do not put secrets on the command line.
 
 Current priorities:
 
-1. define the security evidence model;
-2. implement MCP discovery and baseline validation;
-3. implement deterministic COAZ-MCP/AuthZEN conformance vectors;
-4. build a safe reference lab with intentionally vulnerable MCP examples;
-5. publish the first reproducible benchmark methodology;
-6. integrate with CI through a GitHub Action.
+1. keep the Cycle 001 evidence contract stable;
+2. finish human review/merge of Cycle 002 discovery;
+3. implement deterministic COAZ-MCP/AuthZEN conformance vectors (Cycle 003);
+4. publish the first reproducible benchmark methodology;
+5. integrate with CI through a GitHub Action for authorized environments.
 
 ## Contributing
 

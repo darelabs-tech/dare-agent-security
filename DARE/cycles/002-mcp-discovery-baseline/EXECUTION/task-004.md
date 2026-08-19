@@ -1,6 +1,6 @@
 # task-004 — Version-aware MCP client adapter
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-003
 > Complexity: HIGH
 
@@ -26,3 +26,13 @@ Current lifecycle fixture, legacy fixture, unsupported revision, timeout, redire
 
 ## DONE when
 Current and legacy protocol details are contained behind the adapter and all integration-level adapter tests pass without violating passive policy.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Date:** 2026-08-18
+- **Files:** `crates/dare-mcp-discovery/src/adapter.rs`, `adapter_error.rs`, `adapter_http.rs`, `adapter_stdio.rs`, `adapter_session.rs`, `tests/adapter_*.rs`
+- **Lifecycles:** `2026-07-28` Discover (`server/discover`); legacy `2024-11-05` Initialize
+- **Safety:** TLS required, redirects disabled, stdio argv without shell, PolicyGuardedTransport on outbound methods

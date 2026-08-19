@@ -1,6 +1,6 @@
 # task-010 — `dare-agent-security discover` CLI
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-005, task-006, task-007, task-008
 > Complexity: HIGH
 

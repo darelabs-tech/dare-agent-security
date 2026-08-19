@@ -1,11 +1,16 @@
 [workspace]
 resolver = "2"
-members = ["crates/dare-security-evidence"]
+members = [
+    "crates/dare-security-evidence",
+    "crates/dare-mcp-discovery",
+    "crates/dare-agent-security-cli",
+    "labs/synthetic-mcp",
+]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.88"
 license = "Apache-2.0"
 repository = "https://github.com/darelabs-tech/dare-agent-security"
 
@@ -14,3 +19,14 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 time = { version = "0.3", features = ["formatting", "macros", "parsing", "serde"] }
 jsonschema = { version = "0.37", default-features = false }
+tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread", "time", "process", "io-util", "sync"] }
+clap = { version = "4.5", features = ["derive"] }
+async-trait = "0.1"
+futures = "0.3"
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls"] }
+rmcp = { version = "3.1.3", default-features = false, features = [
+    "client",
+    "reqwest",
+    "transport-child-process",
+    "transport-streamable-http-client-reqwest",
+] }

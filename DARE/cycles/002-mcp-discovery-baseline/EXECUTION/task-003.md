@@ -1,6 +1,6 @@
 # task-003 — Passive MCP method policy
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-001
 > Complexity: HIGH
 
@@ -24,3 +24,13 @@ Allowlist, never denylist. No arguments/secrets echoed on refusal. No bypass pat
 
 ## DONE when
 All outbound discovery entrypoints are policy-gated and forbidden-method tests prove zero transport activity.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Date:** 2026-08-18
+- **Files:** `crates/dare-mcp-discovery/src/policy.rs`, `policy_error.rs`, `policy_transport.rs`, `tests/policy_guard.rs`
+- **Profiles:** MCP `2026-07-28` (includes `server/discover`) and legacy `2024-11-05` (`initialize` + `notifications/initialized`)
+- **Proof:** forbidden methods including `tools/call`, `resources/read`, `prompts/get` produce zero `RecordingTransport` dispatches

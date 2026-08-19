@@ -1,6 +1,6 @@
 # task-008 — Cycle 001 evidence bridge
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-002, task-003, task-006, task-007
 > Complexity: MEDIUM
 

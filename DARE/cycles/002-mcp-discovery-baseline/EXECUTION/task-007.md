@@ -1,6 +1,6 @@
 # task-007 — Redaction and target/auth sanitization
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-002, task-004
 > Complexity: HIGH
 
@@ -26,3 +26,11 @@ Never depend on perfect secret detection; prevent raw secret fields by design an
 
 ## DONE when
 Canary-secret suite proves supported output/error paths cannot emit the raw test secrets and all Rust gates pass.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Files:** `sanitize.rs`, `sanitize_*.rs`, `tests/sanitize.rs`
+- **Proof:** 14 canary tests; AdapterError Display redacted

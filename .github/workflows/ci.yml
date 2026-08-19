@@ -8,8 +8,8 @@ permissions:
   contents: read
 
 jobs:
-  evidence-contract:
-    name: Cycle 001 evidence contract
+  rust:
+    name: Rust workspace
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,5 +20,11 @@ jobs:
         run: cargo fmt --all --check
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
+      # Schema fixtures, passive method traces, and secret canaries are
+      # asserted by the workspace test suite (no extra job required).
       - name: Test
         run: cargo test --workspace
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+      - name: Audit
+        run: cargo audit

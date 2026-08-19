@@ -1,6 +1,6 @@
 # task-002 — Discovery Inventory v1 model and JSON Schema
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-001
 > Complexity: HIGH
 
@@ -29,3 +29,12 @@ Workspace Rust gates plus offline JSON Schema validation.
 
 ## DONE when
 Both public fixtures validate structurally and semantically and invalid corpus fails for the intended reasons.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Date:** 2026-08-18
+- **Files:** `crates/dare-mcp-discovery/src/inventory*.rs`, `tests/inventory_*.rs`, `schemas/discovery/v1/inventory.schema.json`, `examples/discovery/{complete,partial}.json`
+- **Gates:** workspace fmt/clippy/test passed after merge with task-003

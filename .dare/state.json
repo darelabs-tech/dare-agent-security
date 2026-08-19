@@ -1,56 +1,66 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T19:16:24.519Z",
+  "updatedAt": "2026-08-19T00:06:48.771Z",
   "tasks": {
     "task-001": {
       "status": "DONE",
-      "output": "Bootstrapped Apache-2.0 Cargo workspace with isolated library crate crates/dare-security-evidence. Files: Cargo.toml, Cargo.lock, crates/dare-security-evidence/{Cargo.toml,src/lib.rs}, .gitignore. Gates passed: cargo fmt, clippy -D warnings, cargo test. No protocol/network/database deps.",
-      "duration": 796
+      "output": "Bootstrapped dare-mcp-discovery lib and dare-agent-security CLI binary. Dependency direction CLI -> discovery -> dare-security-evidence. Files: Cargo.toml, Cargo.lock, crates/dare-mcp-discovery/{Cargo.toml,src/lib.rs}, crates/dare-agent-security-cli/{Cargo.toml,src/main.rs}. Gates: fmt, clippy -D warnings, cargo test --workspace.",
+      "duration": 5356
     },
     "task-002": {
       "status": "DONE",
-      "output": "Implemented canonical SecurityEvidence model and bounded wire enums (PASS/FAIL/INCONCLUSIVE/ERROR, severity, redaction, decisions). Files: crates/dare-security-evidence/src/{lib.rs,model.rs,verdict.rs,version.rs,redaction.rs}. serde round-trip, unknown-field and invalid-enum tests pass. No MCP/customer/credential fields in the core model.",
-      "duration": 684
+      "output": "Inventory v1: Rust model, offline JSON Schema, complete/partial fixtures, semantic fail-closed validation, no credential fields. Files: crates/dare-mcp-discovery/src/inventory*.rs, tests/inventory_*.rs, schemas/discovery/v1/inventory.schema.json, examples/discovery/{complete,partial}.json.",
+      "duration": 2820
     },
     "task-003": {
       "status": "DONE",
-      "output": "Published schemas/evidence/v1/evidence.schema.json (Draft 2020-12, additionalProperties false, local jsonschema validation without network). Tests: valid record, missing field, invalid verdict, malformed digest/timestamp, unknown top-level field.",
-      "duration": 1980
+      "output": "Passive allowlist guard: PolicyGuardedTransport refuses unknown/tools.call/resources.read/prompts.get before dispatch. Profiles 2026-07-28 and legacy 2024-11-05. Files: crates/dare-mcp-discovery/src/policy*.rs, tests/policy_guard.rs. RecordingTransport proves zero dispatches on refusal.",
+      "duration": 2211
     },
     "task-004": {
       "status": "DONE",
-      "output": "Added typed EvidenceError and validate() for major-version fail-closed, non-empty IDs, timestamp order, hash coherence, INCONCLUSIVE/ERROR prerequisites, namespaced extensions. Errors do not echo payloads.",
-      "duration": 1104
+      "output": "Version-aware MCP adapter: McpDiscoveryClient wraps rmcp. Discover lifecycle 2026-07-28 (server/discover) and legacy 2024-11-05 initialize. stdio argv no-shell; HTTP TLS+no-redirect. All outbound methods PolicyGuardedTransport. Files: crates/dare-mcp-discovery/src/adapter*.rs, tests/adapter_*.rs.",
+      "duration": 42010
     },
     "task-005": {
       "status": "DONE",
-      "output": "Enforced redaction metadata coherence and high-risk key/value heuristics on generic maps. Representative password/token/api_key/private_key/authorization inputs are rejected; error Display never contains the secret.",
-      "duration": 1015
+      "output": "Bounded enumeration engine: PagingCatalog for tools/resources/templates/prompts. COMPLETE vs PARTIAL, repeated-cursor MALFORMED_METADATA, page/item/byte/depth/timeout bounds. Only list methods. Files: enumerate*.rs, tests/enumerate.rs.",
+      "duration": 16133
     },
     "task-006": {
       "status": "DONE",
-      "output": "ExactOutcomeComparator, ComparisonResult, derive_verdict/apply_derived_verdict. Contradictory PASS and INCONCLUSIVE/ERROR masquerading as PASS/FAIL are rejected. Protocol-specific comparison remains outside the crate.",
-      "duration": 1370
+      "output": "Deterministic classify_tool: explicit config wins, destructive dominates, name heuristics cannot independently produce READ_ONLY. Ambiguity => UNKNOWN+INSUFFICIENT_METADATA. Files: crates/dare-mcp-discovery/src/classification.rs, tests/classification.rs.",
+      "duration": 2368
     },
     "task-007": {
       "status": "DONE",
-      "output": "Published synthetic examples/evidence/{pass,fail,inconclusive,error}.json for synthetic-payment-mcp. All four pass JSON Schema and semantic validation.",
-      "duration": 1194
+      "output": "Redaction/sanitization: URL userinfo/query/fragment, bearer/API key/PEM/env canaries never appear in inventory JSON or AdapterError Display. Files: sanitize*.rs, tests/sanitize.rs.",
+      "duration": 2430
     },
     "task-008": {
       "status": "DONE",
-      "output": "Added tests/contract.rs and tests/negative.rs: public fixture round-trip pipeline plus required negative cases (unsupported major, missing vector id, contradictory PASS, ERROR without context, timestamp order, secret-like authorization, invalid verdict, malformed digest, unknown field).",
-      "duration": 1184
+      "output": "Evidence bridge MCP-DISCOVERY-001..004 emits valid SecurityEvidence v1. MCP details only in extensions dare.mcp.discovery. Evidence crate untouched. Files: evidence_bridge*.rs, tests/evidence_bridge.rs.",
+      "duration": 55991
     },
     "task-009": {
       "status": "DONE",
-      "output": "Added .github/workflows/ci.yml (fmt/clippy/test) and crates/dare-security-evidence/README.md covering schema path, versioning, verdicts, redaction limits, offline validation. Linked from root README.",
-      "duration": 1394
+      "output": "Synthetic MCP lab labs/synthetic-mcp: 8 tools, 3 resources, template, 2 prompts, tools/list pages of 3, method_trace() names only. Binary synthetic-mcp stdio. Tests: labs/synthetic-mcp/tests/lab.rs.",
+      "duration": 8042
     },
     "task-010": {
       "status": "DONE",
-      "output": "e2e_proof.rs covers v1 validate, fail-closed major, contradictory PASS, secret rejection without echo, all four fixture semantics, CI/docs presence, no MCP core coupling. cargo fmt/clippy/test green.",
-      "duration": 1135
+      "output": "CLI discover: --stdio/--url exclusive, --json Inventory v1 stdout, human summary, exit 0/1/2/3, no credential flags. Files: crates/dare-agent-security-cli/src/{main,args,discover,output,exit_code}.rs, EXIT.md, tests/discover_cli.rs.",
+      "duration": 89087
+    },
+    "task-011": {
+      "status": "DONE",
+      "output": "E2E passive proof: lab method trace subset of Cycle002Allowlist; no tools/call, resources/read, prompts/get, ping. CLI stdio + in-process HTTP + legacy initialize + pagination + partial + canary + repeated-scan. Files: tests/e2e_passive.rs, tests/e2e_matrix.rs, labs/synthetic-mcp/tests/passive_proof.rs.",
+      "duration": 99585
+    },
+    "task-012": {
+      "status": "DONE",
+      "output": "Cycle 002 closed: operator docs, CI audit, Design §16 PROOF.md. Files: README.md; crates/dare-mcp-discovery/README.md; docs/inventory-v1.md, passive-policy.md, synthetic-lab.md, mcp-compatibility.md; .github/workflows/ci.yml (+ cargo audit); discover_cli::cycle_002_operator_docs_exist. Gates: fmt, clippy -D warnings, cargo test --workspace, cargo audit (281 crates, no HIGH/CRITICAL). llms.txt skipped.",
+      "duration": 35591
     }
   }
 }

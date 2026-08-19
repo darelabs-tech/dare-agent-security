@@ -1,6 +1,6 @@
 # task-001 — Bootstrap discovery and CLI crates
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: Cycle 001
 > Complexity: MEDIUM
 
@@ -29,3 +29,14 @@ Create the Rust workspace members that will host passive MCP discovery and the C
 
 ## DONE when
 Workspace builds, dependency direction is correct, and all gates pass.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Date:** 2026-08-18
+- **Files:** `Cargo.toml`, `Cargo.lock`, `crates/dare-mcp-discovery/{Cargo.toml,src/lib.rs}`, `crates/dare-agent-security-cli/{Cargo.toml,src/main.rs}`
+- **Dependency direction:** `dare-agent-security` → `dare-mcp-discovery` → `dare-security-evidence`
+- **Gates:** `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` passed
+- **Tests:** discovery crate identity + inward evidence dependency + evidence manifest isolation; CLI binary depends on discovery

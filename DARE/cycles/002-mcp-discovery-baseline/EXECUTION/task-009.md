@@ -1,6 +1,6 @@
 # task-009 — Deterministic synthetic MCP lab
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-004, task-005, task-006
 > Complexity: HIGH
 

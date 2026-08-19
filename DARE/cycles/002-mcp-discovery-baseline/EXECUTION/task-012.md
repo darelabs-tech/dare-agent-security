@@ -1,6 +1,6 @@
 # task-012 — Documentation, CI, compatibility matrix and final proof
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-011
 > Complexity: MEDIUM
 
@@ -33,3 +33,20 @@ Do not weaken tests or security rules to achieve green CI. Any architectural dev
 
 ## DONE when
 All approved Design acceptance criteria are evidenced, all required gates pass, unresolved risks/deviations are documented, and the cycle is ready for human final review/merge.
+
+## Execution result
+
+- Status: DONE
+- Proof: `DARE/cycles/002-mcp-discovery-baseline/PROOF.md`
+- Files:
+  - `README.md`
+  - `crates/dare-mcp-discovery/README.md`
+  - `docs/inventory-v1.md`
+  - `docs/passive-policy.md`
+  - `docs/synthetic-lab.md`
+  - `docs/mcp-compatibility.md`
+  - `.github/workflows/ci.yml`
+  - `crates/dare-agent-security-cli/tests/discover_cli.rs` (`cycle_002_operator_docs_exist`)
+  - `crates/dare-security-evidence/tests/e2e_proof.rs` (CI now requires `cargo audit`)
+- Gates: `cargo fmt --all --check` PASS; `cargo clippy --workspace --all-targets -- -D warnings` PASS; `cargo test --workspace` PASS; `cargo audit` PASS (exit 0, no HIGH/CRITICAL)
+- Did not run `dare execute --complete`

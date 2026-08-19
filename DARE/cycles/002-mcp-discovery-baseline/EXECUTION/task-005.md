@@ -1,6 +1,6 @@
 # task-005 — Bounded enumeration engine
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-002, task-004
 > Complexity: HIGH
 
@@ -30,3 +30,11 @@ Multi-page success, repeated cursor, each configured bound, malformed page/curso
 
 ## DONE when
 All four catalogs enumerate within bounds, partial results remain valid Inventory v1 records, and no content-fetch/action method is sent.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Files:** `enumerate.rs`, `enumerate_loop.rs`, `enumerate_schema.rs`, `tests/enumerate.rs`
+- **Proof:** list methods only; COMPLETE vs PARTIAL; repeated cursor; bound tests

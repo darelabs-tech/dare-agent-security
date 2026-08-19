@@ -1,6 +1,6 @@
 # task-011 — Integration matrix and passive-safety proof
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-009, task-010
 > Complexity: HIGH
 

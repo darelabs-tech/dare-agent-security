@@ -1,0 +1,96 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/discovery",
+    "version": "1.0.0"
+  },
+  "generated_at": "2026-08-18T15:05:00Z",
+  "completeness": "PARTIAL",
+  "target": {
+    "id": "synthetic-rental-mcp",
+    "display_name": "synthetic rental lab",
+    "endpoint_fingerprint": "mcp.example.test/mcp"
+  },
+  "protocol": {
+    "revision": "2026-07-28",
+    "negotiated": true,
+    "client_name": "dare-agent-security",
+    "client_version": "0.1.0"
+  },
+  "transport": {
+    "kind": "STREAMABLE_HTTP",
+    "identity": "mcp.example.test/mcp"
+  },
+  "server": {
+    "name": "synthetic-rental-mcp",
+    "version": "1.0.0"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "resource_templates": false,
+    "prompts": true
+  },
+  "auth": {
+    "state": "DECLARED",
+    "mechanism": "OAUTH_METADATA"
+  },
+  "tools": [
+    {
+      "name": "customer.lookup",
+      "classification": {
+        "class": "READ_ONLY",
+        "source": "PROTOCOL_ANNOTATION",
+        "rationale_code": "PROTOCOL_READ_ONLY_HINT",
+        "heuristic_indicators": []
+      }
+    },
+    {
+      "name": "legacy.ambiguous",
+      "classification": {
+        "class": "UNKNOWN",
+        "source": "INSUFFICIENT_METADATA",
+        "rationale_code": "INSUFFICIENT_METADATA",
+        "heuristic_indicators": []
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "synthetic://fleet/catalog",
+      "name": "fleet-catalog"
+    }
+  ],
+  "resource_templates": [],
+  "prompts": [
+    {
+      "name": "booking-summary"
+    }
+  ],
+  "indicators": [
+    {
+      "id": "MCP-DISCOVERY-003",
+      "code": "INVENTORY_PARTIAL",
+      "message": "Tool catalog enumeration stopped at the configured item bound."
+    }
+  ],
+  "warnings": [
+    {
+      "code": "ITEM_LIMIT_REACHED",
+      "message": "tools/list stopped after the configured item bound"
+    }
+  ],
+  "redaction": {
+    "applied": false,
+    "strategy": "NONE"
+  },
+  "hashes": [
+    {
+      "alg": "sha256",
+      "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "scanner": {
+    "name": "dare-agent-security",
+    "version": "0.1.0"
+  }
+}

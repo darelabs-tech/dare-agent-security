@@ -1,9 +1,10 @@
 # Cycle 002 — Tasks: Passive MCP Discovery and Enterprise Security Baseline
 
-> Status: **READY FOR REVIEW**
+> Status: **IMPLEMENTATION COMPLETE — PENDING HUMAN FINAL REVIEW**
 > Issue: #3
 > Design: `DESIGN.md` (approved)
-> Architecture: `BLUEPRINT.md` (pending human approval)
+> Architecture: `BLUEPRINT.md` (approved)
+> Proof: `PROOF.md`
 
 ## Execution contract
 
@@ -32,18 +33,18 @@ Cycle-wide invariants:
 
 | ID | Task | Depends on | Complexity | Done when |
 |---|---|---|---|---|
-| task-001 | Bootstrap discovery + CLI crates | Cycle 001 | MEDIUM | workspace builds with correct dependency direction |
-| task-002 | Implement Discovery Inventory v1 model + JSON Schema | task-001 | HIGH | canonical inventory validates offline and invalid records fail closed |
-| task-003 | Implement passive MCP method policy | task-001 | HIGH | non-allowlisted methods are refused before transport dispatch |
-| task-004 | Implement version-aware MCP client adapter | task-003 | HIGH | current + selected legacy lifecycle are isolated behind project interfaces |
-| task-005 | Implement bounded enumeration engine | task-002, task-004 | HIGH | catalogs paginate safely with typed partial outcomes |
-| task-006 | Implement deterministic tool classification | task-002 | HIGH | metadata maps deterministically; ambiguity yields UNKNOWN |
-| task-007 | Implement redaction and target/auth sanitization | task-002, task-004 | HIGH | canary secrets never appear in public artifacts or errors |
-| task-008 | Implement Cycle 001 evidence bridge | task-002, task-003, task-006, task-007 | MEDIUM | discovery observations emit valid SecurityEvidence v1 |
-| task-009 | Build deterministic synthetic MCP lab | task-004, task-005, task-006 | HIGH | lab exposes mixed capabilities, pagination and method tracing |
-| task-010 | Implement `dare-agent-security discover` CLI | task-005, task-006, task-007, task-008 | HIGH | stdio/URL modes, human output, JSON output and stable exit semantics work |
-| task-011 | Add integration matrix + passive-safety proof | task-009, task-010 | HIGH | E2E trace proves only allowlisted methods reached the lab |
-| task-012 | Documentation, CI, compatibility matrix and final proof | task-011 | MEDIUM | all Design acceptance criteria have concrete PASS/FAIL evidence |
+| task-001 | Bootstrap discovery + CLI crates | Cycle 001 | MEDIUM | DONE — workspace builds with correct dependency direction |
+| task-002 | Implement Discovery Inventory v1 model + JSON Schema | task-001 | HIGH | DONE — canonical inventory validates offline and invalid records fail closed |
+| task-003 | Implement passive MCP method policy | task-001 | HIGH | DONE — non-allowlisted methods are refused before transport dispatch |
+| task-004 | Implement version-aware MCP client adapter | task-003 | HIGH | DONE — current + selected legacy lifecycle are isolated behind project interfaces |
+| task-005 | Implement bounded enumeration engine | task-002, task-004 | HIGH | DONE — catalogs paginate safely with typed partial outcomes |
+| task-006 | Implement deterministic tool classification | task-002 | HIGH | DONE — metadata maps deterministically; ambiguity yields UNKNOWN |
+| task-007 | Implement redaction and target/auth sanitization | task-002, task-004 | HIGH | DONE — canary secrets never appear in public artifacts or errors |
+| task-008 | Implement Cycle 001 evidence bridge | task-002, task-003, task-006, task-007 | MEDIUM | DONE — discovery observations emit valid SecurityEvidence v1 |
+| task-009 | Build deterministic synthetic MCP lab | task-004, task-005, task-006 | HIGH | DONE — lab exposes mixed capabilities, pagination and method tracing |
+| task-010 | Implement `dare-agent-security discover` CLI | task-005, task-006, task-007, task-008 | HIGH | DONE — stdio/URL modes, human output, JSON output and stable exit semantics work |
+| task-011 | Add integration matrix + passive-safety proof | task-009, task-010 | HIGH | DONE — E2E trace proves only allowlisted methods reached the lab |
+| task-012 | Documentation, CI, compatibility matrix and final proof | task-011 | MEDIUM | DONE — Design §16 mapped in PROOF.md; docs/CI/audit recorded |
 
 ## Phase A — Contracts and policy
 

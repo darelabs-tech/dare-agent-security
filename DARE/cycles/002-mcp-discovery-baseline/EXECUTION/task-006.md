@@ -1,6 +1,6 @@
 # task-006 — Deterministic tool classification
 
-> Status: PENDING REVIEW
+> Status: DONE
 > Depends on: task-002
 > Complexity: HIGH
 
@@ -26,3 +26,12 @@ No LLM-as-judge. No classification may convert uncertainty into `READ_ONLY` mere
 
 ## DONE when
 Classification is deterministic, provenance-rich and all ambiguous fixtures resolve to `UNKNOWN` unless an approved authoritative rule applies.
+
+---
+
+## Execution result
+
+- **Status:** DONE
+- **Date:** 2026-08-18
+- **Files:** `crates/dare-mcp-discovery/src/classification.rs`, `tests/classification.rs`
+- **Rules:** explicit config wins; destructive dominates; name heuristics cannot independently produce READ_ONLY
