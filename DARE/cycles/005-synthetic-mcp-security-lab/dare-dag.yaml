@@ -1,0 +1,62 @@
+cycle:
+  id: "005"
+  name: "synthetic-mcp-security-lab"
+  status: "APPROVED_FOR_EXECUTION"
+  approval: "APPROVED"
+
+dependencies:
+  delivered_cycles:
+    - "001"
+    - "002"
+    - "003"
+    - "004"
+
+gates:
+  - "cargo fmt --all --check"
+  - "cargo clippy --workspace --all-targets -- -D warnings"
+  - "cargo test --workspace"
+
+invariants:
+  - "synthetic/local fixtures only"
+  - "reuse Cycles 001-004 contracts — no second evidence/CI/integrity engine"
+  - "secure + vulnerable variants per security property"
+  - "no real credentials or production network for security semantics"
+  - "expected FAIL + observed FAIL = scenario assertion PASS"
+
+tasks:
+  task-001:
+    title: "Reconcile post-Cycle-004 main"
+    depends_on: []
+  task-002:
+    title: "Define scenario manifest and schema"
+    depends_on: ["task-001"]
+  task-003:
+    title: "Build shared synthetic lab framework"
+    depends_on: ["task-001", "task-002"]
+  task-004:
+    title: "Implement passive discovery and authorization-presence scenarios"
+    depends_on: ["task-002", "task-003"]
+  task-005:
+    title: "Implement confused-deputy scenario"
+    depends_on: ["task-002", "task-003"]
+  task-006:
+    title: "Implement authorization-integrity mutation scenarios"
+    depends_on: ["task-002", "task-003"]
+  task-007:
+    title: "Implement modern MCP routing and authorization scenarios"
+    depends_on: ["task-002", "task-003"]
+  task-008:
+    title: "Implement MRTR authorization-mutation scenario"
+    depends_on: ["task-002", "task-003", "task-006"]
+  task-009:
+    title: "Build scenario runner and evidence assertions"
+    depends_on: ["task-004", "task-005", "task-006", "task-007", "task-008"]
+  task-010:
+    title: "Integrate full corpus with Cycle 004 CI gate"
+    depends_on: ["task-009"]
+  task-011:
+    title: "Add hostile-fixture and isolation tests"
+    depends_on: ["task-003", "task-009"]
+  task-012:
+    title: "Documentation, scenario catalog, and final DARE proof"
+    depends_on: ["task-010", "task-011"]

@@ -452,6 +452,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-mcp-lab"
+version = "0.1.0"
+dependencies = [
+ "dare-coaz-integrity",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "time",
+]
+
+[[package]]
 name = "dare-security-evidence"
 version = "0.1.0"
 dependencies = [

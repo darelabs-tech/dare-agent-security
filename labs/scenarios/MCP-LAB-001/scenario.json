@@ -1,0 +1,47 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "MCP-LAB-001",
+  "revision": "1.0.0",
+  "title": "Passive discovery boundary",
+  "family": "passive-boundary",
+  "mcp": {
+    "revision": "2026-07-28",
+    "profile": "passive-list-only"
+  },
+  "property": {
+    "id": "PASSIVE_DISCOVERY_BOUNDARY",
+    "description": "Passive mode never dispatches active or state-changing operations"
+  },
+  "variants": {
+    "secure": {
+      "target": "secure",
+      "expected": {
+        "coverage_status": "APPLICABLE",
+        "verdict": "PASS"
+      }
+    },
+    "vulnerable": {
+      "target": "vulnerable",
+      "expected": {
+        "coverage_status": "APPLICABLE",
+        "verdict": "FAIL"
+      }
+    }
+  },
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "tools/list vs tools/call boundary",
+      "status": "NORMATIVE"
+    }
+  ],
+  "safety": {
+    "destructive": false,
+    "external_network": false,
+    "real_credentials": false,
+    "notes": "synthetic local fixtures only"
+  }
+}

@@ -1,41 +1,43 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-20T03:58:21.006Z",
+  "updatedAt": "2026-08-20T05:12:56.035Z",
   "tasks": {
     "task-001": {
       "status": "DONE",
-      "output": "IMPLEMENTATION-NOTES.md maps tasks 002-011. Cycle 003 PROOF+crates verified on main (7e7fd15). tests/cycle004_reconcile.rs. MSRV 1.88. Doc drift: README priorities stale.",
-      "duration": 120634,
+      "output": "IMPLEMENTATION-NOTES.md maps 002-012. Cycle 004 PROOF+Action+CI contract verified (b9860a4). tests/cycle005_reconcile.rs. MSRV 1.88 rmcp 3.1.3. Extend labs/synthetic-mcp — no second engine.",
+      "duration": 90514,
       "dependsOn": []
     },
     "task-002": {
       "status": "DONE",
-      "output": "CI result contract: schema + ci_result.rs + contract tests. Precedence ERROR>FAIL>INCONCLUSIVE>PASS.",
-      "duration": 67709,
+      "output": "schemas/lab/v1/scenario.schema.json + crates/dare-mcp-lab scenario module. labs/scenarios/MCP-LAB-001. Tests: scenario_schema.rs.",
+      "duration": 28673,
       "dependsOn": [
         "task-001"
       ]
     },
     "task-003": {
       "status": "DONE",
-      "output": "Docker container Action selected. action/ARCHITECTURE.md + action/THREAT-MODEL.md. Tests: action_architecture.rs.",
-      "duration": 19071,
+      "output": "dare-mcp-lab framework: LabSession/Identity/Credential/Policy/State. Isolation tests lab_framework.rs. No external network.",
+      "duration": 21276,
       "dependsOn": [
-        "task-001"
+        "task-001",
+        "task-002"
       ]
     },
     "task-004": {
       "status": "DONE",
-      "output": "CLI --output-dir + ci-result.json + ci_output.rs. Tests: cli_ci_automation.rs. Backward compatible without flag.",
-      "duration": 61571,
+      "output": "MCP-LAB-001/002 manifests + corpus_scenarios matrix. Secure PASS / vulnerable FAIL.",
+      "duration": 34968,
       "dependsOn": [
-        "task-002"
+        "task-002",
+        "task-003"
       ]
     },
     "task-005": {
       "status": "DONE",
-      "output": "action.yml + action/Dockerfile + action/entrypoint.sh. Tests: action_adapter.rs. Docker container invokes CLI only.",
-      "duration": 24970,
+      "output": "MCP-LAB-003 confused deputy secure/vulnerable matrix.",
+      "duration": 32391,
       "dependsOn": [
         "task-002",
         "task-003"
@@ -43,56 +45,68 @@
     },
     "task-006": {
       "status": "DONE",
-      "output": "github-output.env + summary.md. ci_github_outputs.rs.",
-      "duration": 37301,
+      "output": "MCP-LAB-004/005/006 via dare-coaz-integrity secure vs vulnerable PEP.",
+      "duration": 27278,
       "dependsOn": [
-        "task-004",
-        "task-005"
+        "task-002",
+        "task-003"
       ]
     },
     "task-007": {
       "status": "DONE",
-      "output": "fixtures/ci/matrix.json + README. Target aliases in entrypoint. Tests: fixtures_ci_matrix.rs.",
-      "duration": 39579,
+      "output": "MCP-LAB-007/008/009 routing and modern auth scenarios.",
+      "duration": 24221,
       "dependsOn": [
         "task-002",
-        "task-004"
+        "task-003"
       ]
     },
     "task-008": {
       "status": "DONE",
-      "output": ".github/workflows/action-e2e.yml — uses ./ matrix PASS/FAIL/INCONCLUSIVE/ERROR.",
-      "duration": 29055,
+      "output": "MCP-LAB-010 MRTR authorization mutation matrix.",
+      "duration": 25381,
       "dependsOn": [
-        "task-006",
-        "task-007"
+        "task-002",
+        "task-003",
+        "task-006"
       ]
     },
     "task-009": {
       "status": "DONE",
-      "output": "hostile_input.rs",
-      "duration": 19740,
+      "output": "harness.rs thin runner: expected FAIL + observed FAIL = assertion PASS. No duplicated domain engine.",
+      "duration": 31614,
       "dependsOn": [
-        "task-003",
+        "task-004",
         "task-005",
-        "task-006"
+        "task-006",
+        "task-007",
+        "task-008"
       ]
     },
     "task-010": {
       "status": "DONE",
-      "output": "docs/ci-gate.md README",
-      "duration": 21925,
+      "output": "ci.yml lab-corpus job runs corpus_scenarios + integrity FAIL semantics + hostile.",
+      "duration": 24655,
       "dependsOn": [
-        "task-008",
         "task-009"
       ]
     },
     "task-011": {
       "status": "DONE",
-      "output": "PROOF.md",
-      "duration": 18486,
+      "output": "hostile_fixtures.rs: traversal, secrets, malformed, isolation, external_network refuse.",
+      "duration": 21542,
       "dependsOn": [
-        "task-010"
+        "task-003",
+        "task-009"
+      ]
+    },
+    "task-012": {
+      "status": "DONE",
+      "output": "docs/mcp-security-lab.md + catalog + PROOF.md. README reconciled. No prevalence claim.",
+      "duration": 21115,
+      "dependsOn": [
+        "task-010",
+        "task-011"
       ]
     }
   }

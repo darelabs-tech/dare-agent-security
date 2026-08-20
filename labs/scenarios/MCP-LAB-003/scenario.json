@@ -1,0 +1,41 @@
+﻿{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "MCP-LAB-003",
+  "revision": "1.0.0",
+  "title": "Confused deputy",
+  "family": "confused-deputy",
+  "mcp": {
+    "revision": "2026-07-28",
+    "profile": "synthetic-lab"
+  },
+  "property": {
+    "id": "CONFUSED_DEPUTY_BINDING",
+    "description": "Principal, agent, and privileged service identity remain distinct"
+  },
+  "variants": {
+    "secure": {
+      "target": "secure",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "PASS" }
+    },
+    "vulnerable": {
+      "target": "vulnerable",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "FAIL" }
+    }
+  },
+  "standards": [
+    {
+      "source": "CWE",
+      "reference": "CWE-441 Unintended Proxy or Intermediary",
+      "status": "INFORMATIVE"
+    }
+  ],
+  "safety": {
+    "destructive": false,
+    "external_network": false,
+    "real_credentials": false,
+    "notes": "synthetic local fixtures only"
+  }
+}

@@ -1,0 +1,41 @@
+﻿{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "MCP-LAB-005",
+  "revision": "1.0.0",
+  "title": "Argument mutation after PERMIT",
+  "family": "authorization-integrity",
+  "mcp": {
+    "revision": "2026-07-28",
+    "profile": "synthetic-lab"
+  },
+  "property": {
+    "id": "AUTHZ_EXECUTION_INTEGRITY_ARGUMENTS",
+    "description": "Authorization-relevant arguments must remain bound to the final forwarded operation"
+  },
+  "variants": {
+    "secure": {
+      "target": "secure",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "PASS" }
+    },
+    "vulnerable": {
+      "target": "vulnerable",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "FAIL" }
+    }
+  },
+  "standards": [
+    {
+      "source": "COAZ-MCP",
+      "reference": "authorization-to-execution binding / arguments",
+      "status": "DRAFT_OR_OPEN_PROPOSAL"
+    }
+  ],
+  "safety": {
+    "destructive": false,
+    "external_network": false,
+    "real_credentials": false,
+    "notes": "synthetic local fixtures only"
+  }
+}

@@ -1,0 +1,41 @@
+﻿{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "MCP-LAB-002",
+  "revision": "1.0.0",
+  "title": "Missing per-tool authorization",
+  "family": "authorization-presence",
+  "mcp": {
+    "revision": "2026-07-28",
+    "profile": "synthetic-lab"
+  },
+  "property": {
+    "id": "AUTHZ_PRESENCE_PER_TOOL",
+    "description": "Authentication alone is not per-operation authorization"
+  },
+  "variants": {
+    "secure": {
+      "target": "secure",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "PASS" }
+    },
+    "vulnerable": {
+      "target": "vulnerable",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "FAIL" }
+    }
+  },
+  "standards": [
+    {
+      "source": "OWASP",
+      "reference": "Agentic authorization vs authentication",
+      "status": "INFORMATIVE"
+    }
+  ],
+  "safety": {
+    "destructive": false,
+    "external_network": false,
+    "real_credentials": false,
+    "notes": "synthetic local fixtures only"
+  }
+}

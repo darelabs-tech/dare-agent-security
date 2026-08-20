@@ -25,7 +25,23 @@ jobs:
       # are asserted by the workspace test suite (no extra job required).
       - name: Test
         run: cargo test --workspace
+      # Cycle 005 synthetic MCP lab corpus (MCP-LAB-001..010 secure/vulnerable matrix)
+      # is covered by `cargo test -p dare-mcp-lab` inside the workspace suite above.
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked
       - name: Audit
         run: cargo audit
+
+  lab-corpus:
+    name: Cycle 005 lab corpus
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run secure/vulnerable corpus matrix
+        run: cargo test -p dare-mcp-lab --test corpus_scenarios -- --nocapture
+      - name: Assert expected FAIL yields scenario PASS
+        run: |
+          cargo test -p dare-mcp-lab mcp_lab_004_005_006_integrity_via_coaz_engine -- --nocapture
+      - name: Hostile fixtures
+        run: cargo test -p dare-mcp-lab --test hostile_fixtures -- --nocapture
