@@ -3,6 +3,7 @@
 pub mod ci;
 pub mod ci_output;
 pub mod ci_result;
+pub mod coverage;
 
 pub mod args;
 pub mod coaz_integrity;

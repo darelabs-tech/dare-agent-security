@@ -44,6 +44,8 @@ pub enum ValidateSubcommand {
     /// Validate built-in COAZ authorization-integrity vectors (Cycle 003).
     #[command(name = "coaz-integrity", after_help = COAZ_INTEGRITY_AFTER_HELP)]
     CoazIntegrity(CoazIntegrityArgs),
+    /// Evaluate an assessment profile and coverage report (Cycle 006).
+    Coverage(crate::coverage::CoverageArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

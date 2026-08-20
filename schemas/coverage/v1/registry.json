@@ -1,0 +1,128 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/registry.json",
+    "version": "1.0.0"
+  },
+  "properties": [
+    {
+      "id": "MCP.DISCOVERY.PASSIVE_BOUNDARY",
+      "title": "Passive discovery boundary",
+      "category": "DISCOVERY",
+      "description": "Passive discovery never dispatches active or state-changing operations.",
+      "applicability": { "predicates": ["tools_present"] },
+      "supported_modes": ["passive", "static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "MCP", "reference": "tools/list vs tools/call", "status": "NORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.DISCOVERY.EXPLICIT_TARGET",
+      "title": "Explicit target discovery",
+      "category": "DISCOVERY",
+      "description": "Discovery requires an explicit operator-named target.",
+      "applicability": { "predicates": ["tools_present"] },
+      "supported_modes": ["passive", "static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "DARE", "reference": "Cycle 002 explicit target", "status": "INFORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.AUTHZ.PER_OPERATION",
+      "title": "Per-operation authorization presence",
+      "category": "AUTHORIZATION",
+      "description": "Each tool/operation advertises or requires authorization presence.",
+      "applicability": { "predicates": ["tools_present", "authorization_present"] },
+      "supported_modes": ["static", "dynamic"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "MCP", "reference": "authorization presence", "status": "DRAFT" }
+      ]
+    },
+    {
+      "id": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+      "title": "Authorization-to-execution integrity (tool name)",
+      "category": "AUTHZ_EXECUTION_INTEGRITY",
+      "description": "Authorized tool name must match executed tool name.",
+      "applicability": { "predicates": ["tools_present", "execution_integrity_supported"] },
+      "supported_modes": ["static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "COAZ-MCP", "reference": "tool-name binding", "status": "NORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.AUTHZ.EXECUTION_INTEGRITY.ARGUMENTS",
+      "title": "Authorization-to-execution integrity (arguments)",
+      "category": "AUTHZ_EXECUTION_INTEGRITY",
+      "description": "Authorized arguments must match executed arguments.",
+      "applicability": { "predicates": ["tools_present", "execution_integrity_supported"] },
+      "supported_modes": ["static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "COAZ-MCP", "reference": "argument binding", "status": "NORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.AUTHZ.EXECUTION_INTEGRITY.CONTEXT",
+      "title": "Authorization-to-execution integrity (trusted context)",
+      "category": "AUTHZ_EXECUTION_INTEGRITY",
+      "description": "Trusted authorization context must bind to execution.",
+      "applicability": { "predicates": ["tools_present", "execution_integrity_supported"] },
+      "supported_modes": ["static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "COAZ-MCP", "reference": "trusted context", "status": "NORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.EVIDENCE.REDACTION",
+      "title": "Evidence redaction",
+      "category": "EVIDENCE",
+      "description": "Security evidence must not echo raw secrets.",
+      "applicability": { "predicates": ["tools_present"] },
+      "supported_modes": ["static", "passive"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "DARE", "reference": "Cycle 001 redaction", "status": "INFORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.IDENTITY.CONFUSED_DEPUTY",
+      "title": "Confused-deputy authority binding",
+      "category": "IDENTITY",
+      "description": "Privileged identity must not be reused across unauthorized principals.",
+      "applicability": { "predicates": ["tools_present", "confused_deputy_supported"] },
+      "supported_modes": ["static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "OWASP", "reference": "confused deputy", "status": "INFORMATIVE" }
+      ]
+    },
+    {
+      "id": "MCP.DISCOVERY.STREAMABLE_HTTP",
+      "title": "Streamable HTTP discovery surface",
+      "category": "DISCOVERY",
+      "description": "HTTP-transport-specific discovery properties apply only to Streamable HTTP targets.",
+      "applicability": { "predicates": ["transport_http"] },
+      "supported_modes": ["passive", "static"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "MCP", "reference": "streamable HTTP", "status": "DRAFT" }
+      ]
+    },
+    {
+      "id": "MCP.AUTHZ.DYNAMIC_VALIDATION",
+      "title": "Dynamic authorization validation",
+      "category": "AUTHORIZATION",
+      "description": "Runtime authorization re-evaluation. Static-only ROE must BLOCK, never NOT_APPLICABLE.",
+      "applicability": { "predicates": ["tools_present", "dynamic_authorization_allowed"] },
+      "supported_modes": ["dynamic"],
+      "evidence": { "required_for_confirmed_verdict": true },
+      "standards": [
+        { "source": "COAZ-MCP", "reference": "dynamic re-evaluation", "status": "DRAFT" }
+      ]
+    }
+  ]
+}

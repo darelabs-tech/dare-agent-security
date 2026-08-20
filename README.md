@@ -79,9 +79,9 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Pre-alpha — Cycles 001–004 merged; Cycle 005 adds a synthetic MCP security lab corpus (MCP-LAB-001..010)
+**Stage:** Pre-alpha — Cycles 001–005 merged; Cycle 006 adds assessment profiles and a coverage engine
 
-Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). **Cycle 006** adds assessment profiles and coverage (`crates/dare-coverage`) — see [docs/assessment-coverage.md](docs/assessment-coverage.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
 
 ### Discover quick start
 
@@ -113,6 +113,18 @@ cargo run -p dare-agent-security -- validate coaz-integrity --all --reference-mo
 
 See [docs/coaz-integrity.md](docs/coaz-integrity.md) for the vector matrix, standards snapshot, and upstream contribution package.
 
+### Validate coverage quick start
+
+```bash
+cargo run -p dare-agent-security -- validate coverage \
+  --profile mcp-security-baseline \
+  --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+  --output-dir .dare-agent-security/coverage \
+  --json
+```
+
+This produces `coverage-report.json`. It does not replace discovery or integrity validation. See [docs/assessment-coverage.md](docs/assessment-coverage.md).
+
 ### Exit codes
 
 `discover` uses stable numeric codes documented in [`crates/dare-agent-security-cli/EXIT.md`](crates/dare-agent-security-cli/EXIT.md) and in `--help`:
@@ -135,9 +147,9 @@ There are no `--token`, `--password`, or `--credential` flags. HTTP targets are 
 Current priorities:
 
 1. keep the Cycle 001 evidence contract stable;
-2. expand and harden the Cycle 005 synthetic MCP lab corpus;
-3. harden and document the Cycle 004 GitHub Action (pre-release, pin-by-SHA);
-4. publish the first reproducible benchmark methodology;
+2. expand Cycle 006 coverage profiles without claiming production completeness;
+3. expand and harden the Cycle 005 synthetic MCP lab corpus;
+4. harden and document the Cycle 004 GitHub Action (pre-release, pin-by-SHA);
 5. Agent Attack Graph (after validated scenario semantics are proven).
 
 ## Contributing

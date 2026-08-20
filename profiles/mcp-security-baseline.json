@@ -1,0 +1,21 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "mcp-security-baseline",
+  "version": "1.0.0",
+  "title": "MCP security baseline (Cycles 001-004 capabilities)",
+  "properties": [
+    { "id": "MCP.DISCOVERY.PASSIVE_BOUNDARY", "requirement": "REQUIRED" },
+    { "id": "MCP.DISCOVERY.EXPLICIT_TARGET", "requirement": "REQUIRED" },
+    { "id": "MCP.AUTHZ.PER_OPERATION", "requirement": "REQUIRED" },
+    { "id": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME", "requirement": "REQUIRED" },
+    { "id": "MCP.AUTHZ.EXECUTION_INTEGRITY.ARGUMENTS", "requirement": "CONDITIONAL" },
+    { "id": "MCP.AUTHZ.EXECUTION_INTEGRITY.CONTEXT", "requirement": "CONDITIONAL" },
+    { "id": "MCP.EVIDENCE.REDACTION", "requirement": "OPTIONAL" },
+    { "id": "MCP.IDENTITY.CONFUSED_DEPUTY", "requirement": "OPTIONAL" },
+    { "id": "MCP.DISCOVERY.STREAMABLE_HTTP", "requirement": "OPTIONAL" },
+    { "id": "MCP.AUTHZ.DYNAMIC_VALIDATION", "requirement": "CONDITIONAL" }
+  ]
+}

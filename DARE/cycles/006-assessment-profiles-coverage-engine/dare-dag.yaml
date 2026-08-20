@@ -1,0 +1,75 @@
+cycle:
+  id: "006"
+  name: "assessment-profiles-coverage-engine"
+  status: "APPROVED_FOR_EXECUTION"
+  approval: "APPROVED"
+
+dependencies:
+  delivered_cycles:
+    - "001"
+    - "002"
+    - "003"
+    - "004"
+    - "005"
+  cycle_005_required_for_core: false
+  cycle_005_merged_on_main: true
+  task_013: "APPLICABLE"
+
+gates:
+  - "cargo fmt --all --check"
+  - "cargo clippy --workspace --all-targets -- -D warnings"
+  - "cargo test --workspace"
+
+invariants:
+  - "coverage is not a second verdict engine — reuse Cycle 001 evidence"
+  - "profiles are data, not executable code"
+  - "applicability is deterministic — no LLM-only decisions"
+  - "CoverageStatus is distinct from Cycle 001 PASS/FAIL"
+  - "no silent property deletion or denominator manipulation"
+  - "Cycle 005 adapter must not change core coverage semantics"
+
+tasks:
+  task-001:
+    title: "Reconcile post-Cycle-004 main"
+    depends_on: []
+  task-002:
+    title: "Define Security Property Registry"
+    depends_on: ["task-001"]
+  task-003:
+    title: "Define Assessment Profile schema"
+    depends_on: ["task-001", "task-002"]
+  task-004:
+    title: "Define CoverageStatus domain model"
+    depends_on: ["task-001"]
+  task-005:
+    title: "Define coverage math and finalization semantics"
+    depends_on: ["task-004"]
+  task-006:
+    title: "Implement deterministic Applicability Engine"
+    depends_on: ["task-002", "task-003", "task-004", "task-005"]
+  task-007:
+    title: "Implement Assessment Plan artifact"
+    depends_on: ["task-006"]
+  task-008:
+    title: "Implement coverage/evidence correlation"
+    depends_on: ["task-007"]
+  task-009:
+    title: "Build deterministic local coverage fixtures"
+    depends_on: ["task-004", "task-005", "task-006", "task-007"]
+  task-010:
+    title: "Build coverage reports and machine output"
+    depends_on: ["task-008", "task-009"]
+  task-011:
+    title: "Extend CLI and Cycle 004 CI gate"
+    depends_on: ["task-010"]
+  task-012:
+    title: "Add adversarial profile and denominator tests"
+    depends_on: ["task-003", "task-005", "task-006", "task-010"]
+  task-013:
+    title: "Cycle 005 integration adapter"
+    conditional: false
+    condition: "cycle_005_merged_on_main"
+    depends_on: ["task-002", "task-008"]
+  task-014:
+    title: "Documentation and final DARE proof"
+    depends_on: ["task-011", "task-012", "task-013"]

@@ -21,6 +21,12 @@ It does **not** duplicate MCP discovery, COAZ integrity validation, or evidence 
 | `output-dir` | Default `.dare-agent-security` (workspace-relative, no `..`) |
 | `fail-on-inconclusive` | Default `true` — exit non-zero on `INCONCLUSIVE` |
 | `reference-mode` | `validate` only — `secure` (default) or `vulnerable` |
+| `profile` | Optional Cycle 006 profile id/path. Empty = coverage off |
+| `coverage-facts` | Typed facts JSON (required when `profile` is set) |
+| `min-required-coverage` | Default `0` — fail if required coverage is below this ratio |
+| `fail-on-required-blocked` | Default `false` — fail if a REQUIRED property is BLOCKED |
+
+Coverage is written to `coverage-report.json` and appended to `summary.md`. It does **not** add fields to `ci-result.json` (that schema is closed).
 
 ## Outputs
 

@@ -1,0 +1,52 @@
+flowchart TB
+    T001["task-001 Reconcile post-Cycle-004 main"]
+    T002["task-002 Property Registry"]
+    T003["task-003 Profile Schema"]
+    T004["task-004 CoverageStatus"]
+    T005["task-005 Coverage Math"]
+    T006["task-006 Applicability Engine"]
+    T007["task-007 Assessment Plan"]
+    T008["task-008 Evidence Correlation"]
+    T009["task-009 Local Coverage Fixtures"]
+    T010["task-010 Coverage Report"]
+    T011["task-011 CLI + CI"]
+    T012["task-012 Adversarial Tests"]
+    T013["task-013 Optional Cycle 005 Adapter"]
+    T014["task-014 Final Proof"]
+
+    T001 --> T002
+    T001 --> T003
+    T001 --> T004
+
+    T002 --> T003
+    T004 --> T005
+
+    T002 --> T006
+    T003 --> T006
+    T004 --> T006
+    T005 --> T006
+
+    T006 --> T007
+    T007 --> T008
+
+    T004 --> T009
+    T005 --> T009
+    T006 --> T009
+    T007 --> T009
+
+    T008 --> T010
+    T009 --> T010
+
+    T010 --> T011
+
+    T003 --> T012
+    T005 --> T012
+    T006 --> T012
+    T010 --> T012
+
+    T002 -. optional if Cycle 005 merged .-> T013
+    T008 -. optional if Cycle 005 merged .-> T013
+
+    T011 --> T014
+    T012 --> T014
+    T013 -. optional .-> T014

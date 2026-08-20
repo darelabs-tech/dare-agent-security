@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/coverage/v1/coverage-report.schema.json",
+  "title": "DARE Coverage Report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "profile",
+    "profile_digest_sha256",
+    "overall_coverage",
+    "required_coverage",
+    "counts",
+    "properties"
+  ],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "https://darelabs.tech/schemas/coverage/v1/coverage-report.schema.json"
+        },
+        "version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "profile_digest_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "overall_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+    "required_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+    "eligible": { "type": "integer", "minimum": 0 },
+    "tested": { "type": "integer", "minimum": 0 },
+    "required_eligible": { "type": "integer", "minimum": 0 },
+    "required_tested": { "type": "integer", "minimum": 0 },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "APPLICABLE",
+        "NOT_APPLICABLE",
+        "NOT_TESTED",
+        "OUT_OF_SCOPE",
+        "BLOCKED",
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE",
+        "ERROR"
+      ],
+      "properties": {
+        "APPLICABLE": { "type": "integer", "minimum": 0 },
+        "NOT_APPLICABLE": { "type": "integer", "minimum": 0 },
+        "NOT_TESTED": { "type": "integer", "minimum": 0 },
+        "OUT_OF_SCOPE": { "type": "integer", "minimum": 0 },
+        "BLOCKED": { "type": "integer", "minimum": 0 },
+        "PASS": { "type": "integer", "minimum": 0 },
+        "FAIL": { "type": "integer", "minimum": 0 },
+        "INCONCLUSIVE": { "type": "integer", "minimum": 0 },
+        "ERROR": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "properties": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ok": { "type": "boolean" },
+        "reasons": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

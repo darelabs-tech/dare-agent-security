@@ -45,3 +45,14 @@ jobs:
           cargo test -p dare-mcp-lab mcp_lab_004_005_006_integrity_via_coaz_engine -- --nocapture
       - name: Hostile fixtures
         run: cargo test -p dare-mcp-lab --test hostile_fixtures -- --nocapture
+
+  coverage-engine:
+    name: Cycle 006 coverage engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Coverage fixtures and adversarial tests
+        run: cargo test -p dare-coverage -- --nocapture
+      - name: Cycle 005 adapter mapping
+        run: cargo test -p dare-coverage --test cycle005_adapter -- --nocapture
