@@ -97,7 +97,20 @@ fn write_trace_file(path: &str, methods: &[String]) {
         Ok(json) => json,
         Err(_) => methods.join("\n"),
     };
-    let _ = std::fs::write(path, body);
+    if let Some(parent) = std::path::Path::new(path).parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    if let Ok(file) = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(path)
+    {
+        use std::io::Write;
+        let mut file = file;
+        let _ = file.write_all(body.as_bytes());
+        let _ = file.sync_all();
+    }
 }
 
 #[cfg(test)]
