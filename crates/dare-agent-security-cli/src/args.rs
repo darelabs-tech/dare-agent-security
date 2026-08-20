@@ -51,6 +51,8 @@ pub enum ValidateSubcommand {
     /// Build and validate a deterministic bounded Agent Attack Graph (Cycle 008).
     #[command(name = "attack-graph")]
     AttackGraph(crate::attack_graph::AttackGraphArgs),
+    /// Run controlled offline-first adversarial validation (Cycle 009).
+    Adversarial(crate::adversarial::AdversarialArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

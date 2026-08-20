@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/adversarial/v1/validation-plan.schema.json",
+  "title": "DARE Adversarial Validation Plan v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "target_id", "target_version", "environment", "attack_path_id", "attack_path_digest", "property_id", "mode", "proof", "vector_id", "vector_digest", "budget_id", "budget_digest"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "target_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "target_version": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "environment": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "attack_path_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "attack_path_digest": { "$ref": "#/$defs/digest" },
+    "property_id": { "type": "string", "pattern": "^MCP\\.", "maxLength": 256 },
+    "mode": { "$ref": "#/$defs/mode" },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective", "minimum_safe_condition", "proof_class"],
+      "properties": {
+        "objective": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "minimum_safe_condition": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "proof_class": { "enum": ["READ_ONLY", "SYNTHETIC_NOOP", "DRY_RUN"] }
+      }
+    },
+    "roe_id": { "type": ["string", "null"], "maxLength": 128 },
+    "roe_digest": { "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] },
+    "vector_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "vector_digest": { "$ref": "#/$defs/digest" },
+    "budget_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "budget_digest": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "mode": { "enum": ["PLAN_ONLY", "SIMULATED", "LOCAL_SYNTHETIC", "AUTHORIZED_DYNAMIC"] },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}
