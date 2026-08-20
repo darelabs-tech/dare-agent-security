@@ -12,11 +12,19 @@ publish = false
 name = "dare-agent-security"
 path = "src/main.rs"
 
+[lib]
+name = "dare_agent_security"
+path = "src/lib.rs"
+
 [dependencies]
 clap = { workspace = true }
 dare-coaz-integrity = { path = "../dare-coaz-integrity" }
 dare-mcp-discovery = { path = "../dare-mcp-discovery" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
+thiserror = "2.0"
 time = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
@@ -24,3 +32,4 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 dare-coaz-integrity = { path = "../dare-coaz-integrity" }
 dare-mcp-discovery = { path = "../dare-mcp-discovery" }
 serde_json = { workspace = true }
+tempfile = "3.14"

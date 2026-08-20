@@ -1,19 +1,13 @@
 //! `dare-agent-security` CLI binary.
 
-mod args;
-mod coaz_integrity;
-mod discover;
-mod exit_code;
-mod output;
-
 use std::process::ExitCode;
 
 use clap::{error::ErrorKind, Parser};
-
-use args::{Cli, Command, ValidateSubcommand};
-use coaz_integrity::run_coaz_integrity;
-use discover::run_discover;
-use exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
+use dare_agent_security::args::{Cli, Command, ValidateSubcommand};
+use dare_agent_security::ci::run_ci;
+use dare_agent_security::coaz_integrity::run_coaz_integrity;
+use dare_agent_security::discover::run_discover;
+use dare_agent_security::exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> ExitCode {
@@ -25,6 +19,7 @@ async fn main() -> ExitCode {
                     ExitCode::from(run_coaz_integrity(args) as u8)
                 }
             },
+            Command::Ci { command } => ExitCode::from(run_ci(command) as u8),
         },
         Err(err) => {
             let _ = err.print();

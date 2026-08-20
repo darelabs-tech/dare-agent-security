@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{builder::BoolishValueParser, Args, Parser, Subcommand, ValueEnum};
 
 use crate::exit_code::{AFTER_HELP, COAZ_INTEGRITY_AFTER_HELP};
 
@@ -30,6 +30,11 @@ pub enum Command {
     Validate {
         #[command(subcommand)]
         command: ValidateSubcommand,
+    },
+    /// CI adapter helpers for GitHub Actions (no domain security logic).
+    Ci {
+        #[command(subcommand)]
+        command: crate::ci::CiSubcommand,
     },
 }
 
@@ -64,6 +69,14 @@ pub struct CoazIntegrityArgs {
     /// Write vector result and Cycle 001 evidence JSON files into this directory.
     #[arg(long, value_name = "PATH")]
     pub evidence_dir: Option<PathBuf>,
+
+    /// Write CI aggregate result (`ci-result.json`) and default evidence under this directory.
+    #[arg(long, value_name = "PATH")]
+    pub output_dir: Option<PathBuf>,
+
+    /// When used with `--output-dir`, exit non-zero on INCONCLUSIVE aggregate (default: true).
+    #[arg(long, default_value = "true", value_parser = BoolishValueParser::new())]
+    pub fail_on_inconclusive: bool,
 }
 
 /// CLI reference PEP mode override.
@@ -110,6 +123,14 @@ pub struct DiscoverArgs {
     /// Write Cycle 001 baseline evidence JSON files into this directory.
     #[arg(long, value_name = "PATH")]
     pub evidence_dir: Option<PathBuf>,
+
+    /// Write CI aggregate result (`ci-result.json`) and default evidence under this directory.
+    #[arg(long, value_name = "PATH")]
+    pub output_dir: Option<PathBuf>,
+
+    /// When used with `--output-dir`, exit non-zero on INCONCLUSIVE aggregate (default: true).
+    #[arg(long, default_value = "true", value_parser = BoolishValueParser::new())]
+    pub fail_on_inconclusive: bool,
 
     /// stdio executable and argv after `--`. Never interpolated by a shell.
     #[arg(last = true, value_name = "COMMAND")]

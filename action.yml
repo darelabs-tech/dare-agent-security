@@ -1,0 +1,41 @@
+name: DARE Agent Security Gate
+description: Deterministic MCP security gate for GitHub Actions (pre-release)
+author: DARE Labs
+
+inputs:
+  mode:
+    description: Bounded operation mode — discover or validate
+    required: true
+  target:
+    description: Explicit target — stdio executable for discover, or COAZ-INTEGRITY fixture id / all for validate
+    required: true
+  output-dir:
+    description: Workspace-relative output directory for evidence and ci-result.json
+    required: false
+    default: .dare-agent-security
+  fail-on-inconclusive:
+    description: Fail the step when aggregate verdict is INCONCLUSIVE
+    required: false
+    default: "true"
+  reference-mode:
+    description: "validate mode only — secure (default) or vulnerable for synthetic stale-permit proof"
+    required: false
+    default: secure
+
+outputs:
+  verdict:
+    description: Aggregate security verdict (PASS, FAIL, INCONCLUSIVE, ERROR)
+  evidence-path:
+    description: Primary evidence file path relative to workspace
+  summary-path:
+    description: Job summary markdown path relative to workspace
+
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    INPUT_MODE: ${{ inputs.mode }}
+    INPUT_TARGET: ${{ inputs.target }}
+    INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+    INPUT_FAIL_ON_INCONCLUSIVE: ${{ inputs.fail-on-inconclusive }}
+    INPUT_REFERENCE_MODE: ${{ inputs.reference-mode }}

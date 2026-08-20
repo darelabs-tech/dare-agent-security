@@ -13,21 +13,64 @@ use dare_coaz_integrity::{
 use dare_mcp_discovery::sanitize_stream;
 
 use crate::args::{CoazIntegrityArgs, ReferenceModeArg};
+use crate::ci_output::CiAutomation;
+use crate::ci_result::ActionMode;
 use crate::exit_code::{PARTIAL, SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
 
 /// Run `validate coaz-integrity` and write stdout/stderr. Returns a documented exit code.
-pub fn run_coaz_integrity(args: CoazIntegrityArgs) -> i32 {
+pub fn run_coaz_integrity(mut args: CoazIntegrityArgs) -> i32 {
+    let ci = match prepare_ci_automation(&mut args) {
+        Ok(ci) => ci,
+        Err(code) => return code,
+    };
+
     match validate_coaz_integrity(args) {
         Ok(outcome) => {
             if let Err(err) = write_stdout(&outcome.stdout) {
                 diagnostic(&err);
-                return SCANNER_ERROR;
+                return finalize_ci(ci, ActionMode::Validate, SCANNER_ERROR);
             }
-            outcome.exit
+            finalize_ci(ci, ActionMode::Validate, outcome.exit)
         }
         Err(err) => {
             diagnostic(&err.message);
-            err.code
+            finalize_ci(ci, ActionMode::Validate, err.code)
+        }
+    }
+}
+
+fn prepare_ci_automation(args: &mut CoazIntegrityArgs) -> Result<Option<CiAutomation>, i32> {
+    let Some(ci) = CiAutomation::from_flags(
+        args.output_dir.clone(),
+        args.evidence_dir.clone(),
+        args.fail_on_inconclusive,
+    ) else {
+        return Ok(None);
+    };
+    if let Err(message) = ci.prepare() {
+        diagnostic(&message);
+        return Err(SCANNER_ERROR);
+    }
+    if args.evidence_dir.is_none() {
+        args.evidence_dir = Some(ci.evidence_dir.clone());
+    }
+    Ok(Some(ci))
+}
+
+fn finalize_ci(ci: Option<CiAutomation>, mode: ActionMode, command_exit: i32) -> i32 {
+    let Some(ci) = ci else {
+        return command_exit;
+    };
+    let writer = if command_exit == SCANNER_ERROR || command_exit == UNSUPPORTED_TARGET {
+        ci.write_error_result(mode, command_exit)
+    } else {
+        ci.write_ci_result(mode, command_exit)
+    };
+    match writer {
+        Ok(exit) => exit,
+        Err(message) => {
+            diagnostic(&message);
+            SCANNER_ERROR
         }
     }
 }
@@ -309,6 +352,8 @@ mod tests {
             json: false,
             reference_mode: Some(ReferenceModeArg::Vulnerable),
             evidence_dir: None,
+            output_dir: None,
+            fail_on_inconclusive: true,
         };
         let err = build_run_options(&args, &vector).expect_err("must refuse non-synthetic");
         assert_eq!(err.code, UNSUPPORTED_TARGET);

@@ -117,16 +117,12 @@ fn find_url_start(input: &str, start: usize) -> Option<usize> {
     let bytes = input.as_bytes();
     let mut search = start;
     while search + 3 <= bytes.len() {
-        match find_ascii_ignore_case(input, search, "://") {
-            Some(sep) => {
-                let scheme_start = walk_scheme_start(bytes, sep);
-                if scheme_start < sep && input.is_char_boundary(scheme_start) {
-                    return Some(scheme_start);
-                }
-                search = sep + 3;
-            }
-            None => return None,
+        let sep = find_ascii_ignore_case(input, search, "://")?;
+        let scheme_start = walk_scheme_start(bytes, sep);
+        if scheme_start < sep && input.is_char_boundary(scheme_start) {
+            return Some(scheme_start);
         }
+        search = sep + 3;
     }
     None
 }
