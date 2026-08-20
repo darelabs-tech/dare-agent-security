@@ -18,22 +18,65 @@ use dare_mcp_discovery::{
 use time::OffsetDateTime;
 
 use crate::args::DiscoverArgs;
+use crate::ci_output::CiAutomation;
+use crate::ci_result::ActionMode;
 use crate::exit_code::{PARTIAL, SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
 use crate::output::{human_summary, json_inventory};
 
 /// Run `discover` and write stdout/stderr. Returns a documented exit code.
-pub async fn run_discover(args: DiscoverArgs) -> i32 {
+pub async fn run_discover(mut args: DiscoverArgs) -> i32 {
+    let ci = match prepare_ci_automation(&mut args) {
+        Ok(ci) => ci,
+        Err(code) => return code,
+    };
+
     match discover(args).await {
         Ok(outcome) => {
             if let Err(err) = write_stdout(&outcome.stdout) {
                 diagnostic(&err);
-                return SCANNER_ERROR;
+                return finalize_ci(ci, ActionMode::Discover, SCANNER_ERROR);
             }
-            outcome.exit
+            finalize_ci(ci, ActionMode::Discover, outcome.exit)
         }
         Err(err) => {
             diagnostic(&err.message);
-            err.code
+            finalize_ci(ci, ActionMode::Discover, err.code)
+        }
+    }
+}
+
+fn prepare_ci_automation(args: &mut DiscoverArgs) -> Result<Option<CiAutomation>, i32> {
+    let Some(ci) = CiAutomation::from_flags(
+        args.output_dir.clone(),
+        args.evidence_dir.clone(),
+        args.fail_on_inconclusive,
+    ) else {
+        return Ok(None);
+    };
+    if let Err(message) = ci.prepare() {
+        diagnostic(&message);
+        return Err(SCANNER_ERROR);
+    }
+    if args.evidence_dir.is_none() {
+        args.evidence_dir = Some(ci.evidence_dir.clone());
+    }
+    Ok(Some(ci))
+}
+
+fn finalize_ci(ci: Option<CiAutomation>, mode: ActionMode, command_exit: i32) -> i32 {
+    let Some(ci) = ci else {
+        return command_exit;
+    };
+    let writer = if command_exit == SCANNER_ERROR || command_exit == UNSUPPORTED_TARGET {
+        ci.write_error_result(mode, command_exit)
+    } else {
+        ci.write_ci_result(mode, command_exit)
+    };
+    match writer {
+        Ok(exit) => exit,
+        Err(message) => {
+            diagnostic(&message);
+            SCANNER_ERROR
         }
     }
 }

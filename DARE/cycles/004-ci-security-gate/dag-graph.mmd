@@ -1,0 +1,36 @@
+flowchart TB
+    T001["task-001<br/>Reconcile main"]
+    T002["task-002<br/>CI result contract"]
+    T003["task-003<br/>Packaging + threat model"]
+    T004["task-004<br/>CLI CI contract"]
+    T005["task-005<br/>GitHub Action adapter"]
+    T006["task-006<br/>Evidence + outputs + summary"]
+    T007["task-007<br/>Synthetic Action fixtures"]
+    T008["task-008<br/>Action E2E matrix"]
+    T009["task-009<br/>Security hardening"]
+    T010["task-010<br/>Docs + project state"]
+    T011["task-011<br/>Final DARE proof"]
+
+    T001 --> T002
+    T001 --> T003
+
+    T002 --> T004
+    T002 --> T005
+    T003 --> T005
+
+    T004 --> T006
+    T005 --> T006
+
+    T002 --> T007
+    T004 --> T007
+
+    T006 --> T008
+    T007 --> T008
+
+    T003 --> T009
+    T005 --> T009
+    T006 --> T009
+
+    T008 --> T010
+    T009 --> T010
+    T010 --> T011

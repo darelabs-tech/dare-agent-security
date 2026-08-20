@@ -79,9 +79,9 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Pre-alpha — Cycle 002 passive MCP discovery and Cycle 003 COAZ integrity vectors are usable against synthetic fixtures
+**Stage:** Pre-alpha — Cycles 001–003 merged; Cycle 004 adds a pre-release GitHub Action CI gate (synthetic fixtures only)
 
-Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: a passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors for COAZ-MCP (built-in synthetic fixtures only). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
 
 ### Discover quick start
 
@@ -135,10 +135,10 @@ There are no `--token`, `--password`, or `--credential` flags. HTTP targets are 
 Current priorities:
 
 1. keep the Cycle 001 evidence contract stable;
-2. finish human review/merge of Cycle 002 discovery;
-3. human review of Cycle 003 COAZ authorization-integrity vectors and upstream package;
+2. harden and document the Cycle 004 GitHub Action (pre-release, pin-by-SHA);
+3. expand synthetic CI fixture coverage and operator docs;
 4. publish the first reproducible benchmark methodology;
-5. integrate with CI through a GitHub Action for authorized environments.
+5. Agent Attack Graph (after repeatable CI enforcement is proven).
 
 ## Contributing
 

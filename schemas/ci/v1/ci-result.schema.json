@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/ci/v1/ci-result.schema.json",
+  "title": "DARE Agent Security CI Result v1",
+  "description": "Deterministic aggregate outcome for GitHub Actions and other CI adapters. Reuses Cycle 001 verdict vocabulary; does not introduce GitHub-specific security verdicts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "mode",
+    "aggregate_verdict",
+    "evidence_counts",
+    "evidence_paths",
+    "output_dir",
+    "process_exit_code",
+    "fail_on_inconclusive",
+    "github_outputs",
+    "timestamps"
+  ],
+  "properties": {
+    "schema": { "$ref": "#/$defs/schemaRef" },
+    "mode": { "$ref": "#/$defs/actionMode" },
+    "aggregate_verdict": { "$ref": "#/$defs/verdict" },
+    "evidence_counts": { "$ref": "#/$defs/evidenceCounts" },
+    "evidence_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "output_dir": { "type": "string", "minLength": 1 },
+    "process_exit_code": { "type": "integer", "minimum": 0, "maximum": 255 },
+    "fail_on_inconclusive": { "type": "boolean" },
+    "github_outputs": { "$ref": "#/$defs/githubOutputs" },
+    "timestamps": { "$ref": "#/$defs/ciTimestamps" }
+  },
+  "$defs": {
+    "schemaRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "https://darelabs.tech/schemas/ci/v1/ci-result.schema.json"
+        },
+        "version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" }
+      }
+    },
+    "actionMode": {
+      "type": "string",
+      "enum": ["discover", "validate"]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR"]
+    },
+    "evidenceCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR"],
+      "properties": {
+        "PASS": { "type": "integer", "minimum": 0 },
+        "FAIL": { "type": "integer", "minimum": 0 },
+        "INCONCLUSIVE": { "type": "integer", "minimum": 0 },
+        "ERROR": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "githubOutputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "evidence-path", "summary-path"],
+      "properties": {
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "evidence-path": { "type": "string", "minLength": 1 },
+        "summary-path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ciTimestamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completed_at"],
+      "properties": {
+        "completed_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-19T19:28:34.140Z",
+  "tasks": {
+    "task-001": {
+      "status": "DONE",
+      "output": "Bootstrapped dare-coaz-integrity crate; cycle003_standards_snapshot + fixture examples/coaz-integrity/cycle003-standards-v1.json; IMPLEMENTATION-NOTES.md maps tasks 002-012 to merged Cycle 002 paths. No duplicate discovery/CLI/lab crates. authzen#603 OPEN_PROPOSAL; scope tools/call.",
+      "duration": 88054
+    },
+    "task-002": {
+      "status": "DONE",
+      "output": "Vector/result contracts v1: schemas/vectors/coaz-integrity/v1/*.schema.json; Rust models vector/result/validation; examples secure+vulnerable fixtures; tests vector_result_contract.rs. Offline jsonschema + semantic fail-closed.",
+      "duration": 17761
+    },
+    "task-003": {
+      "status": "DONE",
+      "output": "CanonicalValue in canonical.rs: semantic normalization, stable serialization, SHA-256 digest. Key-order equivalence, mapped-value inequality, non-finite rejection. tests/canonical.rs.",
+      "duration": 26879
+    },
+    "task-004": {
+      "status": "DONE",
+      "output": "BindingMaterialV1 + compute_authorization_binding (coaz-binding-v1 SHA-256). binding.rs + tests/binding.rs truth table 001-007 mutation classes.",
+      "duration": 18519
+    },
+    "task-005": {
+      "status": "DONE",
+      "output": "AuthorizationProjector trait; DefaultToolsCallProjector; RentalQuoteProjector (daily_rate mapped). projector*.rs + tests/projector.rs (8 tests). No CEL.",
+      "duration": 14839
+    },
+    "task-006": {
+      "status": "DONE",
+      "output": "Deterministic PDP: pdp.rs + pdp_rental.rs (synthetic-rental-policy-v1). BoundDecision with binding digest. tests/pdp.rs (6 tests).",
+      "duration": 19920
+    },
+    "task-007": {
+      "status": "DONE",
+      "output": "Mutation stage + synthetic sink: mutation.rs, sink.rs. PEP modes SecureReevaluate/SecureRefuseOnChange/VulnerableReusePermit (synthetic-only). tests/mutation_sink.rs (13 tests).",
+      "duration": 14804
+    },
+    "task-008": {
+      "status": "DONE",
+      "output": "COAZ-INTEGRITY-001..007 fixtures; runner.rs; tests/vectors.rs secure PASS + vulnerable stale-permit FAIL 002-005.",
+      "duration": 14498
+    },
+    "task-009": {
+      "status": "DONE",
+      "output": "Evidence bridge dare.coaz.integrity: emit_integrity_evidence from VectorResult. Fixtures pass/fail/inconclusive/error. tests/evidence_bridge.rs (12). Evidence crate unchanged.",
+      "duration": 26848
+    },
+    "task-010": {
+      "status": "DONE",
+      "output": "CLI validate coaz-integrity: --all, --fixture, --json, --reference-mode vulnerable, --evidence-dir. coaz_integrity.rs + tests/validate_cli.rs. EXIT.md exit codes. discover unchanged.",
+      "duration": 23650
+    },
+    "task-011": {
+      "status": "DONE",
+      "output": "E2E proof: e2e_integrity.rs (13 tests) + e2e_coaz_integrity.rs (5 CLI). Stale-permit FAIL 002-005 vulnerable; secure re-eval/refuse; controls 006-007; negative security canaries.",
+      "duration": 22483
+    },
+    "task-012": {
+      "status": "DONE",
+      "output": "Docs docs/coaz-integrity*.md; PROOF.md Design matrix; upstream/ package; README quick start; cycle_003_operator_docs_exist; cargo audit PASS.",
+      "duration": 44619
+    }
+  }
+}

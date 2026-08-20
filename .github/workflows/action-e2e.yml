@@ -1,0 +1,105 @@
+name: action-e2e
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  action-matrix:
+    name: Action E2E (${{ matrix.id }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: secure-pass
+            mode: validate
+            target: secure-pass
+            expect_verdict: PASS
+            expect_failure: false
+          - id: fail-stale-permit
+            mode: validate
+            target: fail-stale-permit
+            reference_mode: vulnerable
+            expect_verdict: FAIL
+            expect_failure: true
+          - id: inconclusive-empty
+            mode: validate
+            target: inconclusive-empty
+            expect_verdict: INCONCLUSIVE
+            expect_failure: true
+          - id: discover-synthetic-mcp
+            mode: discover
+            target: synthetic-mcp
+            expect_verdict: PASS
+            expect_failure: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run DARE security gate
+        uses: ./
+        id: gate
+        continue-on-error: ${{ matrix.expect_failure }}
+        with:
+          mode: ${{ matrix.mode }}
+          target: ${{ matrix.target }}
+          output-dir: .dare-agent-security/${{ matrix.id }}
+          reference-mode: ${{ matrix.reference_mode || 'secure' }}
+
+      - name: Assert expected step outcome
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ matrix.expect_failure }}" = "true" ]; then
+            if [ "${{ steps.gate.outcome }}" = "success" ]; then
+              echo "expected security failure but step succeeded" >&2
+              exit 1
+            fi
+          else
+            if [ "${{ steps.gate.outcome }}" != "success" ]; then
+              echo "expected success but step outcome was ${{ steps.gate.outcome }}" >&2
+              exit 1
+            fi
+          fi
+
+      - name: Assert GitHub outputs match evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT=".dare-agent-security/${{ matrix.id }}"
+          test "${{ steps.gate.outputs.verdict }}" = "${{ matrix.expect_verdict }}"
+          test -f "$OUT/ci-result.json"
+          test -f "$OUT/summary.md"
+          AGG=$(python3 -c "import json; print(json.load(open('$OUT/ci-result.json'))['aggregate_verdict'])")
+          test "$AGG" = "${{ matrix.expect_verdict }}"
+          EVIDENCE="${{ steps.gate.outputs.evidence-path }}"
+          if [ "${{ matrix.expect_verdict }}" = "INCONCLUSIVE" ]; then
+            echo "$EVIDENCE" | grep -q '.none$'
+          else
+            test -f "$EVIDENCE"
+          fi
+
+  action-error:
+    name: Action E2E (error-invalid-fixture)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run invalid fixture (expect failure)
+        uses: ./
+        id: gate
+        continue-on-error: true
+        with:
+          mode: validate
+          target: error-invalid-fixture
+          output-dir: .dare-agent-security/error
+
+      - name: Assert ERROR aggregate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ steps.gate.outcome }}" = "failure"
+          test "${{ steps.gate.outputs.verdict }}" = "ERROR"
+          test -f .dare-agent-security/error/ci-result.json

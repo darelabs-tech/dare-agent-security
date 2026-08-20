@@ -1,0 +1,39 @@
+{
+  "schema": "fixtures/ci/v1/matrix.schema.json",
+  "description": "Deterministic Action fixture matrix — synthetic/local only, no production targets.",
+  "cases": [
+    {
+      "id": "secure-pass",
+      "mode": "validate",
+      "target": "secure-pass",
+      "expected_verdict": "PASS",
+      "expected_exit": 0,
+      "notes": "COAZ-INTEGRITY-001 secure mode"
+    },
+    {
+      "id": "fail-stale-permit",
+      "mode": "validate",
+      "target": "fail-stale-permit",
+      "reference_mode": "vulnerable",
+      "expected_verdict": "FAIL",
+      "expected_exit": 2,
+      "notes": "COAZ-INTEGRITY-003 vulnerable stale permit"
+    },
+    {
+      "id": "inconclusive-empty",
+      "mode": "validate",
+      "target": "inconclusive-empty",
+      "expected_verdict": "INCONCLUSIVE",
+      "expected_exit": 2,
+      "notes": "No evidence files — aggregate INCONCLUSIVE per ci-result contract"
+    },
+    {
+      "id": "discover-synthetic-mcp",
+      "mode": "discover",
+      "target": "synthetic-mcp",
+      "expected_verdict": "PASS",
+      "expected_exit": 0,
+      "notes": "Passive discovery against bundled synthetic-mcp lab"
+    }
+  ]
+}

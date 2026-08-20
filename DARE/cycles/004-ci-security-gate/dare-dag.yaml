@@ -1,0 +1,46 @@
+cycle:
+  id: "004"
+  name: "ci-security-gate"
+  status: "READY_FOR_REVIEW"
+  approval: "PENDING"
+
+dependencies:
+  delivered_cycles:
+    - "001"
+    - "002"
+    - "003"
+
+tasks:
+  task-001:
+    title: "Reconcile post-Cycle-003 main"
+    depends_on: []
+  task-002:
+    title: "Define deterministic CI result contract"
+    depends_on: ["task-001"]
+  task-003:
+    title: "Verify Action packaging architecture and threat model"
+    depends_on: ["task-001"]
+  task-004:
+    title: "Make the CLI CI-safe and non-interactive"
+    depends_on: ["task-002"]
+  task-005:
+    title: "Implement the thin GitHub Action adapter"
+    depends_on: ["task-002", "task-003"]
+  task-006:
+    title: "Integrate evidence, outputs, and job summary"
+    depends_on: ["task-004", "task-005"]
+  task-007:
+    title: "Build synthetic Action fixtures"
+    depends_on: ["task-002", "task-004"]
+  task-008:
+    title: "Add Action E2E workflow matrix"
+    depends_on: ["task-006", "task-007"]
+  task-009:
+    title: "Security hardening and hostile-input tests"
+    depends_on: ["task-003", "task-005", "task-006"]
+  task-010:
+    title: "Documentation and project-state reconciliation"
+    depends_on: ["task-008", "task-009"]
+  task-011:
+    title: "Final DARE proof and release-candidate handoff"
+    depends_on: ["task-010"]
