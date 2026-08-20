@@ -1,21 +1,9 @@
-# syntax=docker/dockerfile:1
+# This file is intentionally not used by action.yml.
+# GitHub Actions Docker build context is the Dockerfile directory; building from
+# action/ cannot see the workspace crates. The Action image is defined at the
+# repository root: ../Dockerfile (see action.yml runs.image).
+#
+# Kept as a pointer so older docs that mention action/Dockerfile resolve.
 
-FROM rust:1.88-bookworm AS builder
-WORKDIR /src
-COPY Cargo.toml Cargo.lock ./
-COPY crates ./crates
-COPY labs ./labs
-COPY schemas ./schemas
-COPY vectors ./vectors
-RUN cargo build --release -p dare-agent-security -p synthetic-mcp
-
-FROM debian:bookworm-slim
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /src/target/release/dare-agent-security /usr/local/bin/dare-agent-security
-COPY --from=builder /src/target/release/synthetic-mcp /usr/local/bin/synthetic-mcp
-COPY action/entrypoint.sh /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
-WORKDIR /github/workspace
-ENTRYPOINT ["/entrypoint.sh"]
+FROM scratch
+LABEL org.opencontainers.image.description="Use repository-root Dockerfile with action.yml"

@@ -32,7 +32,7 @@ outputs:
 
 runs:
   using: docker
-  image: action/Dockerfile
+  image: Dockerfile
   env:
     INPUT_MODE: ${{ inputs.mode }}
     INPUT_TARGET: ${{ inputs.target }}

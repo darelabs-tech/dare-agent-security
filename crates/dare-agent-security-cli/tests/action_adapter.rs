@@ -11,6 +11,8 @@ fn repo_root() -> PathBuf {
 fn action_metadata_exists_with_bounded_mode_input() {
     let action = fs::read_to_string(repo_root().join("action.yml")).expect("action.yml");
     assert!(action.contains("using: docker"));
+    assert!(action.contains("image: Dockerfile"));
+    assert!(!action.contains("image: action/Dockerfile"));
     assert!(action.contains("mode:"));
     assert!(action.contains("target:"));
     assert!(action.contains("output-dir:"));
@@ -32,16 +34,18 @@ fn entrypoint_invokes_cli_without_eval_or_shell_c() {
 
 #[test]
 fn dockerfile_builds_cli_from_repository() {
-    let dockerfile = fs::read_to_string(repo_root().join("action/Dockerfile")).expect("Dockerfile");
+    let dockerfile = fs::read_to_string(repo_root().join("Dockerfile")).expect("root Dockerfile");
     assert!(dockerfile.contains("cargo build --release -p dare-agent-security"));
     assert!(dockerfile.contains("entrypoint.sh"));
+    assert!(dockerfile.contains("/src/vectors"));
     assert!(!dockerfile.contains("curl"));
     assert!(!dockerfile.contains("wget"));
 }
 
 #[test]
-fn entrypoint_rejects_unsupported_mode_in_script() {
+fn entrypoint_preserves_outputs_after_nonzero_cli_exit() {
     let entry = fs::read_to_string(repo_root().join("action/entrypoint.sh")).expect("entrypoint");
-    assert!(entry.contains("unsupported mode"));
-    assert!(entry.contains(".."));
+    assert!(entry.contains("set +e"));
+    assert!(entry.contains("write_github_outputs"));
+    assert!(entry.contains("EXIT=$?"));
 }

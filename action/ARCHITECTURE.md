@@ -43,16 +43,18 @@ GitHub-hosted `ubuntu-latest` runners support container actions natively. This m
 
 ### Build and runtime
 
-- **Multi-stage Dockerfile:** builder stage (`rust:1.88-bookworm`) compiles workspace release binary; runtime stage (`debian:bookworm-slim`) copies only the binary plus entrypoint.
+- **Multi-stage Dockerfile (repository root):** builder stage (`rust:1.88-bookworm`) compiles workspace release binary; runtime stage (`debian:bookworm-slim`) copies the binary, `synthetic-mcp`, built-in vectors, and entrypoint.
+- **Why root Dockerfile:** GitHub Actions uses the Dockerfile directory as the build context. An `action/Dockerfile` cannot see workspace crates. `action.yml` therefore sets `image: Dockerfile` at the repository root.
 - **Expected image size:** ~80–120 MB (slim runtime + static-linked or dynamically linked binary).
 - **Cold build time:** dominated by `cargo build --release` for workspace members; acceptable for CI gate use when Action ref is pinned.
 
 ### Action metadata
 
-- `action.yml` at repository root (or `action/action.yml` with composite path — final path locked in task-005).
+- `action.yml` at repository root with `runs.image: Dockerfile` (also at repository root).
 - Inputs: bounded `mode` enum (`discover`, `validate`), required `target`, optional `output-dir`, optional `fail-on-inconclusive`.
 - Outputs: `verdict`, `evidence-path`, `summary-path` (from `ci-result.json` / task-002 contract).
-- `runs.using: docker`, `runs.image: Dockerfile`.
+- `runs.using: docker`, `runs.image: Dockerfile` (root context so crates can be compiled).
+- Entrypoint: `action/entrypoint.sh`.
 
 ### Workspace and evidence mapping
 

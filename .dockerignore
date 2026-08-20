@@ -1,0 +1,14 @@
+target
+.git
+.dare
+**/target
+*.zip
+node_modules
+.github
+DARE
+docs
+examples
+fixtures
+tmp
+*.md
+!action/entrypoint.sh

@@ -103,6 +103,8 @@ if [ -z "$TARGET" ]; then
   exit 1
 fi
 
+# Capture CLI exit without aborting before GitHub outputs are written.
+set +e
 if [ "$MODE" = "discover" ]; then
   case "$TARGET" in
     synthetic-mcp) run_discover "/usr/local/bin/synthetic-mcp" ;;
@@ -122,7 +124,8 @@ else
     *) run_validate_fixture "$TARGET" ;;
   esac
 fi
-
 EXIT=$?
+set -e
+
 write_github_outputs
 exit "$EXIT"

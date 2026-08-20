@@ -20,7 +20,7 @@ fn fixture_matrix_documents_four_aggregate_classes() {
         .collect();
     for expected in ["PASS", "FAIL", "INCONCLUSIVE"] {
         assert!(
-            verdicts.iter().any(|v| *v == expected),
+            verdicts.contains(&expected),
             "missing expected verdict {expected}"
         );
     }
