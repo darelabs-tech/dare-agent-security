@@ -1,0 +1,56 @@
+flowchart TB
+    T001["task-001 Reconcile main"]
+    T002["task-002 Corpus Manifest"]
+    T003["task-003 Benchmark Run"]
+    T004["task-004 Benchmark Record"]
+    T005["task-005 Dedup + lineage"]
+    T006["task-006 Sampling methodology"]
+    T007["task-007 Eligibility + aggregation"]
+    T008["task-008 Safe runner"]
+    T009["task-009 Security fixtures"]
+    T010["task-010 Human validation"]
+    T011["task-011 Disclosure"]
+    T012["task-012 Pilot corpus"]
+    T013["task-013 Aggregate output"]
+    T014["task-014 CI regression"]
+    T015["task-015 Methodology docs"]
+    T016["task-016 Final proof"]
+
+    T001 --> T002
+    T001 --> T003
+    T001 --> T004
+    T002 --> T003
+    T003 --> T004
+    T002 --> T005
+    T002 --> T006
+    T005 --> T006
+    T004 --> T007
+    T006 --> T007
+    T003 --> T008
+    T004 --> T008
+    T007 --> T008
+    T008 --> T009
+    T004 --> T010
+    T007 --> T010
+    T010 --> T011
+    T005 --> T012
+    T006 --> T012
+    T008 --> T012
+    T009 --> T012
+    T011 --> T012
+    T007 --> T013
+    T010 --> T013
+    T012 --> T013
+    T004 --> T014
+    T005 --> T014
+    T007 --> T014
+    T008 --> T014
+    T009 --> T014
+    T010 --> T014
+    T006 --> T015
+    T007 --> T015
+    T011 --> T015
+    T013 --> T015
+    T013 --> T016
+    T014 --> T016
+    T015 --> T016

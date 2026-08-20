@@ -409,6 +409,7 @@ name = "dare-agent-security"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "dare-benchmark",
  "dare-coaz-integrity",
  "dare-coverage",
  "dare-mcp-discovery",
@@ -420,6 +421,21 @@ dependencies = [
  "thiserror",
  "time",
  "tokio",
+]
+
+[[package]]
+name = "dare-benchmark"
+version = "0.1.0"
+dependencies = [
+ "dare-coverage",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "time",
 ]
 
 [[package]]

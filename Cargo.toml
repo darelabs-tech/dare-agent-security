@@ -7,6 +7,7 @@ members = [
     "crates/dare-agent-security-cli",
     "crates/dare-mcp-lab",
     "crates/dare-coverage",
+    "crates/dare-benchmark",
     "labs/synthetic-mcp",
 ]
 

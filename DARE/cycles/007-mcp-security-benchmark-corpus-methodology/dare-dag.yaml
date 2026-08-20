@@ -1,0 +1,79 @@
+cycle:
+  id: "007"
+  name: "mcp-security-benchmark-corpus-methodology"
+  status: "APPROVED_FOR_EXECUTION"
+  approval: "APPROVED"
+
+dependencies:
+  delivered_cycles:
+    - "001"
+    - "002"
+    - "003"
+    - "004"
+    - "005"
+    - "006"
+
+gates:
+  - "cargo fmt --all --check"
+  - "cargo clippy --workspace --all-targets -- -D warnings"
+  - "cargo test --workspace"
+
+invariants:
+  - "pinned commit SHA per target — never a moving branch alone"
+  - "reuse Cycles 001-006 — no second evidence/verdict/coverage/profile engine"
+  - "coverage-aware denominators — never hide NA/OOS/BLOCKED as PASS"
+  - "static/local-passive by default for third-party public OSS"
+  - "no unauthorized active/dynamic testing of third-party infrastructure"
+  - "no automatic publish of secrets, credentials, or exploit chains"
+  - "dedup/lineage — forks/mirrors must not inflate prevalence"
+  - "pilot corpus validates methodology (25-50), not ecosystem claims"
+
+tasks:
+  task-001:
+    title: "Reconcile post-Cycle-006 main"
+    depends_on: []
+  task-002:
+    title: "Define Corpus Manifest schema"
+    depends_on: ["task-001"]
+  task-003:
+    title: "Define Benchmark Run schema"
+    depends_on: ["task-001", "task-002"]
+  task-004:
+    title: "Define Benchmark Record schema"
+    depends_on: ["task-001", "task-003"]
+  task-005:
+    title: "Implement corpus dedup and lineage classification"
+    depends_on: ["task-002"]
+  task-006:
+    title: "Define sampling and corpus-selection methodology"
+    depends_on: ["task-002", "task-005"]
+  task-007:
+    title: "Define benchmark eligibility and aggregation math"
+    depends_on: ["task-001", "task-004", "task-006"]
+  task-008:
+    title: "Implement safe benchmark runner"
+    depends_on: ["task-003", "task-004", "task-007"]
+  task-009:
+    title: "Build benchmark security fixtures"
+    depends_on: ["task-008"]
+  task-010:
+    title: "Implement human-validation ledger"
+    depends_on: ["task-004", "task-007"]
+  task-011:
+    title: "Define responsible-disclosure workflow"
+    depends_on: ["task-004", "task-010"]
+  task-012:
+    title: "Build pilot corpus"
+    depends_on: ["task-005", "task-006", "task-008", "task-009", "task-011"]
+  task-013:
+    title: "Produce aggregate benchmark output"
+    depends_on: ["task-007", "task-010", "task-012"]
+  task-014:
+    title: "Add CI regression coverage"
+    depends_on: ["task-004", "task-005", "task-007", "task-008", "task-009", "task-010"]
+  task-015:
+    title: "Write methodology and interpretation documentation"
+    depends_on: ["task-006", "task-007", "task-011", "task-013"]
+  task-016:
+    title: "Final DARE proof"
+    depends_on: ["task-013", "task-014", "task-015"]

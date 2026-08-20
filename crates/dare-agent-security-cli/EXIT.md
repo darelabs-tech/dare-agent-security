@@ -34,3 +34,17 @@ Profile and coverage evaluation. Does not replace `discover` or `validate coaz-i
 | 3 | Usage error |
 
 Artifact: `coverage-report.json` (sibling of `ci-result.json`; Cycle 004 schema stays closed).
+
+## `validate benchmark`
+
+Offline corpus methodology runner (Cycle 007). Default modes: `static` / `local-passive`.
+
+| Code | Meaning |
+|------|---------|
+| 0 | Benchmark run completed |
+| 1 | Harness error |
+| 2 | Empty corpus / partial |
+| 3 | Usage or safety refusal (e.g. unauthorized dynamic mode) |
+
+Artifacts: `benchmark-run.json`, `aggregate.json`, `records/*.json`.
+

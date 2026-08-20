@@ -56,3 +56,19 @@ jobs:
         run: cargo test -p dare-coverage -- --nocapture
       - name: Cycle 005 adapter mapping
         run: cargo test -p dare-coverage --test cycle005_adapter -- --nocapture
+
+  benchmark-methodology:
+    name: Cycle 007 benchmark methodology
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Benchmark schemas, pilot, and safety tests
+        run: cargo test -p dare-benchmark -- --nocapture
+      - name: Offline pilot CLI
+        run: |
+          cargo run -p dare-agent-security -- validate benchmark \
+            --corpus benchmark/corpus/pilot-methodology-v1/corpus-manifest.json \
+            --output-dir .dare-agent-security/benchmark-ci \
+            --mode local-passive
+

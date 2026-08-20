@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/benchmark/v1/benchmark-run.schema.json",
+  "title": "DARE Benchmark Run v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "corpus", "engine", "property_registry", "assessment_profile", "policies", "runner", "environment"],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "https://darelabs.tech/schemas/benchmark/v1/benchmark-run.schema.json"
+        },
+        "version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" }
+      }
+    },
+    "id": { "type": "string", "minLength": 1 },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "digest"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "commit"],
+      "properties": {
+        "version": { "type": "string" },
+        "commit": { "type": "string", "minLength": 7 }
+      }
+    },
+    "property_registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "digest"],
+      "properties": {
+        "version": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "assessment_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "digest"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage", "severity", "confidence"],
+      "properties": {
+        "coverage": { "$ref": "#/$defs/policyRef" },
+        "severity": { "$ref": "#/$defs/policyRef" },
+        "confidence": { "$ref": "#/$defs/policyRef" }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "default_mode"],
+      "properties": {
+        "version": { "type": "string" },
+        "default_mode": {
+          "type": "string",
+          "enum": ["STATIC", "LOCAL_PASSIVE", "AUTHORIZED_DYNAMIC"]
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network_mode"],
+      "properties": {
+        "network_mode": { "type": "string", "enum": ["restricted", "none", "authorized"] },
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "container_digest": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "policyRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "digest"],
+      "properties": {
+        "version": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

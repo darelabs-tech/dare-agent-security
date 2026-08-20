@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/benchmark/v1/benchmark-record.schema.json",
+  "title": "DARE Benchmark Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "benchmark_run_id", "target", "assessment", "coverage", "findings", "property_results"],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "https://darelabs.tech/schemas/benchmark/v1/benchmark-record.schema.json"
+        },
+        "version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" }
+      }
+    },
+    "benchmark_run_id": { "type": "string", "minLength": 1 },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "repository", "commit"],
+      "properties": {
+        "id": { "type": "string" },
+        "repository": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "plan_digest"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["STATIC", "LOCAL_PASSIVE", "AUTHORIZED_DYNAMIC"] },
+        "plan_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "evidence_bundle_digest": { "type": ["string", "null"] }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assessment_coverage", "not_applicable", "out_of_scope", "not_tested", "blocked", "error"],
+      "properties": {
+        "assessment_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "execution_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "not_applicable": { "type": "integer", "minimum": 0 },
+        "out_of_scope": { "type": "integer", "minimum": 0 },
+        "not_tested": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 },
+        "error": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "findings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass", "fail", "inconclusive", "error"],
+      "properties": {
+        "pass": { "type": "integer", "minimum": 0 },
+        "fail": { "type": "integer", "minimum": 0 },
+        "inconclusive": { "type": "integer", "minimum": 0 },
+        "error": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "property_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["property_id", "coverage_status"],
+        "properties": {
+          "property_id": { "type": "string" },
+          "coverage_status": {
+            "type": "string",
+            "enum": ["APPLICABLE", "NOT_APPLICABLE", "NOT_TESTED", "OUT_OF_SCOPE", "BLOCKED"]
+          },
+          "verdict": {
+            "type": ["string", "null"],
+            "enum": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR", null]
+          },
+          "evidence_ids": { "type": "array", "items": { "type": "string" } },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["PUBLIC", "DISCLOSURE_PENDING", "EMBARGOED", "REDACTED", "FIXED"]
+        }
+      }
+    }
+  }
+}

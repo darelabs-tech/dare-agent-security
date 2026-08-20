@@ -4,6 +4,7 @@ use std::process::ExitCode;
 
 use clap::{error::ErrorKind, Parser};
 use dare_agent_security::args::{Cli, Command, ValidateSubcommand};
+use dare_agent_security::benchmark::run_benchmark;
 use dare_agent_security::ci::run_ci;
 use dare_agent_security::coaz_integrity::run_coaz_integrity;
 use dare_agent_security::coverage::run_coverage;
@@ -20,6 +21,7 @@ async fn main() -> ExitCode {
                     ExitCode::from(run_coaz_integrity(args) as u8)
                 }
                 ValidateSubcommand::Coverage(args) => ExitCode::from(run_coverage(args) as u8),
+                ValidateSubcommand::Benchmark(args) => ExitCode::from(run_benchmark(args) as u8),
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),
         },

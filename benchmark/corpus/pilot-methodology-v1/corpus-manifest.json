@@ -1,0 +1,330 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/benchmark/v1/corpus-manifest.schema.json",
+    "version": "1.0.0"
+  },
+  "corpus": {
+    "id": "mcp-oss-pilot-methodology-2026",
+    "version": "1.0.0",
+    "title": "MCP OSS pilot methodology validation corpus",
+    "purpose": "METHODOLOGY_VALIDATION"
+  },
+  "selection": {
+    "source": "fixture-corpus",
+    "population": "synthetic methodology fixtures representing public OSS MCP server shapes",
+    "inclusion": [
+      "MCP server-capable implementation shape",
+      "pinned immutable revision",
+      "license permits analysis",
+      "identity can be frozen"
+    ],
+    "exclusion": [
+      "docs-only repositories",
+      "clients only",
+      "mirrors without provenance",
+      "targets requiring unauthorized production access"
+    ]
+  },
+  "targets": [
+    {
+      "id": "mcp-target-000001",
+      "repository": "fixture/pilot-1",
+      "commit": "47ff05d087e7438323bc37f7631b3b8d6f9076dd",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "rust", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000001.json"
+    },
+    {
+      "id": "mcp-target-000002",
+      "repository": "fixture/pilot-2",
+      "commit": "cc1bd0f31e57945508653d47a0412e35c7185387",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "typescript", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000002.json"
+    },
+    {
+      "id": "mcp-target-000003",
+      "repository": "fixture/pilot-3",
+      "commit": "a878e2e5789b4e8a984e666dff2bb081261a027d",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "python", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000003.json"
+    },
+    {
+      "id": "mcp-target-000004",
+      "repository": "fixture/pilot-4",
+      "commit": "34d14dec928ad6b48437cb624a7e9e08c6ec9b21",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MATERIAL_FORK", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "go", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000004.json"
+    },
+    {
+      "id": "mcp-target-000005",
+      "repository": "fixture/pilot-5",
+      "commit": "b7b85e7e00b1bf300919dd6cee77c8a7c6fc7465",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MIRROR", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "java", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000005.json"
+    },
+    {
+      "id": "mcp-target-000006",
+      "repository": "fixture/pilot-6",
+      "commit": "737820a2c7d77e329d68c0bb0a63beeea1f9d8b7",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "EXAMPLE", "parent_target_id": null },
+      "stratification": { "language": "rust", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000006.json"
+    },
+    {
+      "id": "mcp-target-000007",
+      "repository": "fixture/pilot-7",
+      "commit": "2cbc0867637f8eb8a38527195b55eab2b4fe8b12",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "VENDOR_COPY", "parent_target_id": "mcp-target-000002" },
+      "stratification": { "language": "typescript", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000007.json"
+    },
+    {
+      "id": "mcp-target-000008",
+      "repository": "fixture/pilot-8",
+      "commit": "086a76b1f22f47d9060306abf2e1685d257c58ed",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "python", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000008.json"
+    },
+    {
+      "id": "mcp-target-000009",
+      "repository": "fixture/pilot-9",
+      "commit": "6d44e5970445c884a19a965abf78a884c9a8760c",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "go", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000009.json"
+    },
+    {
+      "id": "mcp-target-000010",
+      "repository": "fixture/pilot-10",
+      "commit": "bf44c027aab244808da4c1b5bf5d6a21bb5738b0",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "java", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000010.json"
+    },
+    {
+      "id": "mcp-target-000011",
+      "repository": "fixture/pilot-11",
+      "commit": "9dd17ba6958658c6a5c02a9bb7f176fe7d1cc2c1",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MATERIAL_FORK", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "rust", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000011.json"
+    },
+    {
+      "id": "mcp-target-000012",
+      "repository": "fixture/pilot-12",
+      "commit": "3c2d6aa660e7a4ce54c6e002296003ed701cb512",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MIRROR", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "typescript", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000012.json"
+    },
+    {
+      "id": "mcp-target-000013",
+      "repository": "fixture/pilot-13",
+      "commit": "35440394e713f0f0412824d92b47b14b05be2e5a",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "EXAMPLE", "parent_target_id": null },
+      "stratification": { "language": "python", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000013.json"
+    },
+    {
+      "id": "mcp-target-000014",
+      "repository": "fixture/pilot-14",
+      "commit": "f2c7bbc22cfdd49647cd89c7d96a1658d8d8cb39",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "VENDOR_COPY", "parent_target_id": "mcp-target-000002" },
+      "stratification": { "language": "go", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000014.json"
+    },
+    {
+      "id": "mcp-target-000015",
+      "repository": "fixture/pilot-15",
+      "commit": "39eabd1a5d6a89d862cf2095304e6ba85b18f455",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "java", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000015.json"
+    },
+    {
+      "id": "mcp-target-000016",
+      "repository": "fixture/pilot-16",
+      "commit": "28f884b58261a9078f40464cbde89b1e6b764d00",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "rust", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000016.json"
+    },
+    {
+      "id": "mcp-target-000017",
+      "repository": "fixture/pilot-17",
+      "commit": "237293b32f862286128484a6b121708812bf26ee",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "typescript", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000017.json"
+    },
+    {
+      "id": "mcp-target-000018",
+      "repository": "fixture/pilot-18",
+      "commit": "de7ba9546611b7fee2280a337ce81494a151bfdd",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MATERIAL_FORK", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "python", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000018.json"
+    },
+    {
+      "id": "mcp-target-000019",
+      "repository": "fixture/pilot-19",
+      "commit": "4a2089156352145dbd038101808fce1db2628f9c",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MIRROR", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "go", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000019.json"
+    },
+    {
+      "id": "mcp-target-000020",
+      "repository": "fixture/pilot-20",
+      "commit": "8d5029c5eab873384c1e4d46e2068e5713bcf55f",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "EXAMPLE", "parent_target_id": null },
+      "stratification": { "language": "java", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000020.json"
+    },
+    {
+      "id": "mcp-target-000021",
+      "repository": "fixture/pilot-21",
+      "commit": "ebc3b6a9491335a7857e6f2b4d1e505b80933f9d",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "VENDOR_COPY", "parent_target_id": "mcp-target-000002" },
+      "stratification": { "language": "rust", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000021.json"
+    },
+    {
+      "id": "mcp-target-000022",
+      "repository": "fixture/pilot-22",
+      "commit": "af71eb382a96442358629b73f9a637dd468a0581",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "typescript", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000022.json"
+    },
+    {
+      "id": "mcp-target-000023",
+      "repository": "fixture/pilot-23",
+      "commit": "b950815d6367d7c8bf617034c942810b0d0ec402",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "python", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000023.json"
+    },
+    {
+      "id": "mcp-target-000024",
+      "repository": "fixture/pilot-24",
+      "commit": "91d52dc0ea10a5fad2889a7d927a6f7566b48b74",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "go", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000024.json"
+    },
+    {
+      "id": "mcp-target-000025",
+      "repository": "fixture/pilot-25",
+      "commit": "f95eb3c70971cd97c70ccd33f3f81fab5cc855b1",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MATERIAL_FORK", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "java", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000025.json"
+    },
+    {
+      "id": "mcp-target-000026",
+      "repository": "fixture/pilot-26",
+      "commit": "44444480336dda60d9bfe0aac34f290fc22ea5b8",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "MIRROR", "parent_target_id": "mcp-target-000001" },
+      "stratification": { "language": "rust", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000026.json"
+    },
+    {
+      "id": "mcp-target-000027",
+      "repository": "fixture/pilot-27",
+      "commit": "29d9405b6ccc19792b3d9f34f399fe87b5275786",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "EXAMPLE", "parent_target_id": null },
+      "stratification": { "language": "typescript", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000027.json"
+    },
+    {
+      "id": "mcp-target-000028",
+      "repository": "fixture/pilot-28",
+      "commit": "39d911cd76768c3a7ca0c26f936132e3adc8b0ae",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "VENDOR_COPY", "parent_target_id": "mcp-target-000002" },
+      "stratification": { "language": "python", "sdk": "rmcp-or-equivalent", "transport": "stdio", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000028.json"
+    },
+    {
+      "id": "mcp-target-000029",
+      "repository": "fixture/pilot-29",
+      "commit": "efa8240a86d22778ef863ad681111d707b20dad4",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "go", "sdk": "rmcp-or-equivalent", "transport": "http", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000029.json"
+    },
+    {
+      "id": "mcp-target-000030",
+      "repository": "fixture/pilot-30",
+      "commit": "70c5bd1bffcf6ed5df88fcf77c444a8774fed97b",
+      "license": "Apache-2.0",
+      "discovered_at": "2026-08-20T12:00:00Z",
+      "lineage": { "type": "CANONICAL", "parent_target_id": null },
+      "stratification": { "language": "java", "sdk": "rmcp-or-equivalent", "transport": "unknown", "maintainer_kind": "unknown" },
+      "fixture_path": "fixtures/pilot/mcp-target-000030.json"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/benchmark/v1/benchmark-run.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "cli-benchmark-run",
+  "corpus": {
+    "id": "mcp-oss-pilot-methodology-2026",
+    "version": "1.0.0",
+    "digest": "9f6d13b12f6054e4fda97f364c825f1ad42abaf0cafc0b45a2f8f146b63083ac"
+  },
+  "engine": {
+    "version": "0.1.0",
+    "commit": "local-dev-unpinned"
+  },
+  "property_registry": {
+    "version": "1.0.0",
+    "digest": "bf46947a7c73be6b8c380c8d112ca659798de73aaf37191f5ddb4e027c84d8d2"
+  },
+  "assessment_profile": {
+    "id": "mcp-security-baseline",
+    "version": "1.0.0",
+    "digest": "22842118db14d3d9b765ee488947d1973d6809a2077ded7465c7392f46769903"
+  },
+  "policies": {
+    "coverage": {
+      "version": "1.0.0",
+      "digest": "1e46bd4e17a32a017557a2a883c45ab26d98e0113105b80891de0afda0498892"
+    },
+    "severity": {
+      "version": "1.0.0",
+      "digest": "1e46bd4e17a32a017557a2a883c45ab26d98e0113105b80891de0afda0498892"
+    },
+    "confidence": {
+      "version": "1.0.0",
+      "digest": "1e46bd4e17a32a017557a2a883c45ab26d98e0113105b80891de0afda0498892"
+    }
+  },
+  "runner": {
+    "version": "0.1.0",
+    "default_mode": "LOCAL_PASSIVE"
+  },
+  "environment": {
+    "network_mode": "restricted"
+  }
+}

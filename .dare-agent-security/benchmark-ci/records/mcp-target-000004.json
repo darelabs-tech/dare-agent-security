@@ -1,0 +1,55 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/benchmark/v1/benchmark-record.schema.json",
+    "version": "1.0.0"
+  },
+  "benchmark_run_id": "cli-benchmark-run",
+  "target": {
+    "id": "mcp-target-000004",
+    "repository": "fixture/pilot-4",
+    "commit": "34d14dec928ad6b48437cb624a7e9e08c6ec9b21"
+  },
+  "assessment": {
+    "mode": "LOCAL_PASSIVE",
+    "plan_digest": "252d46c013b3ffa2f516d68290d44c815f07e85d107c2f44cd24a38c7e93195c",
+    "evidence_bundle_digest": "6e226b0c659d51ccdbf7446786b78faf2f6ad1800cb19ba942936bb1a0875c45"
+  },
+  "coverage": {
+    "assessment_coverage": 0.5,
+    "execution_coverage": 0.5,
+    "not_applicable": 1,
+    "out_of_scope": 1,
+    "not_tested": 0,
+    "blocked": 1,
+    "error": 0
+  },
+  "findings": {
+    "pass": 0,
+    "fail": 0,
+    "inconclusive": 1,
+    "error": 0
+  },
+  "property_results": [
+    {
+      "property_id": "MCP.DISCOVERY.PASSIVE_BOUNDARY",
+      "coverage_status": "NOT_APPLICABLE"
+    },
+    {
+      "property_id": "MCP.AUTHZ.PER_OPERATION",
+      "coverage_status": "OUT_OF_SCOPE"
+    },
+    {
+      "property_id": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+      "coverage_status": "APPLICABLE",
+      "verdict": "INCONCLUSIVE",
+      "evidence_ids": [
+        "evidence-mcp-target-000004-2"
+      ],
+      "confidence": 0.5
+    },
+    {
+      "property_id": "MCP.EVIDENCE.REDACTION",
+      "coverage_status": "BLOCKED"
+    }
+  ]
+}
