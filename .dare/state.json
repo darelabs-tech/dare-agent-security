@@ -1,25 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-20T12:53:26.081Z",
+  "updatedAt": "2026-08-20T18:09:14.263Z",
   "tasks": {
     "task-001": {
       "status": "DONE",
-      "output": "Reconciled Cycles 001-006; IMPLEMENTATION-NOTES.md + cycle007_reconcile tests; no second engine.",
-      "duration": 54689,
+      "output": "Reconciled Cycles 001-007; IMPLEMENTATION-NOTES.md + cycle008_reconcile tests; no second engine.",
+      "duration": 77753,
       "dependsOn": []
     },
     "task-002": {
       "status": "DONE",
-      "output": "Corpus Manifest schema + Rust types + validation in dare-benchmark.",
-      "duration": 28758,
+      "output": "Attack Graph schema schemas/attack-graph/v1/attack-graph.schema.json.",
+      "duration": 45800,
       "dependsOn": [
         "task-001"
       ]
     },
     "task-003": {
       "status": "DONE",
-      "output": "Benchmark Run schema freezing corpus/engine/profile/policy identity.",
-      "duration": 22863,
+      "output": "Node taxonomy + stable IDs in dare-attack-graph/src/node.rs.",
+      "duration": 33271,
       "dependsOn": [
         "task-001",
         "task-002"
@@ -27,130 +27,147 @@
     },
     "task-004": {
       "status": "DONE",
-      "output": "Benchmark Record schema reusing coverage + verdict contracts.",
-      "duration": 24344,
+      "output": "Edge taxonomy + deterministic edge digests in edge.rs.",
+      "duration": 28079,
       "dependsOn": [
         "task-001",
+        "task-002",
         "task-003"
       ]
     },
     "task-005": {
       "status": "DONE",
-      "output": "Lineage classification; mirrors/forks excluded from prevalence.",
-      "duration": 24037,
+      "output": "Authority context (principal/delegated/tenant/credential) in authority.rs.",
+      "duration": 36774,
       "dependsOn": [
-        "task-002"
+        "task-003",
+        "task-004"
       ]
     },
     "task-006": {
       "status": "DONE",
-      "output": "Sampling methodology + benchmark-policy.json selection rules.",
-      "duration": 23386,
+      "output": "Edge evidence model OBSERVED/STATICALLY_PROVEN/INFERRED/NOT_TESTED.",
+      "duration": 41580,
       "dependsOn": [
         "task-002",
-        "task-005"
+        "task-004"
       ]
     },
     "task-007": {
       "status": "DONE",
-      "output": "Coverage-aware eligibility + aggregate_records denominators.",
-      "duration": 24974,
+      "output": "Graph Fact Extractor facts.rs + GraphFactsInput JSON.",
+      "duration": 29694,
       "dependsOn": [
         "task-001",
+        "task-003",
         "task-004",
+        "task-005",
         "task-006"
       ]
     },
     "task-008": {
       "status": "DONE",
-      "output": "Safe offline runner; AUTHORIZED_DYNAMIC refused by default.",
-      "duration": 22299,
+      "output": "Deterministic Graph Builder builder.rs.",
+      "duration": 27393,
       "dependsOn": [
-        "task-003",
-        "task-004",
         "task-007"
       ]
     },
     "task-009": {
       "status": "DONE",
-      "output": "Hostile fixtures (path-traversal) + runner safety tests.",
-      "duration": 23041,
+      "output": "Property-to-graph mappings using real registry IDs.",
+      "duration": 28565,
       "dependsOn": [
+        "task-001",
         "task-008"
       ]
     },
     "task-010": {
       "status": "DONE",
-      "output": "Human-validation ledger (positive/negative/ambiguous streams).",
-      "duration": 20810,
+      "output": "Bounded Attack Path engine (max_depth/max_paths/cycle detection).",
+      "duration": 58386,
       "dependsOn": [
-        "task-004",
-        "task-007"
+        "task-008",
+        "task-009"
       ]
     },
     "task-011": {
       "status": "DONE",
-      "output": "Disclosure states + publication_safe_export redaction.",
-      "duration": 26018,
+      "output": "Path status weakest-edge + deterministic impact factors.",
+      "duration": 43470,
       "dependsOn": [
-        "task-004",
+        "task-006",
         "task-010"
       ]
     },
     "task-012": {
       "status": "DONE",
-      "output": "Pilot corpus 30 pinned targets (methodology validation only).",
-      "duration": 26457,
+      "output": "Graph provenance digests + sources binding.",
+      "duration": 46122,
       "dependsOn": [
-        "task-005",
-        "task-006",
         "task-008",
-        "task-009",
         "task-011"
       ]
     },
     "task-013": {
       "status": "DONE",
-      "output": "Aggregate JSON + CLI validate benchmark summary.",
-      "duration": 23297,
+      "output": "Safe Mermaid/DOT renderers (escape, cap, no secrets).",
+      "duration": 43719,
       "dependsOn": [
-        "task-007",
-        "task-010",
+        "task-008",
         "task-012"
       ]
     },
     "task-014": {
       "status": "DONE",
-      "output": "CI job benchmark-methodology + Docker benchmark/ copy.",
-      "duration": 24263,
+      "output": "Five synthetic fixtures under fixtures/attack-graph/.",
+      "duration": 35033,
       "dependsOn": [
-        "task-004",
-        "task-005",
-        "task-007",
-        "task-008",
         "task-009",
-        "task-010"
+        "task-010",
+        "task-011",
+        "task-012"
       ]
     },
     "task-015": {
       "status": "DONE",
-      "output": "docs/benchmark-methodology.md + disclosure + interpretation.",
-      "duration": 27110,
+      "output": "Adversarial tests: secrets, dup IDs, bounds, malformed refs.",
+      "duration": 53911,
       "dependsOn": [
-        "task-006",
-        "task-007",
-        "task-011",
-        "task-013"
+        "task-008",
+        "task-010",
+        "task-013",
+        "task-014"
       ]
     },
     "task-016": {
       "status": "DONE",
-      "output": "PROOF.md maps acceptance criteria to tests/artifacts.",
-      "duration": 26171,
+      "output": "CLI validate attack-graph wired; EXIT.md updated.",
+      "duration": 47106,
       "dependsOn": [
-        "task-013",
+        "task-008",
+        "task-010",
+        "task-013"
+      ]
+    },
+    "task-017": {
+      "status": "DONE",
+      "output": "CI job attack-graph-mvp + Dockerfile fixtures copy.",
+      "duration": 42723,
+      "dependsOn": [
         "task-014",
-        "task-015"
+        "task-015",
+        "task-016"
+      ]
+    },
+    "task-018": {
+      "status": "DONE",
+      "output": "docs/attack-graph.md + PROOF.md acceptance matrix.",
+      "duration": 43977,
+      "dependsOn": [
+        "task-012",
+        "task-016",
+        "task-017"
       ]
     }
   }

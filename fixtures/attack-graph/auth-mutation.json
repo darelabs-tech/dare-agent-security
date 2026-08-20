@@ -1,0 +1,13 @@
+{
+  "target_id": "fixture-auth-mutation", "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "engine_commit": "local-dev",
+  "sources": {"inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+  "nodes": [
+    {"local_id": "agent", "type": "AGENT", "display_name": "agent"},
+    {"local_id": "authorized.read", "type": "TOOL", "display_name": "authorized.read"},
+    {"local_id": "executed.write", "type": "TOOL", "display_name": "executed.write"}
+  ],
+  "edges": [
+    {"type": "CAN_INVOKE", "source_local_id": "agent", "source_type": "AGENT", "target_local_id": "authorized.read", "target_type": "TOOL", "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-am-1"]}, "security": {"property": "MCP.AUTHZ.PER_OPERATION", "state_impact": "READ_ONLY"}},
+    {"type": "CALLS", "source_local_id": "authorized.read", "source_type": "TOOL", "target_local_id": "executed.write", "target_type": "TOOL", "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-am-2"]}, "security": {"property": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME", "verdict": "FAIL", "state_impact": "WRITE", "authority_mutation": true}}
+  ]
+}

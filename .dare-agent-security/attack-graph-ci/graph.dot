@@ -1,0 +1,7 @@
+digraph attack_graph {
+  n_nodeagentsupport [label="support"];
+  n_noderesourcecustomerrecord [label="customer record"];
+  n_nodetoolcustomerexport [label="customer.export"];
+  n_nodetoolcustomerexport -> n_noderesourcecustomerrecord [label="Reads [StaticallyProven]"];
+  n_nodeagentsupport -> n_nodetoolcustomerexport [label="CanInvoke [Observed]"];
+}

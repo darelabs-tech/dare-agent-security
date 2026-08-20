@@ -1,0 +1,42 @@
+[
+  {
+    "id": "path:235d95150ddf30a889bb4a5da43b024e5001d9ac816e8507b8695299e875fb0c",
+    "nodes": [
+      "node:tool:customer.export",
+      "node:resource:customer-record"
+    ],
+    "edges": [
+      "edge:2c27441f56ed9c60bdbd86e5fb999c449170bc988a026f2c33ae2875a2dab0f7"
+    ],
+    "status": "PROVEN",
+    "impact_factors": {
+      "cross_tenant": false,
+      "uses_privileged_credential": false,
+      "reaches_sensitive_resource": false,
+      "contains_destructive_capability": false,
+      "contains_failed_security_property": false,
+      "contains_authorization_mutation": false
+    }
+  },
+  {
+    "id": "path:b62da1524db6d3dd9913cac7285401abd0f2cd7c49abccc6b04ede6bbd8e53aa",
+    "nodes": [
+      "node:agent:support",
+      "node:tool:customer.export",
+      "node:resource:customer-record"
+    ],
+    "edges": [
+      "edge:967c6d951a39c2adf013b606f8bc1db25817b76d17819fd377520228ccdbbcb6",
+      "edge:2c27441f56ed9c60bdbd86e5fb999c449170bc988a026f2c33ae2875a2dab0f7"
+    ],
+    "status": "PROVEN",
+    "impact_factors": {
+      "cross_tenant": false,
+      "uses_privileged_credential": false,
+      "reaches_sensitive_resource": false,
+      "contains_destructive_capability": false,
+      "contains_failed_security_property": false,
+      "contains_authorization_mutation": false
+    }
+  }
+]

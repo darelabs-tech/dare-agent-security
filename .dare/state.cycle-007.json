@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-20T12:53:26.081Z",
+  "tasks": {
+    "task-001": {
+      "status": "DONE",
+      "output": "Reconciled Cycles 001-006; IMPLEMENTATION-NOTES.md + cycle007_reconcile tests; no second engine.",
+      "duration": 54689,
+      "dependsOn": []
+    },
+    "task-002": {
+      "status": "DONE",
+      "output": "Corpus Manifest schema + Rust types + validation in dare-benchmark.",
+      "duration": 28758,
+      "dependsOn": [
+        "task-001"
+      ]
+    },
+    "task-003": {
+      "status": "DONE",
+      "output": "Benchmark Run schema freezing corpus/engine/profile/policy identity.",
+      "duration": 22863,
+      "dependsOn": [
+        "task-001",
+        "task-002"
+      ]
+    },
+    "task-004": {
+      "status": "DONE",
+      "output": "Benchmark Record schema reusing coverage + verdict contracts.",
+      "duration": 24344,
+      "dependsOn": [
+        "task-001",
+        "task-003"
+      ]
+    },
+    "task-005": {
+      "status": "DONE",
+      "output": "Lineage classification; mirrors/forks excluded from prevalence.",
+      "duration": 24037,
+      "dependsOn": [
+        "task-002"
+      ]
+    },
+    "task-006": {
+      "status": "DONE",
+      "output": "Sampling methodology + benchmark-policy.json selection rules.",
+      "duration": 23386,
+      "dependsOn": [
+        "task-002",
+        "task-005"
+      ]
+    },
+    "task-007": {
+      "status": "DONE",
+      "output": "Coverage-aware eligibility + aggregate_records denominators.",
+      "duration": 24974,
+      "dependsOn": [
+        "task-001",
+        "task-004",
+        "task-006"
+      ]
+    },
+    "task-008": {
+      "status": "DONE",
+      "output": "Safe offline runner; AUTHORIZED_DYNAMIC refused by default.",
+      "duration": 22299,
+      "dependsOn": [
+        "task-003",
+        "task-004",
+        "task-007"
+      ]
+    },
+    "task-009": {
+      "status": "DONE",
+      "output": "Hostile fixtures (path-traversal) + runner safety tests.",
+      "duration": 23041,
+      "dependsOn": [
+        "task-008"
+      ]
+    },
+    "task-010": {
+      "status": "DONE",
+      "output": "Human-validation ledger (positive/negative/ambiguous streams).",
+      "duration": 20810,
+      "dependsOn": [
+        "task-004",
+        "task-007"
+      ]
+    },
+    "task-011": {
+      "status": "DONE",
+      "output": "Disclosure states + publication_safe_export redaction.",
+      "duration": 26018,
+      "dependsOn": [
+        "task-004",
+        "task-010"
+      ]
+    },
+    "task-012": {
+      "status": "DONE",
+      "output": "Pilot corpus 30 pinned targets (methodology validation only).",
+      "duration": 26457,
+      "dependsOn": [
+        "task-005",
+        "task-006",
+        "task-008",
+        "task-009",
+        "task-011"
+      ]
+    },
+    "task-013": {
+      "status": "DONE",
+      "output": "Aggregate JSON + CLI validate benchmark summary.",
+      "duration": 23297,
+      "dependsOn": [
+        "task-007",
+        "task-010",
+        "task-012"
+      ]
+    },
+    "task-014": {
+      "status": "DONE",
+      "output": "CI job benchmark-methodology + Docker benchmark/ copy.",
+      "duration": 24263,
+      "dependsOn": [
+        "task-004",
+        "task-005",
+        "task-007",
+        "task-008",
+        "task-009",
+        "task-010"
+      ]
+    },
+    "task-015": {
+      "status": "DONE",
+      "output": "docs/benchmark-methodology.md + disclosure + interpretation.",
+      "duration": 27110,
+      "dependsOn": [
+        "task-006",
+        "task-007",
+        "task-011",
+        "task-013"
+      ]
+    },
+    "task-016": {
+      "status": "DONE",
+      "output": "PROOF.md maps acceptance criteria to tests/artifacts.",
+      "duration": 26171,
+      "dependsOn": [
+        "task-013",
+        "task-014",
+        "task-015"
+      ]
+    }
+  }
+}

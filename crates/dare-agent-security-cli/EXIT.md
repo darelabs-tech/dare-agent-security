@@ -48,3 +48,14 @@ Offline corpus methodology runner (Cycle 007). Default modes: `static` / `local-
 
 Artifacts: `benchmark-run.json`, `aggregate.json`, `records/*.json`.
 
+## `validate attack-graph`
+
+| Code | Meaning |
+|------|---------|
+| 0 | Graph and derived artifacts validated successfully |
+| 1 | Harness, serialization, or I/O error |
+| 2 | Fact, schema, or semantic validation failure |
+| 3 | Usage error or traversal safety refusal |
+
+Artifacts: `attack-graph.json`, `paths.json`, `graph.mmd`, `graph.dot`, `summary.md`. Analysis only; no attack path is executed.
+

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/attack-graph/v1/attack-graph.schema.json",
+  "title": "DARE Agent Attack Graph v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "target_id", "target_version", "generated_at", "sources", "engine", "nodes", "edges", "paths"],
+  "properties": {
+    "schema": {
+      "type": "object", "additionalProperties": false, "required": ["id", "version"],
+      "properties": {"id": {"const": "https://darelabs.tech/schemas/attack-graph/v1/attack-graph.schema.json"}, "version": {"const": "1.0.0"}}
+    },
+    "id": {"type": "string", "pattern": "^graph:[0-9a-f]{64}$"},
+    "target_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "target_version": {"type": "string", "minLength": 1, "maxLength": 160},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "sources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inventory_digest", "assessment_plan_digest", "evidence_bundle_digest"],
+      "properties": {
+        "inventory_digest": {"$ref": "#/$defs/digest"},
+        "assessment_plan_digest": {"$ref": "#/$defs/digest"},
+        "evidence_bundle_digest": {"$ref": "#/$defs/digest"},
+        "benchmark_record_digest": {"$ref": "#/$defs/digest"},
+        "property_registry_digest": {"$ref": "#/$defs/digest"},
+        "profile_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "engine": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version", "commit"],
+      "properties": {"name": {"type": "string"}, "version": {"type": "string"}, "commit": {"type": "string"}}
+    },
+    "nodes": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/node"}},
+    "edges": {"type": "array", "maxItems": 50000, "items": {"$ref": "#/$defs/edge"}},
+    "paths": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/path"}}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^(sha256:)?[0-9a-f]{64}$"},
+    "nodeType": {"enum": ["HUMAN", "AGENT", "IDENTITY", "DELEGATED_AUTHORITY", "MCP_SERVER", "CAPABILITY", "TOOL", "CREDENTIAL", "DOWNSTREAM_SERVICE", "RESOURCE", "DATA", "TENANT", "POLICY_DECISION_POINT", "POLICY_ENFORCEMENT_POINT"]},
+    "edgeType": {"enum": ["AUTHENTICATES_AS", "DELEGATES_TO", "CAN_INVOKE", "CALLS", "USES_CREDENTIAL", "AUTHORIZED_BY", "ENFORCED_BY", "READS", "WRITES", "DELETES", "TRANSFERS_TO", "BELONGS_TO_TENANT", "CROSSES_TRUST_BOUNDARY", "CAN_REACH"]},
+    "node": {
+      "type": "object", "additionalProperties": false, "required": ["id", "type", "display_name"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$"},
+        "type": {"$ref": "#/$defs/nodeType"},
+        "display_name": {"type": "string", "minLength": 1, "maxLength": 160},
+        "security": {
+          "type": "object", "additionalProperties": false,
+          "properties": {"state_impact": {"type": "string"}, "tenant": {"type": "string"}, "privileged": {"type": "boolean"}, "sensitive": {"type": "boolean"}, "destructive": {"type": "boolean"}}
+        }
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "principal": {"type": "string"}, "agent_identity": {"type": "string"}, "service_identity": {"type": "string"},
+        "delegated": {"type": "boolean"}, "tenant": {"type": "string"},
+        "credential": {"type": "string", "pattern": "^node:credential:[A-Za-z0-9._:-]+$"},
+        "authorization_decision": {"type": "string"}, "scopes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false, "required": ["status"],
+      "properties": {
+        "status": {"enum": ["OBSERVED", "STATICALLY_PROVEN", "INFERRED", "NOT_TESTED"]},
+        "evidence_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "rationale": {"type": "string", "minLength": 1}, "source_facts": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"enum": ["OBSERVED", "STATICALLY_PROVEN"]}}}, "then": {"required": ["evidence_ids"]}},
+        {"if": {"properties": {"status": {"const": "INFERRED"}}}, "then": {"required": ["rationale", "source_facts"]}},
+        {"if": {"properties": {"status": {"const": "NOT_TESTED"}}}, "then": {"required": ["reason"]}}
+      ]
+    },
+    "edge": {
+      "type": "object", "additionalProperties": false, "required": ["id", "type", "source", "target", "authority", "evidence", "security"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^edge:[0-9a-f]{64}$"}, "type": {"$ref": "#/$defs/edgeType"},
+        "source": {"type": "string"}, "target": {"type": "string"}, "authority": {"$ref": "#/$defs/authority"},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "security": {
+          "type": "object", "additionalProperties": false,
+          "properties": {"property": {"type": "string"}, "applicability": {"type": "string"}, "scope": {"type": "string"}, "execution": {"type": "string"}, "verdict": {"type": "string"}, "state_impact": {"type": "string"}, "authority_mutation": {"type": "boolean"}}
+        }
+      }
+    },
+    "path": {
+      "type": "object", "additionalProperties": false, "required": ["id", "nodes", "edges", "status", "impact_factors"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^path:[0-9a-f]{64}$"}, "nodes": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+        "edges": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "status": {"enum": ["NOT_TESTED", "INFERRED", "PROVEN"]},
+        "impact_factors": {
+          "type": "object", "additionalProperties": false,
+          "required": ["cross_tenant", "uses_privileged_credential", "reaches_sensitive_resource", "contains_destructive_capability", "contains_failed_security_property", "contains_authorization_mutation"],
+          "properties": {"cross_tenant": {"type": "boolean"}, "uses_privileged_credential": {"type": "boolean"}, "reaches_sensitive_resource": {"type": "boolean"}, "contains_destructive_capability": {"type": "boolean"}, "contains_failed_security_property": {"type": "boolean"}, "contains_authorization_mutation": {"type": "boolean"}}
+        }
+      }
+    }
+  }
+}

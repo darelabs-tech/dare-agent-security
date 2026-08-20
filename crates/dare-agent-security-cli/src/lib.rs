@@ -1,5 +1,6 @@
 //! Library surface for `dare-agent-security` CLI crate.
 
+pub mod attack_graph;
 pub mod benchmark;
 pub mod ci;
 pub mod ci_output;

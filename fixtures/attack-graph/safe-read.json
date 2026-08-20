@@ -1,0 +1,31 @@
+{
+  "target_id": "fixture-safe-read",
+  "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "engine_commit": "local-dev",
+  "sources": {
+    "inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "benchmark_record_digest": null
+  },
+  "nodes": [
+    {"local_id": "support", "type": "AGENT", "display_name": "support"},
+    {"local_id": "customer.export", "type": "TOOL", "display_name": "customer.export", "security": {"state_impact": "READ_ONLY"}},
+    {"local_id": "customer-record", "type": "RESOURCE", "display_name": "customer record"}
+  ],
+  "edges": [
+    {
+      "type": "CAN_INVOKE", "source_local_id": "support", "source_type": "AGENT",
+      "target_local_id": "customer.export", "target_type": "TOOL",
+      "authority": {"principal": "user:123", "delegated": true, "tenant": "tenant-a"},
+      "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-1"]},
+      "security": {"property": "MCP.AUTHZ.PER_OPERATION", "state_impact": "READ_ONLY"}
+    },
+    {
+      "type": "READS", "source_local_id": "customer.export", "source_type": "TOOL",
+      "target_local_id": "customer-record", "target_type": "RESOURCE",
+      "evidence": {"status": "STATICALLY_PROVEN", "evidence_ids": ["ev-2"]},
+      "security": {"state_impact": "READ_ONLY"}
+    }
+  ]
+}

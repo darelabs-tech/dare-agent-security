@@ -48,6 +48,9 @@ pub enum ValidateSubcommand {
     Coverage(crate::coverage::CoverageArgs),
     /// Run offline benchmark corpus methodology (Cycle 007).
     Benchmark(crate::benchmark::BenchmarkArgs),
+    /// Build and validate a deterministic bounded Agent Attack Graph (Cycle 008).
+    #[command(name = "attack-graph")]
+    AttackGraph(crate::attack_graph::AttackGraphArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.
