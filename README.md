@@ -79,9 +79,9 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Pre-alpha — Cycles 001–007 merged; Cycle 008 adds the Agent Attack Graph MVP
+**Stage:** Pre-alpha — Cycles 001–009 implement evidence-first analysis and controlled local adversarial validation
 
-Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). **Cycle 006** adds assessment profiles and coverage (`crates/dare-coverage`) — see [docs/assessment-coverage.md](docs/assessment-coverage.md). **Cycle 007** adds benchmark corpus methodology (`crates/dare-benchmark`) — see [docs/benchmark-methodology.md](docs/benchmark-methodology.md). **Cycle 008** adds deterministic bounded attack-graph analysis (`crates/dare-attack-graph`) — see [docs/attack-graph.md](docs/attack-graph.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). **Cycle 006** adds assessment profiles and coverage (`crates/dare-coverage`) — see [docs/assessment-coverage.md](docs/assessment-coverage.md). **Cycle 007** adds benchmark corpus methodology (`crates/dare-benchmark`) — see [docs/benchmark-methodology.md](docs/benchmark-methodology.md). **Cycle 008** adds deterministic bounded attack-graph analysis (`crates/dare-attack-graph`) — see [docs/attack-graph.md](docs/attack-graph.md). **Cycle 009** adds ROE-gated, budgeted, offline-first controlled validation (`crates/dare-adversarial`) — see [docs/adversarial-validation.md](docs/adversarial-validation.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
 
 ### Discover quick start
 
@@ -146,6 +146,17 @@ cargo run -p dare-agent-security -- validate attack-graph \
 
 This produces canonical JSON plus bounded path, Mermaid, DOT, and summary artifacts. It performs analysis only and never executes an attack path. See [docs/attack-graph.md](docs/attack-graph.md).
 
+### Validate adversarial quick start
+
+```bash
+cargo run -p dare-agent-security -- validate adversarial \
+  --fixture fixtures/adversarial/confused-deputy.json \
+  --mode local-synthetic \
+  --output-dir .dare-agent-security/adversarial
+```
+
+The default mode is `plan-only`. Local synthetic mode is in-memory and offline. `authorized-dynamic` requires a valid ROE, and remote dynamic execution remains disabled in the MVP.
+
 ### Exit codes
 
 `discover` uses stable numeric codes documented in [`crates/dare-agent-security-cli/EXIT.md`](crates/dare-agent-security-cli/EXIT.md) and in `--help`:
@@ -168,10 +179,10 @@ There are no `--token`, `--password`, or `--credential` flags. HTTP targets are 
 Current priorities:
 
 1. keep the Cycle 001 evidence contract stable;
-2. harden Cycle 008 attack-graph adapters and completeness signals;
+2. harden Cycle 009 controlled validation adapters and completeness signals;
 3. expand Cycle 006 coverage profiles without claiming production completeness;
 4. expand and harden the Cycle 005 synthetic MCP lab corpus;
-5. prepare explicitly authorized Cycle 009 controlled validation semantics.
+5. prepare Cycle 010 continuous revalidation using stable Cycle 009 artifacts.
 
 ## Contributing
 

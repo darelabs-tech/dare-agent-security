@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-20T18:09:14.263Z",
+  "tasks": {
+    "task-001": {
+      "status": "DONE",
+      "output": "Reconciled Cycles 001-007; IMPLEMENTATION-NOTES.md + cycle008_reconcile tests; no second engine.",
+      "duration": 77753,
+      "dependsOn": []
+    },
+    "task-002": {
+      "status": "DONE",
+      "output": "Attack Graph schema schemas/attack-graph/v1/attack-graph.schema.json.",
+      "duration": 45800,
+      "dependsOn": [
+        "task-001"
+      ]
+    },
+    "task-003": {
+      "status": "DONE",
+      "output": "Node taxonomy + stable IDs in dare-attack-graph/src/node.rs.",
+      "duration": 33271,
+      "dependsOn": [
+        "task-001",
+        "task-002"
+      ]
+    },
+    "task-004": {
+      "status": "DONE",
+      "output": "Edge taxonomy + deterministic edge digests in edge.rs.",
+      "duration": 28079,
+      "dependsOn": [
+        "task-001",
+        "task-002",
+        "task-003"
+      ]
+    },
+    "task-005": {
+      "status": "DONE",
+      "output": "Authority context (principal/delegated/tenant/credential) in authority.rs.",
+      "duration": 36774,
+      "dependsOn": [
+        "task-003",
+        "task-004"
+      ]
+    },
+    "task-006": {
+      "status": "DONE",
+      "output": "Edge evidence model OBSERVED/STATICALLY_PROVEN/INFERRED/NOT_TESTED.",
+      "duration": 41580,
+      "dependsOn": [
+        "task-002",
+        "task-004"
+      ]
+    },
+    "task-007": {
+      "status": "DONE",
+      "output": "Graph Fact Extractor facts.rs + GraphFactsInput JSON.",
+      "duration": 29694,
+      "dependsOn": [
+        "task-001",
+        "task-003",
+        "task-004",
+        "task-005",
+        "task-006"
+      ]
+    },
+    "task-008": {
+      "status": "DONE",
+      "output": "Deterministic Graph Builder builder.rs.",
+      "duration": 27393,
+      "dependsOn": [
+        "task-007"
+      ]
+    },
+    "task-009": {
+      "status": "DONE",
+      "output": "Property-to-graph mappings using real registry IDs.",
+      "duration": 28565,
+      "dependsOn": [
+        "task-001",
+        "task-008"
+      ]
+    },
+    "task-010": {
+      "status": "DONE",
+      "output": "Bounded Attack Path engine (max_depth/max_paths/cycle detection).",
+      "duration": 58386,
+      "dependsOn": [
+        "task-008",
+        "task-009"
+      ]
+    },
+    "task-011": {
+      "status": "DONE",
+      "output": "Path status weakest-edge + deterministic impact factors.",
+      "duration": 43470,
+      "dependsOn": [
+        "task-006",
+        "task-010"
+      ]
+    },
+    "task-012": {
+      "status": "DONE",
+      "output": "Graph provenance digests + sources binding.",
+      "duration": 46122,
+      "dependsOn": [
+        "task-008",
+        "task-011"
+      ]
+    },
+    "task-013": {
+      "status": "DONE",
+      "output": "Safe Mermaid/DOT renderers (escape, cap, no secrets).",
+      "duration": 43719,
+      "dependsOn": [
+        "task-008",
+        "task-012"
+      ]
+    },
+    "task-014": {
+      "status": "DONE",
+      "output": "Five synthetic fixtures under fixtures/attack-graph/.",
+      "duration": 35033,
+      "dependsOn": [
+        "task-009",
+        "task-010",
+        "task-011",
+        "task-012"
+      ]
+    },
+    "task-015": {
+      "status": "DONE",
+      "output": "Adversarial tests: secrets, dup IDs, bounds, malformed refs.",
+      "duration": 53911,
+      "dependsOn": [
+        "task-008",
+        "task-010",
+        "task-013",
+        "task-014"
+      ]
+    },
+    "task-016": {
+      "status": "DONE",
+      "output": "CLI validate attack-graph wired; EXIT.md updated.",
+      "duration": 47106,
+      "dependsOn": [
+        "task-008",
+        "task-010",
+        "task-013"
+      ]
+    },
+    "task-017": {
+      "status": "DONE",
+      "output": "CI job attack-graph-mvp + Dockerfile fixtures copy.",
+      "duration": 42723,
+      "dependsOn": [
+        "task-014",
+        "task-015",
+        "task-016"
+      ]
+    },
+    "task-018": {
+      "status": "DONE",
+      "output": "docs/attack-graph.md + PROOF.md acceptance matrix.",
+      "duration": 43977,
+      "dependsOn": [
+        "task-012",
+        "task-016",
+        "task-017"
+      ]
+    }
+  }
+}

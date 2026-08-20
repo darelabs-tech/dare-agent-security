@@ -86,3 +86,18 @@ jobs:
             --facts fixtures/attack-graph/safe-read.json \
             --output-dir .dare-agent-security/attack-graph-ci
 
+  adversarial-validation:
+    name: Cycle 009 controlled adversarial validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Adversarial fixtures and security gates
+        run: cargo test -p dare-adversarial -- --nocapture
+      - name: Offline local synthetic CLI
+        run: |
+          cargo run -p dare-agent-security -- validate adversarial \
+            --fixture fixtures/adversarial/confused-deputy.json \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/adversarial-ci
+

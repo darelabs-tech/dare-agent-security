@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/adversarial/v1/roe.schema.json",
+  "title": "DARE Rules of Engagement v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "target_id", "environment", "allowed_capabilities", "allowed_identities", "allowed_categories", "allowed_data_classes", "prohibited_operations", "not_before", "not_after", "allow_state_changes", "allow_external_egress", "local_only", "approved_by"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "target_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "environment": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "allowed_capabilities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "maxLength": 256 } },
+    "allowed_identities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "maxLength": 256 } },
+    "allowed_categories": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "maxLength": 128 } },
+    "allowed_data_classes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["SYNTHETIC", "CANARY", "TEST"] } },
+    "prohibited_operations": { "type": "array", "uniqueItems": true, "items": { "type": "string", "maxLength": 256 } },
+    "not_before": { "type": "string", "format": "date-time" },
+    "not_after": { "type": "string", "format": "date-time" },
+    "allow_state_changes": { "type": "boolean" },
+    "allow_external_egress": { "type": "boolean" },
+    "local_only": { "type": "boolean" },
+    "approved_by": { "type": "string", "minLength": 1, "maxLength": 256 }
+  }
+}

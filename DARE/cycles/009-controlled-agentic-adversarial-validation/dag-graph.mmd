@@ -1,0 +1,71 @@
+flowchart TB
+    T001["task-001 Reconcile main"]
+    T002["task-002 Validation Plan"]
+    T003["task-003 Test Vector"]
+    T004["task-004 Execution Budget"]
+    T005["task-005 ROE Gate"]
+    T006["task-006 Preconditions"]
+    T007["task-007 Minimum Safe Proof"]
+    T008["task-008 Candidate Eligibility"]
+    T009["task-009 Runtime Policy"]
+    T010["task-010 Budget Enforcement"]
+    T011["task-011 Kill Switch"]
+    T012["task-012 Controlled Runner"]
+    T013["task-013 Evidence"]
+    T014["task-014 Path Reclassification"]
+    T015["task-015 Adversarial Fixtures"]
+    T016["task-016 Security Tests"]
+    T017["task-017 CLI"]
+    T018["task-018 CI"]
+    T019["task-019 Runbook"]
+    T020["task-020 Final Proof"]
+
+    T001 --> T002
+    T001 --> T003
+    T001 --> T004
+    T002 --> T003
+    T002 --> T005
+    T004 --> T005
+    T002 --> T006
+    T003 --> T006
+    T004 --> T006
+    T005 --> T006
+    T002 --> T007
+    T003 --> T007
+    T006 --> T008
+    T007 --> T008
+    T005 --> T009
+    T006 --> T009
+    T008 --> T009
+    T004 --> T010
+    T009 --> T010
+    T005 --> T011
+    T009 --> T011
+    T010 --> T011
+    T009 --> T012
+    T010 --> T012
+    T011 --> T012
+    T012 --> T013
+    T001 --> T014
+    T013 --> T014
+    T007 --> T015
+    T012 --> T015
+    T013 --> T015
+    T014 --> T015
+    T009 --> T016
+    T010 --> T016
+    T011 --> T016
+    T012 --> T016
+    T015 --> T016
+    T012 --> T017
+    T014 --> T017
+    T015 --> T018
+    T016 --> T018
+    T017 --> T018
+    T005 --> T019
+    T007 --> T019
+    T011 --> T019
+    T017 --> T019
+    T014 --> T020
+    T018 --> T020
+    T019 --> T020

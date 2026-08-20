@@ -3,6 +3,7 @@
 use std::process::ExitCode;
 
 use clap::{error::ErrorKind, Parser};
+use dare_agent_security::adversarial::run_adversarial;
 use dare_agent_security::args::{Cli, Command, ValidateSubcommand};
 use dare_agent_security::attack_graph::run_attack_graph;
 use dare_agent_security::benchmark::run_benchmark;
@@ -25,6 +26,9 @@ async fn main() -> ExitCode {
                 ValidateSubcommand::Benchmark(args) => ExitCode::from(run_benchmark(args) as u8),
                 ValidateSubcommand::AttackGraph(args) => {
                     ExitCode::from(run_attack_graph(args) as u8)
+                }
+                ValidateSubcommand::Adversarial(args) => {
+                    ExitCode::from(run_adversarial(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

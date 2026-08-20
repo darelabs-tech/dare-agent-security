@@ -59,3 +59,14 @@ Artifacts: `benchmark-run.json`, `aggregate.json`, `records/*.json`.
 
 Artifacts: `attack-graph.json`, `paths.json`, `graph.mmd`, `graph.dot`, `summary.md`. Analysis only; no attack path is executed.
 
+## `validate adversarial`
+
+| Code | Meaning |
+|------|---------|
+| 0 | Plan validated, or controlled execution completed with `PASS` |
+| 1 | Harness, serialization, or I/O error |
+| 2 | Validation blocked/stopped/killed, or verdict `FAIL`/`INCONCLUSIVE` |
+| 3 | Usage error or safety refusal, including dynamic mode without valid ROE |
+
+Artifacts: `validation-result.json` and `evidence.json`. Default mode is `plan-only`; the MVP never performs remote network execution.
+
