@@ -410,6 +410,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "dare-coaz-integrity",
+ "dare-coverage",
  "dare-mcp-discovery",
  "dare-security-evidence",
  "jsonschema",
@@ -431,6 +432,20 @@ dependencies = [
  "serde_json",
  "sha2",
  "time",
+]
+
+[[package]]
+name = "dare-coverage"
+version = "0.1.0"
+dependencies = [
+ "dare-mcp-lab",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
 ]
 
 [[package]]

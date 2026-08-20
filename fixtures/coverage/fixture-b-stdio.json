@@ -1,0 +1,11 @@
+{
+  "tools_count": 1,
+  "resources_count": 0,
+  "prompts_count": 0,
+  "transport": "stdio",
+  "authorization_present": false,
+  "dynamic_authorization_allowed": true,
+  "execution_integrity_supported": false,
+  "confused_deputy_supported": false,
+  "out_of_scope_property_ids": []
+}

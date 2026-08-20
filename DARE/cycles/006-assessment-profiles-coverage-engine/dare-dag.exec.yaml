@@ -1,0 +1,137 @@
+title: "DARE Agent Security Cycle 006 - Assessment Profiles and Coverage Engine"
+version: "1.0.0"
+cycle: "006-assessment-profiles-coverage-engine"
+source_design: "DARE/cycles/006-assessment-profiles-coverage-engine/DESIGN.md"
+source_blueprint: "DARE/cycles/006-assessment-profiles-coverage-engine/BLUEPRINT.md"
+source_tasks: "DARE/cycles/006-assessment-profiles-coverage-engine/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Reconcile post-Cycle-004 main"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 006 task-001 exactly as defined in DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-001.md.
+      Inspect merged Cycles 001-004 contracts on main (evidence, discovery, integrity, CLI, Action/CI).
+      Record that Cycle 005 IS merged (PR #10); do not stop. Do not use lab corpus as the coverage engine.
+      Produce IMPLEMENTATION-NOTES.md with paths for tasks 002-014.
+
+  - id: task-002
+    title: "Define Security Property Registry"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 006 task-002: versioned Security Property Registry from capabilities actually present on main (Cycles 001-004). Stable property IDs; tests for schema and uniqueness.
+
+  - id: task-003
+    title: "Define Assessment Profile schema"
+    depends_on: [task-001, task-002]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 006 task-003: versioned Assessment Profile schema with REQUIRED / CONDITIONAL / OPTIONAL property references. Profiles are data, not executable code.
+
+  - id: task-004
+    title: "Define CoverageStatus domain model"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 006 task-004: CoverageStatus domain (APPLICABLE, NOT_APPLICABLE, NOT_TESTED, OUT_OF_SCOPE, BLOCKED) separate from Cycle 001 verdicts.
+
+  - id: task-005
+    title: "Define coverage math and finalization semantics"
+    depends_on: [task-004]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 006 task-005: denominators, required coverage, state transitions, invalid combinations. No silent property deletion.
+
+  - id: task-006
+    title: "Implement deterministic Applicability Engine"
+    depends_on: [task-002, task-003, task-004, task-005]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 006 task-006: deterministic Applicability Engine with typed facts and known predicates. No arbitrary expressions or LLM-only decisions.
+
+  - id: task-007
+    title: "Implement Assessment Plan artifact"
+    depends_on: [task-006]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 006 task-007: generate complete pre-execution expected-property Assessment Plan before security analyzers run.
+
+  - id: task-008
+    title: "Implement coverage/evidence correlation"
+    depends_on: [task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 006 task-008: join Assessment Plan with existing execution results and Cycle 001 evidence. Do not invent a second verdict engine.
+
+  - id: task-009
+    title: "Build deterministic local coverage fixtures"
+    depends_on: [task-004, task-005, task-006, task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 006 task-009: local coverage-engine fixtures (applicability, ROE blocking, not-applicable transports, missing execution, finalization). Not a replacement for Cycle 005 lab scenarios.
+
+  - id: task-010
+    title: "Build coverage reports and machine output"
+    depends_on: [task-008, task-009]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 006 task-010: coverage reports and machine output with property-level states, reasons, verdicts, evidence refs, overall and required coverage.
+
+  - id: task-011
+    title: "Extend CLI and Cycle 004 CI gate"
+    depends_on: [task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 006 task-011: extend existing CLI and Cycle 004 CI gate with profile/coverage execution and deterministic threshold behavior.
+
+  - id: task-012
+    title: "Add adversarial profile and denominator tests"
+    depends_on: [task-003, task-005, task-006, task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 006 task-012: adversarial tests for property injection, duplicate IDs, applicability bypass, status relabeling, denominator manipulation, profile tampering, silent property deletion.
+
+  - id: task-013
+    title: "Cycle 005 integration adapter"
+    depends_on: [task-002, task-008]
+    complexity: HIGH
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-013.md
+    subtask_prompt: |
+      Execute Cycle 006 task-013: Cycle 005 is merged — map lab scenario IDs to security-property IDs without changing Cycle 006 core semantics. Do not mark NOT_APPLICABLE.
+
+  - id: task-014
+    title: "Documentation and final DARE proof"
+    depends_on: [task-011, task-012, task-013]
+    complexity: MED
+    spec_file: DARE/cycles/006-assessment-profiles-coverage-engine/EXECUTION/task-014.md
+    subtask_prompt: |
+      Execute Cycle 006 task-014: document registry, profiles, coverage model, denominator, CLI/CI, Cycle 005 adapter, limitations, and PROOF.md mapping all acceptance criteria.

@@ -21,6 +21,22 @@ inputs:
     description: "validate mode only — secure (default) or vulnerable for synthetic stale-permit proof"
     required: false
     default: secure
+  profile:
+    description: Optional Cycle 006 assessment profile id or path (enables coverage report)
+    required: false
+    default: ""
+  coverage-facts:
+    description: Optional typed facts JSON path for Cycle 006 coverage (required when profile is set)
+    required: false
+    default: ""
+  min-required-coverage:
+    description: Fail when required coverage is below this ratio (0.0–1.0). Used only when profile is set.
+    required: false
+    default: "0"
+  fail-on-required-blocked:
+    description: Fail when a REQUIRED property is BLOCKED. Used only when profile is set.
+    required: false
+    default: "false"
 
 outputs:
   verdict:
@@ -39,3 +55,7 @@ runs:
     INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
     INPUT_FAIL_ON_INCONCLUSIVE: ${{ inputs.fail-on-inconclusive }}
     INPUT_REFERENCE_MODE: ${{ inputs.reference-mode }}
+    INPUT_PROFILE: ${{ inputs.profile }}
+    INPUT_COVERAGE_FACTS: ${{ inputs.coverage-facts }}
+    INPUT_MIN_REQUIRED_COVERAGE: ${{ inputs.min-required-coverage }}
+    INPUT_FAIL_ON_REQUIRED_BLOCKED: ${{ inputs.fail-on-required-blocked }}

@@ -6,6 +6,7 @@ members = [
     "crates/dare-coaz-integrity",
     "crates/dare-agent-security-cli",
     "crates/dare-mcp-lab",
+    "crates/dare-coverage",
     "labs/synthetic-mcp",
 ]
 

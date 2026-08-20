@@ -9,6 +9,8 @@ COPY crates ./crates
 COPY labs ./labs
 COPY schemas ./schemas
 COPY vectors ./vectors
+COPY profiles ./profiles
+COPY integrations ./integrations
 RUN cargo build --release -p dare-agent-security -p synthetic-mcp
 
 FROM debian:bookworm-slim

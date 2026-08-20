@@ -1,0 +1,25 @@
+[package]
+name = "dare-coverage"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Assessment profiles and deterministic coverage engine (Cycle 006)"
+publish = false
+
+[lib]
+name = "dare_coverage"
+path = "src/lib.rs"
+
+[dependencies]
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+
+[dev-dependencies]
+tempfile = "3.14"
+dare-mcp-lab = { path = "../dare-mcp-lab" }

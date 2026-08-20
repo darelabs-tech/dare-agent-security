@@ -18,7 +18,10 @@ fn path_traversal_scenario_path_does_not_escape_loader() {
     let err = dare_mcp_lab::load_corpus_scenario("MCP-LAB-001/../../etc").expect_err("refuse");
     assert!(err.to_string().contains("unsafe scenario id"));
     let path = dare_mcp_lab::scenario_path("MCP-LAB-001");
-    assert!(path.ends_with("labs/scenarios/MCP-LAB-001/scenario.json") || path.ends_with("labs\\scenarios\\MCP-LAB-001\\scenario.json"));
+    assert!(
+        path.ends_with("labs/scenarios/MCP-LAB-001/scenario.json")
+            || path.ends_with("labs\\scenarios\\MCP-LAB-001\\scenario.json")
+    );
 }
 
 #[test]

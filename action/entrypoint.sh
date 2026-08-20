@@ -8,7 +8,10 @@ MODE="${INPUT_MODE:-}"
 TARGET="${INPUT_TARGET:-}"
 OUTPUT_DIR="${INPUT_OUTPUT_DIR:-.dare-agent-security}"
 FAIL_ON_INCONCLUSIVE="${INPUT_FAIL_ON_INCONCLUSIVE:-true}"
-REFERENCE_MODE="${INPUT_REFERENCE_MODE:-secure}"
+PROFILE="${INPUT_PROFILE:-}"
+COVERAGE_FACTS="${INPUT_COVERAGE_FACTS:-}"
+MIN_REQUIRED_COVERAGE="${INPUT_MIN_REQUIRED_COVERAGE:-0}"
+FAIL_ON_REQUIRED_BLOCKED="${INPUT_FAIL_ON_REQUIRED_BLOCKED:-false}"
 
 WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
 cd "$WORKSPACE"
@@ -126,6 +129,29 @@ else
 fi
 EXIT=$?
 set -e
+
+if [ -n "$PROFILE" ]; then
+  if [ -z "$COVERAGE_FACTS" ]; then
+    echo "coverage-facts is required when profile is set" >&2
+    exit 1
+  fi
+  BLOCKED_FLAG=""
+  case "$FAIL_ON_REQUIRED_BLOCKED" in
+    true|1|yes|YES) BLOCKED_FLAG="--fail-on-required-blocked" ;;
+  esac
+  set +e
+  dare-agent-security validate coverage \
+    --profile "$PROFILE" \
+    --facts "$COVERAGE_FACTS" \
+    --output-dir "$OUTPUT_DIR" \
+    --min-required-coverage "$MIN_REQUIRED_COVERAGE" \
+    $BLOCKED_FLAG
+  COVER_EXIT=$?
+  set -e
+  if [ "$COVER_EXIT" -ne 0 ] && [ "$EXIT" -eq 0 ]; then
+    EXIT="$COVER_EXIT"
+  fi
+fi
 
 write_github_outputs
 exit "$EXIT"

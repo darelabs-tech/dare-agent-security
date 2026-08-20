@@ -21,3 +21,16 @@ Built-in synthetic fixtures only. `--reference-mode vulnerable` never accepts ar
 | 1 | Harness error (fixture load, vector execution, result/evidence serialization, stdout I/O). |
 | 2 | At least one vector returned verdict `FAIL` or `INCONCLUSIVE`. |
 | 3 | Usage error or safety refusal (invalid flags, unknown fixture id, `--reference-mode vulnerable` on a non-synthetic fixture). |
+
+## `validate coverage`
+
+Profile and coverage evaluation. Does not replace `discover` or `validate coaz-integrity`.
+
+| Code | Meaning |
+|------|---------|
+| 0 | Coverage gate passed |
+| 1 | Harness error (profile/facts/schema/I/O) |
+| 2 | Coverage threshold or required-BLOCKED policy failed |
+| 3 | Usage error |
+
+Artifact: `coverage-report.json` (sibling of `ci-result.json`; Cycle 004 schema stays closed).
