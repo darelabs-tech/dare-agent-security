@@ -1,0 +1,172 @@
+title: "DARE Agent Security Cycle 008 - Agent Attack Graph MVP"
+version: "1.0.0"
+cycle: "008-agent-attack-graph-mvp"
+source_design: "DARE/cycles/008-agent-attack-graph-mvp/DESIGN.md"
+source_blueprint: "DARE/cycles/008-agent-attack-graph-mvp/BLUEPRINT.md"
+source_tasks: "DARE/cycles/008-agent-attack-graph-mvp/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Reconcile post-Cycle-007 main"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 008 task-001 exactly as defined in DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-001.md.
+      Inspect merged Cycles 001-007 on main (evidence, discovery, integrity, CI, lab, coverage, benchmark).
+      Produce IMPLEMENTATION-NOTES.md with paths for tasks 002-018. Confirm no second engine is needed.
+      Safety: analysis/graph only — no autonomous exploit execution.
+
+  - id: task-002
+    title: "Define Attack Graph schema"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 008 task-002: versioned canonical Attack Graph schema (graph/nodes/edges/paths metadata).
+
+  - id: task-003
+    title: "Define node taxonomy and stable node IDs"
+    depends_on: [task-001, task-002]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 008 task-003: reviewed node types and deterministic stable node IDs.
+
+  - id: task-004
+    title: "Define edge taxonomy and stable edge IDs"
+    depends_on: [task-001, task-002, task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 008 task-004: semantic edge types and deterministic edge IDs (canonical digest).
+
+  - id: task-005
+    title: "Implement authority context"
+    depends_on: [task-003, task-004]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 008 task-005: principals, delegated authority, tenant, credential and authorization context.
+
+  - id: task-006
+    title: "Implement edge evidence model"
+    depends_on: [task-002, task-004]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 008 task-006: OBSERVED/STATICALLY_PROVEN/INFERRED/NOT_TESTED with strict invariants.
+      Edge evidence state must NOT reuse PASS/FAIL verdict semantics.
+
+  - id: task-007
+    title: "Implement Graph Fact Extractor"
+    depends_on: [task-001, task-003, task-004, task-005, task-006]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 008 task-007: normalize Cycle 001/002/003/006/007 artifacts into graph facts.
+
+  - id: task-008
+    title: "Implement deterministic Graph Builder"
+    depends_on: [task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 008 task-008: deterministic Graph Builder from normalized facts → canonical AttackGraph JSON.
+
+  - id: task-009
+    title: "Implement property-to-graph mappings"
+    depends_on: [task-001, task-008]
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 008 task-009: map security properties to graph semantics without changing verdicts.
+      Use actual registry IDs from main.
+
+  - id: task-010
+    title: "Implement bounded Attack Path engine"
+    depends_on: [task-008, task-009]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 008 task-010: bounded Attack Path engine with max_depth, max_paths, cycle detection.
+      Unbounded traversal is forbidden. Do not execute paths.
+
+  - id: task-011
+    title: "Implement path status and impact factors"
+    depends_on: [task-006, task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 008 task-011: weakest-edge path status and deterministic impact factors (no exploitability score).
+
+  - id: task-012
+    title: "Implement graph provenance and digest"
+    depends_on: [task-008, task-011]
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 008 task-012: bind graph to target/engine/profile/plan/evidence and optional benchmark inputs; digest.
+
+  - id: task-013
+    title: "Implement Mermaid/DOT views"
+    depends_on: [task-008, task-012]
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-013.md
+    subtask_prompt: |
+      Execute Cycle 008 task-013: safe derived Mermaid/DOT views from canonical JSON (escape, cap labels, no secrets).
+
+  - id: task-014
+    title: "Build graph-specific synthetic fixtures"
+    depends_on: [task-009, task-010, task-011, task-012]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-014.md
+    subtask_prompt: |
+      Execute Cycle 008 task-014: synthetic fixtures — safe read, confused deputy, inferred credential, blocked/destructive, auth mutation.
+
+  - id: task-015
+    title: "Add adversarial graph-input tests"
+    depends_on: [task-008, task-010, task-013, task-014]
+    complexity: HIGH
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-015.md
+    subtask_prompt: |
+      Execute Cycle 008 task-015: adversarial tests — hostile labels, duplicate IDs, malformed refs, path explosion, secret leakage.
+
+  - id: task-016
+    title: "Extend CLI / output integration"
+    depends_on: [task-008, task-010, task-013]
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-016.md
+    subtask_prompt: |
+      Execute Cycle 008 task-016: expose graph generation/path queries through existing CLI architecture.
+
+  - id: task-017
+    title: "Add CI regression coverage"
+    depends_on: [task-014, task-015, task-016]
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-017.md
+    subtask_prompt: |
+      Execute Cycle 008 task-017: CI regression — determinism, schema invariants, path semantics, redaction, bounds.
+
+  - id: task-018
+    title: "Documentation and final DARE proof"
+    depends_on: [task-012, task-016, task-017]
+    complexity: MED
+    spec_file: DARE/cycles/008-agent-attack-graph-mvp/EXECUTION/task-018.md
+    subtask_prompt: |
+      Execute Cycle 008 task-018: taxonomy/evidence/path docs, limitations, and PROOF.md acceptance matrix.

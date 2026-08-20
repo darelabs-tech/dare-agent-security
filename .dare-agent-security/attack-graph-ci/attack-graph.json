@@ -1,0 +1,128 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/attack-graph/v1/attack-graph.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "graph:19d85b97a5e627804e7c669ff537e25eca2e84ad7e73cf12fc4fce9b3b7ac94f",
+  "target_id": "fixture-safe-read",
+  "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "generated_at": "1970-01-01T00:00:00Z",
+  "sources": {
+    "inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "engine": {
+    "name": "dare-attack-graph",
+    "version": "0.1.0",
+    "commit": "local-dev"
+  },
+  "nodes": [
+    {
+      "id": "node:agent:support",
+      "type": "AGENT",
+      "display_name": "support"
+    },
+    {
+      "id": "node:resource:customer-record",
+      "type": "RESOURCE",
+      "display_name": "customer record"
+    },
+    {
+      "id": "node:tool:customer.export",
+      "type": "TOOL",
+      "display_name": "customer.export",
+      "security": {
+        "state_impact": "READ_ONLY",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:2c27441f56ed9c60bdbd86e5fb999c449170bc988a026f2c33ae2875a2dab0f7",
+      "type": "READS",
+      "source": "node:tool:customer.export",
+      "target": "node:resource:customer-record",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "ev-2"
+        ]
+      },
+      "security": {
+        "state_impact": "READ_ONLY",
+        "authority_mutation": false
+      }
+    },
+    {
+      "id": "edge:967c6d951a39c2adf013b606f8bc1db25817b76d17819fd377520228ccdbbcb6",
+      "type": "CAN_INVOKE",
+      "source": "node:agent:support",
+      "target": "node:tool:customer.export",
+      "authority": {
+        "principal": "user:123",
+        "delegated": true,
+        "tenant": "tenant-a"
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "ev-1"
+        ]
+      },
+      "security": {
+        "property": "MCP.AUTHZ.PER_OPERATION",
+        "state_impact": "READ_ONLY",
+        "authority_mutation": false
+      }
+    }
+  ],
+  "paths": [
+    {
+      "id": "path:235d95150ddf30a889bb4a5da43b024e5001d9ac816e8507b8695299e875fb0c",
+      "nodes": [
+        "node:tool:customer.export",
+        "node:resource:customer-record"
+      ],
+      "edges": [
+        "edge:2c27441f56ed9c60bdbd86e5fb999c449170bc988a026f2c33ae2875a2dab0f7"
+      ],
+      "status": "PROVEN",
+      "impact_factors": {
+        "cross_tenant": false,
+        "uses_privileged_credential": false,
+        "reaches_sensitive_resource": false,
+        "contains_destructive_capability": false,
+        "contains_failed_security_property": false,
+        "contains_authorization_mutation": false
+      }
+    },
+    {
+      "id": "path:b62da1524db6d3dd9913cac7285401abd0f2cd7c49abccc6b04ede6bbd8e53aa",
+      "nodes": [
+        "node:agent:support",
+        "node:tool:customer.export",
+        "node:resource:customer-record"
+      ],
+      "edges": [
+        "edge:967c6d951a39c2adf013b606f8bc1db25817b76d17819fd377520228ccdbbcb6",
+        "edge:2c27441f56ed9c60bdbd86e5fb999c449170bc988a026f2c33ae2875a2dab0f7"
+      ],
+      "status": "PROVEN",
+      "impact_factors": {
+        "cross_tenant": false,
+        "uses_privileged_credential": false,
+        "reaches_sensitive_resource": false,
+        "contains_destructive_capability": false,
+        "contains_failed_security_property": false,
+        "contains_authorization_mutation": false
+      }
+    }
+  ]
+}

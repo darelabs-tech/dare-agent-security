@@ -141,7 +141,7 @@ Do not solve an architectural ambiguity by silently inventing a new design.
 At the time this workflow was installed, the approved execution round is:
 
 ```text
-DARE/cycles/007-mcp-security-benchmark-corpus-methodology/
+DARE/cycles/008-agent-attack-graph-mvp/
 ```
 
 Always verify repository state before assuming this remains the active cycle.

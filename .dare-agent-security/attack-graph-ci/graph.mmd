@@ -1,0 +1,6 @@
+flowchart LR
+  n_nodeagentsupport["support"]
+  n_noderesourcecustomerrecord["customer record"]
+  n_nodetoolcustomerexport["customer.export"]
+  n_nodetoolcustomerexport -->|"Reads [StaticallyProven]"| n_noderesourcecustomerrecord
+  n_nodeagentsupport -->|"CanInvoke [Observed]"| n_nodetoolcustomerexport

@@ -1,0 +1,22 @@
+[package]
+name = "dare-attack-graph"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Deterministic bounded Agent Attack Graph engine"
+publish = false
+
+[dependencies]
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

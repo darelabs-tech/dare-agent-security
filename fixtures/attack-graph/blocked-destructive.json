@@ -1,0 +1,13 @@
+{
+  "target_id": "fixture-blocked-destructive", "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "engine_commit": "local-dev",
+  "sources": {"inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+  "nodes": [
+    {"local_id": "agent", "type": "AGENT", "display_name": "agent"},
+    {"local_id": "customer.delete", "type": "CAPABILITY", "display_name": "customer.delete", "security": {"state_impact": "DESTRUCTIVE", "destructive": true}},
+    {"local_id": "records", "type": "RESOURCE", "display_name": "records"}
+  ],
+  "edges": [
+    {"type": "CAN_INVOKE", "source_local_id": "agent", "source_type": "AGENT", "target_local_id": "customer.delete", "target_type": "CAPABILITY", "evidence": {"status": "NOT_TESTED", "reason": "Rules of engagement block destructive execution"}, "security": {"execution": "BLOCKED", "state_impact": "DESTRUCTIVE"}},
+    {"type": "DELETES", "source_local_id": "customer.delete", "source_type": "CAPABILITY", "target_local_id": "records", "target_type": "RESOURCE", "evidence": {"status": "STATICALLY_PROVEN", "evidence_ids": ["ev-bd-1"]}}
+  ]
+}

@@ -1,0 +1,57 @@
+flowchart TB
+    T001["task-001 Reconcile main"]
+    T002["task-002 Attack Graph schema"]
+    T003["task-003 Node taxonomy"]
+    T004["task-004 Edge taxonomy"]
+    T005["task-005 Authority context"]
+    T006["task-006 Edge evidence model"]
+    T007["task-007 Graph Fact Extractor"]
+    T008["task-008 Graph Builder"]
+    T009["task-009 Property mappings"]
+    T010["task-010 Attack Path engine"]
+    T011["task-011 Path status + impact"]
+    T012["task-012 Provenance + digest"]
+    T013["task-013 Mermaid/DOT views"]
+    T014["task-014 Synthetic fixtures"]
+    T015["task-015 Adversarial graph tests"]
+    T016["task-016 CLI integration"]
+    T017["task-017 CI regression"]
+    T018["task-018 Docs + final proof"]
+
+    T001 --> T002
+    T001 --> T003
+    T002 --> T003
+    T003 --> T004
+    T004 --> T005
+    T004 --> T006
+    T003 --> T007
+    T004 --> T007
+    T005 --> T007
+    T006 --> T007
+    T007 --> T008
+    T008 --> T009
+    T008 --> T010
+    T009 --> T010
+    T006 --> T011
+    T010 --> T011
+    T008 --> T012
+    T011 --> T012
+    T008 --> T013
+    T012 --> T013
+    T009 --> T014
+    T010 --> T014
+    T011 --> T014
+    T012 --> T014
+    T008 --> T015
+    T010 --> T015
+    T013 --> T015
+    T014 --> T015
+    T008 --> T016
+    T010 --> T016
+    T013 --> T016
+    T014 --> T017
+    T015 --> T017
+    T016 --> T017
+    T012 --> T018
+    T016 --> T018
+    T017 --> T018

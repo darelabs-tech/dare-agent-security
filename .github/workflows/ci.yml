@@ -72,3 +72,17 @@ jobs:
             --output-dir .dare-agent-security/benchmark-ci \
             --mode local-passive
 
+  attack-graph-mvp:
+    name: Cycle 008 attack graph MVP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Attack graph fixtures and safety tests
+        run: cargo test -p dare-attack-graph -- --nocapture
+      - name: Offline attack graph CLI
+        run: |
+          cargo run -p dare-agent-security -- validate attack-graph \
+            --facts fixtures/attack-graph/safe-read.json \
+            --output-dir .dare-agent-security/attack-graph-ci
+

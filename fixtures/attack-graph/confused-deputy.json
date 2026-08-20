@@ -1,0 +1,15 @@
+{
+  "target_id": "fixture-confused-deputy", "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "engine_commit": "local-dev",
+  "sources": {"inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+  "nodes": [
+    {"local_id": "human-a", "type": "HUMAN", "display_name": "Human A"},
+    {"local_id": "agent", "type": "AGENT", "display_name": "support agent"},
+    {"local_id": "service-credential", "type": "CREDENTIAL", "display_name": "CRM service credential", "security": {"privileged": true}},
+    {"local_id": "tenant-b-data", "type": "RESOURCE", "display_name": "Tenant B data", "security": {"tenant": "tenant-b", "sensitive": true}}
+  ],
+  "edges": [
+    {"type": "DELEGATES_TO", "source_local_id": "human-a", "source_type": "HUMAN", "target_local_id": "agent", "target_type": "AGENT", "authority": {"principal": "user:a", "delegated": true, "tenant": "tenant-a"}, "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-cd-1"]}},
+    {"type": "USES_CREDENTIAL", "source_local_id": "agent", "source_type": "AGENT", "target_local_id": "service-credential", "target_type": "CREDENTIAL", "authority": {"principal": "user:a", "delegated": true, "tenant": "tenant-b", "credential": "node:credential:service-credential"}, "evidence": {"status": "INFERRED", "rationale": "Service identity differs from delegated principal tenant", "source_facts": ["auth.principal", "service.tenant"]}, "security": {"property": "MCP.IDENTITY.CONFUSED_DEPUTY", "verdict": "FAIL"}},
+    {"type": "READS", "source_local_id": "service-credential", "source_type": "CREDENTIAL", "target_local_id": "tenant-b-data", "target_type": "RESOURCE", "authority": {"tenant": "tenant-b"}, "evidence": {"status": "STATICALLY_PROVEN", "evidence_ids": ["ev-cd-2"]}}
+  ]
+}
