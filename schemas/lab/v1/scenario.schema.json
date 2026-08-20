@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json",
+  "title": "DARE MCP Security Lab Scenario Manifest v1",
+  "description": "Versioned scenario contract for the synthetic MCP security lab corpus (Cycle 005). Reuses Cycle 001 verdict vocabulary. Does not define a second evidence or CI model.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "revision",
+    "title",
+    "family",
+    "mcp",
+    "property",
+    "variants",
+    "standards",
+    "safety"
+  ],
+  "properties": {
+    "schema": { "$ref": "#/$defs/schemaRef" },
+    "id": {
+      "type": "string",
+      "pattern": "^MCP-LAB-[0-9]{3}$",
+      "description": "Stable scenario identifier"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Scenario content revision (semver)"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "family": { "$ref": "#/$defs/scenarioFamily" },
+    "mcp": { "$ref": "#/$defs/mcpProfile" },
+    "property": { "$ref": "#/$defs/securityProperty" },
+    "variants": { "$ref": "#/$defs/variants" },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/standardMapping" }
+    },
+    "safety": { "$ref": "#/$defs/safetyMetadata" }
+  },
+  "$defs": {
+    "schemaRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json"
+        },
+        "version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" }
+      }
+    },
+    "scenarioFamily": {
+      "type": "string",
+      "enum": [
+        "passive-boundary",
+        "authorization-presence",
+        "confused-deputy",
+        "authorization-integrity",
+        "mcp-routing",
+        "modern-authorization",
+        "mrtr"
+      ]
+    },
+    "mcpProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision"],
+      "properties": {
+        "revision": {
+          "type": "string",
+          "enum": ["2024-11-05", "2025-03-26", "2025-06-18", "2026-07-28"]
+        },
+        "profile": { "type": "string", "minLength": 1 }
+      }
+    },
+    "securityProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "minLength": 3
+        },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["secure", "vulnerable"],
+      "properties": {
+        "secure": { "$ref": "#/$defs/variantSpec" },
+        "vulnerable": { "$ref": "#/$defs/variantSpec" }
+      }
+    },
+    "variantSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "expected"],
+      "properties": {
+        "target": {
+          "type": "string",
+          "enum": ["secure", "vulnerable"]
+        },
+        "expected": { "$ref": "#/$defs/expectedOutcome" }
+      }
+    },
+    "expectedOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage_status", "verdict"],
+      "properties": {
+        "coverage_status": { "$ref": "#/$defs/coverageStatus" },
+        "verdict": { "$ref": "#/$defs/verdict" }
+      }
+    },
+    "coverageStatus": {
+      "type": "string",
+      "enum": [
+        "APPLICABLE",
+        "NOT_APPLICABLE",
+        "NOT_TESTED",
+        "OUT_OF_SCOPE",
+        "BLOCKED"
+      ]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR"]
+    },
+    "standardMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "reference", "status"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "reference": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/standardsStatus" }
+      }
+    },
+    "standardsStatus": {
+      "type": "string",
+      "enum": [
+        "NORMATIVE",
+        "DRAFT",
+        "OPEN_PROPOSAL",
+        "DRAFT_OR_OPEN_PROPOSAL",
+        "INFORMATIVE",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "safetyMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["destructive", "external_network", "real_credentials"],
+      "properties": {
+        "destructive": { "type": "boolean" },
+        "external_network": { "type": "boolean" },
+        "real_credentials": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

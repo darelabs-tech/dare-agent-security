@@ -79,9 +79,9 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Pre-alpha — Cycles 001–003 merged; Cycle 004 adds a pre-release GitHub Action CI gate (synthetic fixtures only)
+**Stage:** Pre-alpha — Cycles 001–004 merged; Cycle 005 adds a synthetic MCP security lab corpus (MCP-LAB-001..010)
 
-Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
 
 ### Discover quick start
 
@@ -135,10 +135,10 @@ There are no `--token`, `--password`, or `--credential` flags. HTTP targets are 
 Current priorities:
 
 1. keep the Cycle 001 evidence contract stable;
-2. harden and document the Cycle 004 GitHub Action (pre-release, pin-by-SHA);
-3. expand synthetic CI fixture coverage and operator docs;
+2. expand and harden the Cycle 005 synthetic MCP lab corpus;
+3. harden and document the Cycle 004 GitHub Action (pre-release, pin-by-SHA);
 4. publish the first reproducible benchmark methodology;
-5. Agent Attack Graph (after repeatable CI enforcement is proven).
+5. Agent Attack Graph (after validated scenario semantics are proven).
 
 ## Contributing
 

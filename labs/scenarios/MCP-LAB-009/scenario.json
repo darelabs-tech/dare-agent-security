@@ -1,0 +1,41 @@
+﻿{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/lab/v1/scenario.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "MCP-LAB-009",
+  "revision": "1.0.0",
+  "title": "Credential issuer reuse",
+  "family": "modern-authorization",
+  "mcp": {
+    "revision": "2026-07-28",
+    "profile": "synthetic-lab"
+  },
+  "property": {
+    "id": "CREDENTIAL_ISSUER_BINDING",
+    "description": "Client credentials remain bound to the intended issuer context"
+  },
+  "variants": {
+    "secure": {
+      "target": "secure",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "PASS" }
+    },
+    "vulnerable": {
+      "target": "vulnerable",
+      "expected": { "coverage_status": "APPLICABLE", "verdict": "FAIL" }
+    }
+  },
+  "standards": [
+    {
+      "source": "OAuth",
+      "reference": "credential binding to authorization server",
+      "status": "INFORMATIVE"
+    }
+  ],
+  "safety": {
+    "destructive": false,
+    "external_network": false,
+    "real_credentials": false,
+    "notes": "synthetic local fixtures only"
+  }
+}

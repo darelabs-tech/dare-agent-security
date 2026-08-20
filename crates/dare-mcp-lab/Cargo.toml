@@ -1,0 +1,25 @@
+[package]
+name = "dare-mcp-lab"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Synthetic MCP security lab scenario manifests and shared fixture framework (Cycle 005)"
+publish = false
+
+[lib]
+name = "dare_mcp_lab"
+path = "src/lib.rs"
+
+[dependencies]
+dare-security-evidence = { path = "../dare-security-evidence" }
+dare-coaz-integrity = { path = "../dare-coaz-integrity" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

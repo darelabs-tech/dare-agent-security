@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-20T03:58:21.006Z",
+  "tasks": {
+    "task-001": {
+      "status": "DONE",
+      "output": "IMPLEMENTATION-NOTES.md maps tasks 002-011. Cycle 003 PROOF+crates verified on main (7e7fd15). tests/cycle004_reconcile.rs. MSRV 1.88. Doc drift: README priorities stale.",
+      "duration": 120634,
+      "dependsOn": []
+    },
+    "task-002": {
+      "status": "DONE",
+      "output": "CI result contract: schema + ci_result.rs + contract tests. Precedence ERROR>FAIL>INCONCLUSIVE>PASS.",
+      "duration": 67709,
+      "dependsOn": [
+        "task-001"
+      ]
+    },
+    "task-003": {
+      "status": "DONE",
+      "output": "Docker container Action selected. action/ARCHITECTURE.md + action/THREAT-MODEL.md. Tests: action_architecture.rs.",
+      "duration": 19071,
+      "dependsOn": [
+        "task-001"
+      ]
+    },
+    "task-004": {
+      "status": "DONE",
+      "output": "CLI --output-dir + ci-result.json + ci_output.rs. Tests: cli_ci_automation.rs. Backward compatible without flag.",
+      "duration": 61571,
+      "dependsOn": [
+        "task-002"
+      ]
+    },
+    "task-005": {
+      "status": "DONE",
+      "output": "action.yml + action/Dockerfile + action/entrypoint.sh. Tests: action_adapter.rs. Docker container invokes CLI only.",
+      "duration": 24970,
+      "dependsOn": [
+        "task-002",
+        "task-003"
+      ]
+    },
+    "task-006": {
+      "status": "DONE",
+      "output": "github-output.env + summary.md. ci_github_outputs.rs.",
+      "duration": 37301,
+      "dependsOn": [
+        "task-004",
+        "task-005"
+      ]
+    },
+    "task-007": {
+      "status": "DONE",
+      "output": "fixtures/ci/matrix.json + README. Target aliases in entrypoint. Tests: fixtures_ci_matrix.rs.",
+      "duration": 39579,
+      "dependsOn": [
+        "task-002",
+        "task-004"
+      ]
+    },
+    "task-008": {
+      "status": "DONE",
+      "output": ".github/workflows/action-e2e.yml — uses ./ matrix PASS/FAIL/INCONCLUSIVE/ERROR.",
+      "duration": 29055,
+      "dependsOn": [
+        "task-006",
+        "task-007"
+      ]
+    },
+    "task-009": {
+      "status": "DONE",
+      "output": "hostile_input.rs",
+      "duration": 19740,
+      "dependsOn": [
+        "task-003",
+        "task-005",
+        "task-006"
+      ]
+    },
+    "task-010": {
+      "status": "DONE",
+      "output": "docs/ci-gate.md README",
+      "duration": 21925,
+      "dependsOn": [
+        "task-008",
+        "task-009"
+      ]
+    },
+    "task-011": {
+      "status": "DONE",
+      "output": "PROOF.md",
+      "duration": 18486,
+      "dependsOn": [
+        "task-010"
+      ]
+    }
+  }
+}
