@@ -1,0 +1,152 @@
+title: "DARE Agent Security Cycle 007 - MCP Security Benchmark and Corpus Methodology"
+version: "1.0.0"
+cycle: "007-mcp-security-benchmark-corpus-methodology"
+source_design: "DARE/cycles/007-mcp-security-benchmark-corpus-methodology/DESIGN.md"
+source_blueprint: "DARE/cycles/007-mcp-security-benchmark-corpus-methodology/BLUEPRINT.md"
+source_tasks: "DARE/cycles/007-mcp-security-benchmark-corpus-methodology/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Reconcile post-Cycle-006 main"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 007 task-001 exactly as defined in DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-001.md.
+      Inspect merged Cycles 001-006 on main (evidence, discovery, integrity, CI, lab, coverage/profile).
+      Produce IMPLEMENTATION-NOTES.md with paths for tasks 002-016. Confirm no second engine is needed.
+
+  - id: task-002
+    title: "Define Corpus Manifest schema"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 007 task-002: versioned Corpus Manifest schema for corpus selection and pinned targets (repo, commit SHA, license, timestamps).
+
+  - id: task-003
+    title: "Define Benchmark Run schema"
+    depends_on: [task-001, task-002]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 007 task-003: Benchmark Run schema freezing corpus, engine, profile, registry, policies, runner and environment identity.
+
+  - id: task-004
+    title: "Define Benchmark Record schema"
+    depends_on: [task-001, task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 007 task-004: Benchmark Record schema reusing Cycle 001 evidence and Cycle 006 coverage contracts — no parallel verdict model.
+
+  - id: task-005
+    title: "Implement corpus dedup and lineage classification"
+    depends_on: [task-002]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 007 task-005: dedup and lineage classification so mirrors/forks/examples do not inflate prevalence.
+
+  - id: task-006
+    title: "Define sampling and corpus-selection methodology"
+    depends_on: [task-002, task-005]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 007 task-006: sampling/selection methodology — population, inclusion/exclusion, stratification, representativeness limits.
+
+  - id: task-007
+    title: "Define benchmark eligibility and aggregation math"
+    depends_on: [task-001, task-004, task-006]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 007 task-007: coverage-aware eligibility and aggregation math with explicit denominators, confidence and error handling.
+
+  - id: task-008
+    title: "Implement safe benchmark runner"
+    depends_on: [task-003, task-004, task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 007 task-008: thin safe runner with pinned revisions, isolation, restricted network, static/local-passive defaults. No unauthorized third-party active testing.
+
+  - id: task-009
+    title: "Build benchmark security fixtures"
+    depends_on: [task-008]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 007 task-009: hostile repository/manifest fixtures and runner safety boundary tests.
+
+  - id: task-010
+    title: "Implement human-validation ledger"
+    depends_on: [task-004, task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 007 task-010: human-validation ledger for positive, negative and ambiguous samples.
+
+  - id: task-011
+    title: "Define responsible-disclosure workflow"
+    depends_on: [task-004, task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 007 task-011: publication, embargo, redaction and coordinated-disclosure states. Never auto-publish secrets or exploit chains.
+
+  - id: task-012
+    title: "Build pilot corpus"
+    depends_on: [task-005, task-006, task-008, task-009, task-011]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 007 task-012: 25-50 target public OSS pilot corpus for methodology validation — not ecosystem prevalence claims.
+
+  - id: task-013
+    title: "Produce aggregate benchmark output"
+    depends_on: [task-007, task-010, task-012]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-013.md
+    subtask_prompt: |
+      Execute Cycle 007 task-013: aggregate coverage, property failure, severity/confidence and blind-spot statistics with explicit denominators.
+
+  - id: task-014
+    title: "Add CI regression coverage"
+    depends_on: [task-004, task-005, task-007, task-008, task-009, task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-014.md
+    subtask_prompt: |
+      Execute Cycle 007 task-014: CI regression for schemas, eligibility, canonicalization, dedup and runner safety using deterministic fixtures.
+
+  - id: task-015
+    title: "Write methodology and interpretation documentation"
+    depends_on: [task-006, task-007, task-011, task-013]
+    complexity: MED
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-015.md
+    subtask_prompt: |
+      Execute Cycle 007 task-015: methodology docs — formulas, limitations, reproducibility, validation and disclosure. No prevalence overclaim.
+
+  - id: task-016
+    title: "Final DARE proof"
+    depends_on: [task-013, task-014, task-015]
+    complexity: MED
+    spec_file: DARE/cycles/007-mcp-security-benchmark-corpus-methodology/EXECUTION/task-016.md
+    subtask_prompt: |
+      Execute Cycle 007 task-016: PROOF.md mapping every acceptance criterion to deterministic implementation/test evidence.

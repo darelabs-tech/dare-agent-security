@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/benchmark/v1/corpus-manifest.schema.json",
+  "title": "DARE Benchmark Corpus Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "corpus", "selection", "targets"],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "https://darelabs.tech/schemas/benchmark/v1/corpus-manifest.schema.json"
+        },
+        "version": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" }
+      }
+    },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "title": { "type": "string" },
+        "purpose": {
+          "type": "string",
+          "enum": ["METHODOLOGY_VALIDATION", "EXPANDED", "RESEARCH"]
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "inclusion", "exclusion"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "population": { "type": "string" },
+        "inclusion": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+        "exclusion": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "repository", "commit", "license", "lineage", "discovered_at"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^mcp-target-[0-9]{6}$" },
+          "repository": { "type": "string", "minLength": 1 },
+          "commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+          "license": { "type": "string", "minLength": 1 },
+          "discovered_at": { "type": "string", "format": "date-time" },
+          "lineage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["CANONICAL", "MATERIAL_FORK", "MIRROR", "VENDOR_COPY", "EXAMPLE"]
+              },
+              "parent_target_id": { "type": ["string", "null"] }
+            }
+          },
+          "stratification": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "language": { "type": "string" },
+              "sdk": { "type": "string" },
+              "transport": { "type": "string", "enum": ["stdio", "http", "unknown"] },
+              "maintainer_kind": { "type": "string", "enum": ["organization", "individual", "unknown"] }
+            }
+          },
+          "fixture_path": { "type": "string" }
+        }
+      }
+    }
+  }
+}

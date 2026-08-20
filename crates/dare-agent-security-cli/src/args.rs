@@ -46,6 +46,8 @@ pub enum ValidateSubcommand {
     CoazIntegrity(CoazIntegrityArgs),
     /// Evaluate an assessment profile and coverage report (Cycle 006).
     Coverage(crate::coverage::CoverageArgs),
+    /// Run offline benchmark corpus methodology (Cycle 007).
+    Benchmark(crate::benchmark::BenchmarkArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

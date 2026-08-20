@@ -1,0 +1,26 @@
+[package]
+name = "dare-benchmark"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "MCP security benchmark corpus methodology (Cycle 007)"
+publish = false
+
+[lib]
+name = "dare_benchmark"
+path = "src/lib.rs"
+
+[dependencies]
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

@@ -22,6 +22,7 @@ dare-coaz-integrity = { path = "../dare-coaz-integrity" }
 dare-mcp-discovery = { path = "../dare-mcp-discovery" }
 dare-security-evidence = { path = "../dare-security-evidence" }
 dare-coverage = { path = "../dare-coverage" }
+dare-benchmark = { path = "../dare-benchmark" }
 jsonschema = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
