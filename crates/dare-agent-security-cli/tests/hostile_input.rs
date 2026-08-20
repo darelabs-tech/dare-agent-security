@@ -49,4 +49,5 @@ fn entrypoint_documents_rejection_of_unknown_mode() {
     .expect("entrypoint");
     assert!(entry.contains("unsupported mode"));
     assert!(entry.contains("unsupported reference-mode"));
+    assert!(entry.contains(r#"REFERENCE_MODE="${INPUT_REFERENCE_MODE:-secure}""#));
 }

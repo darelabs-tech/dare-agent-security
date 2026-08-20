@@ -80,6 +80,20 @@ fn read_trace(path: &Path) -> Vec<String> {
     })
 }
 
+/// CI runners can observe the trace file slightly after the CLI exits; retry briefly.
+fn read_trace_after_discover(path: &Path) -> Vec<String> {
+    for attempt in 0..20 {
+        let methods = read_trace(path);
+        if !methods.is_empty() {
+            return methods;
+        }
+        if attempt + 1 < 20 {
+            std::thread::sleep(std::time::Duration::from_millis(25));
+        }
+    }
+    read_trace(path)
+}
+
 fn assert_passive_trace(methods: &[String]) {
     let allow = PolicyProfile::Current2026_07_28.allowlisted_methods();
     for method in methods {
@@ -150,7 +164,7 @@ fn stdio_current_protocol_trace_is_subset_of_allowlist() {
         serde_json::from_str(stdout.trim()).expect("inventory json");
     validate(&inventory).expect("validate");
     assert_eq!(inventory.completeness, Completeness::Complete);
-    let methods = read_trace(&trace);
+    let methods = read_trace_after_discover(&trace);
     assert!(
         !methods.is_empty(),
         "expected SYNTHETIC_MCP_TRACE_PATH dump at {}",
@@ -192,7 +206,7 @@ fn max_pages_bound_exits_partial_and_stays_passive() {
         serde_json::from_str(stdout.trim()).expect("inventory json");
     assert_eq!(inventory.completeness, Completeness::Partial);
     validate(&inventory).expect("partial still validates");
-    assert_passive_trace(&read_trace(&trace));
+    assert_passive_trace(&read_trace_after_discover(&trace));
     let _ = std::fs::remove_file(&trace);
 }
 
@@ -250,8 +264,8 @@ fn repeated_scans_normalize_catalog_names() {
         serde_json::from_str(stdout_str(&second).trim()).expect("second");
     assert_ne!(left.generated_at, right.generated_at);
     assert_eq!(names_from(&left), names_from(&right));
-    assert_passive_trace(&read_trace(&first_trace));
-    assert_passive_trace(&read_trace(&second_trace));
+    assert_passive_trace(&read_trace_after_discover(&first_trace));
+    assert_passive_trace(&read_trace_after_discover(&second_trace));
     let _ = std::fs::remove_file(&first_trace);
     let _ = std::fs::remove_file(&second_trace);
 }
@@ -279,6 +293,6 @@ fn json_value_has_no_recursive_live_uris() {
     let encoded = value.to_string();
     assert!(!encoded.contains("https://schemas.example.test") || encoded.contains("$ref"));
     assert!(!encoded.contains("http://"));
-    assert_passive_trace(&read_trace(&trace));
+    assert_passive_trace(&read_trace_after_discover(&trace));
     let _ = std::fs::remove_file(&trace);
 }
