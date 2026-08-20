@@ -1,0 +1,33 @@
+{
+  "corpus_id": "mcp-oss-pilot-methodology-2026",
+  "corpus_version": "1.0.0",
+  "target_count": 30,
+  "prevalence_eligible_targets": 4,
+  "finding_count_fail": 15,
+  "affected_target_count_fail": 15,
+  "coverage": {
+    "median": 0.5,
+    "p25": 0.5,
+    "p75": 0.6666666666666666,
+    "minimum": 0.5,
+    "maximum": 1.0,
+    "n": 30
+  },
+  "blind_spots": {
+    "error_ratio": 0.0,
+    "blocked_ratio": 0.09166666666666666,
+    "not_tested_ratio": 0.175,
+    "out_of_scope_ratio": 0.13333333333333333,
+    "not_applicable_ratio": 0.19166666666666668
+  },
+  "property_prevalence": [
+    {
+      "property_id": "MCP.DISCOVERY.PASSIVE_BOUNDARY",
+      "eligible": 4,
+      "failed": 0,
+      "failure_rate": null,
+      "note": "N/A: eligible 4 < min 5"
+    }
+  ],
+  "disclaimer": "Descriptive pilot statistics only. Not a population inference about all MCP servers."
+}

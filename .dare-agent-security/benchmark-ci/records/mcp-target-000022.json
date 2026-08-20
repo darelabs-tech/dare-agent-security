@@ -1,0 +1,60 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/benchmark/v1/benchmark-record.schema.json",
+    "version": "1.0.0"
+  },
+  "benchmark_run_id": "cli-benchmark-run",
+  "target": {
+    "id": "mcp-target-000022",
+    "repository": "fixture/pilot-22",
+    "commit": "af71eb382a96442358629b73f9a637dd468a0581"
+  },
+  "assessment": {
+    "mode": "LOCAL_PASSIVE",
+    "plan_digest": "42f9b62913c81b0284b414fdf61c047fecb2d59ed080de2bb28f5d9c9f08885f",
+    "evidence_bundle_digest": "3cdaae7b46227bfbce25027067cbcb82f8c89370186679e6136810c26d49c843"
+  },
+  "coverage": {
+    "assessment_coverage": 1.0,
+    "execution_coverage": 1.0,
+    "not_applicable": 1,
+    "out_of_scope": 1,
+    "not_tested": 0,
+    "blocked": 0,
+    "error": 0
+  },
+  "findings": {
+    "pass": 1,
+    "fail": 0,
+    "inconclusive": 1,
+    "error": 0
+  },
+  "property_results": [
+    {
+      "property_id": "MCP.DISCOVERY.PASSIVE_BOUNDARY",
+      "coverage_status": "APPLICABLE",
+      "verdict": "PASS",
+      "evidence_ids": [
+        "evidence-mcp-target-000022-0"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "property_id": "MCP.AUTHZ.PER_OPERATION",
+      "coverage_status": "NOT_APPLICABLE"
+    },
+    {
+      "property_id": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+      "coverage_status": "OUT_OF_SCOPE"
+    },
+    {
+      "property_id": "MCP.EVIDENCE.REDACTION",
+      "coverage_status": "APPLICABLE",
+      "verdict": "INCONCLUSIVE",
+      "evidence_ids": [
+        "evidence-mcp-target-000022-3"
+      ],
+      "confidence": 0.5
+    }
+  ]
+}
