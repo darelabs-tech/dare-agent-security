@@ -1,0 +1,30 @@
+[package]
+name = "dare-product"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Productization layer for DARE Agent Security v1 (config, privacy, reports, orchestration)"
+publish = false
+
+[lib]
+name = "dare_product"
+path = "src/lib.rs"
+
+[dependencies]
+dare-attack-graph = { path = "../dare-attack-graph" }
+dare-continuous = { path = "../dare-continuous" }
+dare-coverage = { path = "../dare-coverage" }
+dare-mcp-discovery = { path = "../dare-mcp-discovery" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = "0.9"
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

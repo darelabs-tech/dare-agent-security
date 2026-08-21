@@ -81,3 +81,17 @@ Artifacts: `validation-result.json` and `evidence.json`. Default mode is `plan-o
 
 Artifacts: `security-changeset.json`, `revalidation-plan.json`, and `continuous-report.json`. The command is offline and never grants `AUTHORIZED_DYNAMIC`; Cycle 009 ROE remains mandatory.
 
+## Product commands (`init` / `assess` / `report` / `doctor`)
+
+Categorized errors are printed as `[category] message` where category is one of:
+`configuration`, `unsupported_target`, `blocked_assessment`, `security_gate_failure`, `environment`, `internal`.
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success (`init` wrote config; `assess` gate PASS; `report` ok; `doctor` all checks pass) |
+| 1 | Environment or internal error (I/O, unexpected failure) |
+| 2 | Security gate failure / blocked assessment / doctor failed check / assess gate FAIL\|PARTIAL\|BLOCKED\|INCONCLUSIVE |
+| 3 | Configuration or unsupported target / usage |
+
+`--help` and `--version` exit 0.
+

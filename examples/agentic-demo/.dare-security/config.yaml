@@ -1,0 +1,16 @@
+version: "1"
+project:
+  name: agentic-demo
+assessment:
+  profile: mcp-security-baseline
+privacy:
+  mode: confidential
+  telemetry: false
+  network: denied
+  offline: true
+reporting:
+  formats: [html, json]
+classification:
+  level: CONFIDENTIAL
+  distribution: [security-team]
+  publication_allowed: false

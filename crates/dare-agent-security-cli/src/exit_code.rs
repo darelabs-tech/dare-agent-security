@@ -13,9 +13,13 @@ pub const UNSUPPORTED_TARGET: i32 = 3;
 pub const AFTER_HELP: &str = "\
 Exit codes:
   0  complete success
-  1  scanner execution error
-  2  partial inventory or inconclusive evidence
-  3  unsupported or refused target (policy, revision, invalid target)
+  1  scanner / environment / internal error
+  2  partial result, gate failure, or blocked assessment
+  3  unsupported target, configuration, or usage error
+
+Product commands (init/assess/report/doctor) use categorized errors:
+  configuration | unsupported_target | blocked_assessment |
+  security_gate_failure | environment | internal
 ";
 
 /// After-help text for `validate coaz-integrity`.

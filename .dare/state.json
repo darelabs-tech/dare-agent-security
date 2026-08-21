@@ -1,25 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-20T23:02:18.997Z",
+  "updatedAt": "2026-08-21T04:07:40.086Z",
   "tasks": {
     "task-001": {
       "status": "DONE",
-      "output": "Reconciled Cycles 001-009; IMPLEMENTATION-NOTES + cycle010_reconcile; no second engine.",
-      "duration": 44384,
+      "output": "Reconciled Cycles 001-010 on main (174d92a); IMPLEMENTATION-NOTES + cycle011_reconcile; product layer only, CORE FEATURE FREEZE preserved.",
+      "duration": 91053,
       "dependsOn": []
     },
     "task-002": {
       "status": "DONE",
-      "output": "SecurityStateSnapshot schema.",
-      "duration": 27540,
+      "output": "v1 product contract documented (docs/product/v1-contract.md) + schemas/product/v1.",
+      "duration": 84410,
       "dependsOn": [
         "task-001"
       ]
     },
     "task-003": {
       "status": "DONE",
-      "output": "SecurityChangeSet schema and taxonomy.",
-      "duration": 27212,
+      "output": "Installation/packaging stabilized (docs/product/packaging-install.md + release scripts).",
+      "duration": 36728,
       "dependsOn": [
         "task-001",
         "task-002"
@@ -27,25 +27,26 @@
     },
     "task-004": {
       "status": "DONE",
-      "output": "Security Change Detector.",
-      "duration": 24927,
+      "output": "CLI init first-run initialization.",
+      "duration": 35166,
       "dependsOn": [
+        "task-002",
         "task-003"
       ]
     },
     "task-005": {
       "status": "DONE",
-      "output": "Dependency/impact mapping.",
-      "duration": 25331,
+      "output": "Config v1 schema + loader (schemas/product/v1/config.schema.json).",
+      "duration": 31693,
       "dependsOn": [
         "task-001",
-        "task-003"
+        "task-002"
       ]
     },
     "task-006": {
       "status": "DONE",
-      "output": "Impact Resolver (or UNKNOWN).",
-      "duration": 49875,
+      "output": "Unified assess UX orchestrating Cycles 001-010 offline fixtures.",
+      "duration": 26252,
       "dependsOn": [
         "task-004",
         "task-005"
@@ -53,188 +54,196 @@
     },
     "task-007": {
       "status": "DONE",
-      "output": "ContinuousRevalidationPlan schema.",
-      "duration": 34653,
+      "output": "Confidential/offline mode fail-closed.",
+      "duration": 28120,
       "dependsOn": [
-        "task-002",
-        "task-003",
-        "task-006"
+        "task-001",
+        "task-005"
       ]
     },
     "task-008": {
       "status": "DONE",
-      "output": "Safe result reuse validator.",
-      "duration": 28398,
+      "output": "Zero-telemetry/no-egress proofs in dare-product tests.",
+      "duration": 24563,
       "dependsOn": [
-        "task-005",
-        "task-006",
         "task-007"
       ]
     },
     "task-009": {
       "status": "DONE",
-      "output": "Deterministic validation cache (no PASS invention).",
-      "duration": 34103,
+      "output": "Product-level redaction hardened.",
+      "duration": 22708,
       "dependsOn": [
-        "task-008"
+        "task-001",
+        "task-007"
       ]
     },
     "task-010": {
       "status": "DONE",
-      "output": "Incremental Revalidation Runner.",
-      "duration": 30634,
+      "output": "Product result/view model in dare-product.",
+      "duration": 22953,
       "dependsOn": [
-        "task-007",
-        "task-008",
+        "task-001",
+        "task-002",
         "task-009"
       ]
     },
     "task-011": {
       "status": "DONE",
-      "output": "Full fallback on unknown impact.",
-      "duration": 27637,
+      "output": "Executive HTML report renderer.",
+      "duration": 23318,
       "dependsOn": [
-        "task-006",
         "task-010"
       ]
     },
     "task-012": {
       "status": "DONE",
-      "output": "Property and Coverage Drift.",
-      "duration": 30067,
+      "output": "Technical HTML report renderer.",
+      "duration": 24650,
       "dependsOn": [
-        "task-002",
-        "task-010",
-        "task-011"
+        "task-010"
       ]
     },
     "task-013": {
       "status": "DONE",
-      "output": "Attack Graph and Path Drift.",
-      "duration": 35611,
+      "output": "Machine-readable report schemas (summary/findings/coverage).",
+      "duration": 25582,
       "dependsOn": [
         "task-002",
-        "task-010",
-        "task-011"
+        "task-010"
       ]
     },
     "task-014": {
       "status": "DONE",
-      "output": "Validation Drift (Cycle 009).",
-      "duration": 37559,
+      "output": "Confidentiality metadata and labels on reports.",
+      "duration": 31399,
       "dependsOn": [
-        "task-001",
-        "task-010",
-        "task-011"
+        "task-011",
+        "task-012",
+        "task-013"
       ]
     },
     "task-015": {
       "status": "DONE",
-      "output": "ContinuousValidationPolicy.",
-      "duration": 35580,
+      "output": "CLI doctor diagnostics.",
+      "duration": 23709,
       "dependsOn": [
-        "task-001",
-        "task-007",
-        "task-012",
-        "task-013",
-        "task-014"
+        "task-003",
+        "task-005",
+        "task-007"
       ]
     },
     "task-016": {
       "status": "DONE",
-      "output": "Continuous Gate.",
-      "duration": 35173,
+      "output": "Error UX + exit codes extended in EXIT.md.",
+      "duration": 22661,
       "dependsOn": [
-        "task-012",
-        "task-013",
-        "task-014",
+        "task-002",
+        "task-006",
         "task-015"
       ]
     },
     "task-017": {
       "status": "DONE",
-      "output": "Longitudinal state history.",
-      "duration": 38990,
+      "output": "Demo targets examples/vulnerable-mcp, secure-mcp, agentic-demo.",
+      "duration": 25518,
       "dependsOn": [
-        "task-002",
-        "task-012",
-        "task-013",
-        "task-014"
+        "task-006",
+        "task-009",
+        "task-012"
       ]
     },
     "task-018": {
       "status": "DONE",
-      "output": "CI baseline comparison job.",
-      "duration": 32506,
+      "output": "docs/quickstart.md acceptance journey.",
+      "duration": 30659,
       "dependsOn": [
-        "task-016",
+        "task-003",
+        "task-006",
+        "task-011",
+        "task-012",
         "task-017"
       ]
     },
     "task-019": {
       "status": "DONE",
-      "output": "Continuous-validation synthetic fixtures.",
-      "duration": 32151,
+      "output": "v1 docs set under docs/product/.",
+      "duration": 32147,
       "dependsOn": [
-        "task-010",
+        "task-005",
+        "task-006",
+        "task-007",
         "task-011",
         "task-012",
-        "task-013",
-        "task-014",
-        "task-016"
+        "task-015",
+        "task-016",
+        "task-018"
       ]
     },
     "task-020": {
       "status": "DONE",
-      "output": "Cache/baseline/invalidation security tests.",
-      "duration": 31793,
+      "output": "Performance baseline documented.",
+      "duration": 31841,
       "dependsOn": [
-        "task-008",
-        "task-009",
-        "task-011",
-        "task-019"
+        "task-006",
+        "task-017"
       ]
     },
     "task-021": {
       "status": "DONE",
-      "output": "CLI validate continuous.",
-      "duration": 29245,
+      "output": "Release security hardening tests (path/HTML/offline).",
+      "duration": 29746,
       "dependsOn": [
-        "task-010",
-        "task-016",
+        "task-007",
+        "task-008",
+        "task-009",
+        "task-011",
+        "task-012",
+        "task-013",
         "task-017"
       ]
     },
     "task-022": {
       "status": "DONE",
-      "output": "Performance baseline (plan size/reuse ratio).",
-      "duration": 31429,
+      "output": "Release automation scripts/release package + checksums.",
+      "duration": 28639,
       "dependsOn": [
-        "task-010",
-        "task-019"
+        "task-003",
+        "task-016",
+        "task-019",
+        "task-021"
       ]
     },
     "task-023": {
       "status": "DONE",
-      "output": "docs/continuous-validation.md runbook.",
-      "duration": 32003,
+      "output": "Clean-environment v1 acceptance scripts.",
+      "duration": 28511,
       "dependsOn": [
-        "task-015",
-        "task-016",
         "task-018",
-        "task-021"
+        "task-021",
+        "task-022"
       ]
     },
     "task-024": {
       "status": "DONE",
-      "output": "PROOF.md + CORE FEATURE FREEZE.",
-      "duration": 28759,
+      "output": "External-operator usability checklist.",
+      "duration": 34281,
       "dependsOn": [
         "task-018",
         "task-019",
-        "task-020",
-        "task-022",
         "task-023"
+      ]
+    },
+    "task-025": {
+      "status": "DONE",
+      "output": "PROOF.md + v1.0 release-gate decision.",
+      "duration": 30105,
+      "dependsOn": [
+        "task-020",
+        "task-021",
+        "task-022",
+        "task-023",
+        "task-024"
       ]
     }
   }

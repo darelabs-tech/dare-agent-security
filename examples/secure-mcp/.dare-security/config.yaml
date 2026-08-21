@@ -1,0 +1,16 @@
+version: "1"
+project:
+  name: secure-mcp
+assessment:
+  profile: mcp-security-baseline
+privacy:
+  mode: standard
+  telemetry: false
+  network: restricted
+  offline: true
+reporting:
+  formats: [html, json]
+classification:
+  level: INTERNAL
+  distribution: [security-team]
+  publication_allowed: false

@@ -12,7 +12,7 @@ use crate::exit_code::{AFTER_HELP, COAZ_INTEGRITY_AFTER_HELP};
 #[command(
     name = "dare-agent-security",
     version,
-    about = "Passive MCP discovery and security baseline scanner",
+    about = "DARE Agent Security — product assessment, discovery, and validation CLI",
     after_help = AFTER_HELP,
     disable_help_subcommand = true
 )]
@@ -24,6 +24,14 @@ pub struct Cli {
 /// Supported CLI commands.
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    /// Initialize a local product config and artifact store.
+    Init(crate::product::InitCliArgs),
+    /// Run a unified product assessment (orchestrates Cycles 001–010).
+    Assess(crate::product::AssessCliArgs),
+    /// Show or refresh reports for an assessment run.
+    Report(crate::product::ReportCliArgs),
+    /// Diagnose environment, config, privacy, and output paths.
+    Doctor(crate::product::DoctorCliArgs),
     /// Discover an explicit MCP target without invoking tools or reading contents.
     Discover(DiscoverArgs),
     /// Run offline authorization-integrity validation harnesses.

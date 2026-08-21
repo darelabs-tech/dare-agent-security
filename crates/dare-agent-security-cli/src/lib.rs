@@ -8,6 +8,7 @@ pub mod ci_output;
 pub mod ci_result;
 pub mod continuous;
 pub mod coverage;
+pub mod product;
 
 pub mod args;
 pub mod coaz_integrity;

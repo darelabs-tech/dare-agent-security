@@ -1,1 +1,5 @@
 /target
+.dare-security/runs/
+**/.dare-security/runs/
+.dare-agent-security/
+dist/

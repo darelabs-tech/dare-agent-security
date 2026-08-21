@@ -141,7 +141,7 @@ Do not solve an architectural ambiguity by silently inventing a new design.
 At the time this workflow was installed, the approved execution round is:
 
 ```text
-DARE/cycles/010-continuous-agent-security-validation/
+DARE/cycles/011-productization-v1-release-readiness/
 ```
 
 Always verify repository state before assuming this remains the active cycle.

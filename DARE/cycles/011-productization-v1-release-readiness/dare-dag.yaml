@@ -1,0 +1,33 @@
+cycle:
+  id: "011"
+  name: "productization-v1-release-readiness"
+  status: "READY_FOR_REVIEW"
+  approval: "PENDING"
+baseline:
+  main_contains: ["001","002","003","004","005","006","007","008","009","010"]
+tasks:
+  task-001: {depends_on: []}
+  task-002: {depends_on: ["task-001"]}
+  task-003: {depends_on: ["task-001", "task-002"]}
+  task-004: {depends_on: ["task-002", "task-003"]}
+  task-005: {depends_on: ["task-001", "task-002"]}
+  task-006: {depends_on: ["task-004", "task-005"]}
+  task-007: {depends_on: ["task-001", "task-005"]}
+  task-008: {depends_on: ["task-007"]}
+  task-009: {depends_on: ["task-001", "task-007"]}
+  task-010: {depends_on: ["task-001", "task-002", "task-009"]}
+  task-011: {depends_on: ["task-010"]}
+  task-012: {depends_on: ["task-010"]}
+  task-013: {depends_on: ["task-002", "task-010"]}
+  task-014: {depends_on: ["task-011", "task-012", "task-013"]}
+  task-015: {depends_on: ["task-003", "task-005", "task-007"]}
+  task-016: {depends_on: ["task-002", "task-006", "task-015"]}
+  task-017: {depends_on: ["task-006", "task-009", "task-012"]}
+  task-018: {depends_on: ["task-003", "task-006", "task-011", "task-012", "task-017"]}
+  task-019: {depends_on: ["task-005", "task-006", "task-007", "task-011", "task-012", "task-015", "task-016", "task-018"]}
+  task-020: {depends_on: ["task-006", "task-017"]}
+  task-021: {depends_on: ["task-007", "task-008", "task-009", "task-011", "task-012", "task-013", "task-017"]}
+  task-022: {depends_on: ["task-003", "task-016", "task-019", "task-021"]}
+  task-023: {depends_on: ["task-018", "task-021", "task-022"]}
+  task-024: {depends_on: ["task-018", "task-019", "task-023"]}
+  task-025: {depends_on: ["task-020", "task-021", "task-022", "task-023", "task-024"]}

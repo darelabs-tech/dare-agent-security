@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/product/v1/coverage.schema.json",
+  "title": "DARE Product Coverage Artifact v1",
+  "description": "Product run coverage.json may embed a Cycle 006 coverage-report or a placeholder note. Cycle 004 ci-result.json remains closed.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "type": "object" },
+    "note": { "type": "string" }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "gate": "PASS",
+  "overall_coverage": 0.9,
+  "required_coverage": 0.5,
+  "attack_path_summary": "Safe read path only; continuous plan-only shows unrelated change reuse.",
+  "validation_status": "plan-only continuous revalidation",
+  "limitations": [
+    "Integrated demo fixture using Cycles 006/008/010 engines via product orchestrator.",
+    "AUTHORIZED_DYNAMIC remains ROE-gated (Cycle 009)."
+  ],
+  "findings": [
+    {
+      "id": "FIND-DEMO-001",
+      "title": "Baseline agentic controls present",
+      "property": "MCP.AUTHZ.PER_OPERATION",
+      "severity": "INFO",
+      "confidence": "MEDIUM",
+      "component": "agent:support",
+      "status": "PASS",
+      "evidence_refs": ["ev-agentic-001"],
+      "attack_path_refs": ["path:support->customer.export"],
+      "expected": "Per-operation authz",
+      "observed": "Present in fixture facts",
+      "remediation": null,
+      "retest_status": "PASS"
+    }
+  ],
+  "coverage_facts": {
+    "tools_count": 1,
+    "resources_count": 1,
+    "prompts_count": 0,
+    "transport": "stdio",
+    "authorization_present": true,
+    "dynamic_authorization_allowed": false,
+    "execution_integrity_supported": true,
+    "confused_deputy_supported": false,
+    "out_of_scope_property_ids": []
+  },
+  "coverage_executions": [
+    {
+      "property_id": "MCP.AUTHZ.PER_OPERATION",
+      "verdict": "PASS",
+      "evidence_ids": ["ev-agentic-001"]
+    }
+  ],
+  "attack_graph_facts": {
+    "target_id": "agentic-demo",
+    "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "engine_commit": "local-dev",
+    "sources": {
+      "inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "nodes": [
+      {"local_id": "support", "type": "AGENT", "display_name": "support"},
+      {"local_id": "customer.export", "type": "TOOL", "display_name": "customer.export", "security": {"state_impact": "READ_ONLY"}},
+      {"local_id": "customer-record", "type": "RESOURCE", "display_name": "customer record"}
+    ],
+    "edges": [
+      {
+        "type": "CAN_INVOKE",
+        "source_local_id": "support",
+        "source_type": "AGENT",
+        "target_local_id": "customer.export",
+        "target_type": "TOOL",
+        "authority": {"principal": "user:123", "delegated": true, "tenant": "tenant-a"},
+        "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-1"]},
+        "security": {"property": "MCP.AUTHZ.PER_OPERATION", "state_impact": "READ_ONLY"}
+      },
+      {
+        "type": "READS",
+        "source_local_id": "customer.export",
+        "source_type": "TOOL",
+        "target_local_id": "customer-record",
+        "target_type": "RESOURCE",
+        "evidence": {"status": "STATICALLY_PROVEN", "evidence_ids": ["ev-2"]},
+        "security": {"state_impact": "READ_ONLY"}
+      }
+    ]
+  },
+  "continuous_fixture": "continuous-unrelated.json",
+  "evidence": [
+    {
+      "name": "ev-agentic-001.json",
+      "content": { "id": "ev-agentic-001", "verdict": "PASS" }
+    }
+  ]
+}

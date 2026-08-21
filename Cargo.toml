@@ -11,6 +11,7 @@ members = [
     "crates/dare-attack-graph",
     "crates/dare-adversarial",
     "crates/dare-continuous",
+    "crates/dare-product",
     "labs/synthetic-mcp",
 ]
 
