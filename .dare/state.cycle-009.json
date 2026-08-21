@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-20T21:05:14.237Z",
+  "tasks": {
+    "task-001": {
+      "status": "DONE",
+      "output": "Reconciled Cycles 001-008; IMPLEMENTATION-NOTES.md + cycle009_reconcile; no second engine.",
+      "duration": 114787,
+      "dependsOn": []
+    },
+    "task-002": {
+      "status": "DONE",
+      "output": "Adversarial Validation Plan schema.",
+      "duration": 41725,
+      "dependsOn": [
+        "task-001"
+      ]
+    },
+    "task-003": {
+      "status": "DONE",
+      "output": "Test Vector schema (data-only).",
+      "duration": 37863,
+      "dependsOn": [
+        "task-001",
+        "task-002"
+      ]
+    },
+    "task-004": {
+      "status": "DONE",
+      "output": "Execution Budget schema.",
+      "duration": 37132,
+      "dependsOn": [
+        "task-001",
+        "task-002"
+      ]
+    },
+    "task-005": {
+      "status": "DONE",
+      "output": "ROE authorization gate.",
+      "duration": 28863,
+      "dependsOn": [
+        "task-001",
+        "task-002",
+        "task-004"
+      ]
+    },
+    "task-006": {
+      "status": "DONE",
+      "output": "Precondition Engine fail-closed.",
+      "duration": 31597,
+      "dependsOn": [
+        "task-002",
+        "task-003",
+        "task-004",
+        "task-005"
+      ]
+    },
+    "task-007": {
+      "status": "DONE",
+      "output": "Minimum Safe Proof registry.",
+      "duration": 28263,
+      "dependsOn": [
+        "task-001",
+        "task-002",
+        "task-003"
+      ]
+    },
+    "task-008": {
+      "status": "DONE",
+      "output": "Attack-path candidate eligibility.",
+      "duration": 31042,
+      "dependsOn": [
+        "task-006",
+        "task-007"
+      ]
+    },
+    "task-009": {
+      "status": "DONE",
+      "output": "Runtime policy enforcement.",
+      "duration": 44489,
+      "dependsOn": [
+        "task-005",
+        "task-006",
+        "task-008"
+      ]
+    },
+    "task-010": {
+      "status": "DONE",
+      "output": "Execution Budget enforcement STOP.",
+      "duration": 32784,
+      "dependsOn": [
+        "task-004",
+        "task-009"
+      ]
+    },
+    "task-011": {
+      "status": "DONE",
+      "output": "Kill switch implemented.",
+      "duration": 29073,
+      "dependsOn": [
+        "task-005",
+        "task-009",
+        "task-010"
+      ]
+    },
+    "task-012": {
+      "status": "DONE",
+      "output": "Controlled Validation Runner.",
+      "duration": 28819,
+      "dependsOn": [
+        "task-009",
+        "task-010",
+        "task-011"
+      ]
+    },
+    "task-013": {
+      "status": "DONE",
+      "output": "Cycle 001 evidence bridge.",
+      "duration": 33879,
+      "dependsOn": [
+        "task-012"
+      ]
+    },
+    "task-014": {
+      "status": "DONE",
+      "output": "Path reclassification revisions.",
+      "duration": 48425,
+      "dependsOn": [
+        "task-001",
+        "task-013"
+      ]
+    },
+    "task-015": {
+      "status": "DONE",
+      "output": "Controlled adversarial fixtures.",
+      "duration": 31295,
+      "dependsOn": [
+        "task-007",
+        "task-012",
+        "task-013",
+        "task-014"
+      ]
+    },
+    "task-016": {
+      "status": "DONE",
+      "output": "Adversarial security tests.",
+      "duration": 25810,
+      "dependsOn": [
+        "task-009",
+        "task-010",
+        "task-011",
+        "task-012",
+        "task-015"
+      ]
+    },
+    "task-017": {
+      "status": "DONE",
+      "output": "CLI validate adversarial.",
+      "duration": 33047,
+      "dependsOn": [
+        "task-012",
+        "task-014"
+      ]
+    },
+    "task-018": {
+      "status": "DONE",
+      "output": "CI adversarial-validation job.",
+      "duration": 21596,
+      "dependsOn": [
+        "task-015",
+        "task-016",
+        "task-017"
+      ]
+    },
+    "task-019": {
+      "status": "DONE",
+      "output": "docs/adversarial-validation.md runbook.",
+      "duration": 28036,
+      "dependsOn": [
+        "task-005",
+        "task-007",
+        "task-011",
+        "task-017"
+      ]
+    },
+    "task-020": {
+      "status": "DONE",
+      "output": "PROOF.md acceptance matrix.",
+      "duration": 20594,
+      "dependsOn": [
+        "task-014",
+        "task-018",
+        "task-019"
+      ]
+    }
+  }
+}

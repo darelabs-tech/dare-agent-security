@@ -53,6 +53,8 @@ pub enum ValidateSubcommand {
     AttackGraph(crate::attack_graph::AttackGraphArgs),
     /// Run controlled offline-first adversarial validation (Cycle 009).
     Adversarial(crate::adversarial::AdversarialArgs),
+    /// Plan deterministic continuous security revalidation (Cycle 010).
+    Continuous(crate::continuous::ContinuousArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

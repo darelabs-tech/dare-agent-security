@@ -101,3 +101,18 @@ jobs:
             --mode local-synthetic \
             --output-dir .dare-agent-security/adversarial-ci
 
+  continuous-validation:
+    name: Cycle 010 continuous security validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Continuous fixtures and security gates
+        run: cargo test -p dare-continuous -- --nocapture
+      - name: Offline incremental plan
+        run: |
+          cargo run -p dare-agent-security -- validate continuous \
+            --fixture fixtures/continuous/unrelated-change.json \
+            --mode plan-only \
+            --output-dir .dare-agent-security/continuous-ci
+

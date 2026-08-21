@@ -6,6 +6,7 @@ pub mod benchmark;
 pub mod ci;
 pub mod ci_output;
 pub mod ci_result;
+pub mod continuous;
 pub mod coverage;
 
 pub mod args;

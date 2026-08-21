@@ -429,6 +429,7 @@ dependencies = [
  "dare-attack-graph",
  "dare-benchmark",
  "dare-coaz-integrity",
+ "dare-continuous",
  "dare-coverage",
  "dare-mcp-discovery",
  "dare-security-evidence",
@@ -480,6 +481,23 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "time",
+]
+
+[[package]]
+name = "dare-continuous"
+version = "0.1.0"
+dependencies = [
+ "dare-adversarial",
+ "dare-attack-graph",
+ "dare-coverage",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
  "time",
 ]
 

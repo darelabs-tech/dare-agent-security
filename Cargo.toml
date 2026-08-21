@@ -10,6 +10,7 @@ members = [
     "crates/dare-benchmark",
     "crates/dare-attack-graph",
     "crates/dare-adversarial",
+    "crates/dare-continuous",
     "labs/synthetic-mcp",
 ]
 

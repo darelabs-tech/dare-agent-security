@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/continuous/v1/security-changeset.schema.json",
+  "title": "SecurityChangeSet v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "baseline_state", "candidate_state", "changes"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "baseline_state": { "type": "string", "minLength": 1 },
+    "candidate_state": { "type": "string", "minLength": 1 },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "source", "entity"],
+        "properties": {
+          "type": {
+            "enum": [
+              "SOURCE_CODE_CHANGED", "INVENTORY_CHANGED", "CAPABILITY_ADDED",
+              "CAPABILITY_REMOVED", "CAPABILITY_CHANGED", "AUTHORIZATION_CHANGED",
+              "CREDENTIAL_CHANGED", "TENANT_MODEL_CHANGED", "DEPENDENCY_CHANGED",
+              "PROFILE_CHANGED", "PROPERTY_REGISTRY_CHANGED", "POLICY_CHANGED",
+              "ROE_CHANGED", "GRAPH_CHANGED", "VALIDATION_CHANGED",
+              "RUNTIME_EVIDENCE_CHANGED", "UNKNOWN"
+            ]
+          },
+          "source": { "type": "string", "minLength": 1 },
+          "entity": { "type": "string", "minLength": 1 },
+          "before": { "type": ["string", "null"] },
+          "after": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+[package]
+name = "dare-continuous"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Deterministic continuous security revalidation engine"
+publish = false
+
+[features]
+default = []
+adversarial = ["dep:dare-adversarial"]
+
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial", optional = true }
+dare-attack-graph = { path = "../dare-attack-graph" }
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

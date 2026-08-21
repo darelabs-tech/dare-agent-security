@@ -1,0 +1,53 @@
+{
+  "schema_version": "1",
+  "baseline_digest": "sha256:1c3ee66f47fd9296ce229ba52124158cb701e5f81eb19b7d2387f7faae1ab48c",
+  "candidate_digest": "sha256:10f2ba98694fb1ec19aef33055febf84b063df4840714690e491f499dcdbb9cd",
+  "policy_digest": "sha256:60548634bc75f2e988ae6421070f06acdc6b76d13478409077c8abb527b4a31a",
+  "plan": {
+    "schema_version": "1",
+    "id": "crp:sha256:0f1fc6544b67bf7f2e7aee0e5c4f856fc51e7703f9e5691e82c0fe043fe39329",
+    "baseline_state": "state-unrelated-baseline",
+    "candidate_state": "state-unrelated-candidate",
+    "change_set_digest": "sha256:0d833c2af74d267a58fc4694e1e4c28bc195137adcfd83c6c018d16309192dec",
+    "full_fallback": false,
+    "items": [
+      {
+        "kind": "PROPERTY",
+        "id": "MCP.AUTHZ.PER_OPERATION",
+        "action": "REUSE",
+        "reason": "no mapped security dependency changed"
+      }
+    ]
+  },
+  "run": null,
+  "drift": {
+    "disposition": "UNCHANGED",
+    "properties": [
+      {
+        "property_id": "MCP.AUTHZ.PER_OPERATION",
+        "before": "PASS",
+        "after": "PASS",
+        "disposition": "UNCHANGED"
+      }
+    ],
+    "coverage": {
+      "before": 1.0,
+      "after": 1.0,
+      "delta": 0.0,
+      "blocked_delta": 0,
+      "not_tested_delta": 0,
+      "error_delta": 0,
+      "disposition": "UNCHANGED"
+    },
+    "graph": [],
+    "validations": []
+  },
+  "gate": {
+    "decision": "PASS",
+    "reasons": []
+  },
+  "revalidate_count": 0,
+  "reuse_count": 1,
+  "reuse_ratio": 1.0,
+  "dynamic_approval_granted": false
+}

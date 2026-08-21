@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/continuous/v1/continuous-policy.schema.json",
+  "title": "ContinuousValidationPolicy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "fallback_full_on_unknown", "dynamic", "gates"],
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "fallback_full_on_unknown": { "const": true },
+    "dynamic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["auto_modes", "require_approval"],
+      "properties": {
+        "auto_modes": {
+          "type": "array",
+          "items": { "enum": ["PLAN_ONLY", "SIMULATED", "LOCAL_SYNTHETIC"] },
+          "uniqueItems": true
+        },
+        "require_approval": {
+          "type": "array",
+          "contains": { "const": "AUTHORIZED_DYNAMIC" },
+          "items": { "const": "AUTHORIZED_DYNAMIC" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regression", "coverage_drop", "risky_path", "unknown_posture", "destructive_capability"],
+      "properties": {
+        "regression": { "$ref": "#/$defs/action" },
+        "coverage_drop": { "$ref": "#/$defs/action" },
+        "risky_path": { "$ref": "#/$defs/action" },
+        "unknown_posture": { "$ref": "#/$defs/action" },
+        "destructive_capability": { "$ref": "#/$defs/action" }
+      }
+    }
+  },
+  "$defs": {
+    "action": { "enum": ["FAIL", "WARN", "REVIEW"] }
+  }
+}

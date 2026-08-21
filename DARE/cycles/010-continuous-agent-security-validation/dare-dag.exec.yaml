@@ -1,0 +1,216 @@
+title: "DARE Agent Security Cycle 010 - Continuous Agent Security Validation"
+version: "1.0.0"
+cycle: "010-continuous-agent-security-validation"
+source_design: "DARE/cycles/010-continuous-agent-security-validation/DESIGN.md"
+source_blueprint: "DARE/cycles/010-continuous-agent-security-validation/BLUEPRINT.md"
+source_tasks: "DARE/cycles/010-continuous-agent-security-validation/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Reconcile post-Cycle-009 main"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 010 task-001 exactly as defined in DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-001.md.
+      Inspect merged Cycles 001-009 on main. Produce IMPLEMENTATION-NOTES.md with paths for tasks 002-024.
+      Confirm no second engine. Preserve Cycle 009 ROE/budget/kill-switch controls.
+
+  - id: task-002
+    title: "Define SecurityStateSnapshot schema"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 010 task-002: immutable versioned SecurityStateSnapshot binding inventory/profile/coverage/evidence/graph/validation digests.
+
+  - id: task-003
+    title: "Define SecurityChangeSet schema and taxonomy"
+    depends_on: [task-001, task-002]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 010 task-003: SecurityChangeSet schema and normalized change taxonomy.
+
+  - id: task-004
+    title: "Implement Security Change Detector"
+    depends_on: [task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 010 task-004: detect semantic security changes between baseline and candidate snapshots.
+
+  - id: task-005
+    title: "Define dependency/impact mapping"
+    depends_on: [task-001, task-003]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 010 task-005: map target/config/policy facts to affected properties, paths and vectors.
+
+  - id: task-006
+    title: "Implement Impact Resolver"
+    depends_on: [task-004, task-005]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 010 task-006: deterministic Impact Resolver producing affected property/path/vector sets (or UNKNOWN).
+
+  - id: task-007
+    title: "Define ContinuousRevalidationPlan schema"
+    depends_on: [task-002, task-003, task-006]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 010 task-007: ContinuousRevalidationPlan with REVALIDATE | REUSE | INVALIDATE | UNKNOWN.
+
+  - id: task-008
+    title: "Implement safe result reuse validator"
+    depends_on: [task-005, task-006, task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 010 task-008: reuse old results only when all security-relevant dependencies remain valid; unknown => deny.
+
+  - id: task-009
+    title: "Implement deterministic validation cache"
+    depends_on: [task-008]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 010 task-009: validation cache with evidence references; never creates PASS by itself; deterministic invalidation.
+
+  - id: task-010
+    title: "Implement incremental Revalidation Runner"
+    depends_on: [task-007, task-008, task-009]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 010 task-010: incremental runner executes only affected validations when impact is known.
+
+  - id: task-011
+    title: "Implement full fallback on unknown"
+    depends_on: [task-006, task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 010 task-011: full assessment fallback whenever impact cannot prove safe incrementality.
+
+  - id: task-012
+    title: "Implement Property and Coverage Drift"
+    depends_on: [task-002, task-010, task-011]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 010 task-012: property/coverage drift (verdict/execution/applicability/scope transitions).
+
+  - id: task-013
+    title: "Implement Attack Graph and Path Drift"
+    depends_on: [task-002, task-010, task-011]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-013.md
+    subtask_prompt: |
+      Execute Cycle 010 task-013: compare Cycle 008 graph revisions; classify new/removed/changed paths.
+
+  - id: task-014
+    title: "Implement Validation Drift"
+    depends_on: [task-001, task-010, task-011]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-014.md
+    subtask_prompt: |
+      Execute Cycle 010 task-014: track Cycle 009 validation-result/vector/precondition drift.
+
+  - id: task-015
+    title: "Define ContinuousValidationPolicy"
+    depends_on: [task-001, task-007, task-012, task-013, task-014]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-015.md
+    subtask_prompt: |
+      Execute Cycle 010 task-015: versioned ContinuousValidationPolicy for triggers, reuse, dynamic modes and regression gates.
+
+  - id: task-016
+    title: "Implement Continuous Gate"
+    depends_on: [task-012, task-013, task-014, task-015]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-016.md
+    subtask_prompt: |
+      Execute Cycle 010 task-016: Continuous Gate fail/warn/review on policy-defined security regressions.
+
+  - id: task-017
+    title: "Implement longitudinal state history"
+    depends_on: [task-002, task-012, task-013, task-014]
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-017.md
+    subtask_prompt: |
+      Execute Cycle 010 task-017: persist immutable snapshots and transition records (append-only history).
+
+  - id: task-018
+    title: "Integrate CI baseline comparison"
+    depends_on: [task-016, task-017]
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-018.md
+    subtask_prompt: |
+      Execute Cycle 010 task-018: CI compares PR/current state against explicit trusted baseline.
+
+  - id: task-019
+    title: "Build continuous-validation synthetic fixtures"
+    depends_on: [task-010, task-011, task-012, task-013, task-014, task-016]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-019.md
+    subtask_prompt: |
+      Execute Cycle 010 task-019: fixtures for unrelated change, tool change, destructive capability, auth fix, coverage degradation, unknown impact, invalid reuse, dynamic approval.
+
+  - id: task-020
+    title: "Add security tests for cache/baseline/invalidation"
+    depends_on: [task-008, task-009, task-011, task-019]
+    complexity: HIGH
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-020.md
+    subtask_prompt: |
+      Execute Cycle 010 task-020: tests for stale baseline, cache poisoning, omitted dependency, policy downgrade, false reuse.
+
+  - id: task-021
+    title: "Extend CLI integration"
+    depends_on: [task-010, task-016, task-017]
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-021.md
+    subtask_prompt: |
+      Execute Cycle 010 task-021: CLI snapshot/diff/plan/revalidate/report via existing conventions.
+
+  - id: task-022
+    title: "Add performance baseline"
+    depends_on: [task-010, task-019]
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-022.md
+    subtask_prompt: |
+      Execute Cycle 010 task-022: measure full vs incremental runs and reuse ratio without sacrificing correctness.
+
+  - id: task-023
+    title: "Documentation and operator runbook"
+    depends_on: [task-015, task-016, task-018, task-021]
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-023.md
+    subtask_prompt: |
+      Execute Cycle 010 task-023: document baselines, drift, revalidation, cache, fallback and CI usage.
+
+  - id: task-024
+    title: "Final DARE proof and core feature freeze"
+    depends_on: [task-018, task-019, task-020, task-022, task-023]
+    complexity: MED
+    spec_file: DARE/cycles/010-continuous-agent-security-validation/EXECUTION/task-024.md
+    subtask_prompt: |
+      Execute Cycle 010 task-024: PROOF.md acceptance matrix and declare CORE FEATURE FREEZE before Cycle 011.

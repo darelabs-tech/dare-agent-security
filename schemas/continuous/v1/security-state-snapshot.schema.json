@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/continuous/v1/security-state-snapshot.schema.json",
+  "title": "SecurityStateSnapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "security_state"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "security_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "target", "inventory_digest", "property_registry_digest",
+        "profile_digest", "assessment_plan_digest", "evidence_bundle_digest",
+        "coverage_digest", "attack_graph_digest", "validation_results_digest",
+        "policies", "facts", "property_results", "attack_paths", "validation_results"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "minLength": 1 }
+          }
+        },
+        "inventory_digest": { "$ref": "#/$defs/digest" },
+        "property_registry_digest": { "$ref": "#/$defs/digest" },
+        "profile_digest": { "$ref": "#/$defs/digest" },
+        "assessment_plan_digest": { "$ref": "#/$defs/digest" },
+        "evidence_bundle_digest": { "$ref": "#/$defs/digest" },
+        "coverage_digest": { "$ref": "#/$defs/digest" },
+        "attack_graph_digest": { "$ref": "#/$defs/digest" },
+        "validation_results_digest": { "$ref": "#/$defs/digest" },
+        "policies": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/digest" },
+          "required": ["coverage", "severity", "confidence", "continuous_validation"]
+        },
+        "facts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["complete", "capabilities"],
+          "properties": {
+            "complete": { "type": "boolean" },
+            "source_code_digest": { "$ref": "#/$defs/digest" },
+            "authorization_digest": { "$ref": "#/$defs/digest" },
+            "credential_digest": { "$ref": "#/$defs/digest" },
+            "tenant_model_digest": { "$ref": "#/$defs/digest" },
+            "dependency_digest": { "$ref": "#/$defs/digest" },
+            "roe_digest": { "$ref": "#/$defs/digest" },
+            "validation_vector_digest": { "$ref": "#/$defs/digest" },
+            "runtime_evidence_digest": { "$ref": "#/$defs/digest" },
+            "capabilities": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["digest", "destructive"],
+                "properties": {
+                  "digest": { "$ref": "#/$defs/digest" },
+                  "destructive": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "property_results": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/propertyResult" }
+        },
+        "attack_paths": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/pathResult" }
+        },
+        "validation_results": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/validationResult" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "propertyResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage_status", "evidence_ids", "dependency_digests"],
+      "properties": {
+        "coverage_status": { "enum": ["APPLICABLE", "NOT_APPLICABLE", "NOT_TESTED", "OUT_OF_SCOPE", "BLOCKED"] },
+        "verdict": { "enum": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR"] },
+        "severity": { "enum": ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+        "evidence_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "dependency_digests": {
+          "type": "object",
+          "additionalProperties": { "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] }
+        }
+      }
+    },
+    "pathResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "property_ids", "status", "destructive", "cross_tenant"],
+      "properties": {
+        "digest": { "$ref": "#/$defs/digest" },
+        "property_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "status": { "enum": ["NOT_TESTED", "INFERRED", "PROVEN"] },
+        "destructive": { "type": "boolean" },
+        "cross_tenant": { "type": "boolean" }
+      }
+    },
+    "validationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "property_id", "mode", "evidence_ids", "dependency_digests"],
+      "properties": {
+        "digest": { "$ref": "#/$defs/digest" },
+        "property_id": { "type": "string", "minLength": 1 },
+        "path_id": { "type": "string" },
+        "mode": { "enum": ["PLAN_ONLY", "SIMULATED", "LOCAL_SYNTHETIC", "AUTHORIZED_DYNAMIC"] },
+        "verdict": { "enum": ["PASS", "FAIL", "INCONCLUSIVE", "ERROR"] },
+        "evidence_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "dependency_digests": {
+          "type": "object",
+          "additionalProperties": { "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] }
+        }
+      }
+    }
+  }
+}
