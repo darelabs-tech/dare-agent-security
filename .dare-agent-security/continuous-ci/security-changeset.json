@@ -1,0 +1,6 @@
+{
+  "schema_version": "1",
+  "baseline_state": "state-unrelated-baseline",
+  "candidate_state": "state-unrelated-candidate",
+  "changes": []
+}

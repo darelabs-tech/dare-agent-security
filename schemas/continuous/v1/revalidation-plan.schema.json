@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/continuous/v1/revalidation-plan.schema.json",
+  "title": "ContinuousRevalidationPlan v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "baseline_state", "candidate_state", "change_set_digest", "full_fallback", "items"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "id": { "type": "string", "minLength": 1 },
+    "baseline_state": { "type": "string", "minLength": 1 },
+    "candidate_state": { "type": "string", "minLength": 1 },
+    "change_set_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "full_fallback": { "type": "boolean" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "id", "action", "reason"],
+        "properties": {
+          "kind": { "enum": ["PROPERTY", "PATH", "VECTOR"] },
+          "id": { "type": "string", "minLength": 1 },
+          "action": { "enum": ["REVALIDATE", "REUSE", "INVALIDATE", "UNKNOWN"] },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

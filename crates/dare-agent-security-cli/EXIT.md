@@ -70,3 +70,14 @@ Artifacts: `attack-graph.json`, `paths.json`, `graph.mmd`, `graph.dot`, `summary
 
 Artifacts: `validation-result.json` and `evidence.json`. Default mode is `plan-only`; the MVP never performs remote network execution.
 
+## `validate continuous`
+
+| Code | Meaning |
+|------|---------|
+| 0 | Plan/report completed and gate passed (warnings are non-failing) |
+| 1 | Harness, schema, serialization, or I/O error |
+| 2 | Regression gate failed or requires explicit review |
+| 3 | Usage or safety refusal, including any implicit dynamic approval |
+
+Artifacts: `security-changeset.json`, `revalidation-plan.json`, and `continuous-report.json`. The command is offline and never grants `AUTHORIZED_DYNAMIC`; Cycle 009 ROE remains mandatory.
+

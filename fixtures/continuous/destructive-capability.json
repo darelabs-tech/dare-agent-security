@@ -1,0 +1,145 @@
+{
+  "baseline_snapshot": {
+    "schema_version": "1",
+    "security_state": {
+      "id": "state-unrelated-baseline",
+      "target": {
+        "id": "target-001",
+        "version": "revision-stable"
+      },
+      "inventory_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "property_registry_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "profile_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "assessment_plan_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "evidence_bundle_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "coverage_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "attack_graph_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "validation_results_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "policies": {
+        "coverage": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+        "severity": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+        "confidence": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "continuous_validation": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "facts": {
+        "complete": true,
+        "source_code_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "authorization_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "credential_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "tenant_model_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "dependency_digest": "sha256:0101010101010101010101010101010101010101010101010101010101010101",
+        "roe_digest": "sha256:0202020202020202020202020202020202020202020202020202020202020202",
+        "validation_vector_digest": "sha256:0303030303030303030303030303030303030303030303030303030303030303",
+        "runtime_evidence_digest": "sha256:0404040404040404040404040404040404040404040404040404040404040404",
+        "capabilities": {
+          "tool:invoice.read": {
+            "digest": "sha256:0505050505050505050505050505050505050505050505050505050505050505",
+            "destructive": false
+          }
+        }
+      },
+      "property_results": {
+        "MCP.AUTHZ.PER_OPERATION": {
+          "coverage_status": "APPLICABLE",
+          "verdict": "PASS",
+          "severity": "INFO",
+          "evidence_ids": [
+            "evidence-authz-1"
+          ],
+          "dependency_digests": {
+            "inventory": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "authorization": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        }
+      },
+      "attack_paths": {},
+      "validation_results": {}
+    }
+  },
+  "candidate_snapshot": {
+    "schema_version": "1",
+    "security_state": {
+      "id": "state-unrelated-candidate",
+      "target": {
+        "id": "target-001",
+        "version": "revision-stable"
+      },
+      "inventory_digest": "sha256:1515151515151515151515151515151515151515151515151515151515151515",
+      "property_registry_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "profile_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "assessment_plan_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "evidence_bundle_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "coverage_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "attack_graph_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "validation_results_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "policies": {
+        "coverage": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+        "severity": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+        "confidence": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "continuous_validation": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "facts": {
+        "complete": true,
+        "source_code_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "authorization_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "credential_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "tenant_model_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "dependency_digest": "sha256:0101010101010101010101010101010101010101010101010101010101010101",
+        "roe_digest": "sha256:0202020202020202020202020202020202020202020202020202020202020202",
+        "validation_vector_digest": "sha256:0303030303030303030303030303030303030303030303030303030303030303",
+        "runtime_evidence_digest": "sha256:0404040404040404040404040404040404040404040404040404040404040404",
+        "capabilities": {
+          "tool:invoice.read": {
+            "digest": "sha256:0505050505050505050505050505050505050505050505050505050505050505",
+            "destructive": false
+          },
+          "tool:invoice.delete": {
+            "digest": "sha256:1616161616161616161616161616161616161616161616161616161616161616",
+            "destructive": true
+          }
+        }
+      },
+      "property_results": {
+        "MCP.AUTHZ.PER_OPERATION": {
+          "coverage_status": "APPLICABLE",
+          "verdict": "PASS",
+          "severity": "INFO",
+          "evidence_ids": [
+            "evidence-authz-1"
+          ],
+          "dependency_digests": {
+            "inventory": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "authorization": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        }
+      },
+      "attack_paths": {},
+      "validation_results": {}
+    }
+  },
+  "policy": {
+    "version": "1.0.0",
+    "fallback_full_on_unknown": true,
+    "dynamic": {
+      "auto_modes": [
+        "PLAN_ONLY",
+        "SIMULATED",
+        "LOCAL_SYNTHETIC"
+      ],
+      "require_approval": [
+        "AUTHORIZED_DYNAMIC"
+      ]
+    },
+    "gates": {
+      "regression": "FAIL",
+      "coverage_drop": "FAIL",
+      "risky_path": "FAIL",
+      "unknown_posture": "REVIEW",
+      "destructive_capability": "REVIEW"
+    }
+  },
+  "expected": {
+    "gate": "REVIEW_OR_FAIL",
+    "destructive_capability": true
+  }
+}

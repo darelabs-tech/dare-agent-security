@@ -9,6 +9,7 @@ use dare_agent_security::attack_graph::run_attack_graph;
 use dare_agent_security::benchmark::run_benchmark;
 use dare_agent_security::ci::run_ci;
 use dare_agent_security::coaz_integrity::run_coaz_integrity;
+use dare_agent_security::continuous::run_continuous;
 use dare_agent_security::coverage::run_coverage;
 use dare_agent_security::discover::run_discover;
 use dare_agent_security::exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
@@ -30,6 +31,7 @@ async fn main() -> ExitCode {
                 ValidateSubcommand::Adversarial(args) => {
                     ExitCode::from(run_adversarial(args) as u8)
                 }
+                ValidateSubcommand::Continuous(args) => ExitCode::from(run_continuous(args) as u8),
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),
         },

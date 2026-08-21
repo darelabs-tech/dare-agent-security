@@ -1,0 +1,16 @@
+{
+  "schema_version": "1",
+  "id": "crp:sha256:0f1fc6544b67bf7f2e7aee0e5c4f856fc51e7703f9e5691e82c0fe043fe39329",
+  "baseline_state": "state-unrelated-baseline",
+  "candidate_state": "state-unrelated-candidate",
+  "change_set_digest": "sha256:0d833c2af74d267a58fc4694e1e4c28bc195137adcfd83c6c018d16309192dec",
+  "full_fallback": false,
+  "items": [
+    {
+      "kind": "PROPERTY",
+      "id": "MCP.AUTHZ.PER_OPERATION",
+      "action": "REUSE",
+      "reason": "no mapped security dependency changed"
+    }
+  ]
+}
