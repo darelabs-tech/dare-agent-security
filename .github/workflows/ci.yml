@@ -116,3 +116,23 @@ jobs:
             --mode plan-only \
             --output-dir .dare-agent-security/continuous-ci
 
+  productization-v1:
+    name: Cycle 011 productization
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Product crate tests
+        run: cargo test -p dare-product -- --nocapture
+      - name: Product CLI smoke (init/doctor)
+        run: |
+          TMP=$(mktemp -d)
+          cargo run -p dare-agent-security -- init "$TMP" --name ci-product
+          cargo run -p dare-agent-security -- doctor "$TMP" --json
+          cargo run -p dare-agent-security -- assess "$TMP" --offline --run run-ci-001
+          cargo run -p dare-agent-security -- report --path "$TMP" --run run-ci-001
+          rm -rf "$TMP"
+      - name: Demo fixture assess (secure)
+        run: |
+          cargo run -p dare-agent-security -- assess examples/secure-mcp --offline --run run-ci-secure
+

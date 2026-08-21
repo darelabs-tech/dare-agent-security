@@ -1,0 +1,273 @@
+title: "DARE Agent Security Cycle 011 - Productization & v1.0 Release Readiness"
+version: "1.0.0"
+cycle: "011-productization-v1-release-readiness"
+source_design: "DARE/cycles/011-productization-v1-release-readiness/DESIGN.md"
+source_blueprint: "DARE/cycles/011-productization-v1-release-readiness/BLUEPRINT.md"
+source_tasks: "DARE/cycles/011-productization-v1-release-readiness/TASKS.md"
+limits:
+  parent_context_chars: 2000
+  task_output_chars: 4000
+  timeout_seconds: 1800
+rules:
+  execution_mode: "execute-only"
+  require_design_conformance: true
+  require_blueprint_conformance: true
+  require_anti_stub_review: true
+  fail_closed_on_unknown_schema_major: true
+  forbid_customer_specific_fields: true
+  forbid_raw_credentials: true
+  required_gates:
+    - "cargo fmt --all --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+tasks:
+  - id: task-001
+    title: "Reconcile post-Cycle-010 main"
+    depends_on: []
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-001.md
+    subtask_prompt: |
+      Execute Cycle 011 task-001 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-001.md.
+      Title: Reconcile post-Cycle-010 main
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-002
+    title: "Define v1 product contract"
+    depends_on: [task-001]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-002.md
+    subtask_prompt: |
+      Execute Cycle 011 task-002 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-002.md.
+      Title: Define v1 product contract
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-003
+    title: "Stabilize installation and packaging"
+    depends_on: [task-001, task-002]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-003.md
+    subtask_prompt: |
+      Execute Cycle 011 task-003 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-003.md.
+      Title: Stabilize installation and packaging
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-004
+    title: "Implement first-run initialization"
+    depends_on: [task-002, task-003]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-004.md
+    subtask_prompt: |
+      Execute Cycle 011 task-004 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-004.md.
+      Title: Implement first-run initialization
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-005
+    title: "Stabilize v1 configuration schema"
+    depends_on: [task-001, task-002]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-005.md
+    subtask_prompt: |
+      Execute Cycle 011 task-005 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-005.md.
+      Title: Stabilize v1 configuration schema
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-006
+    title: "Implement unified assessment UX"
+    depends_on: [task-004, task-005]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-006.md
+    subtask_prompt: |
+      Execute Cycle 011 task-006 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-006.md.
+      Title: Implement unified assessment UX
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-007
+    title: "Implement confidential/offline mode"
+    depends_on: [task-001, task-005]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-007.md
+    subtask_prompt: |
+      Execute Cycle 011 task-007 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-007.md.
+      Title: Implement confidential/offline mode
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-008
+    title: "Prove zero-telemetry/no-egress behavior"
+    depends_on: [task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-008.md
+    subtask_prompt: |
+      Execute Cycle 011 task-008 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-008.md.
+      Title: Prove zero-telemetry/no-egress behavior
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-009
+    title: "Harden product-level redaction"
+    depends_on: [task-001, task-007]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-009.md
+    subtask_prompt: |
+      Execute Cycle 011 task-009 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-009.md.
+      Title: Harden product-level redaction
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-010
+    title: "Implement product result/view model"
+    depends_on: [task-001, task-002, task-009]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-010.md
+    subtask_prompt: |
+      Execute Cycle 011 task-010 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-010.md.
+      Title: Implement product result/view model
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-011
+    title: "Implement Executive Report"
+    depends_on: [task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-011.md
+    subtask_prompt: |
+      Execute Cycle 011 task-011 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-011.md.
+      Title: Implement Executive Report
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-012
+    title: "Implement Technical Report"
+    depends_on: [task-010]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-012.md
+    subtask_prompt: |
+      Execute Cycle 011 task-012 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-012.md.
+      Title: Implement Technical Report
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-013
+    title: "Stabilize machine-readable report schema"
+    depends_on: [task-002, task-010]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-013.md
+    subtask_prompt: |
+      Execute Cycle 011 task-013 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-013.md.
+      Title: Stabilize machine-readable report schema
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-014
+    title: "Implement confidentiality metadata and labels"
+    depends_on: [task-011, task-012, task-013]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-014.md
+    subtask_prompt: |
+      Execute Cycle 011 task-014 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-014.md.
+      Title: Implement confidentiality metadata and labels
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-015
+    title: "Implement diagnostics / doctor command"
+    depends_on: [task-003, task-005, task-007]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-015.md
+    subtask_prompt: |
+      Execute Cycle 011 task-015 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-015.md.
+      Title: Implement diagnostics / doctor command
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-016
+    title: "Stabilize error UX and exit codes"
+    depends_on: [task-002, task-006, task-015]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-016.md
+    subtask_prompt: |
+      Execute Cycle 011 task-016 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-016.md.
+      Title: Stabilize error UX and exit codes
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-017
+    title: "Build v1 demo targets"
+    depends_on: [task-006, task-009, task-012]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-017.md
+    subtask_prompt: |
+      Execute Cycle 011 task-017 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-017.md.
+      Title: Build v1 demo targets
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-018
+    title: "Build Quickstart"
+    depends_on: [task-003, task-006, task-011, task-012, task-017]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-018.md
+    subtask_prompt: |
+      Execute Cycle 011 task-018 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-018.md.
+      Title: Build Quickstart
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-019
+    title: "Complete v1 documentation set"
+    depends_on: [task-005, task-006, task-007, task-011, task-012, task-015, task-016, task-018]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-019.md
+    subtask_prompt: |
+      Execute Cycle 011 task-019 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-019.md.
+      Title: Complete v1 documentation set
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-020
+    title: "Establish performance baseline"
+    depends_on: [task-006, task-017]
+    complexity: MED
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-020.md
+    subtask_prompt: |
+      Execute Cycle 011 task-020 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-020.md.
+      Title: Establish performance baseline
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-021
+    title: "Perform v1 release security hardening"
+    depends_on: [task-007, task-008, task-009, task-011, task-012, task-013, task-017]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-021.md
+    subtask_prompt: |
+      Execute Cycle 011 task-021 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-021.md.
+      Title: Perform v1 release security hardening
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-022
+    title: "Implement release automation"
+    depends_on: [task-003, task-016, task-019, task-021]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-022.md
+    subtask_prompt: |
+      Execute Cycle 011 task-022 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-022.md.
+      Title: Implement release automation
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-023
+    title: "Implement clean-environment v1 acceptance test"
+    depends_on: [task-018, task-021, task-022]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-023.md
+    subtask_prompt: |
+      Execute Cycle 011 task-023 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-023.md.
+      Title: Implement clean-environment v1 acceptance test
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-024
+    title: "External-operator usability pass"
+    depends_on: [task-018, task-019, task-023]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-024.md
+    subtask_prompt: |
+      Execute Cycle 011 task-024 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-024.md.
+      Title: External-operator usability pass
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+
+  - id: task-025
+    title: "Final DARE proof and v1.0 release gate"
+    depends_on: [task-020, task-021, task-022, task-023, task-024]
+    complexity: HIGH
+    spec_file: DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-025.md
+    subtask_prompt: |
+      Execute Cycle 011 task-025 exactly as defined in DARE/cycles/011-productization-v1-release-readiness/EXECUTION/task-025.md.
+      Title: Final DARE proof and v1.0 release gate
+      Preserve Cycles 001-010 engines; product layer only. Confidential/offline fail-closed. No telemetry/egress in offline mode.
+

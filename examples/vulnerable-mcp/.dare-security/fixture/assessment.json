@@ -1,0 +1,113 @@
+{
+  "gate": "FAIL",
+  "overall_coverage": 0.55,
+  "required_coverage": 0.8,
+  "attack_path_summary": "One authority-mutation path from authorized.read to executed.write (analysis only).",
+  "validation_status": "plan-only (static fixture)",
+  "limitations": [
+    "Demo fixture — not a live MCP server.",
+    "Safe defaults: static/passive/plan-only."
+  ],
+  "findings": [
+    {
+      "id": "FIND-AUTHZ-001",
+      "title": "Missing per-operation authorization",
+      "property": "MCP.AUTHZ.PER_OPERATION",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "component": "tool:customer.export",
+      "status": "FAIL",
+      "evidence_refs": ["ev-vuln-authz-001"],
+      "attack_path_refs": ["path:agent->authorized.read"],
+      "expected": "DENY or RE-EVALUATE without fresh authz",
+      "observed": "ALLOW without per-operation check",
+      "remediation": "Require AuthZEN/COAZ decision per tool invocation.",
+      "retest_status": "PENDING"
+    },
+    {
+      "id": "FIND-INTEGRITY-001",
+      "title": "Tool name mutated after authorization",
+      "property": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+      "severity": "CRITICAL",
+      "confidence": "HIGH",
+      "component": "tool:executed.write",
+      "status": "FAIL",
+      "evidence_refs": ["ev-vuln-integrity-001"],
+      "attack_path_refs": ["path:authorized.read->executed.write"],
+      "expected": "DENY on tool-name mismatch",
+      "observed": "ALLOW mutated write tool",
+      "remediation": "Bind authorization decision to exact tool identity; re-evaluate on mutation.",
+      "retest_status": "PENDING"
+    }
+  ],
+  "coverage_facts": {
+    "tools_count": 2,
+    "resources_count": 1,
+    "prompts_count": 0,
+    "transport": "stdio",
+    "authorization_present": false,
+    "dynamic_authorization_allowed": false,
+    "execution_integrity_supported": true,
+    "confused_deputy_supported": false,
+    "out_of_scope_property_ids": []
+  },
+  "coverage_executions": [],
+  "attack_graph_facts": {
+    "target_id": "vulnerable-mcp",
+    "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "engine_commit": "local-dev",
+    "sources": {
+      "inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "nodes": [
+      {"local_id": "agent", "type": "AGENT", "display_name": "agent"},
+      {"local_id": "authorized.read", "type": "TOOL", "display_name": "authorized.read"},
+      {"local_id": "executed.write", "type": "TOOL", "display_name": "executed.write"}
+    ],
+    "edges": [
+      {
+        "type": "CAN_INVOKE",
+        "source_local_id": "agent",
+        "source_type": "AGENT",
+        "target_local_id": "authorized.read",
+        "target_type": "TOOL",
+        "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-am-1"]},
+        "security": {"property": "MCP.AUTHZ.PER_OPERATION", "state_impact": "READ_ONLY"}
+      },
+      {
+        "type": "CALLS",
+        "source_local_id": "authorized.read",
+        "source_type": "TOOL",
+        "target_local_id": "executed.write",
+        "target_type": "TOOL",
+        "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-am-2"]},
+        "security": {
+          "property": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+          "verdict": "FAIL",
+          "state_impact": "WRITE",
+          "authority_mutation": true
+        }
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "name": "ev-vuln-authz-001.json",
+      "content": {
+        "id": "ev-vuln-authz-001",
+        "verdict": "FAIL",
+        "note": "Synthetic evidence — no customer secrets"
+      }
+    },
+    {
+      "name": "ev-vuln-integrity-001.json",
+      "content": {
+        "id": "ev-vuln-integrity-001",
+        "verdict": "FAIL",
+        "note": "Synthetic evidence — no customer secrets"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+version: "1"
+project:
+  name: vulnerable-mcp
+assessment:
+  profile: mcp-security-baseline
+privacy:
+  mode: confidential
+  telemetry: false
+  network: denied
+  offline: true
+reporting:
+  formats: [html, json]
+classification:
+  level: CONFIDENTIAL
+  distribution: [security-team, target-owner]
+  publication_allowed: false

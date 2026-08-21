@@ -1,0 +1,112 @@
+{
+  "gate": "PASS",
+  "overall_coverage": 1.0,
+  "required_coverage": 0.8,
+  "attack_path_summary": "No risky authority-mutation paths after remediation.",
+  "validation_status": "plan-only (static fixture) — retest PASS",
+  "limitations": [
+    "Demo fixture — not a live MCP server.",
+    "Safe defaults: static/passive/plan-only."
+  ],
+  "findings": [
+    {
+      "id": "FIND-AUTHZ-001",
+      "title": "Per-operation authorization enforced",
+      "property": "MCP.AUTHZ.PER_OPERATION",
+      "severity": "INFO",
+      "confidence": "HIGH",
+      "component": "tool:customer.export",
+      "status": "PASS",
+      "evidence_refs": ["ev-secure-authz-001"],
+      "attack_path_refs": [],
+      "expected": "DENY or RE-EVALUATE without fresh authz",
+      "observed": "DENY without per-operation decision",
+      "remediation": null,
+      "retest_status": "PASS"
+    },
+    {
+      "id": "FIND-INTEGRITY-001",
+      "title": "Tool-name integrity binding enforced",
+      "property": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+      "severity": "INFO",
+      "confidence": "HIGH",
+      "component": "tool:customer.export",
+      "status": "PASS",
+      "evidence_refs": ["ev-secure-integrity-001"],
+      "attack_path_refs": [],
+      "expected": "DENY on tool-name mismatch",
+      "observed": "DENY mutated tool identity",
+      "remediation": null,
+      "retest_status": "PASS"
+    }
+  ],
+  "coverage_facts": {
+    "tools_count": 1,
+    "resources_count": 1,
+    "prompts_count": 0,
+    "transport": "stdio",
+    "authorization_present": true,
+    "dynamic_authorization_allowed": false,
+    "execution_integrity_supported": true,
+    "confused_deputy_supported": true,
+    "out_of_scope_property_ids": []
+  },
+  "coverage_executions": [
+    {
+      "property_id": "MCP.AUTHZ.PER_OPERATION",
+      "verdict": "PASS",
+      "evidence_ids": ["ev-secure-authz-001"]
+    },
+    {
+      "property_id": "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+      "verdict": "PASS",
+      "evidence_ids": ["ev-secure-integrity-001"]
+    }
+  ],
+  "attack_graph_facts": {
+    "target_id": "secure-mcp",
+    "target_version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "engine_commit": "local-dev",
+    "sources": {
+      "inventory_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "assessment_plan_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evidence_bundle_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "nodes": [
+      {"local_id": "support", "type": "AGENT", "display_name": "support"},
+      {"local_id": "customer.export", "type": "TOOL", "display_name": "customer.export", "security": {"state_impact": "READ_ONLY"}},
+      {"local_id": "customer-record", "type": "RESOURCE", "display_name": "customer record"}
+    ],
+    "edges": [
+      {
+        "type": "CAN_INVOKE",
+        "source_local_id": "support",
+        "source_type": "AGENT",
+        "target_local_id": "customer.export",
+        "target_type": "TOOL",
+        "authority": {"principal": "user:123", "delegated": true, "tenant": "tenant-a"},
+        "evidence": {"status": "OBSERVED", "evidence_ids": ["ev-1"]},
+        "security": {"property": "MCP.AUTHZ.PER_OPERATION", "state_impact": "READ_ONLY"}
+      },
+      {
+        "type": "READS",
+        "source_local_id": "customer.export",
+        "source_type": "TOOL",
+        "target_local_id": "customer-record",
+        "target_type": "RESOURCE",
+        "evidence": {"status": "STATICALLY_PROVEN", "evidence_ids": ["ev-2"]},
+        "security": {"state_impact": "READ_ONLY"}
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "name": "ev-secure-authz-001.json",
+      "content": { "id": "ev-secure-authz-001", "verdict": "PASS" }
+    },
+    {
+      "name": "ev-secure-integrity-001.json",
+      "content": { "id": "ev-secure-integrity-001", "verdict": "PASS" }
+    }
+  ]
+}

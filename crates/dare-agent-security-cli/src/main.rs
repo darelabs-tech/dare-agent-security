@@ -13,11 +13,16 @@ use dare_agent_security::continuous::run_continuous;
 use dare_agent_security::coverage::run_coverage;
 use dare_agent_security::discover::run_discover;
 use dare_agent_security::exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
+use dare_agent_security::product::{run_assess, run_doctor_cmd, run_init, run_report};
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> ExitCode {
     match Cli::try_parse() {
         Ok(cli) => match cli.command {
+            Command::Init(args) => ExitCode::from(run_init(args) as u8),
+            Command::Assess(args) => ExitCode::from(run_assess(args) as u8),
+            Command::Report(args) => ExitCode::from(run_report(args) as u8),
+            Command::Doctor(args) => ExitCode::from(run_doctor_cmd(args) as u8),
             Command::Discover(args) => ExitCode::from(run_discover(args).await as u8),
             Command::Validate { command } => match command {
                 ValidateSubcommand::CoazIntegrity(args) => {

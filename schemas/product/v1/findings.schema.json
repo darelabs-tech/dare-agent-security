@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/product/v1/findings.schema.json",
+  "title": "DARE Product Findings v1",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "title",
+      "property",
+      "severity",
+      "confidence",
+      "component",
+      "status"
+    ],
+    "properties": {
+      "id": { "type": "string" },
+      "title": { "type": "string" },
+      "property": { "type": "string" },
+      "severity": {
+        "type": "string",
+        "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+      },
+      "confidence": { "type": "string" },
+      "component": { "type": "string" },
+      "status": { "type": "string" },
+      "evidence_refs": { "type": "array", "items": { "type": "string" } },
+      "attack_path_refs": { "type": "array", "items": { "type": "string" } },
+      "expected": { "type": ["string", "null"] },
+      "observed": { "type": ["string", "null"] },
+      "remediation": { "type": ["string", "null"] },
+      "retest_status": { "type": ["string", "null"] }
+    }
+  }
+}

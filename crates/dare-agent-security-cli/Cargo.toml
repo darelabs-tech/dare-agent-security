@@ -26,6 +26,7 @@ dare-benchmark = { path = "../dare-benchmark" }
 dare-attack-graph = { path = "../dare-attack-graph" }
 dare-adversarial = { path = "../dare-adversarial" }
 dare-continuous = { path = "../dare-continuous" }
+dare-product = { path = "../dare-product" }
 jsonschema = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

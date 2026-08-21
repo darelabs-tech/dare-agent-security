@@ -79,9 +79,21 @@ Active tests should start in local, sandbox, or staging environments and must re
 
 ## Project status
 
-**Stage:** Pre-alpha — Cycles 001–010 implement evidence-first analysis, controlled validation, and deterministic continuous revalidation
+**Stage:** v1.0 release readiness (Cycle 011) — product UX over Cycles 001–010 core (feature freeze)
 
-Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). **Cycle 006** adds assessment profiles and coverage (`crates/dare-coverage`) — see [docs/assessment-coverage.md](docs/assessment-coverage.md). **Cycle 007** adds benchmark corpus methodology (`crates/dare-benchmark`) — see [docs/benchmark-methodology.md](docs/benchmark-methodology.md). **Cycle 008** adds deterministic bounded attack-graph analysis (`crates/dare-attack-graph`) — see [docs/attack-graph.md](docs/attack-graph.md). **Cycle 009** adds ROE-gated, budgeted, offline-first controlled validation (`crates/dare-adversarial`) — see [docs/adversarial-validation.md](docs/adversarial-validation.md). **Cycle 010** adds immutable snapshots, safe incremental planning, drift gates, and fail-closed fallback (`crates/dare-continuous`) — see [docs/continuous-validation.md](docs/continuous-validation.md). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
+### Product quick start
+
+```bash
+cargo run -p dare-agent-security -- init
+cargo run -p dare-agent-security -- doctor
+cargo run -p dare-agent-security -- assess examples/vulnerable-mcp --offline --confidential
+cargo run -p dare-agent-security -- report --path examples/vulnerable-mcp
+cargo run -p dare-agent-security -- assess examples/secure-mcp --offline
+```
+
+See [docs/quickstart.md](docs/quickstart.md) and [docs/product/v1-contract.md](docs/product/v1-contract.md). Power-user commands (`discover`, `validate *`, `ci`) remain available.
+
+Cycle 001 shipped the protocol-neutral evidence kernel (`crates/dare-security-evidence`, schema at [`schemas/evidence/v1/evidence.schema.json`](schemas/evidence/v1/evidence.schema.json)). Cycle 002 adds `dare-agent-security discover`: passive inventory of an operator-supplied MCP target. Cycle 003 adds `validate coaz-integrity`: deterministic authorization-to-execution integrity vectors (built-in synthetic fixtures only). **Cycle 004** adds a repository-local GitHub Action (`action.yml`) that invokes the CLI with deterministic aggregate verdicts for CI — see [docs/ci-gate.md](docs/ci-gate.md). **Cycle 005** adds a synthetic MCP security lab and scenario corpus (`crates/dare-mcp-lab`, `labs/scenarios/`) — see [docs/mcp-security-lab.md](docs/mcp-security-lab.md). **Cycle 006** adds assessment profiles and coverage (`crates/dare-coverage`) — see [docs/assessment-coverage.md](docs/assessment-coverage.md). **Cycle 007** adds benchmark corpus methodology (`crates/dare-benchmark`) — see [docs/benchmark-methodology.md](docs/benchmark-methodology.md). **Cycle 008** adds deterministic bounded attack-graph analysis (`crates/dare-attack-graph`) — see [docs/attack-graph.md](docs/attack-graph.md). **Cycle 009** adds ROE-gated, budgeted, offline-first controlled validation (`crates/dare-adversarial`) — see [docs/adversarial-validation.md](docs/adversarial-validation.md). **Cycle 010** adds immutable snapshots, safe incremental planning, drift gates, and fail-closed fallback (`crates/dare-continuous`) — see [docs/continuous-validation.md](docs/continuous-validation.md). **Cycle 011** productizes the core (`crates/dare-product`: `init` / `assess` / `report` / `doctor`). Validate JSON contracts locally from committed schema files; do not fetch `$id` from the network.
 
 ### Discover quick start
 

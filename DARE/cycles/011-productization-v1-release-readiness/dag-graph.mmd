@@ -1,0 +1,96 @@
+flowchart TB
+    T001["001 Reconcile post-Cycle-010 main"]
+    T002["002 Define v1 product contract"]
+    T003["003 Stabilize installation and packaging"]
+    T004["004 Implement first-run initialization"]
+    T005["005 Stabilize v1 configuration schema"]
+    T006["006 Implement unified assessment UX"]
+    T007["007 Implement confidential/offline mode"]
+    T008["008 Prove zero-telemetry/no-egress behavior"]
+    T009["009 Harden product-level redaction"]
+    T010["010 Implement product result/view model"]
+    T011["011 Implement Executive Report"]
+    T012["012 Implement Technical Report"]
+    T013["013 Stabilize machine-readable report schema"]
+    T014["014 Implement confidentiality metadata and labels"]
+    T015["015 Implement diagnostics / doctor command"]
+    T016["016 Stabilize error UX and exit codes"]
+    T017["017 Build v1 demo targets"]
+    T018["018 Build Quickstart"]
+    T019["019 Complete v1 documentation set"]
+    T020["020 Establish performance baseline"]
+    T021["021 Perform v1 release security hardening"]
+    T022["022 Implement release automation"]
+    T023["023 Implement clean-environment v1 acceptance test"]
+    T024["024 External-operator usability pass"]
+    T025["025 Final DARE proof and v1.0 release gate"]
+    T001 --> T002
+    T001 --> T003
+    T002 --> T003
+    T002 --> T004
+    T003 --> T004
+    T001 --> T005
+    T002 --> T005
+    T004 --> T006
+    T005 --> T006
+    T001 --> T007
+    T005 --> T007
+    T007 --> T008
+    T001 --> T009
+    T007 --> T009
+    T001 --> T010
+    T002 --> T010
+    T009 --> T010
+    T010 --> T011
+    T010 --> T012
+    T002 --> T013
+    T010 --> T013
+    T011 --> T014
+    T012 --> T014
+    T013 --> T014
+    T003 --> T015
+    T005 --> T015
+    T007 --> T015
+    T002 --> T016
+    T006 --> T016
+    T015 --> T016
+    T006 --> T017
+    T009 --> T017
+    T012 --> T017
+    T003 --> T018
+    T006 --> T018
+    T011 --> T018
+    T012 --> T018
+    T017 --> T018
+    T005 --> T019
+    T006 --> T019
+    T007 --> T019
+    T011 --> T019
+    T012 --> T019
+    T015 --> T019
+    T016 --> T019
+    T018 --> T019
+    T006 --> T020
+    T017 --> T020
+    T007 --> T021
+    T008 --> T021
+    T009 --> T021
+    T011 --> T021
+    T012 --> T021
+    T013 --> T021
+    T017 --> T021
+    T003 --> T022
+    T016 --> T022
+    T019 --> T022
+    T021 --> T022
+    T018 --> T023
+    T021 --> T023
+    T022 --> T023
+    T018 --> T024
+    T019 --> T024
+    T023 --> T024
+    T020 --> T025
+    T021 --> T025
+    T022 --> T025
+    T023 --> T025
+    T024 --> T025
