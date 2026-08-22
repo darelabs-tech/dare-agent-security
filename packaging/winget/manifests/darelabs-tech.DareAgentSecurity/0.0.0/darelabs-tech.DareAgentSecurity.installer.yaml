@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: darelabs-tech.DareAgentSecurity
+PackageVersion: 0.0.0 # updated per release
+InstallerType: zip
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/darelabs-tech/dare-agent-security/releases/download/v0.0.0/dare-agent-security-v0.0.0-windows-x86_64.zip
+    InstallerSha256: PLACEHOLDER_SHA256_WINDOWS_X86_64
+    NestedInstallerType: portable
+    NestedInstallerFiles:
+      - RelativeFilePath: dare-agent-security-v0.0.0-windows-x86_64\dare-agent-security.exe
+        PortableCommandAlias: dare-agent-security
+ManifestType: installer
+ManifestVersion: 1.6.0

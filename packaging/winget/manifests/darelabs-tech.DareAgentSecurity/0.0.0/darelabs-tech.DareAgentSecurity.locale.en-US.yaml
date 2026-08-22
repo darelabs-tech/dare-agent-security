@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: darelabs-tech.DareAgentSecurity
+PackageVersion: 0.0.0 # updated per release
+PackageLocale: en-US
+Publisher: DARE Labs
+PublisherUrl: https://darelabs.tech
+PackageName: DARE Agent Security
+PackageUrl: https://github.com/darelabs-tech/dare-agent-security
+License: Apache-2.0
+LicenseUrl: https://github.com/darelabs-tech/dare-agent-security/blob/main/LICENSE
+ShortDescription: Deterministic adversarial validation and security conformance testing for AI agents and MCP systems.
+Tags:
+  - security
+  - mcp
+  - ai-agents
+  - conformance-testing
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

@@ -77,6 +77,25 @@ Do not use the project to access, disrupt, exploit, or test third-party systems 
 
 Active tests should start in local, sandbox, or staging environments and must respect the target's approved scope, rules of engagement, rate limits, data-handling rules, and kill-switch procedures.
 
+## Install
+
+```bash
+# Linux/macOS
+curl -fsSL https://darelabs.tech/security/install | sh
+
+# Windows PowerShell
+irm https://darelabs.tech/security/install.ps1 | iex
+```
+
+Both installers resolve the latest release and **fail closed on any missing
+or mismatched checksum** — see [`installers/`](installers/) and
+[docs/product/packaging-install.md](docs/product/packaging-install.md) for
+fallback install methods (manual download, `cargo install`, build from
+source). Full documentation: the DARE Agent Security Book
+(`book/en`, published via GitHub Pages once `deploy-docs.yml` runs on `main`).
+
+Contributors building from source, keep using the commands below.
+
 ## Project status
 
 **Stage:** v1.0 release readiness (Cycle 011) — product UX over Cycles 001–010 core (feature freeze)

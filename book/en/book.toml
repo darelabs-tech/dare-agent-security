@@ -1,0 +1,18 @@
+[book]
+title = "DARE Agent Security"
+description = "Deterministic adversarial validation and security conformance testing for AI agents and MCP systems."
+authors = ["DARE Labs"]
+language = "en"
+src = "src"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/darelabs-tech/dare-agent-security"
+edit-url-template = "https://github.com/darelabs-tech/dare-agent-security/edit/main/book/en/{path}"
+additional-css = ["../theme/custom.css"]
+site-url = "/dare-agent-security/en/"
+
+[output.html.fold]
+enable = true
+level = 1

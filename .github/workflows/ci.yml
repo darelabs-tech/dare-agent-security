@@ -136,3 +136,18 @@ jobs:
         run: |
           cargo run -p dare-agent-security -- assess examples/secure-mcp --offline --run run-ci-secure
 
+  docs-build:
+    name: mdBook documentation gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mdBook
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL https://github.com/rust-lang/mdBook/releases/download/v0.4.40/mdbook-v0.4.40-x86_64-unknown-linux-gnu.tar.gz \
+            | tar -xz -C "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build English book
+        run: mdbook build book/en
+      - name: Build Portuguese book
+        run: mdbook build book/pt

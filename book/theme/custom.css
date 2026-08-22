@@ -1,0 +1,49 @@
+/* DARE Agent Security — mdBook branding pass. */
+
+:root {
+    --dare-accent: #7c3aed;
+    --dare-accent-dark: #a78bfa;
+}
+
+.menu-title {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+a {
+    color: var(--dare-accent);
+}
+
+.navy a,
+.coal a,
+.ayu a {
+    color: var(--dare-accent-dark);
+}
+
+h1 {
+    border-bottom: 2px solid var(--dare-accent);
+    padding-bottom: 0.3em;
+}
+
+.sidebar-scrollbox .chapter li.chapter-item a.active {
+    color: var(--dare-accent);
+    font-weight: 600;
+}
+
+.navy .sidebar-scrollbox .chapter li.chapter-item a.active,
+.coal .sidebar-scrollbox .chapter li.chapter-item a.active,
+.ayu .sidebar-scrollbox .chapter li.chapter-item a.active {
+    color: var(--dare-accent-dark);
+}
+
+blockquote {
+    border-left: 4px solid var(--dare-accent);
+}
+
+pre {
+    border-radius: 6px;
+}
+
+table th {
+    background: rgba(124, 58, 237, 0.08);
+}

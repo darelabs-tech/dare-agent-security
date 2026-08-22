@@ -3,3 +3,8 @@
 **/.dare-security/runs/
 .dare-agent-security/
 dist/
+book/en/book/
+book/pt/book/
+book/en/theme/
+book/pt/theme/
+_site/
