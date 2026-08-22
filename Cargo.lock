@@ -406,7 +406,7 @@ dependencies = [
 
 [[package]]
 name = "dare-adversarial"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-attack-graph",
  "dare-coverage",
@@ -422,7 +422,7 @@ dependencies = [
 
 [[package]]
 name = "dare-agent-security"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "clap",
  "dare-adversarial",
@@ -445,7 +445,7 @@ dependencies = [
 
 [[package]]
 name = "dare-attack-graph"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-coverage",
  "dare-security-evidence",
@@ -460,7 +460,7 @@ dependencies = [
 
 [[package]]
 name = "dare-benchmark"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-coverage",
  "dare-security-evidence",
@@ -475,7 +475,7 @@ dependencies = [
 
 [[package]]
 name = "dare-coaz-integrity"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-security-evidence",
  "jsonschema",
@@ -487,7 +487,7 @@ dependencies = [
 
 [[package]]
 name = "dare-continuous"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-adversarial",
  "dare-attack-graph",
@@ -504,7 +504,7 @@ dependencies = [
 
 [[package]]
 name = "dare-coverage"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-mcp-lab",
  "dare-security-evidence",
@@ -518,7 +518,7 @@ dependencies = [
 
 [[package]]
 name = "dare-mcp-discovery"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "async-trait",
  "dare-security-evidence",
@@ -536,7 +536,7 @@ dependencies = [
 
 [[package]]
 name = "dare-mcp-lab"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-coaz-integrity",
  "dare-security-evidence",
@@ -550,7 +550,7 @@ dependencies = [
 
 [[package]]
 name = "dare-product"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "dare-attack-graph",
  "dare-continuous",
@@ -569,7 +569,7 @@ dependencies = [
 
 [[package]]
 name = "dare-security-evidence"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "jsonschema",
  "serde",
@@ -2180,7 +2180,7 @@ dependencies = [
 
 [[package]]
 name = "synthetic-mcp"
-version = "0.1.0"
+version = "1.0.0-rc1"
 dependencies = [
  "axum",
  "rmcp",
