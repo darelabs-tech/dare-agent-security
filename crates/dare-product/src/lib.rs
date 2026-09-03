@@ -1,7 +1,8 @@
 //! Productization layer for DARE Agent Security v1.
 //!
-//! Orchestrates Cycles 001–010 crates. Does not implement a second security engine.
+//! Orchestrates Cycles 001–012 crates. Does not implement a second security engine.
 
+pub mod agentic_metadata;
 pub mod assess;
 pub mod classification;
 pub mod config;
@@ -15,6 +16,7 @@ pub mod report;
 pub mod store;
 pub mod view_model;
 
+pub use agentic_metadata::build_agentic_metadata;
 pub use assess::{run_assessment, AssessOptions, AssessOutcome};
 pub use classification::Classification;
 pub use config::{load_config, ProductConfig, CONFIG_SCHEMA_V1_ID};
