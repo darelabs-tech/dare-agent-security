@@ -1,10 +1,10 @@
 # Cycle 012 - OWASP Agentic Security Registry 2026
 
-**Status:** DESIGN READY FOR REVIEW  
+**Status:** APPROVED FOR EXECUTION  
 **Base branch:** `main`  
 **Baseline:** v1.0-rc1 / Cycles 001-011 delivered  
 **Branch:** `agent/cycle-012-owasp-agentic-security-registry-2026`  
-**Approval:** PENDING
+**Approval:** APPROVED 2026-09-03
 
 ## 1. Purpose
 
@@ -320,7 +320,7 @@ These are candidate later cycles.
 26. No new active attack capability is introduced.
 27. No arbitrary LLM verdict authority is introduced.
 28. Final proof maps every acceptance criterion to files/tests/results.
-29. `APPROVAL.md` remains absent until explicit Product Owner approval.
+29. `APPROVAL.md` records explicit Product Owner approval before Execute.
 
 ## 19. Definition of done
 
