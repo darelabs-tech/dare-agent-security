@@ -104,9 +104,6 @@ pub struct ProductViewModel {
     pub validation: serde_json::Value,
     #[serde(default)]
     pub drift: serde_json::Value,
-    /// Additive Cycle 012 metadata. It is written as a sibling artifact and does not alter v1 schemas.
-    #[serde(default)]
-    pub agentic_metadata: serde_json::Value,
 }
 
 impl ProductViewModel {
@@ -176,7 +173,6 @@ mod tests {
             attack_graph: serde_json::json!({}),
             validation: serde_json::json!({}),
             drift: serde_json::json!({}),
-            agentic_metadata: serde_json::Value::Null,
         };
         vm.recount_severity();
         assert_eq!(vm.summary.severity_counts.high, 1);
