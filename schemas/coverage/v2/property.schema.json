@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/coverage/v2/property.schema.json",
+  "title": "DARE Security Property Registry entry v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id","title","category","description","applicability","supported_modes","evidence","standards"],
+  "properties": {
+    "id": {"type":"string","pattern":"^(MCP|AGENT)\\.[A-Z][A-Z0-9_.]+$"},
+    "title": {"type":"string","minLength":1},
+    "risk_family": {
+      "type":"string",
+      "enum":[
+        "AGENT_GOAL_HIJACKING",
+        "TOOL_MISUSE_EXPLOITATION",
+        "IDENTITY_PRIVILEGE_ABUSE",
+        "AGENTIC_SUPPLY_CHAIN",
+        "UNEXPECTED_CODE_EXECUTION",
+        "MEMORY_CONTEXT_POISONING",
+        "INSECURE_INTER_AGENT_COMMUNICATION",
+        "CASCADING_FAILURES",
+        "HUMAN_AGENT_TRUST_EXPLOITATION",
+        "ROGUE_AGENTS"
+      ]
+    },
+    "category": {
+      "type":"string",
+      "enum":[
+        "DISCOVERY","IDENTITY","AUTHENTICATION","AUTHORIZATION","AUTHZ_EXECUTION_INTEGRITY",
+        "CAPABILITY_EXPOSURE","CREDENTIAL_BOUNDARIES","EVIDENCE",
+        "GOAL_INTEGRITY","TOOL_SECURITY","DELEGATION","PRIVILEGE","SUPPLY_CHAIN",
+        "CODE_EXECUTION","MEMORY_CONTEXT","INTER_AGENT","FAILURE_CONTAINMENT",
+        "HUMAN_OVERSIGHT","ROGUE_BEHAVIOR"
+      ]
+    },
+    "description":{"type":"string","minLength":1},
+    "applicability": {
+      "type":"object","additionalProperties":false,"required":["predicates"],
+      "properties":{"predicates":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","enum":[
+        "tools_present","resources_present","prompts_present","transport_http","transport_stdio",
+        "authorization_present","dynamic_authorization_allowed","execution_integrity_supported","confused_deputy_supported",
+        "agent_present","memory_present","rag_present","multi_agent_present","code_execution_present",
+        "human_approval_present","delegated_identity_present","external_components_present","stateful_agent_present",
+        "runtime_dynamic_allowed"
+      ]}}}
+    },
+    "supported_modes":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","enum":["static","dynamic","passive"]}},
+    "evidence": {
+      "type":"object","additionalProperties":false,"required":["required_for_confirmed_verdict"],
+      "properties": {
+        "required_for_confirmed_verdict":{"type":"boolean"},
+        "accepted_classes":{"type":"array","uniqueItems":true,"items":{"type":"string","enum":["STATIC","PASSIVE_RUNTIME","DYNAMIC_AUTHORIZED","SYNTHETIC","POLICY","TRACE","CONFIGURATION"]}}
+      }
+    },
+    "standards":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"required":["source","reference","status"],"properties":{
+      "source":{"type":"string","minLength":1},"reference":{"type":"string","minLength":1},"status":{"type":"string","enum":["NORMATIVE","DRAFT","INFORMATIVE"]}
+    }}},
+    "maturity":{"type":"string","enum":["EXPERIMENTAL","STABLE"]}
+  },
+  "allOf": [
+    {"if":{"properties":{"id":{"pattern":"^AGENT\\."}}},"then":{"required":["risk_family","maturity"]}}
+  ]
+}
