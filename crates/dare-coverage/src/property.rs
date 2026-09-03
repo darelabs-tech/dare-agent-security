@@ -9,6 +9,8 @@ use crate::error::CoverageError;
 
 pub const PROPERTY_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/coverage/v1/property.schema.json");
+pub const PROPERTY_SCHEMA_V2_JSON: &str =
+    include_str!("../../../schemas/coverage/v2/property.schema.json");
 pub const REGISTRY_JSON: &str = include_str!("../../../schemas/coverage/v1/registry.json");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -22,6 +24,17 @@ pub enum PropertyCategory {
     CapabilityExposure,
     CredentialBoundaries,
     Evidence,
+    GoalIntegrity,
+    ToolSecurity,
+    Delegation,
+    Privilege,
+    SupplyChain,
+    CodeExecution,
+    MemoryContext,
+    InterAgent,
+    FailureContainment,
+    HumanOversight,
+    RogueBehavior,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -36,6 +49,16 @@ pub enum Predicate {
     DynamicAuthorizationAllowed,
     ExecutionIntegritySupported,
     ConfusedDeputySupported,
+    AgentPresent,
+    MemoryPresent,
+    RagPresent,
+    MultiAgentPresent,
+    CodeExecutionPresent,
+    HumanApprovalPresent,
+    DelegatedIdentityPresent,
+    ExternalComponentsPresent,
+    StatefulAgentPresent,
+    RuntimeDynamicAllowed,
 }
 
 impl Predicate {
@@ -50,6 +73,16 @@ impl Predicate {
             Self::DynamicAuthorizationAllowed => "dynamic_authorization_allowed",
             Self::ExecutionIntegritySupported => "execution_integrity_supported",
             Self::ConfusedDeputySupported => "confused_deputy_supported",
+            Self::AgentPresent => "agent_present",
+            Self::MemoryPresent => "memory_present",
+            Self::RagPresent => "rag_present",
+            Self::MultiAgentPresent => "multi_agent_present",
+            Self::CodeExecutionPresent => "code_execution_present",
+            Self::HumanApprovalPresent => "human_approval_present",
+            Self::DelegatedIdentityPresent => "delegated_identity_present",
+            Self::ExternalComponentsPresent => "external_components_present",
+            Self::StatefulAgentPresent => "stateful_agent_present",
+            Self::RuntimeDynamicAllowed => "runtime_dynamic_allowed",
         }
     }
 
@@ -63,8 +96,51 @@ impl Predicate {
                 | Self::TransportHttp
                 | Self::TransportStdio
                 | Self::AuthorizationPresent
+                | Self::AgentPresent
+                | Self::MemoryPresent
+                | Self::RagPresent
+                | Self::MultiAgentPresent
+                | Self::CodeExecutionPresent
+                | Self::HumanApprovalPresent
+                | Self::DelegatedIdentityPresent
+                | Self::ExternalComponentsPresent
+                | Self::StatefulAgentPresent
         )
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum RiskFamily {
+    AgentGoalHijacking,
+    ToolMisuseExploitation,
+    IdentityPrivilegeAbuse,
+    AgenticSupplyChain,
+    UnexpectedCodeExecution,
+    MemoryContextPoisoning,
+    InsecureInterAgentCommunication,
+    CascadingFailures,
+    HumanAgentTrustExploitation,
+    RogueAgents,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PropertyMaturity {
+    Experimental,
+    Stable,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum EvidenceClass {
+    Static,
+    PassiveRuntime,
+    DynamicAuthorized,
+    Synthetic,
+    Policy,
+    Trace,
+    Configuration,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -90,18 +166,24 @@ pub struct ApplicabilitySpec {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EvidenceSpec {
     pub required_for_confirmed_verdict: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub accepted_classes: Vec<EvidenceClass>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PropertyDefinition {
     pub id: String,
     pub title: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub risk_family: Option<RiskFamily>,
     pub category: PropertyCategory,
     pub description: String,
     pub applicability: ApplicabilitySpec,
     pub supported_modes: Vec<SupportedMode>,
     pub evidence: EvidenceSpec,
     pub standards: Vec<StandardRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub maturity: Option<PropertyMaturity>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -112,12 +194,17 @@ pub struct PropertyRegistry {
 
 pub fn property_schema_v1() -> Result<Value, CoverageError> {
     serde_json::from_str(PROPERTY_SCHEMA_V1_JSON).map_err(|_| CoverageError::Serialization {
-        kind: "property-schema",
+        kind: "property-schema-v1",
     })
 }
 
-pub fn validate_property_instance(instance: &Value) -> Result<(), CoverageError> {
-    let schema = property_schema_v1()?;
+pub fn property_schema_v2() -> Result<Value, CoverageError> {
+    serde_json::from_str(PROPERTY_SCHEMA_V2_JSON).map_err(|_| CoverageError::Serialization {
+        kind: "property-schema-v2",
+    })
+}
+
+fn validate_against_schema(instance: &Value, schema: Value) -> Result<(), CoverageError> {
     let validator = jsonschema::options()
         .should_validate_formats(true)
         .build(&schema)
@@ -135,6 +222,22 @@ pub fn validate_property_instance(instance: &Value) -> Result<(), CoverageError>
     }
 }
 
+pub fn validate_property_instance(instance: &Value) -> Result<(), CoverageError> {
+    validate_against_schema(instance, property_schema_v1()?)
+}
+
+pub fn validate_property_instance_v2(instance: &Value) -> Result<(), CoverageError> {
+    validate_against_schema(instance, property_schema_v2()?)
+}
+
+fn registry_uses_v2(value: &Value) -> bool {
+    value
+        .get("schema")
+        .and_then(|schema| schema.get("version"))
+        .and_then(Value::as_str)
+        .is_some_and(|version| version.starts_with('2'))
+}
+
 pub fn load_registry(raw: &str) -> Result<PropertyRegistry, CoverageError> {
     let value: Value = serde_json::from_str(raw).map_err(|_| CoverageError::Serialization {
         kind: "registry-parse",
@@ -143,9 +246,14 @@ pub fn load_registry(raw: &str) -> Result<PropertyRegistry, CoverageError> {
         .get("properties")
         .and_then(Value::as_array)
         .ok_or_else(|| CoverageError::schema("/properties", "missing array"))?;
+    let v2 = registry_uses_v2(&value);
     for (i, prop) in properties.iter().enumerate() {
-        validate_property_instance(prop)
-            .map_err(|err| CoverageError::schema(format!("/properties/{i}"), err.to_string()))?;
+        let result = if v2 {
+            validate_property_instance_v2(prop)
+        } else {
+            validate_property_instance(prop)
+        };
+        result.map_err(|err| CoverageError::schema(format!("/properties/{i}"), err.to_string()))?;
     }
     let registry: PropertyRegistry =
         serde_json::from_value(value).map_err(|_| CoverageError::Serialization {
@@ -165,6 +273,18 @@ pub fn validate_registry(registry: &PropertyRegistry) -> Result<(), CoverageErro
             return Err(CoverageError::schema(
                 format!("/{}/predicates", prop.id),
                 "empty predicates",
+            ));
+        }
+        if prop.id.starts_with("AGENT.") && prop.risk_family.is_none() {
+            return Err(CoverageError::schema(
+                format!("/{}/risk_family", prop.id),
+                "AGENT property requires risk_family",
+            ));
+        }
+        if prop.id.starts_with("AGENT.") && prop.maturity.is_none() {
+            return Err(CoverageError::schema(
+                format!("/{}/maturity", prop.id),
+                "AGENT property requires maturity",
             ));
         }
     }
@@ -205,5 +325,30 @@ mod tests {
         let mut value: Value = serde_json::from_str(REGISTRY_JSON).unwrap();
         value["properties"][0]["applicability"]["predicates"] = serde_json::json!(["eval(1+1)"]);
         assert!(validate_property_instance(&value["properties"][0]).is_err());
+    }
+
+    #[test]
+    fn v2_accepts_mcp_and_agent_namespaces_and_rejects_unknown_namespace() {
+        let base = serde_json::json!({
+            "id":"MCP.TEST.PROPERTY",
+            "title":"test",
+            "category":"EVIDENCE",
+            "description":"test property",
+            "applicability":{"predicates":["tools_present"]},
+            "supported_modes":["static"],
+            "evidence":{"required_for_confirmed_verdict":true},
+            "standards":[{"source":"DARE","reference":"test","status":"INFORMATIVE"}]
+        });
+        assert!(validate_property_instance_v2(&base).is_ok());
+
+        let mut agent = base.clone();
+        agent["id"] = serde_json::json!("AGENT.TEST.PROPERTY");
+        agent["risk_family"] = serde_json::json!("ROGUE_AGENTS");
+        agent["maturity"] = serde_json::json!("EXPERIMENTAL");
+        assert!(validate_property_instance_v2(&agent).is_ok());
+
+        let mut future = agent;
+        future["id"] = serde_json::json!("RAG.TEST.PROPERTY");
+        assert!(validate_property_instance_v2(&future).is_err());
     }
 }
