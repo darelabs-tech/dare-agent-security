@@ -139,7 +139,12 @@ mod tests {
         let text = serde_json::to_string(&metadata).unwrap();
         assert!(text.contains("UNASSESSED"));
         assert!(text.contains("NOT_TESTED"));
-        assert!(!text.contains("SECURE"));
+        let families = metadata["risk_family_coverage"]
+            .as_array()
+            .expect("risk family coverage");
+        assert!(families.iter().all(|family| {
+            family["assessment_state"].as_str().unwrap_or("UNKNOWN") != "SECURE"
+        }));
     }
 
     #[test]
