@@ -21,12 +21,12 @@ tasks:
   task-013: {depends_on: ["task-006", "task-009", "task-011", "task-012"]}
   task-014: {depends_on: ["task-005", "task-013"]}
   task-015: {depends_on: ["task-008", "task-013"]}
-  task-016: {depends_on: ["task-009", "task-13"]}
+  task-016: {depends_on: ["task-009", "task-013"]}
   task-017: {depends_on: ["task-013", "task-014"]}
   task-018: {depends_on: ["task-017"]}
   task-019: {depends_on: ["task-011", "task-012", "task-013"]}
   task-020: {depends_on: ["task-015", "task-016", "task-018", "task-019"]}
-  task-021: {depends_on: ["task-007", "task-009", "task-10", "task-14"]}
-  task-022: {depends_on: ["task-006", "task-10", "task-21"]}
-  task-023: {depends_on: ["task-15", "task-16", "task-18", "task-19", "task-20", "task-21", "task-22"]}
-  task-024: {depends_on: ["task-23"]}
+  task-021: {depends_on: ["task-007", "task-009", "task-010", "task-014"]}
+  task-022: {depends_on: ["task-006", "task-010", "task-021"]}
+  task-023: {depends_on: ["task-015", "task-016", "task-018", "task-019", "task-020", "task-021", "task-022"]}
+  task-024: {depends_on: ["task-023"]}
