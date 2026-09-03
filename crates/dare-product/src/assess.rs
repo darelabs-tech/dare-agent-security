@@ -155,9 +155,37 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
         }
     }
 
-    let gate = fixture
-        .gate
-        .unwrap_or_else(|| derive_gate(&findings, overall, required));
+    let agentic_without_coverage = config.assessment.profile == "agentic-security-baseline-2026"
+        && fixture.coverage_facts.is_none();
+    let gate = if agentic_without_coverage {
+        GateResult::Inconclusive
+    } else {
+        fixture
+            .gate
+            .unwrap_or_else(|| derive_gate(&findings, overall, required))
+    };
+    let summary_overall = if agentic_without_coverage {
+        0.0
+    } else {
+        fixture.overall_coverage.unwrap_or(overall)
+    };
+    let summary_required = if agentic_without_coverage {
+        0.0
+    } else {
+        fixture.required_coverage.unwrap_or(required)
+    };
+    let mut limitations = if fixture.limitations.is_empty() {
+        default_limitations(&policy)
+    } else {
+        fixture.limitations.clone()
+    };
+    if agentic_without_coverage {
+        limitations.push(
+            "Agentic profile selected without coverage facts: no Agentic security properties were tested; gate forced to INCONCLUSIVE."
+                .to_owned(),
+        );
+    }
+
     let now = OffsetDateTime::now_utc()
         .format(&Rfc3339)
         .unwrap_or_else(|_| "1970-01-01T00:00:00Z".to_owned());
@@ -171,8 +199,8 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
             profile: config.assessment.profile.clone(),
             profile_version: "1.0.0".to_owned(),
             gate,
-            overall_coverage: fixture.overall_coverage.unwrap_or(overall),
-            required_coverage: fixture.required_coverage.unwrap_or(required),
+            overall_coverage: summary_overall,
+            required_coverage: summary_required,
             severity_counts: SeverityCounts::default(),
             top_finding_ids: vec![],
             attack_path_summary: fixture
@@ -183,11 +211,7 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
                 .validation_status
                 .clone()
                 .unwrap_or(validation_status),
-            limitations: if fixture.limitations.is_empty() {
-                default_limitations(&policy)
-            } else {
-                fixture.limitations.clone()
-            },
+            limitations,
             classification: config.classification.clone(),
             privacy_mode: format!("{:?}", policy.mode).to_ascii_lowercase(),
             offline: policy.offline || policy.prohibits_egress(),
