@@ -13,6 +13,7 @@ mod plan;
 mod profile;
 mod property;
 mod report;
+mod risk_family;
 mod status;
 
 pub use agentic::{
@@ -47,6 +48,7 @@ pub use report::{
     build_report, evaluate_gate, CoverageReport, PropertyResult, REPORT_SCHEMA_V1_ID,
     REPORT_SCHEMA_V1_JSON,
 };
+pub use risk_family::{derive_risk_family_coverage, RiskFamilyCoverage};
 pub use status::CoverageStatus;
 
 pub const CRATE_NAME: &str = "dare-coverage";
