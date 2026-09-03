@@ -2,13 +2,14 @@
 
 use crate::error::{ProductError, Result};
 use crate::redaction::{escape_html, redact_product_text};
-use crate::report::{document_shell, finalize_html, vm_title};
+use crate::report::{agentic_report_section, document_shell, finalize_html, vm_title};
 use crate::view_model::{GateResult, ProductViewModel};
 
 pub fn render_executive_html(vm: &ProductViewModel) -> Result<String> {
     let banner = vm.summary.classification.banner_text();
     let title = vm_title(vm, "Executive Report");
     let gate = format!("{:?}", vm.summary.gate);
+    let agentic = agentic_report_section(vm, false).map_err(ProductError::internal)?;
     let limitations = vm
         .summary
         .limitations
@@ -54,6 +55,7 @@ pub fn render_executive_html(vm: &ProductViewModel) -> Result<String> {
 <h2>Assessment Coverage</h2>
 <p>Overall coverage: <strong>{overall:.0}%</strong>. Required coverage: <strong>{required:.0}%</strong>.</p>
 </section>
+{agentic}
 <section>
 <h2>Gate Result</h2>
 <p><strong>{gate}</strong> — {gate_note}</p>
@@ -96,6 +98,7 @@ pub fn render_executive_html(vm: &ProductViewModel) -> Result<String> {
         offline = vm.summary.offline,
         overall = vm.summary.overall_coverage * 100.0,
         required = vm.summary.required_coverage * 100.0,
+        agentic = agentic,
         gate = escape_html(&gate),
         gate_note = gate_note,
         c = vm.summary.severity_counts.critical,
