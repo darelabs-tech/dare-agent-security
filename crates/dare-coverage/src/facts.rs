@@ -21,19 +21,31 @@ pub struct AssessmentFacts {
     pub execution_integrity_supported: bool,
     pub confused_deputy_supported: bool,
     #[serde(default)]
+    pub agent_present: bool,
+    #[serde(default)]
+    pub memory_present: bool,
+    #[serde(default)]
+    pub rag_present: bool,
+    #[serde(default)]
+    pub multi_agent_present: bool,
+    #[serde(default)]
+    pub code_execution_present: bool,
+    #[serde(default)]
+    pub human_approval_present: bool,
+    #[serde(default)]
+    pub delegated_identity_present: bool,
+    #[serde(default)]
+    pub external_components_present: bool,
+    #[serde(default)]
+    pub stateful_agent_present: bool,
+    #[serde(default)]
+    pub runtime_dynamic_allowed: bool,
+    #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }
 
 impl AssessmentFacts {
-    pub fn tools_present(&self) -> bool {
-        self.tools_count > 0
-    }
-
-    pub fn resources_present(&self) -> bool {
-        self.resources_count > 0
-    }
-
-    pub fn prompts_present(&self) -> bool {
-        self.prompts_count > 0
-    }
+    pub fn tools_present(&self) -> bool { self.tools_count > 0 }
+    pub fn resources_present(&self) -> bool { self.resources_count > 0 }
+    pub fn prompts_present(&self) -> bool { self.prompts_count > 0 }
 }
