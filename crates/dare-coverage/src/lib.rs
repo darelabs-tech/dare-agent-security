@@ -1,7 +1,8 @@
-//! Assessment profiles and deterministic coverage engine (Cycle 006).
+//! Assessment profiles and deterministic coverage engine (Cycle 006+).
 //!
 //! Reuses Cycle 001 `Verdict`. Does not define a second evidence or CI-result model.
 
+mod agentic;
 mod applicability;
 mod correlate;
 mod cycle005;
@@ -14,10 +15,15 @@ mod property;
 mod report;
 mod status;
 
+pub use agentic::{
+    load_mcp_crosswalk, load_provenance, validate_agentic_assets,
+    validate_agentic_registry_provenance, validate_mcp_crosswalk, validate_provenance,
+    McpCrosswalk, McpCrosswalkEntry, ProvenanceManifest, ProvenanceSource, RiskFamilyProvenance,
+    AGENTIC_PROVENANCE_JSON, MCP_AGENTIC_CROSSWALK_JSON,
+};
 pub use applicability::{evaluate_applicability, ApplicabilityDecision};
 pub use correlate::{correlate, CorrelatedRow, EvidenceRef, PropertyExecution};
 pub use cycle005::{load_scenario_property_map, map_corpus, ScenarioMapping, LAB_SCENARIO_IDS};
-
 pub use error::CoverageError;
 pub use facts::{AssessmentFacts, TransportKind};
 pub use math::{
@@ -26,13 +32,15 @@ pub use math::{
 };
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
-    builtin_profile, load_profile, load_profile_file, profile_digest_sha256, resolve_profile,
-    validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel, PROFILE_SCHEMA_V1_ID,
-    PROFILE_SCHEMA_V1_JSON,
+    agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
+    resolve_profile, validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel,
+    AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
 };
 pub use property::{
-    builtin_registry, load_registry, Predicate, PropertyCategory, PropertyDefinition,
-    PropertyRegistry, StandardRef, SupportedMode, PROPERTY_SCHEMA_V1_JSON, REGISTRY_JSON,
+    agentic_registry, builtin_registry, load_registry, EvidenceClass, Predicate, PropertyCategory,
+    PropertyDefinition, PropertyMaturity, PropertyRegistry, RiskFamily, StandardRef, SupportedMode,
+    AGENTIC_REGISTRY_JSON, PROPERTY_SCHEMA_V1_JSON, PROPERTY_SCHEMA_V2_JSON, REGISTRY_JSON,
+    REGISTRY_SCHEMA_V2_JSON,
 };
 pub use report::{
     build_report, evaluate_gate, CoverageReport, PropertyResult, REPORT_SCHEMA_V1_ID,
@@ -41,6 +49,16 @@ pub use report::{
 pub use status::CoverageStatus;
 
 pub const CRATE_NAME: &str = "dare-coverage";
+
+pub fn registry_for_profile(profile: &AssessmentProfile) -> Result<PropertyRegistry, CoverageError> {
+    if profile.id == "agentic-security-baseline-2026"
+        || profile.properties.iter().any(|entry| entry.id.starts_with("AGENT."))
+    {
+        agentic_registry()
+    } else {
+        builtin_registry()
+    }
+}
 
 /// Plan → correlate → report (security analyzers remain outside this crate).
 pub fn run_assessment(
@@ -57,9 +75,19 @@ pub fn run_assessment(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn crate_identity() {
         assert_eq!(env!("CARGO_PKG_NAME"), super::CRATE_NAME);
         assert_eq!(env!("CARGO_PKG_LICENSE"), "Apache-2.0");
+    }
+
+    #[test]
+    fn registry_selection_is_profile_aware() {
+        let mcp = builtin_profile().unwrap();
+        assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
+        let agentic = agentic_profile().unwrap();
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 20);
     }
 }
