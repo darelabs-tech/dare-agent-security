@@ -1,13 +1,10 @@
 use std::fs;
 
-use dare_product::{run_assessment, AssessOptions};
+use dare_product::{run_assessment, AssessOptions, GateResult};
 
-#[test]
-fn agentic_assessment_preserves_confidential_offline_guarantees() {
-    let dir = tempfile::tempdir().expect("tempdir");
-
+fn write_agentic_config(root: &std::path::Path) {
     fs::write(
-        dir.path().join("dare-security.json"),
+        root.join("dare-security.json"),
         serde_json::to_vec_pretty(&serde_json::json!({
             "version": "1",
             "project": {"name": "agentic-offline-demo"},
@@ -29,6 +26,12 @@ fn agentic_assessment_preserves_confidential_offline_guarantees() {
         .expect("config json"),
     )
     .expect("write config");
+}
+
+#[test]
+fn agentic_assessment_preserves_confidential_offline_guarantees() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    write_agentic_config(dir.path());
 
     fs::write(
         dir.path().join("assessment-fixture.json"),
@@ -96,4 +99,33 @@ fn agentic_assessment_preserves_confidential_offline_guarantees() {
     assert_eq!(privacy["telemetry"], false);
     assert_eq!(privacy["egress_denied"], true);
     assert_eq!(privacy["offline"], true);
+}
+
+#[test]
+fn agentic_profile_without_coverage_facts_is_inconclusive_not_pass() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    write_agentic_config(dir.path());
+
+    let outcome = run_assessment(&AssessOptions {
+        target: dir.path().to_path_buf(),
+        config_path: None,
+        confidential: true,
+        offline: true,
+        run_id: Some("run-agentic-no-facts".to_owned()),
+    })
+    .expect("Agentic assessment without facts");
+
+    assert_eq!(outcome.gate, GateResult::Inconclusive);
+    assert_eq!(outcome.view_model.summary.overall_coverage, 0.0);
+    assert!(outcome
+        .view_model
+        .summary
+        .limitations
+        .iter()
+        .any(|item| item.contains("no Agentic security properties were tested")));
+
+    let executive = fs::read_to_string(outcome.run_dir.join("reports/executive.html"))
+        .expect("executive report");
+    assert!(executive.contains("INCONCLUSIVE") || executive.contains("Inconclusive"));
+    assert!(executive.contains("UNASSESSED"));
 }
