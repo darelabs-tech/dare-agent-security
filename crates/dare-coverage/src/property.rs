@@ -11,7 +11,11 @@ pub const PROPERTY_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/coverage/v1/property.schema.json");
 pub const PROPERTY_SCHEMA_V2_JSON: &str =
     include_str!("../../../schemas/coverage/v2/property.schema.json");
+pub const REGISTRY_SCHEMA_V2_JSON: &str =
+    include_str!("../../../schemas/coverage/v2/registry.schema.json");
 pub const REGISTRY_JSON: &str = include_str!("../../../schemas/coverage/v1/registry.json");
+pub const AGENTIC_REGISTRY_JSON: &str =
+    include_str!("../../../schemas/coverage/v2/registry.json");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -109,7 +113,7 @@ impl Predicate {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RiskFamily {
     AgentGoalHijacking,
@@ -152,6 +156,7 @@ pub enum SupportedMode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StandardRef {
     pub source: String,
     pub reference: String,
@@ -159,11 +164,13 @@ pub struct StandardRef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ApplicabilitySpec {
     pub predicates: Vec<Predicate>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EvidenceSpec {
     pub required_for_confirmed_verdict: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -171,6 +178,7 @@ pub struct EvidenceSpec {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PropertyDefinition {
     pub id: String,
     pub title: String,
@@ -187,6 +195,7 @@ pub struct PropertyDefinition {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PropertyRegistry {
     pub schema: crate::profile::SchemaRef,
     pub properties: Vec<PropertyDefinition>,
@@ -204,6 +213,12 @@ pub fn property_schema_v2() -> Result<Value, CoverageError> {
     })
 }
 
+pub fn registry_schema_v2() -> Result<Value, CoverageError> {
+    serde_json::from_str(REGISTRY_SCHEMA_V2_JSON).map_err(|_| CoverageError::Serialization {
+        kind: "registry-schema-v2",
+    })
+}
+
 fn validate_against_schema(instance: &Value, schema: Value) -> Result<(), CoverageError> {
     let validator = jsonschema::options()
         .should_validate_formats(true)
@@ -218,7 +233,7 @@ fn validate_against_schema(instance: &Value, schema: Value) -> Result<(), Covera
             err.instance_path().to_string(),
             err.to_string(),
         )),
-        None => Err(CoverageError::schema("/", "property failed schema")),
+        None => Err(CoverageError::schema("/", "instance failed schema")),
     }
 }
 
@@ -230,28 +245,43 @@ pub fn validate_property_instance_v2(instance: &Value) -> Result<(), CoverageErr
     validate_against_schema(instance, property_schema_v2()?)
 }
 
-fn registry_uses_v2(value: &Value) -> bool {
-    value
+fn registry_major(value: &Value) -> Result<u64, CoverageError> {
+    let version = value
         .get("schema")
         .and_then(|schema| schema.get("version"))
         .and_then(Value::as_str)
-        .is_some_and(|version| version.starts_with('2'))
+        .ok_or_else(|| CoverageError::schema("/schema/version", "missing registry version"))?;
+    let major = version
+        .split('.')
+        .next()
+        .and_then(|part| part.parse::<u64>().ok())
+        .ok_or_else(|| CoverageError::schema("/schema/version", "invalid registry version"))?;
+    match major {
+        1 | 2 => Ok(major),
+        _ => Err(CoverageError::schema(
+            "/schema/version",
+            format!("unsupported registry schema major {major}"),
+        )),
+    }
 }
 
 pub fn load_registry(raw: &str) -> Result<PropertyRegistry, CoverageError> {
     let value: Value = serde_json::from_str(raw).map_err(|_| CoverageError::Serialization {
         kind: "registry-parse",
     })?;
+    let major = registry_major(&value)?;
+    if major == 2 {
+        validate_against_schema(&value, registry_schema_v2()?)?;
+    }
     let properties = value
         .get("properties")
         .and_then(Value::as_array)
         .ok_or_else(|| CoverageError::schema("/properties", "missing array"))?;
-    let v2 = registry_uses_v2(&value);
     for (i, prop) in properties.iter().enumerate() {
-        let result = if v2 {
-            validate_property_instance_v2(prop)
-        } else {
-            validate_property_instance(prop)
+        let result = match major {
+            1 => validate_property_instance(prop),
+            2 => validate_property_instance_v2(prop),
+            _ => unreachable!("registry_major rejects unsupported major"),
         };
         result.map_err(|err| CoverageError::schema(format!("/properties/{i}"), err.to_string()))?;
     }
@@ -287,12 +317,22 @@ pub fn validate_registry(registry: &PropertyRegistry) -> Result<(), CoverageErro
                 "AGENT property requires maturity",
             ));
         }
+        if prop.evidence.required_for_confirmed_verdict && prop.standards.is_empty() {
+            return Err(CoverageError::schema(
+                format!("/{}/standards", prop.id),
+                "evidence-backed property requires standards provenance",
+            ));
+        }
     }
     Ok(())
 }
 
 pub fn builtin_registry() -> Result<PropertyRegistry, CoverageError> {
     load_registry(REGISTRY_JSON)
+}
+
+pub fn agentic_registry() -> Result<PropertyRegistry, CoverageError> {
+    load_registry(AGENTIC_REGISTRY_JSON)
 }
 
 impl PropertyRegistry {
@@ -318,6 +358,20 @@ mod tests {
             .get("MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME")
             .is_some());
         assert_eq!(registry.properties.len(), 10);
+    }
+
+    #[test]
+    fn agentic_registry_loads_and_all_families_are_represented() {
+        let registry = agentic_registry().expect("agentic registry");
+        assert_eq!(registry.properties.len(), 20);
+        let families: HashSet<_> = registry
+            .properties
+            .iter()
+            .filter_map(|property| property.risk_family)
+            .collect();
+        assert_eq!(families.len(), 10);
+        assert!(registry.get("AGENT.GOAL.INSTRUCTION_INTEGRITY").is_some());
+        assert!(registry.get("AGENT.ROGUE.CAPABILITY_DRIFT").is_some());
     }
 
     #[test]
@@ -350,5 +404,11 @@ mod tests {
         let mut future = agent;
         future["id"] = serde_json::json!("RAG.TEST.PROPERTY");
         assert!(validate_property_instance_v2(&future).is_err());
+    }
+
+    #[test]
+    fn unknown_registry_major_fails_closed() {
+        let raw = r#"{"schema":{"id":"x","version":"3.0.0"},"properties":[]}"#;
+        assert!(load_registry(raw).is_err());
     }
 }
