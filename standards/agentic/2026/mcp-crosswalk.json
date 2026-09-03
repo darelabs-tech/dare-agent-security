@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "mappings": [
+    {"mcp_property":"MCP.DISCOVERY.PASSIVE_BOUNDARY","risk_families":[],"note":"Foundational discovery safety; no forced OWASP Agentic family equivalence."},
+    {"mcp_property":"MCP.DISCOVERY.EXPLICIT_TARGET","risk_families":[],"note":"Scope/discovery invariant retained independently of the Agentic risk taxonomy."},
+    {"mcp_property":"MCP.AUTHZ.PER_OPERATION","risk_families":["IDENTITY_PRIVILEGE_ABUSE","TOOL_MISUSE_EXPLOITATION"],"note":"Per-operation authorization supports identity/privilege and tool-boundary controls."},
+    {"mcp_property":"MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME","risk_families":["TOOL_MISUSE_EXPLOITATION"],"note":"Authorized tool identity must bind to executed tool identity."},
+    {"mcp_property":"MCP.AUTHZ.EXECUTION_INTEGRITY.ARGUMENTS","risk_families":["TOOL_MISUSE_EXPLOITATION"],"note":"Authorized arguments must bind to execution arguments."},
+    {"mcp_property":"MCP.AUTHZ.EXECUTION_INTEGRITY.CONTEXT","risk_families":["IDENTITY_PRIVILEGE_ABUSE","TOOL_MISUSE_EXPLOITATION"],"note":"Trusted authorization context must survive the authorization-to-execution boundary."},
+    {"mcp_property":"MCP.EVIDENCE.REDACTION","risk_families":[],"note":"Evidence hygiene remains cross-cutting and is not reclassified as a single Agentic risk family."},
+    {"mcp_property":"MCP.IDENTITY.CONFUSED_DEPUTY","risk_families":["IDENTITY_PRIVILEGE_ABUSE"],"note":"Confused-deputy behavior is directly relevant to delegated identity and privilege abuse."},
+    {"mcp_property":"MCP.DISCOVERY.STREAMABLE_HTTP","risk_families":[],"note":"Transport-specific applicability remains MCP-specific."},
+    {"mcp_property":"MCP.AUTHZ.DYNAMIC_VALIDATION","risk_families":["IDENTITY_PRIVILEGE_ABUSE","ROGUE_AGENTS"],"note":"Runtime re-evaluation constrains privilege drift and policy bypass."}
+  ]
+}
