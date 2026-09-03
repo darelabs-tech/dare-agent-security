@@ -6,6 +6,7 @@ use std::path::{Component, Path, PathBuf};
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 
+use crate::agentic_metadata::build_agentic_metadata;
 use crate::error::{ProductError, Result};
 use crate::redaction::assert_no_secrets;
 use crate::view_model::ProductViewModel;
@@ -21,6 +22,7 @@ pub struct RunArtifactPaths {
     pub attack_graph: PathBuf,
     pub validation: PathBuf,
     pub drift: PathBuf,
+    pub agentic_metadata: PathBuf,
     pub evidence_dir: PathBuf,
     pub executive_html: PathBuf,
     pub technical_html: PathBuf,
@@ -37,6 +39,7 @@ impl RunArtifactPaths {
             attack_graph: run_dir.join("attack-graph.json"),
             validation: run_dir.join("validation.json"),
             drift: run_dir.join("drift.json"),
+            agentic_metadata: run_dir.join("agentic-metadata.json"),
             evidence_dir: run_dir.join("evidence"),
             executive_html: run_dir.join("reports").join("executive.html"),
             technical_html: run_dir.join("reports").join("technical.html"),
@@ -106,6 +109,9 @@ pub fn write_view_model(paths: &RunArtifactPaths, vm: &ProductViewModel) -> Resu
     write_json(&paths.attack_graph, &vm.attack_graph)?;
     write_json(&paths.validation, &vm.validation)?;
     write_json(&paths.drift, &vm.drift)?;
+    if let Some(metadata) = build_agentic_metadata(vm)? {
+        write_json(&paths.agentic_metadata, &metadata)?;
+    }
     Ok(())
 }
 
