@@ -5,8 +5,8 @@ use std::path::PathBuf;
 
 use clap::Args;
 use dare_coverage::{
-    builtin_registry, resolve_profile, run_assessment, AssessmentFacts, CoveragePolicy,
-    PropertyExecution,
+    derive_risk_family_coverage, registry_for_profile, resolve_profile, run_assessment,
+    AssessmentFacts, CoveragePolicy, PropertyExecution,
 };
 use dare_mcp_discovery::sanitize_stream;
 
@@ -15,7 +15,7 @@ use crate::exit_code::{PARTIAL, SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
 
 #[derive(Debug, Args)]
 pub struct CoverageArgs {
-    /// Built-in profile id (`mcp-security-baseline`) or a profile JSON path.
+    /// Built-in profile id (`mcp-security-baseline` or `agentic-security-baseline-2026`) or a profile JSON path.
     #[arg(long, value_name = "ID-OR-PATH")]
     pub profile: String,
 
@@ -60,7 +60,7 @@ fn run_coverage_inner(args: CoverageArgs) -> Result<i32, String> {
         return Err("usage: min-required-coverage must be between 0 and 1".to_owned());
     }
     let profile = resolve_profile(&args.profile).map_err(|e| e.to_string())?;
-    let registry = builtin_registry().map_err(|e| e.to_string())?;
+    let registry = registry_for_profile(&profile).map_err(|e| e.to_string())?;
     let facts_raw = fs::read_to_string(&args.facts).map_err(|e| e.to_string())?;
     let facts: AssessmentFacts =
         serde_json::from_str(facts_raw.strip_prefix('\u{feff}').unwrap_or(&facts_raw))
@@ -91,6 +91,16 @@ fn run_coverage_inner(args: CoverageArgs) -> Result<i32, String> {
         let report_path = output_dir.join("coverage-report.json");
         let bytes = serde_json::to_vec_pretty(&report).map_err(|e| e.to_string())?;
         fs::write(&report_path, bytes).map_err(|e| e.to_string())?;
+
+        if profile.id == "agentic-security-baseline-2026"
+            || profile.properties.iter().any(|entry| entry.id.starts_with("AGENT."))
+        {
+            let family_view = derive_risk_family_coverage(&report, &registry);
+            let family_bytes = serde_json::to_vec_pretty(&family_view).map_err(|e| e.to_string())?;
+            fs::write(output_dir.join("risk-family-coverage.json"), family_bytes)
+                .map_err(|e| e.to_string())?;
+        }
+
         let appendix = report.summary_markdown();
         assert_summary_secret_safe(&appendix)?;
         let summary_path = output_dir.join("summary.md");
@@ -143,9 +153,48 @@ mod tests {
         });
         assert_eq!(code, SUCCESS);
         assert!(out.join("coverage-report.json").is_file());
+        assert!(!out.join("risk-family-coverage.json").exists());
         let summary = fs::read_to_string(out.join("summary.md")).unwrap();
         assert!(summary.contains("mcp-security-baseline"));
         assert!(!summary.contains("Bearer "));
+    }
+
+    #[test]
+    fn agentic_coverage_cli_selects_builtin_registry_and_writes_family_view() {
+        let dir = tempfile::tempdir().unwrap();
+        let facts = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../fixtures/coverage/agentic-all-capabilities.json");
+        let out = dir.path().join("out");
+        let code = run_coverage(CoverageArgs {
+            profile: "agentic-security-baseline-2026".to_owned(),
+            facts,
+            executions: None,
+            output_dir: Some(out.clone()),
+            min_required_coverage: 0.0,
+            fail_on_required_blocked: false,
+            json: false,
+        });
+        assert_eq!(code, SUCCESS);
+        assert!(out.join("coverage-report.json").is_file());
+        assert!(out.join("risk-family-coverage.json").is_file());
+        let family = fs::read_to_string(out.join("risk-family-coverage.json")).unwrap();
+        assert!(family.contains("AGENT_GOAL_HIJACKING"));
+        assert!(family.contains("UNASSESSED"));
+        assert!(!family.contains("SECURE"));
+    }
+
+    #[test]
+    fn unknown_builtin_profile_preserves_unsupported_exit_semantics() {
+        let code = run_coverage(CoverageArgs {
+            profile: "not-a-real-profile".to_owned(),
+            facts: PathBuf::from("unused.json"),
+            executions: None,
+            output_dir: None,
+            min_required_coverage: 0.0,
+            fail_on_required_blocked: false,
+            json: false,
+        });
+        assert_eq!(code, UNSUPPORTED_TARGET);
     }
 
     #[test]
