@@ -1,0 +1,96 @@
+{
+  "property_cases": [
+    {
+      "name": "unknown_namespace",
+      "instance": {
+        "id": "RAG.INJECTED.PROPERTY",
+        "title": "Injected",
+        "risk_family": "ROGUE_AGENTS",
+        "category": "ROGUE_BEHAVIOR",
+        "description": "must fail",
+        "applicability": {"predicates": ["agent_present"]},
+        "supported_modes": ["static"],
+        "evidence": {"required_for_confirmed_verdict": true},
+        "standards": [{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],
+        "maturity": "EXPERIMENTAL"
+      }
+    },
+    {
+      "name": "unknown_category",
+      "instance": {
+        "id": "AGENT.INJECTED.CATEGORY",
+        "title": "Injected",
+        "risk_family": "ROGUE_AGENTS",
+        "category": "EVAL_SHELL",
+        "description": "must fail",
+        "applicability": {"predicates": ["agent_present"]},
+        "supported_modes": ["static"],
+        "evidence": {"required_for_confirmed_verdict": true},
+        "standards": [{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],
+        "maturity": "EXPERIMENTAL"
+      }
+    },
+    {
+      "name": "executable_predicate",
+      "instance": {
+        "id": "AGENT.INJECTED.PREDICATE",
+        "title": "Injected",
+        "risk_family": "ROGUE_AGENTS",
+        "category": "ROGUE_BEHAVIOR",
+        "description": "must fail",
+        "applicability": {"predicates": ["eval(shell())"]},
+        "supported_modes": ["static"],
+        "evidence": {"required_for_confirmed_verdict": true},
+        "standards": [{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],
+        "maturity": "EXPERIMENTAL"
+      }
+    },
+    {
+      "name": "spoofed_risk_family",
+      "instance": {
+        "id": "AGENT.INJECTED.FAMILY",
+        "title": "Injected",
+        "risk_family": "ROGUE_AGENT_SUPERUSER",
+        "category": "ROGUE_BEHAVIOR",
+        "description": "must fail",
+        "applicability": {"predicates": ["agent_present"]},
+        "supported_modes": ["static"],
+        "evidence": {"required_for_confirmed_verdict": true},
+        "standards": [{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],
+        "maturity": "EXPERIMENTAL"
+      }
+    },
+    {
+      "name": "unknown_field_injection",
+      "instance": {
+        "id": "AGENT.INJECTED.FIELD",
+        "title": "Injected",
+        "risk_family": "ROGUE_AGENTS",
+        "category": "ROGUE_BEHAVIOR",
+        "description": "must fail",
+        "applicability": {"predicates": ["agent_present"]},
+        "supported_modes": ["static"],
+        "evidence": {"required_for_confirmed_verdict": true},
+        "standards": [{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],
+        "maturity": "EXPERIMENTAL",
+        "script": "rm -rf /"
+      }
+    }
+  ],
+  "registry_cases": [
+    {
+      "name": "unknown_schema_major",
+      "registry": {"schema":{"id":"x","version":"3.0.0"},"properties":[]}
+    },
+    {
+      "name": "duplicate_ids",
+      "registry": {
+        "schema":{"id":"https://darelabs.tech/schemas/coverage/v2/registry.json","version":"2.0.0"},
+        "properties":[
+          {"id":"AGENT.DUPLICATE.TEST","title":"a","risk_family":"ROGUE_AGENTS","category":"ROGUE_BEHAVIOR","description":"a","applicability":{"predicates":["agent_present"]},"supported_modes":["static"],"evidence":{"required_for_confirmed_verdict":true},"standards":[{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],"maturity":"EXPERIMENTAL"},
+          {"id":"AGENT.DUPLICATE.TEST","title":"b","risk_family":"ROGUE_AGENTS","category":"ROGUE_BEHAVIOR","description":"b","applicability":{"predicates":["agent_present"]},"supported_modes":["static"],"evidence":{"required_for_confirmed_verdict":true},"standards":[{"source":"OWASP_AGENTIC_TOP10_2026","reference":"ASI10","status":"NORMATIVE"}],"maturity":"EXPERIMENTAL"}
+        ]
+      }
+    }
+  ]
+}
