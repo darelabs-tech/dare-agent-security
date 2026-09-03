@@ -1,7 +1,7 @@
 # Cycle 012 - Blueprint
 
-**Status:** ARCHITECTURE PROPOSED  
-**Approval:** PENDING
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-03
 
 ## 1. Architecture intent
 
