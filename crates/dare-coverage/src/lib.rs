@@ -37,8 +37,9 @@ pub use profile::{
     AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
 };
 pub use property::{
-    agentic_registry, builtin_registry, load_registry, EvidenceClass, Predicate, PropertyCategory,
-    PropertyDefinition, PropertyMaturity, PropertyRegistry, RiskFamily, StandardRef, SupportedMode,
+    agentic_registry, builtin_registry, load_registry, validate_property_instance,
+    validate_property_instance_v2, EvidenceClass, Predicate, PropertyCategory, PropertyDefinition,
+    PropertyMaturity, PropertyRegistry, RiskFamily, StandardRef, SupportedMode,
     AGENTIC_REGISTRY_JSON, PROPERTY_SCHEMA_V1_JSON, PROPERTY_SCHEMA_V2_JSON, REGISTRY_JSON,
     REGISTRY_SCHEMA_V2_JSON,
 };
