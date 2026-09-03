@@ -39,11 +39,11 @@ fn agentic_baseline_is_consumable_by_existing_coverage_engine() {
     let report = run_assessment(&profile, &registry, &facts, &[], CoveragePolicy::default())
         .expect("coverage report");
 
-    assert_eq!(report.profile_id, "agentic-security-baseline-2026");
+    assert_eq!(report.profile.id, "agentic-security-baseline-2026");
     assert_eq!(report.properties.len(), 10);
     assert!(report.properties.iter().all(|row| {
         matches!(
-            row.status,
+            row.coverage_status,
             dare_coverage::CoverageStatus::NotTested
                 | dare_coverage::CoverageStatus::Blocked
                 | dare_coverage::CoverageStatus::NotApplicable
