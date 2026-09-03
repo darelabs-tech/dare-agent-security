@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "retrieved_at": "2026-09-03",
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026",
+      "title": "OWASP Top 10 for Agentic Applications for 2026",
+      "version": "2026",
+      "published_at": "2025-12-09",
+      "canonical_reference": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "status": "NORMATIVE",
+      "mapping_notes": "Primary risk-family taxonomy for Cycle 012. Property mappings are narrower security invariants and do not imply one-to-one normative equivalence."
+    },
+    {
+      "id": "OWASP_AGENT_CONTROL_STANDARD",
+      "title": "Agent Control Standard (ACS)",
+      "version": "2026-09-01",
+      "published_at": "2026-09-01",
+      "canonical_reference": "https://genai.owasp.org/resource/agent-control-standard-acs/",
+      "status": "DRAFT",
+      "mapping_notes": "Control-oriented reference for inspectability, traceability, middleware hooks and runtime policy enforcement. Cycle 012 records provenance only and does not implement runtime enforcement."
+    },
+    {
+      "id": "DARE_CYCLE_012",
+      "title": "DARE Agent Security Cycle 012 Registry Contract",
+      "version": "1.0.0",
+      "published_at": "2026-09-03",
+      "canonical_reference": "DARE/cycles/012-owasp-agentic-security-registry-2026/DESIGN.md",
+      "status": "INFORMATIVE",
+      "mapping_notes": "Local project-level contract used to bind external standards references to deterministic, evidence-aware DARE security properties."
+    }
+  ],
+  "risk_families": [
+    {"id":"AGENT_GOAL_HIJACKING","owasp_id":"ASI01","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"TOOL_MISUSE_EXPLOITATION","owasp_id":"ASI02","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"IDENTITY_PRIVILEGE_ABUSE","owasp_id":"ASI03","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"AGENTIC_SUPPLY_CHAIN","owasp_id":"ASI04","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"UNEXPECTED_CODE_EXECUTION","owasp_id":"ASI05","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"MEMORY_CONTEXT_POISONING","owasp_id":"ASI06","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"INSECURE_INTER_AGENT_COMMUNICATION","owasp_id":"ASI07","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"CASCADING_FAILURES","owasp_id":"ASI08","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"HUMAN_AGENT_TRUST_EXPLOITATION","owasp_id":"ASI09","source":"OWASP_AGENTIC_TOP10_2026"},
+    {"id":"ROGUE_AGENTS","owasp_id":"ASI10","source":"OWASP_AGENTIC_TOP10_2026"}
+  ]
+}
