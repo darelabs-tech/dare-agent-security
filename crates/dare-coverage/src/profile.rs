@@ -131,7 +131,14 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
     match spec {
         "mcp-security-baseline" => builtin_profile(),
         "agentic-security-baseline-2026" => agentic_profile(),
-        _ => load_profile_file(PathBuf::from(spec)),
+        _ => {
+            let path = PathBuf::from(spec);
+            if path.extension().is_some() || path.components().count() > 1 {
+                load_profile_file(path)
+            } else {
+                Err(CoverageError::UnknownProfile(spec.to_owned()))
+            }
+        }
     }
 }
 
@@ -168,6 +175,14 @@ mod tests {
         validate_profile(&profile, &registry).expect("valid");
         assert_eq!(profile.id, "agentic-security-baseline-2026");
         assert_eq!(profile.properties.len(), 10);
+    }
+
+    #[test]
+    fn unknown_builtin_profile_is_rejected_clearly() {
+        assert!(matches!(
+            resolve_profile("not-a-real-profile"),
+            Err(CoverageError::UnknownProfile(_))
+        ));
     }
 
     #[test]
