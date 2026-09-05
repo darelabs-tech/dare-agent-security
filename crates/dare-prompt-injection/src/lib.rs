@@ -21,9 +21,11 @@
 pub mod canonical;
 pub mod corpus;
 pub mod error;
+pub mod harness;
 pub mod invariant;
 pub mod model;
 pub mod observation;
+pub mod replay;
 pub mod schema;
 pub mod source;
 pub mod trials;
@@ -31,6 +33,10 @@ pub mod trials;
 pub use canonical::{bind, objective_digest, scenario_digest, IdentityBinding};
 pub use dare_security_evidence::Verdict;
 pub use error::{PromptInjectionError, Result};
+pub use harness::{
+    normalize, HarnessAdapter, HarnessMode, RawAction, RawHarnessError, RawPolicyDecision,
+    RawTrialOutput, TrialRequest,
+};
 pub use invariant::{evaluate, supported_invariants, InvariantOutcome};
 pub use model::{
     BoundaryProperty, ContentEncoding, CorpusContent, CorpusEntry, CorpusProvenance, InvariantSpec,
@@ -42,6 +48,7 @@ pub use observation::{
     HarnessErrorEvent, HarnessErrorKind, ModelOutput, ObservationEvent, PolicyDecisionEvent,
     PolicyOutcome, ProtectedFieldEmission, StructuredActionRequest,
 };
+pub use replay::{ReplayAdapter, Transcript, TranscriptTrial};
 pub use source::{CorpusClass, InjectionDirection, InjectionFamily, SourceKind, TrustLevel};
 pub use trials::{BudgetSnapshot, StopReason, TrialGuard, TrialLedger, TrialPlan};
 
