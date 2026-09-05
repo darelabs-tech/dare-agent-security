@@ -33,6 +33,6 @@
 - [x] task-028 — Document operator safe-use semantics and limitations
 - [x] task-029 — Document contributor corpus/property/evaluator extension process
 - [x] task-030 — Run complete workspace, Cycle 013, Agentic and MCP compatibility regression
-- [ ] task-031 — Final DARE proof and Cycle 014 completion gate
+- [x] task-031 — Final DARE proof and Cycle 014 completion gate
 
 Execution order and dependencies are authoritative in `dare-dag.exec.yaml`. Each task must read its `EXECUTION/task-NNN.md` before implementation.
