@@ -17,6 +17,8 @@ pub const PROFILE_SCHEMA_V1_JSON: &str =
 pub const BUILTIN_PROFILE_JSON: &str = include_str!("../../../profiles/mcp-security-baseline.json");
 pub const AGENTIC_PROFILE_JSON: &str =
     include_str!("../../../profiles/agentic-security-baseline-2026.json");
+pub const PROMPT_INJECTION_PROFILE_JSON: &str =
+    include_str!("../../../profiles/prompt-injection-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -118,6 +120,14 @@ pub fn agentic_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(AGENTIC_PROFILE_JSON)
 }
 
+/// Cycle 013 prompt-injection baseline.
+///
+/// Additive: it selects three `AGENT.GOAL.*` properties from the same v2
+/// registry and does not alter the Cycle 012 baseline or its denominator.
+pub fn prompt_injection_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(PROMPT_INJECTION_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -131,6 +141,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
     match spec {
         "mcp-security-baseline" => builtin_profile(),
         "agentic-security-baseline-2026" => agentic_profile(),
+        "prompt-injection-baseline-2026" => prompt_injection_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {
@@ -175,6 +186,49 @@ mod tests {
         validate_profile(&profile, &registry).expect("valid");
         assert_eq!(profile.id, "agentic-security-baseline-2026");
         assert_eq!(profile.properties.len(), 10);
+    }
+
+    #[test]
+    fn prompt_injection_profile_validates_against_the_agentic_registry() {
+        let profile = prompt_injection_profile().expect("profile");
+        let registry = agentic_registry().expect("registry");
+        validate_profile(&profile, &registry).expect("valid");
+        assert_eq!(profile.id, "prompt-injection-baseline-2026");
+        assert_eq!(profile.properties.len(), 3);
+
+        // Requirement levels exactly as approved.
+        let levels: Vec<(&str, RequirementLevel)> = profile
+            .properties
+            .iter()
+            .map(|entry| (entry.id.as_str(), entry.requirement))
+            .collect();
+        assert_eq!(
+            levels,
+            vec![
+                (
+                    "AGENT.GOAL.INSTRUCTION_INTEGRITY",
+                    RequirementLevel::Required
+                ),
+                (
+                    "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY",
+                    RequirementLevel::Required
+                ),
+                (
+                    "AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY",
+                    RequirementLevel::Conditional
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn prompt_injection_profile_resolves_by_name() {
+        assert_eq!(
+            resolve_profile("prompt-injection-baseline-2026")
+                .unwrap()
+                .id,
+            "prompt-injection-baseline-2026"
+        );
     }
 
     #[test]

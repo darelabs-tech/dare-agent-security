@@ -35,8 +35,9 @@ pub use math::{
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
     agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
-    resolve_profile, validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel,
-    AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
+    prompt_injection_profile, resolve_profile, validate_profile, AssessmentProfile,
+    ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID,
+    PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
 };
 pub use prompt_injection_standards::{
     load_prompt_injection_provenance, validate_prompt_injection_provenance,
@@ -65,6 +66,7 @@ pub fn registry_for_profile(
     profile: &AssessmentProfile,
 ) -> Result<PropertyRegistry, CoverageError> {
     if profile.id == "agentic-security-baseline-2026"
+        || profile.id == "prompt-injection-baseline-2026"
         || profile
             .properties
             .iter()

@@ -22,7 +22,7 @@
 - [x] task-017 — Add hostile parser/schema fixtures and executable-field refusal
 - [x] task-018 — Implement canary, protected-field and unauthorized-action deterministic checks
 - [x] task-019 — Implement PromptInjectionResult and Cycle 001 evidence bridge
-- [ ] task-020 — Add `prompt-injection-baseline-2026` profile and coverage integration
+- [x] task-020 — Add `prompt-injection-baseline-2026` profile and coverage integration
 - [ ] task-021 — Add `validate prompt-injection` CLI integration
 - [ ] task-022 — Add product/report integration with bounded-claim wording
 - [ ] task-023 — Add confidential/offline and no-remote-target regressions
