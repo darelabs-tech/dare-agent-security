@@ -18,6 +18,7 @@
 //! Verdict and evidence semantics are reused from Cycle 001; ROE, budget,
 //! kill-switch and canonical-digest controls from Cycle 009.
 
+pub mod canonical;
 pub mod corpus;
 pub mod error;
 pub mod invariant;
@@ -26,6 +27,7 @@ pub mod observation;
 pub mod schema;
 pub mod source;
 
+pub use canonical::{bind, objective_digest, scenario_digest, IdentityBinding};
 pub use dare_security_evidence::Verdict;
 pub use error::{PromptInjectionError, Result};
 pub use invariant::{evaluate, supported_invariants, InvariantOutcome};

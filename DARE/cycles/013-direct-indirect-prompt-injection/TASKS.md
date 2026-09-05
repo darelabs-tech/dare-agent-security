@@ -11,7 +11,7 @@
 - [x] task-006 — Define source trust-boundary and injection-family enums
 - [x] task-007 — Define normalized observation-event model
 - [x] task-008 — Implement deterministic invariant evaluator registry
-- [ ] task-009 — Implement canonical digests and scenario/corpus/objective binding
+- [x] task-009 — Implement canonical digests and scenario/corpus/objective binding
 - [ ] task-010 — Implement bounded trial policy and hard maxima
 - [ ] task-011 — Implement replay adapter
 - [ ] task-012 — Implement simulated adapter
