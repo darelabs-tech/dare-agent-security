@@ -43,18 +43,43 @@
 //! Cycles 013 and 014.
 
 pub mod authority;
+pub mod authorization;
+pub mod canonical;
+pub mod coverage;
 pub mod delegation;
 pub mod error;
+pub mod invariant;
+pub mod model;
+pub mod observation;
+pub mod operation;
 pub mod principal;
+pub mod resource;
 pub mod schema;
 pub mod source;
 
 pub use authority::{
     Authority, AuthorityAxis, AuthorityDimension, AuthorityExcess, LogicalTime, ValidityWindow,
 };
+pub use authorization::{AuthorizationDecision, AuthorizationPolicy, DecisionEffect};
+pub use canonical::{assert_safe_identifier, digest, verify_digest, IdentityBinding};
+pub use coverage::{
+    all_contracts, assess_coverage, coverage_contract, ChannelRequirement, CoverageContract,
+    CoverageDecision,
+};
+pub use dare_security_evidence::Verdict;
 pub use delegation::{ChainDefect, DelegationChain, DelegationEdge};
 pub use error::{IdentitySecurityError, Result};
+pub use invariant::{evaluate, supported_invariants, IdentityInvariantOutcome, IdentityViolation};
+pub use model::{
+    IdentityCorpusEntry, IdentityInvariantType, IdentityLabSpec, IdentityObjective,
+    IdentityProperty, IdentitySecurityScenario, ReferenceBehavior,
+};
+pub use observation::{
+    observed_channels, validate_events, CoverageChannel, EvidenceText, IdentityObservationEvent,
+};
+pub use operation::{Operation, OperationDifference, OperationField, OperationProjection};
 pub use principal::{Principal, PrincipalBindings, PrincipalSet};
+pub use resource::{ResourceClassification, ResourceContext};
 pub use source::{
     CorpusClass, DelegationKind, IdentitySourceKind, PrincipalKind, PrincipalRole, ScenarioClass,
     TrustLevel,
