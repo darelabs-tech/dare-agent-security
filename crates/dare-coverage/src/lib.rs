@@ -16,6 +16,7 @@ mod property;
 mod report;
 mod risk_family;
 mod status;
+mod tool_security_standards;
 
 pub use agentic::{
     load_mcp_crosswalk, load_provenance, validate_agentic_assets,
@@ -59,6 +60,15 @@ pub use report::{
 };
 pub use risk_family::{derive_risk_family_coverage, RiskFamilyCoverage};
 pub use status::CoverageStatus;
+pub use tool_security_standards::{
+    load_tool_security_provenance, validate_tool_security_provenance,
+    validate_tool_security_standards, InheritedLesson, ToolDeferredTopic, ToolPropertyMapping,
+    ToolSecurityProvenance, ToolSecuritySource, ToolSurfaceClass, ToolTaxonomyDistinction,
+    TOOL_ARGUMENT_INTEGRITY_PROPERTY, TOOL_AUTHORIZATION_BOUNDARY_PROPERTY,
+    TOOL_CHAIN_BOUNDARY_PROPERTY, TOOL_METADATA_TRUST_BOUNDARY_PROPERTY,
+    TOOL_OUTPUT_TRUST_BOUNDARY_PROPERTY, TOOL_SECURITY_PROVENANCE_JSON,
+    TOOL_SELECTION_INTENT_BINDING_PROPERTY,
+};
 
 pub const CRATE_NAME: &str = "dare-coverage";
 
