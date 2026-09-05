@@ -24,7 +24,7 @@
 - [x] task-019 — Implement PromptInjectionResult and Cycle 001 evidence bridge
 - [x] task-020 — Add `prompt-injection-baseline-2026` profile and coverage integration
 - [x] task-021 — Add `validate prompt-injection` CLI integration
-- [ ] task-022 — Add product/report integration with bounded-claim wording
+- [x] task-022 — Add product/report integration with bounded-claim wording
 - [ ] task-023 — Add confidential/offline and no-remote-target regressions
 - [ ] task-024 — Add dedicated Cycle 013 CI security gate
 - [ ] task-025 — Document operator safe-use semantics and limitations
