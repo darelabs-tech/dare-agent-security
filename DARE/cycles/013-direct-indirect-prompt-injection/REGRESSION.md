@@ -145,7 +145,27 @@ agentic-registry-2026, prompt-injection-2026, docs-build
 Every assertion inside the new `prompt-injection-2026` job was executed locally
 before being written into the workflow.
 
-## 9. Conclusion
+## 9. PR-open CI outcome
+
+CI run `33968876780` on head `09e8b1d`: ten of eleven jobs succeeded, including
+`Rust workspace` (fmt, clippy, test, audit), `Cycle 012 Agentic registry security
+gate` and `mdBook documentation gate`. Action E2E run `33968876779` succeeded.
+
+The `Cycle 013 Prompt Injection security gate` job failed at one of its 21 steps.
+The cause was a defect in the gate assertion, not in the product: a bare
+`grep -q 'SECURE'` also matches the risk family name
+`INSECURE_INTER_AGENT_COMMUNICATION`. The independent Cycle 012 job, which
+asserts the same property with the precise pattern, passed in the same run.
+
+Fixed in `dceb710`, which changes only `.github/workflows/ci.yml`. All twelve
+gate assertions were reproduced locally against real CLI output, and all four
+mandatory gates were re-run at that head: fmt clean, clippy clean, 965 tests
+passing, `cargo audit` zero vulnerabilities.
+
+See `PROOF.md` §13 for the full record.
+
+## 10. Conclusion
 
 All mandatory and task-specific gates pass locally at head
-`7eb75218155f739f57604998777a2034e620233d`. Cycle 013 is ready for PR.
+`7eb75218155f739f57604998777a2034e620233d`, and were re-run and confirmed green
+at `dceb710` after the CI gate assertion fix.

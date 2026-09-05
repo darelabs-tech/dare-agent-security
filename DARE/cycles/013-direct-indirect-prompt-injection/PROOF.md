@@ -5,7 +5,7 @@
 **Branch:** `agent/cycle-013-direct-indirect-prompt-injection`
 **Planning baseline:** `0bbab9d4e8734a4bd97dbf119cc5d3696a4df34a`
 **Cycle 012 merge baseline:** `09e1279cd9ee2b2319d85272af35775b64ccba5c`
-**Validated implementation head:** `3045d77` (regression recorded at `7eb7521`; the only commit between them is this cycle's regression record)
+**Validated implementation head:** `09e8b1d` (product); branch head `dceb710` adds only the corrected CI gate assertions — see §13
 
 ## 1. Executive result
 
@@ -262,4 +262,60 @@ The PR-open CI result is appended below once the single triggered run completes.
 
 ## 13. PR-open CI result
 
-_To be recorded after the PR is opened._
+**PR:** https://github.com/darelabs-tech/dare-agent-security/pull/19
+**CI run:** `33968876780` on head `09e8b1d` — conclusion **failure**, one step
+**Action E2E run:** `33968876779` on head `09e8b1d` — conclusion **success**
+
+Because CI runs only on PR open, this is the single triggered run and it
+corresponds to head `09e8b1d`, not the current branch head.
+
+### Job results
+
+| Job | Result |
+|---|---|
+| Rust workspace (fmt, clippy, test, audit) | **success** |
+| Cycle 005 lab corpus | success |
+| Cycle 006 coverage engine | success |
+| Cycle 007 benchmark methodology | success |
+| Cycle 008 attack graph MVP | success |
+| Cycle 009 controlled adversarial validation | success |
+| Cycle 010 continuous security validation | success |
+| Cycle 011 productization | success |
+| Cycle 012 Agentic registry security gate | **success** |
+| Cycle 013 Prompt Injection security gate | **failure — 1 of 21 steps** |
+| mdBook documentation gate | success |
+
+### The one failure was a defect in the gate, not in the product
+
+20 of the 21 Cycle 013 gate steps passed, including every engine suite, every
+CLI fixture run, the budget and stop-on-first-fail checks, canary redaction, the
+remote/credential flag absence check and the report-wording check.
+
+The failing step, `Agentic baseline regression (Cycle 012)`, used a bare
+`grep -q 'SECURE'` over `risk-family-coverage.json`. That pattern also matches
+the risk family name `INSECURE_INTER_AGENT_COMMUNICATION`, so the guard fired on
+correct output. The `MCP baseline regression` step was skipped as a consequence.
+
+This is corroborated by the same run: the independent `Cycle 012 Agentic registry
+security gate` job, which asserts the same property with the precise pattern
+`'"assessment_state": "SECURE"'`, passed. The Agentic baseline is intact.
+
+### Remediation
+
+Commit `dceb710` tightens that assertion to the exact pattern the Cycle 012 gate
+uses, and tightens the eight other loose substring assertions introduced in the
+same job so each matches a full JSON field rather than a bare token.
+
+Per the Approval's cost-control rule, this is explicitly recorded rather than
+re-triggered:
+
+- the change is confined to `.github/workflows/ci.yml`; **no product code, test,
+  schema, corpus, profile or document changed** between `09e8b1d` and `dceb710`;
+- all twelve gate assertions were reproduced locally against real CLI output
+  before the fix was committed;
+- all four mandatory gates were re-run locally at the fixed head — fmt clean,
+  clippy clean, 965 tests passing, `cargo audit` reporting zero vulnerabilities;
+- the PR-open CI run therefore validates the product at `09e8b1d`, and the
+  branch head `dceb710` differs from it only by the corrected gate assertions.
+
+The corrected gate will execute on the next PR opened against `main`.
