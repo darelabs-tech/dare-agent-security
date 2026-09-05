@@ -431,6 +431,7 @@ dependencies = [
  "dare-coaz-integrity",
  "dare-continuous",
  "dare-coverage",
+ "dare-identity-security",
  "dare-mcp-discovery",
  "dare-product",
  "dare-prompt-injection",
