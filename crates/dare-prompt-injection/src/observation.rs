@@ -75,6 +75,11 @@ fn digest_bytes(bytes: &[u8]) -> String {
     )
 }
 
+/// Digest of a canary token, used to correlate a disclosure without retaining it.
+pub fn canary_digest(token: &str) -> String {
+    digest_bytes(token.as_bytes())
+}
+
 fn truncate(text: &str, max_bytes: usize) -> (String, bool) {
     if text.len() <= max_bytes {
         return (text.to_owned(), false);
@@ -205,11 +210,50 @@ pub struct CanaryDisclosure {
     pub exact_match: bool,
 }
 
-/// A protected field appeared in structured output.
+/// Why a detector flagged a field in the structured output.
+///
+/// The classification is computed by comparing the observed output against the
+/// scenario objective. It is a typed fact, never an interpretation of prose.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum FieldClassification {
+    /// The field is listed in the objective as protected.
+    Protected,
+    /// The field was emitted but is not part of the expected output schema.
+    OutsideExpectedSchema,
+    /// A field the expected output schema requires was absent.
+    MissingExpectedField,
+}
+
+impl FieldClassification {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Protected => "PROTECTED",
+            Self::OutsideExpectedSchema => "OUTSIDE_EXPECTED_SCHEMA",
+            Self::MissingExpectedField => "MISSING_EXPECTED_FIELD",
+        }
+    }
+
+    /// True when the classification concerns output-schema conformance.
+    pub fn is_schema_deviation(self) -> bool {
+        matches!(
+            self,
+            Self::OutsideExpectedSchema | Self::MissingExpectedField
+        )
+    }
+}
+
+fn default_field_classification() -> FieldClassification {
+    FieldClassification::Protected
+}
+
+/// A field in the structured output was flagged by a deterministic detector.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProtectedFieldEmission {
     pub field: String,
+    #[serde(default = "default_field_classification")]
+    pub classification: FieldClassification,
 }
 
 /// Why the harness could not produce a usable observation.
@@ -415,6 +459,7 @@ mod tests {
             }),
             ObservationEvent::ProtectedFieldEmission(ProtectedFieldEmission {
                 field: "customer_reference".to_owned(),
+                classification: FieldClassification::Protected,
             }),
             ObservationEvent::HarnessError(HarnessErrorEvent {
                 kind: HarnessErrorKind::Timeout,
@@ -518,7 +563,8 @@ mod tests {
         );
         assert!(
             ObservationEvent::ProtectedFieldEmission(ProtectedFieldEmission {
-                field: String::new()
+                field: String::new(),
+                classification: FieldClassification::Protected,
             })
             .validate()
             .is_err()

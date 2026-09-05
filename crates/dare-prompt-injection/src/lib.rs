@@ -20,6 +20,7 @@
 
 pub mod corpus;
 pub mod error;
+pub mod invariant;
 pub mod model;
 pub mod observation;
 pub mod schema;
@@ -27,15 +28,16 @@ pub mod source;
 
 pub use dare_security_evidence::Verdict;
 pub use error::{PromptInjectionError, Result};
+pub use invariant::{evaluate, supported_invariants, InvariantOutcome};
 pub use model::{
     BoundaryProperty, ContentEncoding, CorpusContent, CorpusEntry, CorpusProvenance, InvariantSpec,
     InvariantType, Objective, PromptInjectionScenario, SafetySpec, SourceBoundary, StandardRef,
     TrialSpec, VectorRef,
 };
 pub use observation::{
-    validate_events, CanaryDisclosure, EvidenceText, GoalState, HarnessErrorEvent,
-    HarnessErrorKind, ModelOutput, ObservationEvent, PolicyDecisionEvent, PolicyOutcome,
-    ProtectedFieldEmission, StructuredActionRequest,
+    validate_events, CanaryDisclosure, EvidenceText, FieldClassification, GoalState,
+    HarnessErrorEvent, HarnessErrorKind, ModelOutput, ObservationEvent, PolicyDecisionEvent,
+    PolicyOutcome, ProtectedFieldEmission, StructuredActionRequest,
 };
 pub use source::{CorpusClass, InjectionDirection, InjectionFamily, SourceKind, TrustLevel};
 
