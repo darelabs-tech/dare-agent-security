@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/tool-security/v1/corpus-entry.schema.json",
+  "title": "DARE Tool Security Corpus Entry v1",
+  "description": "One synthetic tool-poisoning or tool-misuse vector, or a benign control. Content is inert data: no executable, credential, remote-target, live-invocation or expected-verdict field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "family",
+    "property",
+    "source_kind",
+    "trust",
+    "preconditions",
+    "reference_behavior",
+    "expected_invariant",
+    "safety_class",
+    "standards",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "class": {
+      "description": "BENIGN_CONTROL entries exist to prove the engine does not raise a violation from adversarial-looking metadata or output alone.",
+      "type": "string",
+      "enum": ["POISONING_ATTACK", "MISUSE_ATTACK", "BENIGN_CONTROL"]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "TOOL_DESCRIPTION_INSTRUCTION_POISONING",
+        "TOOL_DESCRIPTION_CAPABILITY_MISREPRESENTATION",
+        "TOOL_SCHEMA_PARAMETER_POISONING",
+        "TOOL_ANNOTATION_TRUST_POISONING",
+        "TOOL_OUTPUT_INSTRUCTION_POISONING",
+        "TOOL_OUTPUT_DATA_TRUST_POISONING",
+        "TOOL_METADATA_SUBSTITUTION",
+        "TOOL_METADATA_HIDDEN_INSTRUCTION",
+        "UNINTENDED_TOOL_SELECTION",
+        "OBJECTIVE_TOOL_MISMATCH",
+        "ARGUMENT_SUBSTITUTION",
+        "DANGEROUS_ARGUMENT_REQUEST",
+        "PARAMETER_POLLUTION",
+        "EXCESSIVE_INVOCATION",
+        "UNEXPECTED_TOOL_CHAIN",
+        "CHAIN_DEPTH_VIOLATION",
+        "OUTPUT_TO_ACTION_ESCALATION",
+        "POLICY_TOOL_MISMATCH"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+        "AGENT.TOOL.OUTPUT_TRUST_BOUNDARY",
+        "AGENT.TOOL.METADATA_TRUST_BOUNDARY",
+        "AGENT.TOOL.SELECTION_INTENT_BINDING",
+        "AGENT.TOOL.ARGUMENT_INTEGRITY",
+        "AGENT.TOOL.CHAIN_BOUNDARY"
+      ]
+    },
+    "source_kind": {
+      "type": "string",
+      "enum": [
+        "DECLARED_TOOL_METADATA",
+        "MCP_TOOL_METADATA",
+        "TOOL_OUTPUT",
+        "SYNTHETIC_TOOL_SURFACE",
+        "REPLAY_TRACE"
+      ]
+    },
+    "trust": { "type": "string", "enum": ["TRUSTED", "UNTRUSTED", "MIXED"] },
+    "preconditions": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "agent_present",
+          "tools_present",
+          "tool_metadata_present",
+          "tool_output_present",
+          "tool_chaining_present"
+        ]
+      }
+    },
+    "surface_note": {
+      "description": "How the vector manipulates or exercises the tool surface. Documentation only; never parsed for verdict logic.",
+      "type": "string",
+      "maxLength": 512
+    },
+    "payload": {
+      "description": "Inert synthetic fixture content, such as a poisoned description or tool output. Never executed, never interpolated into a shell, never used as a path.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "content"],
+      "properties": {
+        "encoding": {
+          "type": "string",
+          "enum": ["PLAIN_TEXT", "MARKDOWN", "JSON_TEXT"]
+        },
+        "content": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "carrier_note": { "type": "string", "maxLength": 300 }
+      }
+    },
+    "reference_behavior": {
+      "description": "How the reference agent behaves for this vector. Describes behavior, never the verdict; the evaluator still computes the result.",
+      "type": "string",
+      "enum": [
+        "COMPLIANT",
+        "METADATA_TREATED_AS_AUTHORITY",
+        "UNAPPROVED_TOOL_SELECTED",
+        "OBJECTIVE_MISMATCHED_SELECTION",
+        "ARGUMENTS_SUBSTITUTED",
+        "DANGEROUS_ARGUMENT_REQUESTED",
+        "OUTPUT_TREATED_AS_AUTHORITY",
+        "UNAPPROVED_CHAIN_MEMBER",
+        "CHAIN_DEPTH_EXCEEDED",
+        "EXCESSIVE_INVOCATION",
+        "POLICY_DENY_BYPASSED",
+        "MULTIPLE_INDEPENDENT_VIOLATIONS",
+        "NO_RELEVANT_OBSERVATION",
+        "HARNESS_FAILURE"
+      ]
+    },
+    "expected_invariant": {
+      "description": "The invariant this vector is designed to exercise. It names what is measured, not what the result will be.",
+      "type": "string",
+      "enum": [
+        "TOOL_METADATA_NOT_AUTHORITATIVE",
+        "APPROVED_TOOL_ONLY",
+        "TOOL_SELECTION_BOUND_TO_OBJECTIVE",
+        "TOOL_ARGUMENTS_PRESERVE_APPROVED_INTENT",
+        "DANGEROUS_ARGUMENT_NOT_REQUESTED",
+        "TOOL_OUTPUT_NOT_REINTERPRETED_AS_AUTHORITY",
+        "CHAIN_WITHIN_APPROVED_SET",
+        "CHAIN_DEPTH_WITHIN_BOUND",
+        "INVOCATION_COUNT_WITHIN_BOUND",
+        "POLICY_DENY_NOT_BYPASSED"
+      ]
+    },
+    "safety_class": {
+      "description": "Cycle 014 corpus content is inert. SYNTHETIC_NOOP is the only permitted class; no entry may request a state change, an egress or a real tool invocation.",
+      "const": "SYNTHETIC_NOOP"
+    },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reference", "status"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["OWASP_AGENTIC_TOP10_2026", "DARE_CYCLE_014"]
+          },
+          "reference": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "status": { "type": "string", "enum": ["NORMATIVE", "DRAFT", "INFORMATIVE"] }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "created_at", "license"],
+      "properties": {
+        "origin": {
+          "description": "Only synthetic, DARE-authored content is permitted. No customer data and no captured production traffic.",
+          "type": "string",
+          "enum": ["DARE_SYNTHETIC"]
+        },
+        "author": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "created_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "license": { "type": "string", "enum": ["Apache-2.0"] },
+        "note": { "type": "string", "maxLength": 300 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "class": { "const": "POISONING_ATTACK" } } },
+      "then": { "properties": { "family": { "pattern": "^TOOL_" } } }
+    },
+    {
+      "if": { "properties": { "class": { "const": "MISUSE_ATTACK" } } },
+      "then": { "properties": { "family": { "pattern": "^(UNINTENDED|OBJECTIVE|ARGUMENT|DANGEROUS|PARAMETER|EXCESSIVE|UNEXPECTED|CHAIN|OUTPUT_TO|POLICY)" } } }
+    },
+    {
+      "if": { "properties": { "class": { "const": "BENIGN_CONTROL" } } },
+      "then": { "properties": { "reference_behavior": { "const": "COMPLIANT" } } }
+    }
+  ]
+}

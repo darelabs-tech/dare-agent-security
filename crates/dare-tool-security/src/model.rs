@@ -572,6 +572,63 @@ impl ToolLabSpec {
     }
 }
 
+/// Encoding of inert corpus payload content.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PayloadEncoding {
+    PlainText,
+    Markdown,
+    JsonText,
+}
+
+/// Inert corpus payload, such as a poisoned description or tool output.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CorpusPayload {
+    pub encoding: PayloadEncoding,
+    pub content: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub carrier_note: Option<String>,
+}
+
+/// Corpus provenance. Synthetic origin only.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CorpusProvenance {
+    pub origin: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub author: Option<String>,
+    pub created_at: String,
+    pub license: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
+}
+
+/// One tool-security corpus vector or benign control.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ToolCorpusEntry {
+    pub schema_version: String,
+    pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    pub class: crate::source::CorpusClass,
+    pub family: ToolFamily,
+    pub property: ToolBoundaryProperty,
+    pub source_kind: ToolSourceKind,
+    pub trust: TrustLevel,
+    pub preconditions: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surface_note: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub payload: Option<CorpusPayload>,
+    pub reference_behavior: ReferenceBehavior,
+    pub expected_invariant: ToolInvariantType,
+    pub safety_class: String,
+    pub standards: Vec<ToolStandardRef>,
+    pub provenance: CorpusProvenance,
+}
+
 /// A complete, versioned tool-security scenario.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

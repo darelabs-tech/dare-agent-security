@@ -26,6 +26,8 @@
 //! kill-switch controls from Cycle 009; observation/evaluator patterns from
 //! Cycle 013.
 
+pub mod canonical;
+pub mod corpus;
 pub mod coverage;
 pub mod error;
 pub mod invariant;
@@ -34,6 +36,8 @@ pub mod observation;
 pub mod schema;
 pub mod source;
 
+pub use canonical::{bind, bind_corpus, ToolIdentityBinding};
+pub use corpus::{builtin_corpus, builtin_corpus_root, load_corpus, ToolCorpus};
 pub use coverage::{
     all_contracts, assess_coverage, coverage_contract, ChannelRequirement, CoverageContract,
     CoverageDecision,
@@ -49,6 +53,7 @@ pub use model::{
     ToolSafetySpec, ToolSecurityMetadata, ToolSecurityScenario, ToolSourceBoundary,
     ToolStandardRef, ToolSurfaceSnapshot, ToolTrialSpec, ToolVectorRef,
 };
+pub use model::{CorpusPayload, CorpusProvenance, PayloadEncoding, ToolCorpusEntry};
 pub use observation::{
     canary_digest, observed_channels, validate_events, CoverageChannel, EvidenceText,
     HarnessErrorEvent, HarnessErrorKind, ObjectiveState, ObservedArgument, OutputTreatment,

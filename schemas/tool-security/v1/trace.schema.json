@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/tool-security/v1/trace.schema.json",
+  "title": "DARE Tool Trace v1",
+  "description": "A sanitized, local record of tool-surface and tool-use behavior for offline replay. Replay invokes no tool, no MCP server and no model, and performs no network I/O; the trace is inert data.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "trials"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^TOOL-[A-Z0-9]+(-[A-Z0-9]+)*$",
+      "maxLength": 64
+    },
+    "recorded_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "note": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "trials": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9
+          },
+          "surface_observed": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "surface_id",
+              "digest_matches_approved"
+            ],
+            "properties": {
+              "surface_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 96
+              },
+              "digest_matches_approved": {
+                "type": "boolean"
+              },
+              "tool_ids": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                }
+              }
+            }
+          },
+          "objective_state": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "objective_id"
+            ],
+            "properties": {
+              "objective_id": {
+                "type": "string",
+                "pattern": "^objective-[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 96
+              },
+              "goal_id": {
+                "type": "string",
+                "pattern": "^goal-[a-z0-9]+(-[a-z0-9]+)*$",
+                "maxLength": 96
+              }
+            }
+          },
+          "selections": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tool_id"
+              ],
+              "properties": {
+                "tool_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                },
+                "for_objective_id": {
+                  "type": "string",
+                  "pattern": "^objective-[a-z0-9]+(-[a-z0-9]+)*$",
+                  "maxLength": 96
+                }
+              }
+            }
+          },
+          "requests": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tool_id"
+              ],
+              "properties": {
+                "tool_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                },
+                "operation_class": {
+                  "type": "string",
+                  "enum": [
+                    "READ",
+                    "SEARCH",
+                    "SUMMARIZE",
+                    "WRITE",
+                    "DELETE",
+                    "SEND",
+                    "PAYMENT",
+                    "EXTERNAL_FETCH",
+                    "PRIVILEGE_CHANGE"
+                  ]
+                }
+              }
+            }
+          },
+          "arguments": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tool_id",
+                "values"
+              ],
+              "properties": {
+                "tool_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                },
+                "values": {
+                  "type": "array",
+                  "maxItems": 32,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                        "maxLength": 64
+                      },
+                      "value": {
+                        "type": "string",
+                        "maxLength": 4096
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tool_id",
+                "content",
+                "treatment"
+              ],
+              "properties": {
+                "tool_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                },
+                "content": {
+                  "type": "string",
+                  "maxLength": 16384
+                },
+                "treatment": {
+                  "description": "Recorded fact about how the output was handled downstream, not a reading of the text.",
+                  "type": "string",
+                  "enum": [
+                    "TREATED_AS_DATA",
+                    "TREATED_AS_AUTHORITY"
+                  ]
+                },
+                "induced_tool_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                }
+              }
+            }
+          },
+          "chain_steps": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tool_id",
+                "position",
+                "depth"
+              ],
+              "properties": {
+                "tool_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                  "maxLength": 64
+                },
+                "position": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 15
+                },
+                "depth": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 16
+                }
+              }
+            }
+          },
+          "policy_decisions": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "operation",
+                "outcome"
+              ],
+              "properties": {
+                "operation": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$",
+                  "maxLength": 96
+                },
+                "outcome": {
+                  "type": "string",
+                  "enum": [
+                    "ALLOW",
+                    "DENY",
+                    "NOT_EVALUATED"
+                  ]
+                },
+                "policy_id": {
+                  "type": "string",
+                  "maxLength": 96
+                }
+              }
+            }
+          },
+          "harness_error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "detail"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "ADAPTER_FAILURE",
+                  "MALFORMED_TRACE",
+                  "BUDGET_EXHAUSTED",
+                  "TIMEOUT",
+                  "SCHEMA_VIOLATION",
+                  "KILL_SWITCH_TRIGGERED"
+                ]
+              },
+              "detail": {
+                "type": "string",
+                "maxLength": 300
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
