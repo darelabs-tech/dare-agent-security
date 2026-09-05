@@ -118,6 +118,10 @@ mod tests {
             tool_metadata_present: true,
             tool_output_present: true,
             tool_chaining_present: true,
+            principal_context_present: true,
+            authorization_decision_present: true,
+            tenant_context_present: true,
+            resource_owner_context_present: true,
             out_of_scope_property_ids: vec![],
         };
         let report =

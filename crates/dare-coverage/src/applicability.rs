@@ -102,6 +102,10 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::ToolMetadataPresent => facts.tool_metadata_present,
         Predicate::ToolOutputPresent => facts.tool_output_present,
         Predicate::ToolChainingPresent => facts.tool_chaining_present,
+        Predicate::PrincipalContextPresent => facts.principal_context_present,
+        Predicate::AuthorizationDecisionPresent => facts.authorization_decision_present,
+        Predicate::TenantContextPresent => facts.tenant_context_present,
+        Predicate::ResourceOwnerContextPresent => facts.resource_owner_context_present,
     }
 }
 
@@ -136,6 +140,10 @@ mod tests {
             tool_metadata_present: false,
             tool_output_present: false,
             tool_chaining_present: false,
+            principal_context_present: false,
+            authorization_decision_present: false,
+            tenant_context_present: false,
+            resource_owner_context_present: false,
             out_of_scope_property_ids: Vec::new(),
         }
     }
