@@ -15,7 +15,11 @@ pub fn evaluate_applicability(
     property: &PropertyDefinition,
     facts: &AssessmentFacts,
 ) -> Result<ApplicabilityDecision, CoverageError> {
-    if facts.out_of_scope_property_ids.iter().any(|id| id == &property.id) {
+    if facts
+        .out_of_scope_property_ids
+        .iter()
+        .any(|id| id == &property.id)
+    {
         return Ok(ApplicabilityDecision {
             status: CoverageStatus::OutOfScope,
             rationale: format!("property {} listed out of scope by ROE", property.id),
@@ -34,16 +38,25 @@ pub fn evaluate_applicability(
         if evaluate_predicate(*predicate, facts) {
             continue;
         }
-        if matches!(predicate, Predicate::DynamicAuthorizationAllowed | Predicate::RuntimeDynamicAllowed) {
+        if matches!(
+            predicate,
+            Predicate::DynamicAuthorizationAllowed | Predicate::RuntimeDynamicAllowed
+        ) {
             return Ok(ApplicabilityDecision {
                 status: CoverageStatus::Blocked,
                 rationale: format!("{} is false (ROE/runtime policy)", predicate.as_str()),
             });
         }
-        if matches!(predicate, Predicate::ExecutionIntegritySupported | Predicate::ConfusedDeputySupported) {
+        if matches!(
+            predicate,
+            Predicate::ExecutionIntegritySupported | Predicate::ConfusedDeputySupported
+        ) {
             return Ok(ApplicabilityDecision {
                 status: CoverageStatus::NotTested,
-                rationale: format!("capability {} unavailable — not relabeled NOT_APPLICABLE", predicate.as_str()),
+                rationale: format!(
+                    "capability {} unavailable — not relabeled NOT_APPLICABLE",
+                    predicate.as_str()
+                ),
             });
         }
         if predicate.is_target_shape() {
@@ -52,7 +65,9 @@ pub fn evaluate_applicability(
                 rationale: format!("predicate {} is false for this target", predicate.as_str()),
             });
         }
-        return Err(CoverageError::UnknownPredicate(predicate.as_str().to_owned()));
+        return Err(CoverageError::UnknownPredicate(
+            predicate.as_str().to_owned(),
+        ));
     }
 
     Ok(ApplicabilityDecision {
@@ -121,16 +136,24 @@ mod tests {
         let prop = registry.require("MCP.DISCOVERY.PASSIVE_BOUNDARY").unwrap();
         let mut facts = facts_tools_stdio();
         facts.tools_count = 0;
-        assert_eq!(evaluate_applicability(prop, &facts).unwrap().status, CoverageStatus::NotApplicable);
+        assert_eq!(
+            evaluate_applicability(prop, &facts).unwrap().status,
+            CoverageStatus::NotApplicable
+        );
     }
 
     #[test]
     fn integrity_capability_gap_is_not_tested_not_not_applicable() {
         let registry = builtin_registry().unwrap();
-        let prop = registry.require("MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME").unwrap();
+        let prop = registry
+            .require("MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME")
+            .unwrap();
         let mut facts = facts_tools_stdio();
         facts.execution_integrity_supported = false;
-        assert_eq!(evaluate_applicability(prop, &facts).unwrap().status, CoverageStatus::NotTested);
+        assert_eq!(
+            evaluate_applicability(prop, &facts).unwrap().status,
+            CoverageStatus::NotTested
+        );
     }
 
     #[test]
@@ -139,6 +162,9 @@ mod tests {
         let prop = registry.require("MCP.AUTHZ.PER_OPERATION").unwrap();
         let mut facts = facts_tools_stdio();
         facts.dynamic_authorization_allowed = false;
-        assert_eq!(evaluate_applicability(prop, &facts).unwrap().status, CoverageStatus::Applicable);
+        assert_eq!(
+            evaluate_applicability(prop, &facts).unwrap().status,
+            CoverageStatus::Applicable
+        );
     }
 }
