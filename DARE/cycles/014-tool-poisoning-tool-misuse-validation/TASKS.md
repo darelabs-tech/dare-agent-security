@@ -5,7 +5,7 @@
 
 - [x] task-001 — Reconcile current main baseline and freeze compatibility contracts
 - [x] task-002 — Record Cycle 013 lessons/residual risks and ASI02 standards provenance
-- [ ] task-003 — Freeze/add Tool Security AGENT.* properties and applicability predicates
+- [x] task-003 — Freeze/add Tool Security AGENT.* properties and applicability predicates
 - [ ] task-004 — Define ToolSecurityScenario schema
 - [ ] task-005 — Define ToolSurfaceSnapshot and ApprovedToolPolicy schemas
 - [ ] task-006 — Define tool-security corpus-entry and replay trace schemas

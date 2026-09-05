@@ -99,6 +99,9 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::RuntimeDynamicAllowed => facts.runtime_dynamic_allowed,
         Predicate::UserPromptPresent => facts.user_prompt_present,
         Predicate::UntrustedExternalContentPresent => facts.untrusted_external_content_present,
+        Predicate::ToolMetadataPresent => facts.tool_metadata_present,
+        Predicate::ToolOutputPresent => facts.tool_output_present,
+        Predicate::ToolChainingPresent => facts.tool_chaining_present,
     }
 }
 
@@ -130,6 +133,9 @@ mod tests {
             runtime_dynamic_allowed: false,
             user_prompt_present: false,
             untrusted_external_content_present: false,
+            tool_metadata_present: false,
+            tool_output_present: false,
+            tool_chaining_present: false,
             out_of_scope_property_ids: Vec::new(),
         }
     }

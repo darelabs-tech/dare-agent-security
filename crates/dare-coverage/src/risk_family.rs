@@ -115,6 +115,9 @@ mod tests {
             runtime_dynamic_allowed: false,
             user_prompt_present: true,
             untrusted_external_content_present: true,
+            tool_metadata_present: true,
+            tool_output_present: true,
+            tool_chaining_present: true,
             out_of_scope_property_ids: vec![],
         };
         let report =

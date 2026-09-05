@@ -46,6 +46,15 @@ pub struct AssessmentFacts {
     /// Cycle 013: the target ingests untrusted external content as data.
     #[serde(default)]
     pub untrusted_external_content_present: bool,
+    /// Cycle 014: the target exposes tool description/schema/annotation metadata.
+    #[serde(default)]
+    pub tool_metadata_present: bool,
+    /// Cycle 014: the target consumes tool output.
+    #[serde(default)]
+    pub tool_output_present: bool,
+    /// Cycle 014: the target composes tools into chains.
+    #[serde(default)]
+    pub tool_chaining_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

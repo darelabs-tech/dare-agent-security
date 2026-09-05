@@ -116,6 +116,6 @@ mod tests {
         let mcp = builtin_profile().unwrap();
         assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
         let agentic = agentic_profile().unwrap();
-        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 22);
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 26);
     }
 }
