@@ -1,8 +1,9 @@
 name: action-e2e
 
 on:
-  push:
   pull_request:
+    branches: [main]
+    types: [opened]
 
 permissions:
   contents: read
