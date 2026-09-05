@@ -1,7 +1,9 @@
 # Cycle 013 — Tasks
 
-**Status:** IN PROGRESS
+**Status:** COMPLETE — awaiting DARE Review acceptance
 **Approval:** APPROVED 2026-09-05
+**Completed:** 2026-09-05
+**Validated implementation head:** recorded in `PROOF.md`
 
 - [x] task-001 — Reconcile Cycle 012 baseline and freeze compatibility constraints
 - [x] task-002 — Snapshot current OWASP Prompt Injection + ASI01 provenance
@@ -30,6 +32,6 @@
 - [x] task-025 — Document operator safe-use semantics and limitations
 - [x] task-026 — Document contributor corpus/property/evaluator extension process
 - [x] task-027 — Run complete workspace and compatibility regression
-- [ ] task-028 — Final DARE proof and Cycle 013 completion gate
+- [x] task-028 — Final DARE proof and Cycle 013 completion gate
 
 Final evidence is recorded in `PROOF.md`.
