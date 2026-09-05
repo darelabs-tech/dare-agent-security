@@ -77,6 +77,26 @@ impl ReplayTrace {
                 crate::limits::HARD_MAX_TRIALS
             )));
         }
+
+        // A decision must be about an operation the same trial observed. A
+        // permit naming an operation that is not there could otherwise be
+        // carried into evidence as covering something nobody can inspect.
+        for (index, trial) in self.trials.iter().enumerate() {
+            let observed: Vec<&str> = trial
+                .operation_requests
+                .iter()
+                .chain(trial.final_operations.iter())
+                .map(|operation| operation.operation_id.as_str())
+                .collect();
+            for decision in &trial.authorization_decisions {
+                if !observed.contains(&decision.bound_operation_id.as_str()) {
+                    return Err(IdentitySecurityError::unknown_reference(format!(
+                        "trace `{}` trial {index}: decision `{}` binds an operation the trial                          did not observe",
+                        self.trace_id, decision.decision_id
+                    )));
+                }
+            }
+        }
         Ok(())
     }
 
@@ -325,6 +345,19 @@ pub(crate) mod tests {
         let err = adapter.verify_binding().expect_err("must be refused");
         assert!(matches!(err, IdentitySecurityError::DigestMismatch(_)));
         assert!(err.is_refusal());
+    }
+
+    #[test]
+    fn a_permit_binding_an_unobserved_operation_is_refused_at_parse_time() {
+        // Caught before a scenario is even involved: a decision about an
+        // operation nobody can inspect must never reach evidence.
+        let mut value = trace_value();
+        value["trials"][0]["authorization_decisions"][0]["bound_operation_id"] =
+            json!("op-nowhere");
+        let err = parse_trace(&serde_json::to_vec(&value).expect("serializes"), "trace")
+            .expect_err("must be refused");
+        assert!(err.is_refusal());
+        assert!(err.to_string().contains("did not observe"));
     }
 
     #[test]

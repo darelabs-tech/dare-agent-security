@@ -233,7 +233,7 @@ pub fn assert_no_hostile_text(text: &str, label: &str, where_found: &str) -> Res
 const MIN_BEARER_TOKEN_LEN: usize = 16;
 
 /// Whether the text carries a `bearer ` followed by something token-shaped.
-fn contains_bearer_credential(lowered: &str) -> bool {
+pub fn contains_bearer_credential(lowered: &str) -> bool {
     const MARKER: &str = "bearer ";
     let mut rest = lowered;
     while let Some(index) = rest.find(MARKER) {
@@ -484,6 +484,36 @@ pub fn validate_authorization_document(value: &Value) -> Result<()> {
 pub(crate) mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn a_scenario_cannot_state_the_verdict_it_wants() {
+        // A scenario names the invariant to evaluate. If it could also carry
+        // the answer, the evaluator would be decorative and every fixture
+        // would be self-certifying.
+        let raw = include_str!("../tests/fixtures/scenario.json");
+        let mut value: Value = serde_json::from_str(raw).expect("fixture parses");
+        validate_scenario_document(&value).expect("the fixture itself is valid");
+
+        for field in [
+            "expected",
+            "expected_verdict",
+            "verdict",
+            "expected_outcome",
+        ] {
+            let mut hostile = value.clone();
+            hostile["invariant"][field] = json!(true);
+            let err = validate_scenario_document(&hostile)
+                .expect_err(&format!("invariant.{field} must be refused"));
+            assert!(
+                err.is_refusal() || matches!(err, IdentitySecurityError::Schema(_)),
+                "{field}"
+            );
+        }
+
+        value["expected_verdict"] = json!("PASS");
+        let err = validate_scenario_document(&value).expect_err("must be refused");
+        assert!(err.is_refusal() || matches!(err, IdentitySecurityError::Schema(_)));
+    }
 
     #[test]
     fn the_supported_version_is_exact_in_both_directions() {

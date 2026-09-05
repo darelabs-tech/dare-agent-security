@@ -45,6 +45,7 @@
 pub mod authority;
 pub mod authorization;
 pub mod canonical;
+pub mod corpus;
 pub mod coverage;
 pub mod delegation;
 pub mod error;
@@ -67,6 +68,7 @@ pub use authority::{
 };
 pub use authorization::{AuthorizationDecision, AuthorizationPolicy, DecisionEffect};
 pub use canonical::{assert_safe_identifier, digest, verify_digest, IdentityBinding};
+pub use corpus::{builtin_corpus, load_corpus, IdentityCorpus};
 pub use coverage::{
     all_contracts, assess_coverage, coverage_contract, ChannelRequirement, CoverageContract,
     CoverageDecision,

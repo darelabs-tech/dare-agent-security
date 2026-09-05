@@ -223,9 +223,6 @@
             "CREDENTIAL_CONTEXT_NOT_EXPAND_AUTHORITY",
             "DELEGATION_VALID_AT_USE"
           ]
-        },
-        "expected": {
-          "type": "boolean"
         }
       }
     },

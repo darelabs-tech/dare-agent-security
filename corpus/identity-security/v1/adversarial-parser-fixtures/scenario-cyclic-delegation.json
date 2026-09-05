@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "id": "IDENTITY-LAB-001",
-  "title": "a human initiates, the agent acts for them, a broad service identity is present",
+  "title": "the human who initiates the request is the one it runs under",
   "class": "PRINCIPAL_BINDING",
   "property": "AGENT.IDENTITY.PRINCIPAL_BINDING",
   "source": {
@@ -13,13 +13,13 @@
     "description": "Summarize the support ticket for the operator.",
     "authorized_purpose_id": "purpose-summarize",
     "protected_canaries": [
-      "DARE-SYNTHETIC-CANARY-IDENT01"
+      "document-canary-901"
     ]
   },
   "principals": {
     "schema_version": "1",
     "set_id": "principals-support-desk",
-    "title": "one human, one agent, one service identity",
+    "title": "one human, one agent, one service identity, one foreign operator",
     "principals": [
       {
         "id": "user-7",
@@ -46,6 +46,16 @@
         "tenant_id": "tenant-a",
         "roles": [
           "index.admin"
+        ],
+        "authority_ceiling_id": "authority-service-admin"
+      },
+      {
+        "id": "user-9",
+        "kind": "HUMAN",
+        "display_label": "operator in the other tenant",
+        "tenant_id": "tenant-b",
+        "roles": [
+          "support.reader"
         ],
         "authority_ceiling_id": "authority-service-admin"
       }
@@ -187,7 +197,11 @@
         ]
       },
       "purposes": {
-        "constraint": "ANY"
+        "constraint": "ONLY",
+        "values": [
+          "purpose-summarize",
+          "purpose-reindex"
+        ]
       },
       "audiences": {
         "constraint": "ONLY",
@@ -216,6 +230,20 @@
           "valid_from": 100,
           "valid_until": 200
         }
+      },
+      {
+        "edge_id": "edge-agent-to-user",
+        "kind": "AGENT_HANDOFF",
+        "delegator_principal_id": "agent-1",
+        "delegatee_principal_id": "user-7",
+        "delegated_subject_id": "user-7",
+        "authority_ceiling_id": "authority-agent-read",
+        "purpose_id": "purpose-summarize",
+        "audience": "api://support",
+        "validity": {
+          "valid_from": 100,
+          "valid_until": 200
+        }
       }
     ]
   },
@@ -234,7 +262,8 @@
     "subjects": {
       "constraint": "ONLY",
       "values": [
-        "user-7"
+        "user-7",
+        "svc-index"
       ]
     },
     "actions": {

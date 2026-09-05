@@ -105,8 +105,11 @@ pub fn stage(
         B::DenyBypassed => bypass_deny(scenario, &mut output)?,
         B::CredentialContextExpandedAuthority => expand_via_credential(scenario, &mut output)?,
         B::MultipleIndependentViolations => {
-            // Three independently true violations in one trial, so the
-            // evaluator has to report all of them rather than the first.
+            // Four independently true violations in one trial — both principal
+            // roles substituted, the tenant crossed, and authority expanded
+            // through an available credential — so the evaluator has to report
+            // all of them rather than stopping at the first.
+            substitute_initiating(scenario, &mut output)?;
             substitute_effective(scenario, &mut output)?;
             cross_tenant(scenario, &mut output)?;
             expand_via_credential(scenario, &mut output)?;
@@ -806,6 +809,10 @@ mod tests {
             .map(IdentityInvariantType::as_str)
             .collect();
 
+        assert!(
+            failing.contains(&"INITIATING_PRINCIPAL_PRESERVED"),
+            "{failing:?}"
+        );
         assert!(
             failing.contains(&"AGENT_AUTHORITY_NOT_SUBSTITUTED_FOR_USER"),
             "{failing:?}"

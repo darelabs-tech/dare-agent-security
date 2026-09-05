@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "IDENTITY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "trials": [
+    {
+      "principals": [
+        {
+          "role": "INITIATING",
+          "principal_id": "user-7",
+          "kind": "HUMAN"
+        }
+      ],
+      "authorization_decisions": [
+        {
+          "decision_id": "decision-1",
+          "effect": "PERMIT",
+          "subject_id": "user-7",
+          "policy_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "bound_operation_id": "op-never-observed"
+        }
+      ]
+    }
+  ]
+}

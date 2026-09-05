@@ -249,13 +249,15 @@ pub struct IdentityVectorRef {
 }
 
 /// Which invariant a scenario is evaluated against.
+///
+/// The invariant only. A scenario names the question; it never carries the
+/// answer, so there is deliberately no field here in which a fixture could
+/// state the verdict it wants.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IdentityInvariantSpec {
     #[serde(rename = "type")]
     pub type_: IdentityInvariantType,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub expected: Option<bool>,
 }
 
 /// Requested trial policy. Clamped against the hard maxima.
