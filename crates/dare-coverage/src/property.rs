@@ -14,8 +14,7 @@ pub const PROPERTY_SCHEMA_V2_JSON: &str =
 pub const REGISTRY_SCHEMA_V2_JSON: &str =
     include_str!("../../../schemas/coverage/v2/registry.schema.json");
 pub const REGISTRY_JSON: &str = include_str!("../../../schemas/coverage/v1/registry.json");
-pub const AGENTIC_REGISTRY_JSON: &str =
-    include_str!("../../../schemas/coverage/v2/registry.json");
+pub const AGENTIC_REGISTRY_JSON: &str = include_str!("../../../schemas/coverage/v2/registry.json");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
