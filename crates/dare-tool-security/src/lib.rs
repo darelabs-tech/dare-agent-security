@@ -36,6 +36,7 @@ pub mod model;
 pub mod observation;
 pub mod replay;
 pub mod schema;
+pub mod simulated;
 pub mod source;
 pub mod trials;
 
@@ -68,6 +69,7 @@ pub use observation::{
     ToolOutputObserved, ToolRequested, ToolSelected, ToolSurfaceObserved, REDACTION_MARKER,
 };
 pub use replay::{ToolReplayAdapter, ToolTrace, ToolTraceTrial};
+pub use simulated::{stage, ToolSimulatedAdapter};
 pub use source::{
     CorpusClass, MisuseFamily, MisuseSurface, PoisoningFamily, ScenarioClass, ToolSourceKind,
     ToolSurfaceArea, TrustLevel,
