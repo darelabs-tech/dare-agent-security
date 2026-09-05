@@ -86,7 +86,10 @@ pub fn validate_provenance(manifest: &ProvenanceManifest) -> Result<(), Coverage
                 format!("duplicate standards source {}", source.id),
             ));
         }
-        if !matches!(source.status.as_str(), "NORMATIVE" | "DRAFT" | "INFORMATIVE") {
+        if !matches!(
+            source.status.as_str(),
+            "NORMATIVE" | "DRAFT" | "INFORMATIVE"
+        ) {
             return Err(CoverageError::schema(
                 "/sources/status",
                 format!("unknown standards status {}", source.status),
@@ -125,7 +128,10 @@ pub fn validate_provenance(manifest: &ProvenanceManifest) -> Result<(), Coverage
     if families.len() != 10 {
         return Err(CoverageError::schema(
             "/risk_families",
-            format!("expected exactly 10 Agentic risk families, got {}", families.len()),
+            format!(
+                "expected exactly 10 Agentic risk families, got {}",
+                families.len()
+            ),
         ));
     }
     Ok(())
@@ -135,8 +141,16 @@ pub fn validate_agentic_registry_provenance(
     registry: &PropertyRegistry,
     manifest: &ProvenanceManifest,
 ) -> Result<(), CoverageError> {
-    let source_ids: HashSet<_> = manifest.sources.iter().map(|source| source.id.as_str()).collect();
-    let family_ids: HashSet<_> = manifest.risk_families.iter().map(|family| family.id).collect();
+    let source_ids: HashSet<_> = manifest
+        .sources
+        .iter()
+        .map(|source| source.id.as_str())
+        .collect();
+    let family_ids: HashSet<_> = manifest
+        .risk_families
+        .iter()
+        .map(|family| family.id)
+        .collect();
     let mut represented = HashSet::new();
 
     for property in &registry.properties {
@@ -160,7 +174,10 @@ pub fn validate_agentic_registry_provenance(
                     format!("unknown standards source {}", standard.source),
                 ));
             }
-            if !matches!(standard.status.as_str(), "NORMATIVE" | "DRAFT" | "INFORMATIVE") {
+            if !matches!(
+                standard.status.as_str(),
+                "NORMATIVE" | "DRAFT" | "INFORMATIVE"
+            ) {
                 return Err(CoverageError::schema(
                     format!("/{}/standards/status", property.id),
                     format!("unknown standards status {}", standard.status),
@@ -190,7 +207,9 @@ pub fn validate_mcp_crosswalk(crosswalk: &McpCrosswalk) -> Result<(), CoverageEr
     for mapping in &crosswalk.mappings {
         registry.require(&mapping.mcp_property)?;
         if !seen.insert(mapping.mcp_property.as_str()) {
-            return Err(CoverageError::DuplicateProperty(mapping.mcp_property.clone()));
+            return Err(CoverageError::DuplicateProperty(
+                mapping.mcp_property.clone(),
+            ));
         }
     }
     Ok(())
