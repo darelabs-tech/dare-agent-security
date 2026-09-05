@@ -15,6 +15,7 @@
 - [Agentic Security Registry 2026](concepts/agentic-security-registry.md)
 - [Attack Graph](concepts/attack-graph.md)
 - [Validation Modes](concepts/validation.md)
+- [Prompt Injection Validation](concepts/prompt-injection.md)
 
 # Commands
 

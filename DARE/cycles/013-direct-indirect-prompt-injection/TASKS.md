@@ -27,7 +27,7 @@
 - [x] task-022 — Add product/report integration with bounded-claim wording
 - [x] task-023 — Add confidential/offline and no-remote-target regressions
 - [x] task-024 — Add dedicated Cycle 013 CI security gate
-- [ ] task-025 — Document operator safe-use semantics and limitations
+- [x] task-025 — Document operator safe-use semantics and limitations
 - [ ] task-026 — Document contributor corpus/property/evaluator extension process
 - [ ] task-027 — Run complete workspace and compatibility regression
 - [ ] task-028 — Final DARE proof and Cycle 013 completion gate
