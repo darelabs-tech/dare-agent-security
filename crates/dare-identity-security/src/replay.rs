@@ -207,6 +207,10 @@ impl HarnessAdapter for ReplayAdapter {
         HarnessMode::Replay
     }
 
+    fn trial_capacity(&self) -> u32 {
+        self.available_trials()
+    }
+
     fn observe(&self, request: &TrialRequest<'_>) -> Result<RawTrialOutput> {
         self.loaded.trace.assert_matches(request.scenario)?;
         self.verify_binding()?;

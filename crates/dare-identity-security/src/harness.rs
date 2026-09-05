@@ -222,6 +222,16 @@ pub trait HarnessAdapter {
     /// an identity provider or authorization server, or perform any operation
     /// the agent requested.
     fn observe(&self, request: &TrialRequest<'_>) -> Result<RawTrialOutput>;
+
+    /// How many trials this adapter can supply.
+    ///
+    /// A recorded source is bounded by what it recorded; a staged one can
+    /// produce a trial for any index. The default is the hard maximum, so an
+    /// adapter that does not override this never *lowers* a plan by accident —
+    /// and none of them can raise one.
+    fn trial_capacity(&self) -> u32 {
+        crate::limits::HARD_MAX_TRIALS
+    }
 }
 
 /// Convert raw adapter output into normalized, typed observation events.

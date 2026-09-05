@@ -476,8 +476,8 @@ pub fn run_scenario(
 mod tests {
     use super::*;
     use crate::harness::tests::scenario;
-    use crate::model::IdentityProperty;
     use crate::local_synthetic::LocalSyntheticAdapter;
+    use crate::model::IdentityProperty;
     use crate::model::ReferenceBehavior;
     use crate::replay::tests::trace_value;
     use crate::replay::{parse_trace, LoadedTrace, ReplayAdapter};

@@ -29,6 +29,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "crates" / "dare-identity-security" / "tests" / "fixtures" / "scenarios"
+TRACES_OUT = ROOT / "fixtures" / "identity-security" / "traces"
 
 ASI03 = {
     "source": "OWASP_AGENTIC_TOP10_2026",
@@ -526,6 +527,127 @@ def audit(lab_id, document):
     return problems
 
 
+def traces():
+    """Sanitized replay traces, one per lab that ships one.
+
+    A trace records what was observed. It carries no verdict, no credential and
+    no remote target, and replay refuses it if it was recorded against a
+    different scenario.
+    """
+    return {
+        "IDENTITY-LAB-001": {
+            "schema_version": "1",
+            "trace_id": "trace-identity-lab-001",
+            "scenario_id": "IDENTITY-LAB-001",
+            "mode": "REPLAY",
+            "synthetic": True,
+            "description": "Recorded on-behalf-of read within the delegated ceiling.",
+            "trials": [
+                {
+                    "principals": [
+                        {
+                            "role": "INITIATING",
+                            "principal_id": "user-7",
+                            "kind": "HUMAN",
+                            "tenant_id": "tenant-a",
+                        },
+                        {
+                            "role": "EFFECTIVE",
+                            "principal_id": "user-7",
+                            "kind": "HUMAN",
+                            "tenant_id": "tenant-a",
+                        },
+                        {"role": "AGENT", "principal_id": "agent-1", "kind": "AGENT"},
+                        {
+                            "role": "DELEGATED_SUBJECT",
+                            "principal_id": "user-7",
+                            "kind": "HUMAN",
+                        },
+                        {
+                            "role": "RESOURCE_OWNER",
+                            "principal_id": "user-7",
+                            "kind": "HUMAN",
+                        },
+                    ],
+                    "effective_authorities": [
+                        {
+                            "principal_id": "user-7",
+                            "authority_id": "authority-agent-read",
+                            "source_ceiling_id": "authority-user-read",
+                        }
+                    ],
+                    "delegation_edges": [
+                        {
+                            "edge_id": "edge-user-to-agent",
+                            "kind": "ON_BEHALF_OF",
+                            "delegator_principal_id": "user-7",
+                            "delegatee_principal_id": "agent-1",
+                            "delegated_subject_id": "user-7",
+                            "authority_ceiling_id": "authority-agent-read",
+                        }
+                    ],
+                    "resources": [
+                        {
+                            "resource_id": "document-123",
+                            "resource_type": "document",
+                            "tenant_id": "tenant-a",
+                            "owner_principal_id": "user-7",
+                            "classification": "SYNTHETIC_INTERNAL",
+                        }
+                    ],
+                    "credential_contexts": [
+                        {
+                            "credential_context_id": "cred-index-admin",
+                            "owner_principal_id": "svc-index",
+                            "capability_labels": ["index.admin"],
+                            "tenant_labels": ["tenant-a", "tenant-b"],
+                            "capability_authority_id": "authority-service-admin",
+                        }
+                    ],
+                    "authorization_decisions": [
+                        {
+                            "decision_id": "decision-authorized",
+                            "effect": "PERMIT",
+                            "subject_id": "user-7",
+                            "policy_digest": "sha256:" + "1" * 64,
+                            "bound_operation_id": "op-authorized",
+                            "issued_at": 150,
+                        }
+                    ],
+                    "policy_decisions": [
+                        {
+                            "operation_key": "document.read",
+                            "effect": "PERMIT",
+                            "policy_id": "policy-support-desk",
+                        }
+                    ],
+                    "final_operations": [
+                        {
+                            "operation_id": "op-authorized",
+                            "subject_id": "user-7",
+                            "action": "read",
+                            "resource_id": "document-123",
+                            "resource_type": "document",
+                            "tenant_id": "tenant-a",
+                            "objective_id": "objective-summarize-ticket",
+                        }
+                    ],
+                }
+            ],
+        }
+    }
+
+
+def build_traces():
+    files = {}
+    for trace_id, document in traces().items():
+        problems = audit(trace_id, document)
+        if problems:
+            raise SystemExit(f"{trace_id} trace: " + "; ".join(problems))
+        files[trace_id + ".json"] = json.dumps(document, indent=2, ensure_ascii=False) + "\n"
+    return files
+
+
 def build():
     files = {}
     for lab_id, document in labs().items():
@@ -545,30 +667,37 @@ def main():
     files = build()
     if len(files) != 24:
         raise SystemExit(f"expected 24 lab fixtures, built {len(files)}")
+    trace_files = build_traces()
 
     if args.check:
         differences = []
-        for name, text in sorted(files.items()):
-            path = OUT / name
-            if not path.exists():
-                differences.append(f"missing {name}")
-            elif path.read_text(encoding="utf-8") != text:
-                differences.append(f"differs {name}")
-        for path in sorted(OUT.glob("*.json")):
-            if path.name not in files:
-                differences.append(f"unexpected {path.name}")
+        for directory, group in ((OUT, files), (TRACES_OUT, trace_files)):
+            for name, text in sorted(group.items()):
+                path = directory / name
+                if not path.exists():
+                    differences.append(f"missing {path.relative_to(ROOT).as_posix()}")
+                elif path.read_text(encoding="utf-8") != text:
+                    differences.append(f"differs {path.relative_to(ROOT).as_posix()}")
+            if directory.exists():
+                for path in sorted(directory.glob("*.json")):
+                    if path.name not in group:
+                        differences.append(f"unexpected {path.relative_to(ROOT).as_posix()}")
         if differences:
             print("identity-security lab fixtures are out of date:", file=sys.stderr)
             for line in differences:
                 print(f"  {line}", file=sys.stderr)
             return 1
-        print(f"identity-security lab fixtures are current ({len(files)} scenarios)")
+        print(
+            f"identity-security lab fixtures are current "
+            f"({len(files)} scenarios, {len(trace_files)} traces)"
+        )
         return 0
 
-    OUT.mkdir(parents=True, exist_ok=True)
-    for name, text in files.items():
-        (OUT / name).write_text(text, encoding="utf-8", newline="\n")
-    print(f"wrote {len(files)} lab fixtures under {OUT.relative_to(ROOT).as_posix()}")
+    for directory, group in ((OUT, files), (TRACES_OUT, trace_files)):
+        directory.mkdir(parents=True, exist_ok=True)
+        for name, text in group.items():
+            (directory / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"wrote {len(files)} lab fixtures and {len(trace_files)} traces")
     return 0
 
 

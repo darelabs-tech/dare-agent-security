@@ -46,11 +46,11 @@ pub use math::{
 };
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
-    agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
-    prompt_injection_profile, resolve_profile, tool_security_profile, validate_profile,
-    AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
-    PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
-    TOOL_SECURITY_PROFILE_JSON,
+    agentic_profile, builtin_profile, identity_security_profile, load_profile, load_profile_file,
+    profile_digest_sha256, prompt_injection_profile, resolve_profile, tool_security_profile,
+    validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
+    IDENTITY_SECURITY_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
+    PROMPT_INJECTION_PROFILE_JSON, TOOL_SECURITY_PROFILE_JSON,
 };
 pub use prompt_injection_standards::{
     load_prompt_injection_provenance, validate_prompt_injection_provenance,

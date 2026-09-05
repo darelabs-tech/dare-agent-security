@@ -21,6 +21,8 @@ pub const PROMPT_INJECTION_PROFILE_JSON: &str =
     include_str!("../../../profiles/prompt-injection-baseline-2026.json");
 pub const TOOL_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/tool-security-baseline-2026.json");
+pub const IDENTITY_SECURITY_PROFILE_JSON: &str =
+    include_str!("../../../profiles/identity-security-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -138,6 +140,16 @@ pub fn tool_security_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(TOOL_SECURITY_PROFILE_JSON)
 }
 
+/// Cycle 015 identity-security baseline.
+///
+/// Additive: it selects the six `AGENT.IDENTITY.*` properties from the same v2
+/// registry. The two properties that predate this cycle keep their identifiers
+/// and meaning, no earlier profile's requirements change, and no denominator
+/// moves.
+pub fn identity_security_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(IDENTITY_SECURITY_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -153,6 +165,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "agentic-security-baseline-2026" => agentic_profile(),
         "prompt-injection-baseline-2026" => prompt_injection_profile(),
         "tool-security-baseline-2026" => tool_security_profile(),
+        "identity-security-baseline-2026" => identity_security_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

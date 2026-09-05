@@ -149,6 +149,17 @@ impl TrialPlan {
         Ok(self)
     }
 
+    /// Reduce the plan to at most `available` trials.
+    ///
+    /// Downward only, and deliberately so. A source that recorded three trials
+    /// cannot supply four, and planning a fourth would end the run in a harness
+    /// error that says nothing about the boundary under test. Raising the count
+    /// stays impossible: this never increases `trials`.
+    pub fn clamped_to_available(mut self, available: u32) -> Self {
+        self.trials = self.trials.min(available.max(1));
+        self
+    }
+
     pub fn open(self) -> TrialLedger {
         TrialLedger::new(self)
     }
@@ -411,6 +422,23 @@ impl TrialGuard {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_plan_can_be_reduced_to_what_a_source_can_supply_but_never_raised() {
+        let plan = TrialPlan {
+            trials: 3,
+            ..TrialPlan::default()
+        };
+        assert_eq!(plan.clamped_to_available(1).trials, 1);
+        assert_eq!(plan.clamped_to_available(3).trials, 3);
+        // A source claiming more than the plan cannot raise it.
+        assert_eq!(plan.clamped_to_available(9).trials, 3);
+        assert_eq!(plan.clamped_to_available(999).trials, 3);
+        // Zero available still leaves one trial to attempt and fail honestly,
+        // rather than a plan of zero that would report nothing at all.
+        assert_eq!(plan.clamped_to_available(0).trials, 1);
+    }
+
     use serde_json::json;
 
     fn scenario_with(safety: serde_json::Value, trials: serde_json::Value) -> Result<TrialPlan> {

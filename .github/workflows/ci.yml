@@ -697,6 +697,445 @@ jobs:
           test -f .dare-agent-security/regression-mcp/coverage-report.json
           test ! -f .dare-agent-security/regression-mcp/risk-family-coverage.json
 
+  identity-security-2026:
+    name: Cycle 015 Identity, Privilege and Delegation security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (schemas, enums, invariants, bounds, adapters)
+        run: cargo test -p dare-identity-security --lib -- --nocapture
+      - name: Deterministic invariant evaluation across PASS, FAIL and INCONCLUSIVE
+        run: cargo test -p dare-identity-security --test deterministic_invariants -- --nocapture
+      - name: The 24 IDENTITY-LAB fixtures end to end
+        run: cargo test -p dare-identity-security --test lab_scenarios -- --nocapture
+      - name: Corpus, paired vectors and benign controls
+        run: cargo test -p dare-identity-security --test corpus_integration -- --nocapture
+      - name: Hostile parser fixtures fail closed
+        run: cargo test -p dare-identity-security --test hostile_fixtures -- --nocapture
+      - name: Independent multi-violation capture and redaction hygiene
+        run: cargo test -p dare-identity-security --test violations_and_hygiene -- --nocapture
+      - name: Identity-security profile and coverage integration
+        run: cargo test -p dare-coverage --test identity_security_profile -- --nocapture
+      - name: Identity-security properties and standards provenance
+        run: |
+          cargo test -p dare-coverage --test identity_security_properties -- --nocapture
+          cargo test -p dare-coverage --lib identity_security_standards -- --nocapture
+      - name: Additive product metadata and bounded-claim wording
+        run: cargo test -p dare-product --lib identity_security_metadata -- --nocapture
+      - name: CLI flag surface (no provider, credential, PDP or live-identity flag)
+        run: cargo test -p dare-agent-security --lib identity_security -- --nocapture
+      - name: CLI end-to-end matrix and product reporting bridge
+        run: |
+          cargo test -p dare-agent-security --test identity_security_cli -- --nocapture
+          cargo test -p dare-agent-security --test identity_security_product -- --nocapture
+
+      - name: Corpus, scenarios and hostile fixtures are generated, not hand-edited
+        run: |
+          python scripts/gen-identity-security-corpus.py --check
+          python scripts/gen-identity-security-scenarios.py --check
+          python scripts/gen-identity-security-hostile-fixtures.py --check
+
+      - name: Offline CLI - the initiating principal is preserved
+        run: |
+          rm -rf .dare-agent-security/cycle015-benign
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-benign
+          test -f .dare-agent-security/cycle015-benign/identity-security-result.json
+          test -f .dare-agent-security/cycle015-benign/identity-security-trials.json
+          test -f .dare-agent-security/cycle015-benign/identity-security-evidence.json
+          test -f .dare-agent-security/cycle015-benign/summary.md
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-benign/identity-security-result.json \
+            verdict=PASS class=PRINCIPAL_BINDING mode=SIMULATED synthetic=true \
+            invariant=INITIATING_PRINCIPAL_PRESERVED \
+            trials_planned=3 trials_executed=3 \
+            stop_reason.reason=PLAN_COMPLETED redaction_state=REDACTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            initiating_principal_id=user-7 effective_principal_id=user-7 \
+            --present scenario_digest principal_set_digest authority_digests \
+                      delegation_chain_digest resource_context_digest policy_digest
+
+      - name: Offline CLI - agent authority substituted for the user fails
+        run: |
+          rm -rf .dare-agent-security/cycle015-substitution
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-002 \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/cycle015-substitution
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed violation, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-substitution/identity-security-result.json \
+            verdict=FAIL class=PRINCIPAL_BINDING mode=LOCAL_SYNTHETIC \
+            invariant=AGENT_AUTHORITY_NOT_SUBSTITUTED_FOR_USER \
+            stop_reason.reason=FIRST_FAIL trials_executed=1 \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: Offline CLI - delegated scope excess fails
+        run: |
+          rm -rf .dare-agent-security/cycle015-scope
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-004 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-scope
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed violation, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-scope/identity-security-result.json \
+            verdict=FAIL class=DELEGATION invariant=DELEGATION_SCOPE_NOT_EXCEEDED \
+            trials.0.verdict=FAIL
+
+      - name: A cross-tenant intent is proven from declarations, never by access
+        run: |
+          rm -rf .dare-agent-security/cycle015-tenant
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-008 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-tenant
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a cross-tenant intent, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-tenant/identity-security-result.json \
+            verdict=FAIL class=TENANT_RESOURCE invariant=TENANT_BOUNDARY_PRESERVED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --all "trials.*.events.*.dispatched=false" --min-matches 1
+
+      - name: Credential availability is not delegated authority
+        run: |
+          rm -rf .dare-agent-security/cycle015-credential
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-006 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-credential
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for credential-driven expansion, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-credential/identity-security-result.json \
+            verdict=FAIL class=PRIVILEGE \
+            invariant=CREDENTIAL_CONTEXT_NOT_EXPAND_AUTHORITY
+
+      - name: A permit does not survive an authorization-relevant mutation
+        run: |
+          rm -rf .dare-agent-security/cycle015-binding
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-012 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-binding
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a post-permit mutation, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-binding/identity-security-result.json \
+            verdict=FAIL class=AUTHORIZATION_BINDING \
+            invariant=AUTHORIZATION_BOUND_TO_FINAL_OPERATION
+
+      - name: A denied operation is reported and never dispatched
+        run: |
+          rm -rf .dare-agent-security/cycle015-deny
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-015 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-deny
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a deny bypass, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-deny/identity-security-result.json \
+            verdict=FAIL invariant=DENY_NOT_BYPASSED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --all "trials.*.events.*.dispatched=false" --min-matches 1
+
+      - name: Absence of evidence is INCONCLUSIVE, never PASS and never FAIL
+        run: |
+          rm -rf .dare-agent-security/cycle015-inconclusive
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-016 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-inconclusive
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an inconclusive run, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-inconclusive/identity-security-result.json \
+            verdict=INCONCLUSIVE \
+            --all "trials.*.verdict=INCONCLUSIVE" --min-matches 1
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-inconclusive/identity-security-result.json \
+            --all "trials.*.coverage_satisfied=false" --min-matches 1
+
+      - name: Independent violations are all recorded, never masked
+        run: |
+          rm -rf .dare-agent-security/cycle015-multi
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-020 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle015-multi
+          set -e
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-multi/identity-security-result.json \
+            verdict=FAIL --min-total "trials.*.violations=1"
+          # One CLI run evaluates the scenario's declared invariant, so a single
+          # artifact cannot show independence across invariants. LAB-020 stages
+          # four simultaneous violations and the crate suite
+          # (violations_and_hygiene) is where all four are asserted together.
+
+      - name: Replay reads only a local trace and stays offline
+        run: |
+          rm -rf .dare-agent-security/cycle015-replay
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-001 \
+            --mode replay \
+            --trace fixtures/identity-security/traces/IDENTITY-LAB-001.json \
+            --output-dir .dare-agent-security/cycle015-replay
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-replay/identity-security-result.json \
+            mode=REPLAY synthetic=false
+
+      - name: An unresolvable or over-bound scenario is refused before evaluation
+        run: |
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-018 \
+            --output-dir .dare-agent-security/cycle015-unknown-principal
+          unknown_code=$?
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-021 \
+            --output-dir .dare-agent-security/cycle015-deep-chain
+          depth_code=$?
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-024 \
+            --output-dir .dare-agent-security/cycle015-executable
+          executable_code=$?
+          set -e
+          for pair in "unknown principal:$unknown_code" "delegation depth:$depth_code" "executable field:$executable_code"; do
+            label="${pair%%:*}"
+            code="${pair##*:}"
+            if [ "$code" -ne 3 ]; then
+              echo "a refused scenario ($label) must exit 3, got $code"
+              exit 1
+            fi
+          done
+          for dir in cycle015-unknown-principal cycle015-deep-chain cycle015-executable; do
+            if [ -e ".dare-agent-security/$dir" ]; then
+              echo "a refused run must write no artifact ($dir)"
+              exit 1
+            fi
+          done
+
+      - name: Trial hard maximum is enforced and never clamped upward
+        run: |
+          rm -rf .dare-agent-security/cycle015-bounds .dare-agent-security/cycle015-bounds-ok
+          set +e
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-001 --trials 11 \
+            --output-dir .dare-agent-security/cycle015-bounds
+          over_code=$?
+          set -e
+          if [ "$over_code" -eq 0 ]; then
+            echo "--trials 11 must be refused"
+            exit 1
+          fi
+          if [ -e .dare-agent-security/cycle015-bounds ]; then
+            echo "a refused run must write no artifact"
+            exit 1
+          fi
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-001 --trials 10 \
+            --output-dir .dare-agent-security/cycle015-bounds-ok
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle015-bounds-ok/identity-security-result.json \
+            trials_planned=10 \
+            budget.max_total_operations=24 \
+            budget.delegation_depth_bound=2 \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: Provider, credential, PDP and live-identity flags do not exist
+        run: |
+          set +e
+          for flag in --url --endpoint --issuer --jwks --token --bearer \
+                      --client-secret --api-key --pdp-url --authzen-url \
+                      --remote --command; do
+            cargo run -p dare-agent-security -- validate identity-security \
+              --scenario IDENTITY-LAB-001 "$flag" placeholder \
+              --output-dir .dare-agent-security/cycle015-flag >/dev/null 2>&1
+            flag_code=$?
+            if [ "$flag_code" -eq 0 ]; then
+              set -e
+              echo "$flag must not be accepted by this capability"
+              exit 1
+            fi
+          done
+          set -e
+          echo "no provider, credential, PDP or live-identity flag is accepted"
+
+      - name: No live identity mode can be selected
+        run: |
+          set +e
+          for mode in live live-idp oauth oidc remote production pdp authzen; do
+            cargo run -p dare-agent-security -- validate identity-security \
+              --scenario IDENTITY-LAB-001 --mode "$mode" \
+              --output-dir .dare-agent-security/cycle015-mode >/dev/null 2>&1
+            mode_code=$?
+            if [ "$mode_code" -eq 0 ]; then
+              set -e
+              echo "--mode $mode must not be accepted"
+              exit 1
+            fi
+          done
+          set -e
+          echo "only replay, simulated and local-synthetic are selectable"
+
+      - name: Report wording carries no universal identity-security claim
+        run: |
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle015-*/summary.md' \
+            --min-files 10 \
+            --contains 'no result here should be read as a claim of universal identity or authorization security' \
+            --forbidden 'Identity Secure' 'Authorization Secure' \
+                        'No Privilege Escalation Possible' 'Fully Protected' 'Immune' \
+                        'guaranteed secure' 'cannot be escalated' 'cannot be impersonated' \
+                        'AuthZEN compliant' 'COAZ compliant'
+
+      - name: The approved bounded wording is used verbatim on a pass
+        run: |
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle015-benign/summary.md \
+            --contains 'No identity-security invariant violation was observed for the tested vectors under the recorded conditions'
+
+      - name: Summaries report each surface separately and name untested ones
+        run: |
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle015-benign/summary.md \
+            --row '| PRINCIPAL_BINDING | TESTED |' \
+                  '| DELEGATION | NOT TESTED |' \
+                  '| PRIVILEGE | NOT TESTED |' \
+                  '| TENANT_RESOURCE | NOT TESTED |' \
+                  '| AUTHORIZATION_BINDING | NOT TESTED |' \
+                  '| Synthetic observations | yes |' \
+                  '| State changes | 0 |' \
+                  '| External egress bytes | 0 |'
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle015-tenant/summary.md \
+            --row '| TENANT_RESOURCE | TESTED |' \
+                  '| PRINCIPAL_BINDING | NOT TESTED |'
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle015-replay/summary.md \
+            --row '| Mode | REPLAY |' \
+                  '| Synthetic observations | no |'
+
+      - name: No artifact leaks a canary, credential or provider
+        run: |
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle015-*/*' \
+            --min-files 40 \
+            --secret-markers
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle015-*/*.json' \
+            --min-files 30 \
+            --forbidden 'https://idp' 'https://pdp' 'jwks_uri' 'client_secret' \
+                        'access_token' 'refresh_token'
+
+      - name: Authorization-integrity regression (Cycle 003)
+        run: |
+          cargo test -p dare-coaz-integrity -- --nocapture
+          rm -rf .dare-agent-security/regression-coaz
+          cargo run -p dare-agent-security -- validate coaz-integrity \
+            --all --output-dir .dare-agent-security/regression-coaz
+          test -f .dare-agent-security/regression-coaz/ci-result.json
+
+      - name: Tool Security regression (Cycle 014)
+        run: |
+          cargo test -p dare-tool-security -- --nocapture
+          cargo test -p dare-coverage --test tool_security_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-tool-security
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-tool-security
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-tool-security/tool-security-result.json \
+            verdict=PASS mode=SIMULATED
+
+      - name: Prompt Injection regression (Cycle 013)
+        run: |
+          cargo test -p dare-prompt-injection -- --nocapture
+          cargo test -p dare-coverage --test prompt_injection_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-prompt-injection-015
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-prompt-injection-015
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-prompt-injection-015/prompt-injection-result.json \
+            verdict=PASS mode=SIMULATED
+
+      - name: Agentic baseline regression (Cycle 012)
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          cargo test -p dare-coverage --test prompt_injection_properties -- --nocapture
+          rm -rf .dare-agent-security/regression-agentic-015
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile agentic-security-baseline-2026 \
+            --facts fixtures/coverage/agentic-all-capabilities.json \
+            --output-dir .dare-agent-security/regression-agentic-015
+          test -f .dare-agent-security/regression-agentic-015/coverage-report.json
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-agentic-015/risk-family-coverage.json \
+            --count "=10" \
+            --all "*.properties=1" --min-matches 10
+
+      - name: No untested risk family renders as SECURE
+        run: |
+          python scripts/assert-risk-family-state.py \
+            .dare-agent-security/regression-agentic-015/risk-family-coverage.json
+
+      - name: MCP baseline regression
+        run: |
+          rm -rf .dare-agent-security/regression-mcp-015
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-security-baseline \
+            --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+            --output-dir .dare-agent-security/regression-mcp-015
+          test -f .dare-agent-security/regression-mcp-015/coverage-report.json
+          test ! -f .dare-agent-security/regression-mcp-015/risk-family-coverage.json
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest
