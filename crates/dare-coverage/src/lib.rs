@@ -8,6 +8,7 @@ mod correlate;
 mod cycle005;
 mod error;
 mod facts;
+mod identity_security_standards;
 mod math;
 mod plan;
 mod profile;
@@ -29,6 +30,16 @@ pub use correlate::{correlate, CorrelatedRow, EvidenceRef, PropertyExecution};
 pub use cycle005::{load_scenario_property_map, map_corpus, ScenarioMapping, LAB_SCENARIO_IDS};
 pub use error::CoverageError;
 pub use facts::{AssessmentFacts, TransportKind};
+pub use identity_security_standards::{
+    load_identity_security_provenance, validate_identity_security_provenance,
+    validate_identity_security_standards, AuthorityModelStatement, IdentityDeferredTopic,
+    IdentityInheritedLesson, IdentityPropertyMapping, IdentitySecurityProvenance,
+    IdentitySecuritySource, IdentitySurfaceClass,
+    IDENTITY_AUTHORIZATION_EXECUTION_BINDING_PROPERTY, IDENTITY_DELEGATION_INTEGRITY_PROPERTY,
+    IDENTITY_DELEGATION_SCOPE_BOUNDARY_PROPERTY, IDENTITY_PRINCIPAL_BINDING_PROPERTY,
+    IDENTITY_PRIVILEGE_AMPLIFICATION_PROPERTY, IDENTITY_SECURITY_PROVENANCE_JSON,
+    IDENTITY_TENANT_RESOURCE_BOUNDARY_PROPERTY,
+};
 pub use math::{
     coverage_ratio, eligible_count, finalize_row, required_eligible_count, required_tested_count,
     tested_count, validate_pair, CoverageCounts, CoveragePolicy, CoverageTotals, DENOMINATOR_DOC,
