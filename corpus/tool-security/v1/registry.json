@@ -1,0 +1,176 @@
+{
+  "schema_version": "1",
+  "corpus_id": "tool-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 014 tool poisoning and tool misuse corpus",
+  "entries": [
+    {
+      "id": "poison-description-instruction",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-description-instruction.json",
+      "digest": "sha256:5f0d9e370be16bc3be02e4d9df95ada2d4fa5eee95e15308d9bed3dc81866fde"
+    },
+    {
+      "id": "poison-description-capability",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-description-capability.json",
+      "digest": "sha256:23c320c06e170f1be012f526016b8851821c8e657c6169ab686e826ef63b8305"
+    },
+    {
+      "id": "poison-schema-parameter",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-schema-parameter.json",
+      "digest": "sha256:837036ee9bd962818d9634709ff197d63cf9fbdf2bd06d269ece9b5afddacb7d"
+    },
+    {
+      "id": "poison-annotation-trust",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-annotation-trust.json",
+      "digest": "sha256:af544f63f7f9c138167780da1deb43379b461c6eed36f87a018d01fe3ac94f65"
+    },
+    {
+      "id": "poison-output-instruction",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-output-instruction.json",
+      "digest": "sha256:4fbb62229ce110cd46aadb3c688797b91282b12c63771931a55708bb390e3108"
+    },
+    {
+      "id": "poison-output-data-trust",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-output-data-trust.json",
+      "digest": "sha256:0bf5bf0a0664154e50207cf77185e4563e22af4e9bd7eaba31fd681c8a3f6435"
+    },
+    {
+      "id": "poison-metadata-substitution",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-metadata-substitution.json",
+      "digest": "sha256:7ad3d9dec2d976616d093a8bb33a2293e8c65ed7148b5e2ec70d14379abd91c4"
+    },
+    {
+      "id": "poison-metadata-hidden-instruction",
+      "class": "POISONING_ATTACK",
+      "path": "poisoning/poison-metadata-hidden-instruction.json",
+      "digest": "sha256:b2dd98b78499c726a646181329f446c5b3188bd6160d9ad47ead362399b5796e"
+    },
+    {
+      "id": "misuse-unapproved-selection",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-unapproved-selection.json",
+      "digest": "sha256:b623c2dedfccb16db3a2d123bbe5604ddbc810d6cb4c9c5757a37d4d0b2d7c71"
+    },
+    {
+      "id": "misuse-objective-mismatch",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-objective-mismatch.json",
+      "digest": "sha256:a61fa280a5ba6a41187b6e450cb001c4974d1ae40df2cb8bc4656a851b381d9e"
+    },
+    {
+      "id": "misuse-argument-substitution",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-argument-substitution.json",
+      "digest": "sha256:65d8eab7dfdec492bf88ac8eddc88f7a6442a33b9eefbd64f39c7f191dc786e4"
+    },
+    {
+      "id": "misuse-dangerous-argument",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-dangerous-argument.json",
+      "digest": "sha256:cb0eb52947a2cdd50f60c1c2892b3dd714f82d18b2a584d7c8fe745949d41c95"
+    },
+    {
+      "id": "misuse-parameter-pollution",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-parameter-pollution.json",
+      "digest": "sha256:1e39cd42bd821d61483608a7e830fa0060487772f9b789d04cc5e68b7f7ad5d1"
+    },
+    {
+      "id": "misuse-excessive-invocation",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-excessive-invocation.json",
+      "digest": "sha256:0f7db426e255cef291a2dae67dd30715dd7e647bb4927a4488115243b0ab493f"
+    },
+    {
+      "id": "misuse-unexpected-chain",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-unexpected-chain.json",
+      "digest": "sha256:0704ec29dff448206e97d717706e161b41c435de56bab393ef77403c9e29dd8c"
+    },
+    {
+      "id": "misuse-chain-depth",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-chain-depth.json",
+      "digest": "sha256:c3976ad15c8d9c064d51c87a198586b8409e62a2307cc36ae572894a175d336e"
+    },
+    {
+      "id": "misuse-output-to-action",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-output-to-action.json",
+      "digest": "sha256:8f4b4d540fead019141abc79c82da30eb7216dc247c4ef462d6630b1429a8090"
+    },
+    {
+      "id": "misuse-policy-mismatch",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-policy-mismatch.json",
+      "digest": "sha256:c04d5eb5be3c81224041524fe3e5c2a62aa89051189a451b4c186485bd11b945"
+    },
+    {
+      "id": "misuse-multiple-independent",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-multiple-independent.json",
+      "digest": "sha256:92e6a45cd61b2fef808e756bcb6ed01282a300008d656e4a061e85c4f5e0c030"
+    },
+    {
+      "id": "misuse-no-relevant-observation",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-no-relevant-observation.json",
+      "digest": "sha256:af2d9e4d7f40c9a01bd76888a97c049e327ffd267116af44dca52a4c8acfb174"
+    },
+    {
+      "id": "benign-tool-description",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-tool-description.json",
+      "digest": "sha256:b941a1f73fde0d2e241832ce299703cecb7448c5cd030c2a9a8499d619717077"
+    },
+    {
+      "id": "benign-tool-schema",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-tool-schema.json",
+      "digest": "sha256:558e1a3e073a40393ff51b1beb03d512e0dc83f4483b23e3c80d5a047661941b"
+    },
+    {
+      "id": "benign-tool-output",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-tool-output.json",
+      "digest": "sha256:f6378ca47896f4c3007208afdb2a52da8a9573a80c00f4f7c09150787e1789d8"
+    },
+    {
+      "id": "benign-approved-selection",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-approved-selection.json",
+      "digest": "sha256:e5d761ef40cfe17ac07d04a744733163bfd3e1a93188ba31846120cac66342ae"
+    },
+    {
+      "id": "benign-approved-arguments",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-approved-arguments.json",
+      "digest": "sha256:3cd3340597bd379696e1692650530c80e0ba5387417a331abf70d56c3b7a3612"
+    },
+    {
+      "id": "benign-approved-chain",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-approved-chain.json",
+      "digest": "sha256:c599be911375f3867a592a1dad03f838425f71dbde3eaa863abe97f434dc93f3"
+    },
+    {
+      "id": "benign-security-prose",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-security-prose.json",
+      "digest": "sha256:424803e42743de97f4f1237e31717d8e8ebfd38db50749b6a2302005d3e359b6"
+    },
+    {
+      "id": "benign-redaction-hygiene",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-redaction-hygiene.json",
+      "digest": "sha256:ec44c9406177b28d78e60f4337e21bf9cfea4707142095e7a28dde68ef79f731"
+    }
+  ]
+}

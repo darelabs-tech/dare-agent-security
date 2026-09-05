@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "corpus_id": "hostile-registry",
+  "version": "1.0.0",
+  "entries": [
+    {
+      "id": "misuse-unapproved-selection",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-unapproved-selection.json"
+    },
+    {
+      "id": "misuse-objective-mismatch",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-unapproved-selection.json"
+    }
+  ]
+}

@@ -18,10 +18,10 @@
 - [x] task-013 — Implement replay adapter
 - [x] task-014 — Implement simulated adapter
 - [x] task-015 — Integrate local-synthetic harness with Cycle 009 controls
-- [ ] task-016 — Build Tool Poisoning corpus with paired secure/vulnerable fixtures
-- [ ] task-017 — Build Tool Misuse corpus with paired secure/vulnerable fixtures
-- [ ] task-018 — Add benign controls and false-positive regressions
-- [ ] task-019 — Add hostile parser/schema/trace fixtures and executable-field refusal
+- [x] task-016 — Build Tool Poisoning corpus with paired secure/vulnerable fixtures
+- [x] task-017 — Build Tool Misuse corpus with paired secure/vulnerable fixtures
+- [x] task-018 — Add benign controls and false-positive regressions
+- [x] task-019 — Add hostile parser/schema/trace fixtures and executable-field refusal
 - [x] task-020 — Implement deterministic selection, argument, output-trust, chain and policy checks
 - [x] task-021 — Implement independent multi-violation capture and secret/redaction hygiene
 - [ ] task-022 — Implement ToolSecurityResult and Cycle 001 evidence bridge

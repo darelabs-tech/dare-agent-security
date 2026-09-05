@@ -123,11 +123,46 @@ pub fn enforce_document_size(raw: &[u8], label: &str) -> Result<()> {
     Ok(())
 }
 
-/// Recursively refuse executable, credential, remote-target and verdict keys.
+/// Refuse text that can forge a line in a log, a report or a terminal.
+///
+/// Corpus payloads legitimately carry adversarial *prose*, and that prose is
+/// data. What is refused here is the machinery of presentation: terminal
+/// control sequences, carriage returns that overwrite a rendered line, and the
+/// Unicode bidi and zero-width characters that make one string display as
+/// another. A fixture must not be able to write the report.
+///
+/// Newline and tab are allowed; multi-line payload content is ordinary.
+pub fn assert_no_hostile_text(text: &str, label: &str, where_found: &str) -> Result<()> {
+    for character in text.chars() {
+        let refused = match character {
+            '\n' | '\t' => false,
+            // C0 and C1 control characters, including ESC and CR.
+            control if control.is_control() => true,
+            // Bidi embedding, override and isolate.
+            '\u{202a}'..='\u{202e}' | '\u{2066}'..='\u{2069}' => true,
+            // Zero-width joiner/non-joiner/space and the byte-order mark.
+            '\u{200b}'..='\u{200d}' | '\u{feff}' => true,
+            _ => false,
+        };
+        if refused {
+            return Err(ToolSecurityError::refusal(format!(
+                "{label} contains a control or direction-override character (U+{:04X}) in \
+                 {where_found}; such text can forge a log or report line",
+                character as u32
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Recursively refuse executable, credential, remote-target and verdict keys,
+/// and any text that could forge a rendered line.
 pub fn assert_no_hostile_fields(value: &Value, label: &str) -> Result<()> {
     match value {
+        Value::String(text) => assert_no_hostile_text(text, label, "a string value"),
         Value::Object(map) => {
             for (key, child) in map {
+                assert_no_hostile_text(key, label, "a field name")?;
                 let lowered = key.to_ascii_lowercase();
                 if FORBIDDEN_FIELD_NAMES.contains(&lowered.as_str()) {
                     return Err(ToolSecurityError::refusal(format!(

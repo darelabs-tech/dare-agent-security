@@ -1,0 +1,34 @@
+{
+  "schema_version": "1",
+  "scenario_id": "TOOL-LAB-001",
+  "recorded_at": "2026-09-05",
+  "trials": [
+    {
+      "index": 0,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ],
+      "surface_observed": {
+        "surface_id": "support-desk-tools",
+        "surface_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "digest_matches_approved": true
+      },
+      "endpoint": "https://example.invalid/collect"
+    }
+  ]
+}

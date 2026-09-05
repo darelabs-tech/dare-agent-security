@@ -27,8 +27,8 @@ use crate::harness::{
     ToolHarnessAdapter, ToolHarnessMode, ToolTrialRequest,
 };
 use crate::model::{
-    ApprovedTool, ApprovedToolPolicy, OperationClass, ReferenceBehavior, ToolLabSpec,
-    ToolObjective, ToolSecurityScenario,
+    ApprovedTool, ApprovedToolPolicy, CorpusPayload, OperationClass, ReferenceBehavior,
+    ToolLabSpec, ToolObjective, ToolSecurityScenario,
 };
 use crate::observation::{HarnessErrorKind, OutputTreatment, PolicyOutcome};
 
@@ -86,7 +86,16 @@ impl ToolHarnessAdapter for ToolSimulatedAdapter {
 
     fn observe(&self, request: &ToolTrialRequest<'_>) -> Result<RawToolTrialOutput> {
         let behavior = self.lab.behavior_for(request.trial_index);
-        stage(behavior, request.scenario, self.lab.output_filler_bytes)
+        // The corpus payload is inert fixture content. It rides through as the
+        // observed tool output so the redaction and evidence layers actually
+        // handle it — it is never parsed, and it never influences the verdict.
+        let payload = request.entry.and_then(|entry| entry.payload.as_ref());
+        stage(
+            behavior,
+            request.scenario,
+            payload,
+            self.lab.output_filler_bytes,
+        )
     }
 }
 
@@ -278,6 +287,7 @@ fn operation_names_tool(operation: &str, tool_id: &str) -> bool {
 pub fn stage(
     behavior: ReferenceBehavior,
     scenario: &ToolSecurityScenario,
+    payload: Option<&CorpusPayload>,
     output_filler_bytes: Option<usize>,
 ) -> Result<RawToolTrialOutput> {
     let stage = Stage::new(scenario)?;
@@ -455,6 +465,12 @@ pub fn stage(
                 }),
                 ..RawToolTrialOutput::default()
             };
+        }
+    }
+
+    if let Some(payload) = payload {
+        for output in &mut raw.outputs {
+            output.content = payload.content.clone();
         }
     }
 
@@ -772,7 +788,7 @@ mod tests {
     fn a_policy_without_approved_tools_cannot_be_simulated() {
         let mut scenario = scenario();
         scenario.policy.approved_tools.clear();
-        let err = stage(ReferenceBehavior::Compliant, &scenario, None).unwrap_err();
+        let err = stage(ReferenceBehavior::Compliant, &scenario, None, None).unwrap_err();
         assert!(err.to_string().contains("at least one approved tool"));
     }
 
@@ -780,7 +796,13 @@ mod tests {
     fn the_staged_unapproved_tool_is_never_in_the_policy() {
         let mut scenario = scenario();
         scenario.policy.approved_tools[0].tool_id = UNAPPROVED_TOOL_BASE.to_owned();
-        let raw = stage(ReferenceBehavior::UnapprovedToolSelected, &scenario, None).unwrap();
+        let raw = stage(
+            ReferenceBehavior::UnapprovedToolSelected,
+            &scenario,
+            None,
+            None,
+        )
+        .unwrap();
         let staged = &raw.selections[0].tool_id;
         assert!(!scenario.policy.is_approved(staged));
         assert_ne!(staged, UNAPPROVED_TOOL_BASE);
