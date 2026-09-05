@@ -433,6 +433,7 @@ dependencies = [
  "dare-coverage",
  "dare-mcp-discovery",
  "dare-product",
+ "dare-prompt-injection",
  "dare-security-evidence",
  "jsonschema",
  "serde",
