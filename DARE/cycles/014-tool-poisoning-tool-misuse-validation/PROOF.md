@@ -305,11 +305,40 @@ defects on its first two runs.
 
 ## 13. PR-open CI
 
-To be recorded after the pull request is opened. The workflow fires only on
-`pull_request: types: [opened]`, so it cannot run before the PR exists.
+Pull request [#21](https://github.com/darelabs-tech/dare-agent-security/pull/21),
+opened at head `a4f039335cd793eacbdf365abc0118dfe4e469ea`.
 
-**Status: pending PR open.** This section is the one part of this document that
-is not yet evidence, and it is marked as such rather than assumed.
+| Workflow | Run | Conclusion |
+|---|---|---|
+| `ci` | 33982616816 | **success** (6m15s) |
+| `action-e2e` | 33982616776 | **success** (4m0s) |
+
+All twelve `ci` jobs succeeded, including the new one:
+
+| Job | Conclusion |
+|---|---|
+| Rust workspace | success |
+| Cycle 005 lab corpus | success |
+| Cycle 006 coverage engine | success |
+| Cycle 007 benchmark methodology | success |
+| Cycle 008 attack graph MVP | success |
+| Cycle 009 controlled adversarial validation | success |
+| Cycle 010 continuous security validation | success |
+| Cycle 011 productization | success |
+| Cycle 012 Agentic registry security gate | success |
+| Cycle 013 Prompt Injection security gate | success |
+| **Cycle 014 Tool Poisoning and Tool Misuse security gate** | **success** |
+| mdBook documentation gate | success |
+
+The Cycle 014 gate ran 2026-09-05T17:58:57Z to 18:01:46Z. No job failed, and no
+prior cycle's gate regressed.
+
+The only annotations are the repository-wide `actions/checkout@v4` Node.js 20
+deprecation notices, which predate this cycle and affect every job equally.
+
+This is the first cycle where the shipped CI job passed on its first PR-open
+run. Cycle 013's did not, and the gate added in response — running the real
+workflow steps locally before opening the PR — is what closed the gap.
 
 ---
 
@@ -324,5 +353,6 @@ warnings`, `cargo test --workspace` (1315 passing) and `cargo audit`
 green; both books build; all three generator drift checks are clean; and the
 mandatory local workflow-job run passed all 28 steps.
 
-The single outstanding item is §13, PR-open CI, which cannot execute before the
-pull request is opened and is marked pending rather than claimed.
+§13 is now closed as well: PR #21's CI completed green on open, with all twelve
+jobs succeeding and no prior cycle's gate regressing. Nothing in this document
+remains pending.
