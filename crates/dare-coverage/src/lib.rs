@@ -53,9 +53,14 @@ pub use status::CoverageStatus;
 
 pub const CRATE_NAME: &str = "dare-coverage";
 
-pub fn registry_for_profile(profile: &AssessmentProfile) -> Result<PropertyRegistry, CoverageError> {
+pub fn registry_for_profile(
+    profile: &AssessmentProfile,
+) -> Result<PropertyRegistry, CoverageError> {
     if profile.id == "agentic-security-baseline-2026"
-        || profile.properties.iter().any(|entry| entry.id.starts_with("AGENT."))
+        || profile
+            .properties
+            .iter()
+            .any(|entry| entry.id.starts_with("AGENT."))
     {
         agentic_registry()
     } else {
