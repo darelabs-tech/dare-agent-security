@@ -1,9 +1,23 @@
 cycle: "014-tool-poisoning-tool-misuse-validation"
 status: APPROVED_FOR_EXECUTION
 approval: APPROVED
+approval_file: DARE/cycles/014-tool-poisoning-tool-misuse-validation/APPROVAL.md
 base_branch: main
 baseline_commit: 1fa9ba04e55e53e25d71621675cba9a70d174e8e
 branch: agent/cycle-014-tool-poisoning-tool-misuse-validation
+
+execution_rules:
+  order: dependency_dag
+  task_specs_dir: DARE/cycles/014-tool-poisoning-tool-misuse-validation/EXECUTION
+  task_count: 31
+  ralph_loop: [build, test, lint, review]
+  fail_closed: true
+  no_llm_final_judge: true
+  no_remote_execution: true
+  no_real_state_change: true
+  positive_pass_coverage_required: true
+  pr_open_only_ci: true
+  pre_pr_local_workflow_job: tool-security-2026
 
 tasks:
   - {id: task-001, depends_on: []}
@@ -38,8 +52,26 @@ tasks:
   - {id: task-030, depends_on: [task-023, task-024, task-025, task-026, task-027, task-028, task-029]}
   - {id: task-031, depends_on: [task-030]}
 
-execution_gate:
-  requires_approval_file: DARE/cycles/014-tool-poisoning-tool-misuse-validation/APPROVAL.md
-  approval_file_must_exist_before_execute: true
-  approval_file_present: true
-  required_pre_pr_local_workflow_job: tool-security-2026
+hard_bounds:
+  default_trials: 3
+  hard_max_trials: 10
+  stop_on_first_fail: true
+  max_tool_requests_per_trial: 8
+  hard_max_chain_depth: 3
+  hard_max_total_tool_requests: 24
+  max_output_bytes_per_trial: 16384
+  max_total_output_bytes: 65536
+  max_duration_seconds_per_trial: 30
+  max_state_changes: 0
+  external_egress_bytes: 0
+
+completion_gates:
+  - cargo fmt --all --check
+  - cargo clippy --workspace --all-targets -- -D warnings
+  - cargo test --workspace
+  - cargo audit
+  - python scripts/run-ci-job-locally.py .github/workflows/ci.yml tool-security-2026
+  - Cycle 013 prompt-injection regression
+  - Agentic baseline regression
+  - MCP baseline regression
+  - all 61 DESIGN acceptance criteria mapped in PROOF.md
