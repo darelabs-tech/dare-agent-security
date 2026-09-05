@@ -28,6 +28,7 @@
 
 pub mod error;
 pub mod model;
+pub mod observation;
 pub mod schema;
 pub mod source;
 
@@ -40,6 +41,12 @@ pub use model::{
     ToolInvariantSpec, ToolInvariantType, ToolLabSpec, ToolObjective, ToolParameter,
     ToolSafetySpec, ToolSecurityMetadata, ToolSecurityScenario, ToolSourceBoundary,
     ToolStandardRef, ToolSurfaceSnapshot, ToolTrialSpec, ToolVectorRef,
+};
+pub use observation::{
+    canary_digest, observed_channels, validate_events, CoverageChannel, EvidenceText,
+    HarnessErrorEvent, HarnessErrorKind, ObjectiveState, ObservedArgument, OutputTreatment,
+    PolicyDecisionEvent, PolicyOutcome, ToolArguments, ToolChainStep, ToolObservationEvent,
+    ToolOutputObserved, ToolRequested, ToolSelected, ToolSurfaceObserved, REDACTION_MARKER,
 };
 pub use source::{
     CorpusClass, MisuseFamily, MisuseSurface, PoisoningFamily, ScenarioClass, ToolSourceKind,
