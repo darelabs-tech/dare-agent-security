@@ -12,7 +12,7 @@
 - [x] task-007 — Define poisoning/misuse/source/trust closed enums
 - [x] task-008 — Define normalized Tool Observation event model
 - [x] task-009 — Define invariant-specific positive PASS coverage contracts
-- [ ] task-010 — Implement deterministic Tool Security invariant evaluator registry
+- [x] task-010 — Implement deterministic Tool Security invariant evaluator registry
 - [ ] task-011 — Implement canonical scenario/corpus/objective/policy/tool-surface digest binding
 - [ ] task-012 — Implement bounded trials, tool-request counts and chain-depth enforcement
 - [ ] task-013 — Implement replay adapter
@@ -22,8 +22,8 @@
 - [ ] task-017 — Build Tool Misuse corpus with paired secure/vulnerable fixtures
 - [ ] task-018 — Add benign controls and false-positive regressions
 - [ ] task-019 — Add hostile parser/schema/trace fixtures and executable-field refusal
-- [ ] task-020 — Implement deterministic selection, argument, output-trust, chain and policy checks
-- [ ] task-021 — Implement independent multi-violation capture and secret/redaction hygiene
+- [x] task-020 — Implement deterministic selection, argument, output-trust, chain and policy checks
+- [x] task-021 — Implement independent multi-violation capture and secret/redaction hygiene
 - [ ] task-022 — Implement ToolSecurityResult and Cycle 001 evidence bridge
 - [ ] task-023 — Add `tool-security-baseline-2026` profile and coverage integration
 - [ ] task-024 — Add `validate tool-security` CLI integration

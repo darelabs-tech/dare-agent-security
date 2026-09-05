@@ -28,6 +28,7 @@
 
 pub mod coverage;
 pub mod error;
+pub mod invariant;
 pub mod model;
 pub mod observation;
 pub mod schema;
@@ -39,6 +40,7 @@ pub use coverage::{
 };
 pub use dare_security_evidence::Verdict;
 pub use error::{Result, ToolSecurityError};
+pub use invariant::{evaluate, supported_invariants, ToolInvariantOutcome, ToolViolation};
 pub use model::{
     ApprovedArgument, ApprovedTool, ApprovedToolPolicy, ChainPolicy, DeclaredSensitivity,
     InvocationPolicy, OperationClass, ParameterType, ReferenceBehavior, SemanticClass,
