@@ -9,6 +9,7 @@ to; anything not executed is marked as such.
 | Field | Value |
 |---|---|
 | Head SHA at execution | `06c0ad0ff602dccad728bd48661ef760603846b8` |
+| Gates re-run at | `562e6a0a31c349b86409350802d3530800f61e78` |
 | Branch | `agent/cycle-015-identity-privilege-delegation-security` |
 | Baseline | `main @ 2f9c02b4f4f94daa5478a0785f74814fb2d021a2` |
 | Toolchain | `rustc 1.94.1 (e408947bf 2026-03-25)` |
@@ -17,8 +18,16 @@ to; anything not executed is marked as such.
 | Local CI shell | Git Bash (`C:\Program Files\Git\bin\bash.exe`) |
 | Date | 2026-09-05 |
 
-The commits made after this record — `REGRESSION.md` and `PROOF.md` themselves —
-touch documentation only and change no code, schema, fixture or workflow.
+Two commits after the measured head touch code-adjacent files: `f207cff` adds
+the new workspace member to `Cargo.lock`, and `562e6a0` restores the v2
+registry's shipped compact formatting so its diff reads as the four added
+properties it is. Neither changes behaviour or schema content — the registry
+parses to the identical set of 30 properties either way — and every gate below
+was re-run at `562e6a0`.
+
+The commits that follow it are this file and `PROOF.md`, which change no code,
+schema, fixture or workflow. A record cannot name its own commit; `562e6a0` is
+the last head at which the gates were measured.
 
 ## Workspace gates
 

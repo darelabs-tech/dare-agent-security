@@ -3,7 +3,8 @@
 Each of the 67 acceptance criteria in `DESIGN.md` §30 is mapped to the artifact
 that satisfies it and the command that was actually run. Nothing is marked
 satisfied on intent: every row names evidence that executed at
-`06c0ad0ff602dccad728bd48661ef760603846b8`, and the run results are recorded in
+`06c0ad0ff602dccad728bd48661ef760603846b8` and was re-verified at
+`562e6a0a31c349b86409350802d3530800f61e78`; the run results are recorded in
 `REGRESSION.md`.
 
 Commands referenced by shorthand:
