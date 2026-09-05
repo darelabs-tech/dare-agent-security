@@ -17,7 +17,7 @@
 - [x] task-012 — Implement simulated adapter
 - [x] task-013 — Integrate local-synthetic harness with Cycle 009 controls
 - [x] task-014 — Build direct prompt-injection corpus and paired fixtures
-- [ ] task-015 — Build indirect prompt-injection corpus and paired fixtures
+- [x] task-015 — Build indirect prompt-injection corpus and paired fixtures
 - [ ] task-016 — Add benign-control corpus and false-positive regressions
 - [ ] task-017 — Add hostile parser/schema fixtures and executable-field refusal
 - [ ] task-018 — Implement canary, protected-field and unauthorized-action deterministic checks
