@@ -26,6 +26,7 @@ pub mod model;
 pub mod observation;
 pub mod schema;
 pub mod source;
+pub mod trials;
 
 pub use canonical::{bind, objective_digest, scenario_digest, IdentityBinding};
 pub use dare_security_evidence::Verdict;
@@ -42,6 +43,7 @@ pub use observation::{
     PolicyOutcome, ProtectedFieldEmission, StructuredActionRequest,
 };
 pub use source::{CorpusClass, InjectionDirection, InjectionFamily, SourceKind, TrustLevel};
+pub use trials::{BudgetSnapshot, StopReason, TrialGuard, TrialLedger, TrialPlan};
 
 /// Published crate name for workspace identity checks.
 pub const CRATE_NAME: &str = "dare-prompt-injection";
