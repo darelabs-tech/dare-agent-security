@@ -361,6 +361,342 @@ jobs:
           test -f .dare-agent-security/cycle013-mcp/coverage-report.json
           test ! -f .dare-agent-security/cycle013-mcp/risk-family-coverage.json
 
+  tool-security-2026:
+    name: Cycle 014 Tool Poisoning and Tool Misuse security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (schemas, enums, invariants, bounds, adapters)
+        run: cargo test -p dare-tool-security --lib -- --nocapture
+      - name: Corpus, paired vectors, benign controls and false-positive regressions
+        run: cargo test -p dare-tool-security --test corpus_integration -- --nocapture
+      - name: Hostile parser fixtures fail closed
+        run: cargo test -p dare-tool-security --test hostile_fixtures -- --nocapture
+      - name: Offline, confidential and no-remote-tool regressions
+        run: cargo test -p dare-tool-security --test offline_confidential -- --nocapture
+      - name: Tool-security profile and coverage integration
+        run: cargo test -p dare-coverage --test tool_security_profile -- --nocapture
+      - name: Tool-security properties and standards provenance
+        run: |
+          cargo test -p dare-coverage --test tool_security_properties -- --nocapture
+          cargo test -p dare-coverage --lib tool_security_standards -- --nocapture
+      - name: Additive product metadata and bounded-claim wording
+        run: cargo test -p dare-product --lib tool_security_metadata -- --nocapture
+      - name: CLI flag surface (no remote, provider, credential or live-MCP flag)
+        run: cargo test -p dare-agent-security --lib tool_security -- --nocapture
+      - name: CLI end-to-end matrix and product reporting bridge
+        run: |
+          cargo test -p dare-agent-security --test tool_security_cli -- --nocapture
+          cargo test -p dare-agent-security --test tool_security_product -- --nocapture
+
+      - name: Corpus and fixtures are generated, not hand-edited
+        run: |
+          python scripts/gen-tool-security-corpus.py --check
+          python scripts/gen-tool-security-hostile-fixtures.py --check
+          python scripts/gen-tool-security-scenarios.py --check
+
+      - name: Offline CLI - benign control passes
+        run: |
+          rm -rf .dare-agent-security/cycle014-benign
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle014-benign
+          test -f .dare-agent-security/cycle014-benign/tool-security-result.json
+          test -f .dare-agent-security/cycle014-benign/tool-security-trials.json
+          test -f .dare-agent-security/cycle014-benign/tool-security-evidence.json
+          test -f .dare-agent-security/cycle014-benign/summary.md
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-benign/tool-security-result.json \
+            verdict=PASS class=POISONING mode=SIMULATED synthetic=true \
+            trials_planned=3 trials_executed=3 \
+            stop_reason.reason=PLAN_COMPLETED redaction_state=REDACTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --present scenario_digest objective_digest policy_digest surface_digest tool_digests
+
+      - name: Offline CLI - tool poisoning vector fails deterministically
+        run: |
+          rm -rf .dare-agent-security/cycle014-poisoning
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-002 \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/cycle014-poisoning
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed violation, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-poisoning/tool-security-result.json \
+            verdict=FAIL class=POISONING mode=LOCAL_SYNTHETIC \
+            invariant=TOOL_METADATA_NOT_AUTHORITATIVE \
+            stop_reason.reason=FIRST_FAIL trials_executed=1 \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: Offline CLI - tool misuse vector fails deterministically
+        run: |
+          rm -rf .dare-agent-security/cycle014-misuse
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-008 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle014-misuse
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed violation, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-misuse/tool-security-result.json \
+            verdict=FAIL class=MISUSE invariant=APPROVED_TOOL_ONLY trials.0.verdict=FAIL
+
+      - name: A risky operation is observed and never dispatched
+        run: |
+          rm -rf .dare-agent-security/cycle014-dangerous
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-010 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle014-dangerous
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a dangerous-operation request, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-dangerous/tool-security-result.json \
+            verdict=FAIL invariant=DANGEROUS_ARGUMENT_NOT_REQUESTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --all "trials.*.events.*.dispatched=false" --min-matches 1
+
+      - name: Absence of evidence is INCONCLUSIVE, never PASS and never FAIL
+        run: |
+          rm -rf .dare-agent-security/cycle014-inconclusive
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-015 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle014-inconclusive
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an inconclusive run, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-inconclusive/tool-security-result.json \
+            verdict=INCONCLUSIVE \
+            --all "trials.*.verdict=INCONCLUSIVE" --min-matches 1
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-inconclusive/tool-security-result.json \
+            --all "trials.*.coverage_satisfied=false" --min-matches 1
+
+      - name: Independent violations are all recorded, never masked
+        run: |
+          rm -rf .dare-agent-security/cycle014-multi
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-019 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle014-multi
+          set -e
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-multi/tool-security-result.json \
+            verdict=FAIL --min-total "trials.*.violations=1"
+          # TOOL-LAB-008 is where multiplicity is visible in one artifact: the
+          # same unapproved tool crosses APPROVED_TOOL_ONLY twice, once when
+          # selected and once when requested. A first-match evaluator would
+          # report one of those and silently lose the other. TOOL-LAB-019's
+          # independence spans several invariants, which one CLI run cannot
+          # show, so the corpus suite covers that case instead.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-misuse/tool-security-result.json \
+            verdict=FAIL --min-total "trials.*.violations=2"
+
+      - name: Offline CLI - replay reads only a local trace
+        run: |
+          rm -rf .dare-agent-security/cycle014-replay
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-005 \
+            --mode replay \
+            --trace fixtures/tool-security/traces/TOOL-LAB-005.json \
+            --output-dir .dare-agent-security/cycle014-replay
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-replay/tool-security-result.json \
+            verdict=PASS mode=REPLAY synthetic=false
+
+      - name: A poisoned or substituted corpus is refused before execution
+        run: |
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-017 \
+            --corpus fixtures/tool-security/lab-corpora/executable-field-corpus \
+            --output-dir .dare-agent-security/cycle014-executable
+          executable_code=$?
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-016 \
+            --corpus fixtures/tool-security/lab-corpora/malformed-corpus \
+            --output-dir .dare-agent-security/cycle014-substituted
+          substituted_code=$?
+          set -e
+          if [ "$executable_code" -ne 3 ]; then
+            echo "an executable field in a corpus vector must exit 3, got $executable_code"
+            exit 1
+          fi
+          if [ "$substituted_code" -ne 3 ]; then
+            echo "a substituted corpus digest must exit 3, got $substituted_code"
+            exit 1
+          fi
+          if [ -e .dare-agent-security/cycle014-executable ]; then
+            echo "a refused run must write no artifact"
+            exit 1
+          fi
+          if [ -e .dare-agent-security/cycle014-substituted ]; then
+            echo "a refused run must write no artifact"
+            exit 1
+          fi
+
+      - name: Trial hard maximum is enforced and never clamped upward
+        run: |
+          rm -rf .dare-agent-security/cycle014-bounds .dare-agent-security/cycle014-bounds-ok
+          set +e
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-001 --trials 11 \
+            --output-dir .dare-agent-security/cycle014-bounds
+          over_code=$?
+          set -e
+          if [ "$over_code" -eq 0 ]; then
+            echo "--trials 11 must be refused"
+            exit 1
+          fi
+          if [ -e .dare-agent-security/cycle014-bounds ]; then
+            echo "a refused run must write no artifact"
+            exit 1
+          fi
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-001 --trials 10 \
+            --output-dir .dare-agent-security/cycle014-bounds-ok
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle014-bounds-ok/tool-security-result.json \
+            trials_planned=10 \
+            budget.max_total_tool_requests=12 \
+            budget.chain_depth_bound=2
+
+      - name: Remote, credential and live-MCP flags do not exist
+        run: |
+          set +e
+          for flag in --url --endpoint --api-key --token --provider --remote --command --mcp-server; do
+            cargo run -p dare-agent-security -- validate tool-security \
+              --scenario TOOL-LAB-001 "$flag" placeholder \
+              --output-dir .dare-agent-security/cycle014-flag >/dev/null 2>&1
+            flag_code=$?
+            if [ "$flag_code" -eq 0 ]; then
+              set -e
+              echo "$flag must not be accepted by this capability"
+              exit 1
+            fi
+          done
+          set -e
+          echo "no remote, credential or live-MCP flag is accepted"
+
+      - name: Report wording carries no universal tool-security claim
+        run: |
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle014-*/summary.md' \
+            --min-files 8 \
+            --contains 'no result here should be read as a claim of universal tool security' \
+            --forbidden 'tool secure' 'tools are secure' 'safe tools' 'immune' \
+                        'fully protected' 'guaranteed secure' 'cannot be poisoned' \
+                        'cannot be misused'
+
+      - name: The approved bounded wording is used verbatim on a pass
+        run: |
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle014-benign/summary.md \
+            --contains 'No tool-security invariant violation was observed for the tested vectors under the recorded conditions'
+
+      - name: Summaries separate poisoning from misuse and name untested surfaces
+        run: |
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle014-benign/summary.md \
+            --row '| TOOL_POISONING | TESTED |' \
+                  '| TOOL_MISUSE | NOT TESTED |' \
+                  '| Poisoning: description | TESTED |' \
+                  '| Poisoning: output | NOT TESTED |' \
+                  '| Misuse: selection | NOT APPLICABLE |' \
+                  '| State changes | 0 |' \
+                  '| External egress bytes | 0 |'
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle014-misuse/summary.md \
+            --row '| TOOL_POISONING | NOT TESTED |' \
+                  '| TOOL_MISUSE | TESTED |' \
+                  '| Misuse: selection | TESTED |' \
+                  '| Poisoning: description | NOT APPLICABLE |'
+
+      - name: No artifact leaks a canary or credential
+        run: |
+          rm -rf .dare-agent-security/cycle014-canary
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-018 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle014-canary
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle014-*/*' \
+            --min-files 20 \
+            --secret-markers
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle014-canary/tool-security-result.json \
+            --contains '[REDACTED]'
+
+      - name: Prompt Injection regression (Cycle 013)
+        run: |
+          cargo test -p dare-prompt-injection -- --nocapture
+          cargo test -p dare-coverage --test prompt_injection_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-prompt-injection
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-prompt-injection
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-prompt-injection/prompt-injection-result.json \
+            verdict=PASS mode=SIMULATED
+
+      - name: Agentic baseline regression (Cycle 012)
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          cargo test -p dare-coverage --test prompt_injection_properties -- --nocapture
+          rm -rf .dare-agent-security/regression-agentic
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile agentic-security-baseline-2026 \
+            --facts fixtures/coverage/agentic-all-capabilities.json \
+            --output-dir .dare-agent-security/regression-agentic
+          test -f .dare-agent-security/regression-agentic/coverage-report.json
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-agentic/risk-family-coverage.json \
+            --count "=10" \
+            --all "*.properties=1" --min-matches 10
+
+      - name: No untested risk family renders as SECURE
+        run: |
+          python scripts/assert-risk-family-state.py \
+            .dare-agent-security/regression-agentic/risk-family-coverage.json
+
+      - name: MCP baseline regression
+        run: |
+          rm -rf .dare-agent-security/regression-mcp
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-security-baseline \
+            --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+            --output-dir .dare-agent-security/regression-mcp
+          test -f .dare-agent-security/regression-mcp/coverage-report.json
+          test ! -f .dare-agent-security/regression-mcp/risk-family-coverage.json
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

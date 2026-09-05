@@ -29,7 +29,7 @@
 - [x] task-024 — Add `validate tool-security` CLI integration
 - [x] task-025 — Add product/report integration with bounded-claim wording
 - [x] task-026 — Add confidential/offline/no-remote-tool regressions
-- [ ] task-027 — Add dedicated Cycle 014 CI security gate and execute workflow job locally
+- [x] task-027 — Add dedicated Cycle 014 CI security gate and execute workflow job locally
 - [ ] task-028 — Document operator safe-use semantics and limitations
 - [ ] task-029 — Document contributor corpus/property/evaluator extension process
 - [ ] task-030 — Run complete workspace, Cycle 013, Agentic and MCP compatibility regression
