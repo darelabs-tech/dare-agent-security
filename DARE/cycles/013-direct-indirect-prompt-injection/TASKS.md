@@ -7,7 +7,7 @@
 - [x] task-002 — Snapshot current OWASP Prompt Injection + ASI01 provenance
 - [x] task-003 — Add specialized prompt-injection AGENT.* properties and predicates
 - [x] task-004 — Define PromptInjectionScenario schema
-- [ ] task-005 — Define prompt-injection corpus-entry schema
+- [x] task-005 — Define prompt-injection corpus-entry schema
 - [ ] task-006 — Define source trust-boundary and injection-family enums
 - [ ] task-007 — Define normalized observation-event model
 - [ ] task-008 — Implement deterministic invariant evaluator registry

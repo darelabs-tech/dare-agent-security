@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/prompt-injection/v1/corpus-entry.schema.json",
+  "title": "DARE Prompt Injection Corpus Entry v1",
+  "description": "One synthetic prompt-injection vector or benign control. Content is inert data: the contract admits no executable, credential, remote-target or file-reference field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "family",
+    "source_kind",
+    "property",
+    "preconditions",
+    "content",
+    "expected_invariant",
+    "safety_class",
+    "standards",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "class": {
+      "description": "BENIGN_CONTROL entries exist to prove the engine does not raise a deterministic violation from adversarial-looking prose alone.",
+      "type": "string",
+      "enum": ["DIRECT_ATTACK", "INDIRECT_ATTACK", "BENIGN_CONTROL"]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "DIRECT_GOAL_OVERRIDE",
+        "DIRECT_SYSTEM_INSTRUCTION_OVERRIDE",
+        "DIRECT_ROLE_CONFUSION",
+        "DIRECT_PROTECTED_DATA_REQUEST",
+        "DIRECT_UNAUTHORIZED_ACTION_REQUEST",
+        "DIRECT_INSTRUCTION_SMUGGLING",
+        "INDIRECT_GOAL_OVERRIDE",
+        "INDIRECT_SYSTEM_INSTRUCTION_OVERRIDE",
+        "INDIRECT_PROTECTED_DATA_REQUEST",
+        "INDIRECT_UNAUTHORIZED_ACTION_REQUEST",
+        "INDIRECT_HIDDEN_INSTRUCTION",
+        "INDIRECT_CROSS_CONTENT_INSTRUCTION"
+      ]
+    },
+    "source_kind": {
+      "type": "string",
+      "enum": [
+        "USER_PROMPT",
+        "DOCUMENT_TEXT",
+        "HTML_CONTENT",
+        "MCP_RESOURCE_CONTENT",
+        "GENERIC_EXTERNAL_CONTENT"
+      ]
+    },
+    "trust": {
+      "type": "string",
+      "enum": ["TRUSTED", "UNTRUSTED", "MIXED"]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.GOAL.INSTRUCTION_INTEGRITY",
+        "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY",
+        "AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY"
+      ]
+    },
+    "preconditions": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "agent_present",
+          "user_prompt_present",
+          "untrusted_external_content_present"
+        ]
+      }
+    },
+    "content": {
+      "description": "Inert synthetic fixture content. Never executed, never interpolated into a shell, never used as a path.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "payload"],
+      "properties": {
+        "encoding": {
+          "type": "string",
+          "enum": ["PLAIN_TEXT", "HTML", "MARKDOWN", "JSON_TEXT"]
+        },
+        "payload": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "carrier_note": {
+          "description": "How the payload is positioned inside the untrusted content (for example a hidden HTML comment).",
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "expected_invariant": {
+      "type": "string",
+      "enum": [
+        "AUTHORIZED_GOAL_UNCHANGED",
+        "FORBIDDEN_CANARY_NOT_DISCLOSED",
+        "UNAUTHORIZED_ACTION_NOT_REQUESTED",
+        "PROTECTED_FIELD_NOT_EMITTED",
+        "POLICY_DENY_NOT_BYPASSED",
+        "EXPECTED_SCHEMA_PRESERVED"
+      ]
+    },
+    "safety_class": {
+      "description": "Cycle 013 corpus content is inert. SYNTHETIC_NOOP is the only permitted class; no entry may request a state change or egress.",
+      "const": "SYNTHETIC_NOOP"
+    },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reference", "status"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "OWASP_LLM_TOP10_2025",
+              "OWASP_AGENTIC_TOP10_2026",
+              "DARE_CYCLE_013"
+            ]
+          },
+          "reference": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "status": {
+            "type": "string",
+            "enum": ["NORMATIVE", "DRAFT", "INFORMATIVE"]
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "created_at", "license"],
+      "properties": {
+        "origin": {
+          "description": "Only synthetic, DARE-authored content is permitted. No customer data and no captured production traffic.",
+          "type": "string",
+          "enum": ["DARE_SYNTHETIC"]
+        },
+        "author": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "created_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "license": { "type": "string", "enum": ["Apache-2.0"] },
+        "note": { "type": "string", "maxLength": 300 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "class": { "const": "DIRECT_ATTACK" } } },
+      "then": {
+        "properties": {
+          "family": { "pattern": "^DIRECT_" },
+          "source_kind": { "const": "USER_PROMPT" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "class": { "const": "INDIRECT_ATTACK" } } },
+      "then": {
+        "properties": {
+          "family": { "pattern": "^INDIRECT_" },
+          "source_kind": {
+            "enum": [
+              "DOCUMENT_TEXT",
+              "HTML_CONTENT",
+              "MCP_RESOURCE_CONTENT",
+              "GENERIC_EXTERNAL_CONTENT"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -18,6 +18,7 @@
 //! Verdict and evidence semantics are reused from Cycle 001; ROE, budget,
 //! kill-switch and canonical-digest controls from Cycle 009.
 
+pub mod corpus;
 pub mod error;
 pub mod schema;
 
