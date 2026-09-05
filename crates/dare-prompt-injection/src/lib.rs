@@ -23,6 +23,7 @@ pub mod corpus;
 pub mod error;
 pub mod harness;
 pub mod invariant;
+pub mod local_synthetic;
 pub mod model;
 pub mod observation;
 pub mod replay;
@@ -39,6 +40,7 @@ pub use harness::{
     RawTrialOutput, TrialRequest,
 };
 pub use invariant::{evaluate, supported_invariants, InvariantOutcome};
+pub use local_synthetic::{synthetic_budget, ControlSnapshot, LocalSyntheticAdapter};
 pub use model::{
     BoundaryProperty, ContentEncoding, CorpusContent, CorpusEntry, CorpusProvenance, InvariantSpec,
     InvariantType, Objective, PromptInjectionScenario, SafetySpec, SourceBoundary, StandardRef,
