@@ -1,0 +1,66 @@
+# Cycle 014 — Tasks
+
+**Status:** READY FOR REVIEW
+**Approval:** PENDING
+
+## task-001 — Reconcile current main baseline and freeze compatibility contracts
+
+## task-002 — Record Cycle 013 lessons/residual risks and ASI02 standards provenance
+
+## task-003 — Freeze/add Tool Security AGENT.* properties and applicability predicates
+
+## task-004 — Define ToolSecurityScenario schema
+
+## task-005 — Define ToolSurfaceSnapshot and ApprovedToolPolicy schemas
+
+## task-006 — Define tool-security corpus-entry and replay trace schemas
+
+## task-007 — Define poisoning/misuse/source/trust closed enums
+
+## task-008 — Define normalized Tool Observation event model
+
+## task-009 — Define invariant-specific positive PASS coverage contracts
+
+## task-010 — Implement deterministic Tool Security invariant evaluator registry
+
+## task-011 — Implement canonical scenario/corpus/objective/policy/tool-surface digest binding
+
+## task-012 — Implement bounded trials, tool-request counts and chain-depth enforcement
+
+## task-013 — Implement replay adapter
+
+## task-014 — Implement simulated adapter
+
+## task-015 — Integrate local-synthetic harness with Cycle 009 controls
+
+## task-016 — Build Tool Poisoning corpus with paired secure/vulnerable fixtures
+
+## task-017 — Build Tool Misuse corpus with paired secure/vulnerable fixtures
+
+## task-018 — Add benign controls and false-positive regressions
+
+## task-019 — Add hostile parser/schema/trace fixtures and executable-field refusal
+
+## task-020 — Implement deterministic selection, argument, output-trust, chain and policy checks
+
+## task-021 — Implement independent multi-violation capture and secret/redaction hygiene
+
+## task-022 — Implement ToolSecurityResult and Cycle 001 evidence bridge
+
+## task-023 — Add `tool-security-baseline-2026` profile and coverage integration
+
+## task-024 — Add `validate tool-security` CLI integration
+
+## task-025 — Add product/report integration with bounded-claim wording
+
+## task-026 — Add confidential/offline/no-remote-tool regressions
+
+## task-027 — Add dedicated Cycle 014 CI security gate and execute workflow job locally
+
+## task-028 — Document operator safe-use semantics and limitations
+
+## task-029 — Document contributor corpus/property/evaluator extension process
+
+## task-030 — Run complete workspace, Cycle 013, Agentic and MCP compatibility regression
+
+## task-031 — Final DARE proof and Cycle 014 completion gate
