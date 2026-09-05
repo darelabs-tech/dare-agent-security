@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/tool-security/v1/scenario.schema.json",
+  "title": "DARE Tool Security Scenario v1",
+  "description": "Bounded, local-only tool poisoning / tool misuse validation scenario. Closed data: the contract admits no executable, shell, callback, credential, remote-target or live-tool field, and carries no expected verdict.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "family",
+    "property",
+    "source",
+    "objective",
+    "policy",
+    "tool_surface",
+    "invariant",
+    "trials",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "id": {
+      "type": "string",
+      "pattern": "^TOOL-[A-Z0-9]+(-[A-Z0-9]+)*$",
+      "minLength": 6,
+      "maxLength": 64
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "class": {
+      "type": "string",
+      "enum": ["POISONING", "MISUSE"]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "TOOL_DESCRIPTION_INSTRUCTION_POISONING",
+        "TOOL_DESCRIPTION_CAPABILITY_MISREPRESENTATION",
+        "TOOL_SCHEMA_PARAMETER_POISONING",
+        "TOOL_ANNOTATION_TRUST_POISONING",
+        "TOOL_OUTPUT_INSTRUCTION_POISONING",
+        "TOOL_OUTPUT_DATA_TRUST_POISONING",
+        "TOOL_METADATA_SUBSTITUTION",
+        "TOOL_METADATA_HIDDEN_INSTRUCTION",
+        "UNINTENDED_TOOL_SELECTION",
+        "OBJECTIVE_TOOL_MISMATCH",
+        "ARGUMENT_SUBSTITUTION",
+        "DANGEROUS_ARGUMENT_REQUEST",
+        "PARAMETER_POLLUTION",
+        "EXCESSIVE_INVOCATION",
+        "UNEXPECTED_TOOL_CHAIN",
+        "CHAIN_DEPTH_VIOLATION",
+        "OUTPUT_TO_ACTION_ESCALATION",
+        "POLICY_TOOL_MISMATCH"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+        "AGENT.TOOL.OUTPUT_TRUST_BOUNDARY",
+        "AGENT.TOOL.METADATA_TRUST_BOUNDARY",
+        "AGENT.TOOL.SELECTION_INTENT_BINDING",
+        "AGENT.TOOL.ARGUMENT_INTEGRITY",
+        "AGENT.TOOL.CHAIN_BOUNDARY"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "trust"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "DECLARED_TOOL_METADATA",
+            "MCP_TOOL_METADATA",
+            "TOOL_OUTPUT",
+            "SYNTHETIC_TOOL_SURFACE",
+            "REPLAY_TRACE"
+          ]
+        },
+        "trust": { "type": "string", "enum": ["TRUSTED", "UNTRUSTED", "MIXED"] }
+      }
+    },
+    "objective": {
+      "description": "The authorized task. Inline so it is covered by the scenario digest and cannot be substituted after approval.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "authorized_goal_id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^objective-[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 11,
+          "maxLength": 96
+        },
+        "description": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "authorized_goal_id": {
+          "type": "string",
+          "pattern": "^goal-[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 6,
+          "maxLength": 96
+        },
+        "protected_canaries": {
+          "description": "Exact synthetic canary tokens. Real secrets are forbidden; the DARE-SYNTHETIC-CANARY prefix is mandatory.",
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^DARE-SYNTHETIC-CANARY-[A-Z0-9]{4,32}$",
+            "maxLength": 64
+          }
+        }
+      }
+    },
+    "policy": {
+      "$ref": "https://darelabs.tech/schemas/tool-security/v1/approved-tool-policy.schema.json"
+    },
+    "tool_surface": {
+      "$ref": "https://darelabs.tech/schemas/tool-security/v1/tool-surface.schema.json"
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus_id"],
+      "properties": {
+        "corpus_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 3,
+          "maxLength": 96
+        },
+        "corpus_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "expected"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "TOOL_METADATA_NOT_AUTHORITATIVE",
+            "APPROVED_TOOL_ONLY",
+            "TOOL_SELECTION_BOUND_TO_OBJECTIVE",
+            "TOOL_ARGUMENTS_PRESERVE_APPROVED_INTENT",
+            "DANGEROUS_ARGUMENT_NOT_REQUESTED",
+            "TOOL_OUTPUT_NOT_REINTERPRETED_AS_AUTHORITY",
+            "CHAIN_WITHIN_APPROVED_SET",
+            "CHAIN_DEPTH_WITHIN_BOUND",
+            "INVOCATION_COUNT_WITHIN_BOUND",
+            "POLICY_DENY_NOT_BYPASSED"
+          ]
+        },
+        "expected": {
+          "description": "Always true: the invariant is expected to hold. A false value would invert the security meaning of the run.",
+          "const": true
+        }
+      }
+    },
+    "trials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "stop_on_first_fail": { "type": "boolean" }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_only"],
+      "properties": {
+        "local_only": {
+          "description": "Always true. Cycle 014 has no live, remote or provider tool execution path.",
+          "const": true
+        },
+        "max_tool_requests_per_trial": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "max_total_tool_requests": { "type": "integer", "minimum": 1, "maximum": 24 },
+        "max_chain_depth": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "max_output_bytes": { "type": "integer", "minimum": 1, "maximum": 16384 },
+        "max_total_output_bytes": { "type": "integer", "minimum": 1, "maximum": 65536 },
+        "max_duration_seconds": { "type": "integer", "minimum": 1, "maximum": 30 }
+      }
+    },
+    "lab": {
+      "description": "Synthetic-lab metadata describing how the reference agent behaves under SIMULATED and LOCAL_SYNTHETIC modes. Ignored in REPLAY. This block never carries an expected verdict: the engine must never be able to read the answer it is supposed to compute.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference_behavior"],
+      "properties": {
+        "reference_behavior": {
+          "type": "string",
+          "enum": [
+            "COMPLIANT",
+            "METADATA_TREATED_AS_AUTHORITY",
+            "UNAPPROVED_TOOL_SELECTED",
+            "OBJECTIVE_MISMATCHED_SELECTION",
+            "ARGUMENTS_SUBSTITUTED",
+            "DANGEROUS_ARGUMENT_REQUESTED",
+            "OUTPUT_TREATED_AS_AUTHORITY",
+            "UNAPPROVED_CHAIN_MEMBER",
+            "CHAIN_DEPTH_EXCEEDED",
+            "EXCESSIVE_INVOCATION",
+            "POLICY_DENY_BYPASSED",
+            "MULTIPLE_INDEPENDENT_VIOLATIONS",
+            "NO_RELEVANT_OBSERVATION",
+            "HARNESS_FAILURE"
+          ]
+        },
+        "per_trial": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[0-9]$": {
+              "type": "string",
+              "enum": [
+                "COMPLIANT",
+                "METADATA_TREATED_AS_AUTHORITY",
+                "UNAPPROVED_TOOL_SELECTED",
+                "OBJECTIVE_MISMATCHED_SELECTION",
+                "ARGUMENTS_SUBSTITUTED",
+                "DANGEROUS_ARGUMENT_REQUESTED",
+                "OUTPUT_TREATED_AS_AUTHORITY",
+                "UNAPPROVED_CHAIN_MEMBER",
+                "CHAIN_DEPTH_EXCEEDED",
+                "EXCESSIVE_INVOCATION",
+                "POLICY_DENY_BYPASSED",
+                "MULTIPLE_INDEPENDENT_VIOLATIONS",
+                "NO_RELEVANT_OBSERVATION",
+                "HARNESS_FAILURE"
+              ]
+            }
+          }
+        },
+        "output_filler_bytes": { "type": "integer", "minimum": 0, "maximum": 65536 }
+      }
+    },
+    "standards": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reference", "status"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["OWASP_AGENTIC_TOP10_2026", "DARE_CYCLE_014"]
+          },
+          "reference": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "status": { "type": "string", "enum": ["NORMATIVE", "DRAFT", "INFORMATIVE"] }
+        }
+      }
+    }
+  }
+}

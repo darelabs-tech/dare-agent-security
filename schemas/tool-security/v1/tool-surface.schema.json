@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/tool-security/v1/tool-surface.schema.json",
+  "title": "DARE Tool Surface Snapshot v1",
+  "description": "The observed, security-relevant tool surface under test. Data only: no executable, credential, remote-target or live-invocation field. Tool identity is digest-bound so substitution is detectable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "surface_id", "source_kind", "trust", "tools"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "surface_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "source_kind": {
+      "type": "string",
+      "enum": [
+        "DECLARED_TOOL_METADATA",
+        "MCP_TOOL_METADATA",
+        "TOOL_OUTPUT",
+        "SYNTHETIC_TOOL_SURFACE",
+        "REPLAY_TRACE"
+      ]
+    },
+    "trust": {
+      "type": "string",
+      "enum": ["TRUSTED", "UNTRUSTED", "MIXED"]
+    },
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool_id", "tool_name", "description"],
+        "properties": {
+          "tool_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "tool_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "description": {
+            "description": "Untrusted declaration. Never authoritative on its own.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "input_schema": {
+            "description": "Declared parameter surface. Typed, bounded and inert; never compiled or executed.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["parameters"],
+            "properties": {
+              "parameters": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "type"],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+                      "maxLength": 64
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["string", "integer", "number", "boolean", "array", "object"]
+                    },
+                    "required": { "type": "boolean" },
+                    "description": { "type": "string", "maxLength": 1024 },
+                    "semantic_class": {
+                      "description": "Declared meaning of the parameter. Poisoning can misrepresent this, which is why it is compared against the approved policy rather than trusted.",
+                      "type": "string",
+                      "enum": [
+                        "IDENTIFIER",
+                        "QUERY",
+                        "CONTENT",
+                        "PATH",
+                        "RECIPIENT",
+                        "AMOUNT",
+                        "SCOPE",
+                        "FLAG",
+                        "OPAQUE"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "annotations": {
+            "description": "Declared behavioral annotations. A tool asserting it is read-only does not make it read-only.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "read_only_hint": { "type": "boolean" },
+              "destructive_hint": { "type": "boolean" },
+              "idempotent_hint": { "type": "boolean" },
+              "open_world_hint": { "type": "boolean" },
+              "title": { "type": "string", "maxLength": 200 }
+            }
+          },
+          "security_metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "declared_operation_class": {
+                "type": "string",
+                "enum": [
+                  "READ",
+                  "SEARCH",
+                  "SUMMARIZE",
+                  "WRITE",
+                  "DELETE",
+                  "SEND",
+                  "PAYMENT",
+                  "EXTERNAL_FETCH",
+                  "PRIVILEGE_CHANGE"
+                ]
+              },
+              "declared_sensitivity": {
+                "type": "string",
+                "enum": ["LOW", "MEDIUM", "HIGH"]
+              },
+              "declared_requires_approval": { "type": "boolean" }
+            }
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "digest": {
+            "description": "Approved canonical digest of this tool entry. A mismatch is refused before execution.",
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

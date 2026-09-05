@@ -6,10 +6,10 @@
 - [x] task-001 — Reconcile current main baseline and freeze compatibility contracts
 - [x] task-002 — Record Cycle 013 lessons/residual risks and ASI02 standards provenance
 - [x] task-003 — Freeze/add Tool Security AGENT.* properties and applicability predicates
-- [ ] task-004 — Define ToolSecurityScenario schema
-- [ ] task-005 — Define ToolSurfaceSnapshot and ApprovedToolPolicy schemas
+- [x] task-004 — Define ToolSecurityScenario schema
+- [x] task-005 — Define ToolSurfaceSnapshot and ApprovedToolPolicy schemas
 - [ ] task-006 — Define tool-security corpus-entry and replay trace schemas
-- [ ] task-007 — Define poisoning/misuse/source/trust closed enums
+- [x] task-007 — Define poisoning/misuse/source/trust closed enums
 - [ ] task-008 — Define normalized Tool Observation event model
 - [ ] task-009 — Define invariant-specific positive PASS coverage contracts
 - [ ] task-010 — Implement deterministic Tool Security invariant evaluator registry

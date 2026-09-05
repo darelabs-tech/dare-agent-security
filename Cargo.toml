@@ -13,6 +13,7 @@ members = [
     "crates/dare-continuous",
     "crates/dare-product",
     "crates/dare-prompt-injection",
+    "crates/dare-tool-security",
     "labs/synthetic-mcp",
 ]
 
