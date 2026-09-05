@@ -143,18 +143,13 @@ fn truncate(text: &str, max_bytes: usize) -> (String, bool) {
 /// end of a long string is still a secret.
 pub fn mask_sensitive(text: &str) -> String {
     let mut masked = mask_canaries(text);
-    for marker in [
-        "sk-live-",
-        "sk_live_",
-        "xoxb-",
-        "ghp_",
-        "eyJ",
-        "-----BEGIN PRIVATE KEY-----",
-        "-----BEGIN RSA PRIVATE KEY-----",
-        "-----BEGIN OPENSSH PRIVATE KEY-----",
-    ] {
+    for marker in ["sk-live-", "sk_live_", "xoxb-", "ghp_", "eyJ"] {
         masked = mask_from_marker(&masked, marker);
     }
+    // Key material is handled separately: it is whitespace-separated base64
+    // spanning several lines, so stopping at the first non-token character
+    // would mask the armour and leave the key itself in place.
+    masked = mask_pem_blocks(&masked);
     mask_bearer_credentials(&masked)
 }
 
@@ -188,6 +183,43 @@ fn mask_from_marker(text: &str, marker: &str) -> String {
             })
             .unwrap_or(after.len());
         rest = &after[tail..];
+    }
+    out.push_str(rest);
+    out
+}
+
+/// Mask an armoured key block whole, from `-----BEGIN` through its closing
+/// armour, or to the end of the value when the block is unterminated.
+fn mask_pem_blocks(text: &str) -> String {
+    const BEGIN: &str = "-----begin";
+    const END: &str = "-----end";
+    let mut out = String::with_capacity(text.len());
+    let mut rest = text;
+    loop {
+        // `to_ascii_lowercase` maps only A-Z, so byte offsets stay aligned with
+        // the original and slicing below is safe.
+        let lowered = rest.to_ascii_lowercase();
+        let Some(index) = lowered.find(BEGIN) else {
+            break;
+        };
+        out.push_str(&rest[..index]);
+        out.push_str(REDACTION_MARKER);
+
+        let after = &rest[index + BEGIN.len()..];
+        let lowered_after = after.to_ascii_lowercase();
+        rest = match lowered_after.find(END) {
+            Some(end) => {
+                let tail = &after[end + END.len()..];
+                // Consume the closing armour so it is not left dangling.
+                match tail.find("-----") {
+                    Some(close) => &tail[close + "-----".len()..],
+                    None => "",
+                }
+            }
+            // Unterminated: everything after the header is treated as key
+            // material rather than assumed harmless.
+            None => "",
+        };
     }
     out.push_str(rest);
     out
@@ -512,6 +544,26 @@ pub fn validate_events(events: &[IdentityObservationEvent]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_armoured_key_block_is_masked_whole_and_not_just_its_header() {
+        // Masking only the header would leave the key itself in the retained
+        // text, which is the whole thing the masking exists to prevent.
+        let terminated = "note -----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBg\nkqhkiG9w0B\n\
+                          -----END PRIVATE KEY----- tail";
+        let masked = mask_sensitive(terminated);
+        assert!(!masked.contains("MIIEvQIBADANBg"), "{masked}");
+        assert!(!masked.contains("kqhkiG9w0B"), "{masked}");
+        assert!(masked.starts_with("note "), "{masked}");
+        assert!(masked.ends_with(" tail"), "{masked}");
+
+        // Unterminated armour is treated as key material to the end rather
+        // than assumed harmless.
+        let unterminated = "-----BEGIN RSA PRIVATE KEY----- MIIEvQIBADANBg";
+        let masked = mask_sensitive(unterminated);
+        assert!(!masked.contains("MIIEvQIBADANBg"), "{masked}");
+    }
+
     use crate::operation::tests::authorized_operation;
     use serde_json::json;
 

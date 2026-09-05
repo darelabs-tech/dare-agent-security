@@ -109,6 +109,125 @@ pub struct IdentityBinding {
     pub policy_digest: Option<String>,
 }
 
+/// Bind a scenario to every object it evaluates.
+///
+/// Every identifier is checked before it is digested, so a hostile id cannot
+/// travel into an artifact, and every referenced object is digested, so a later
+/// substitution of any one of them is detectable rather than invisible.
+pub fn bind(scenario: &crate::model::IdentitySecurityScenario) -> Result<IdentityBinding> {
+    assert_safe_identifier(&scenario.id, "scenario id")?;
+    assert_safe_identifier(&scenario.objective.id, "objective id")?;
+    assert_safe_identifier(&scenario.principals.set_id, "principal set id")?;
+
+    let bindings = &scenario.principals.bindings;
+    for (label, id) in [
+        (
+            "initiating principal id",
+            Some(&bindings.initiating_principal_id),
+        ),
+        (
+            "effective principal id",
+            Some(&bindings.effective_principal_id),
+        ),
+        ("agent principal id", bindings.agent_principal_id.as_ref()),
+        (
+            "delegated subject id",
+            bindings.delegated_subject_id.as_ref(),
+        ),
+        ("resource owner id", bindings.resource_owner_id.as_ref()),
+    ] {
+        if let Some(id) = id {
+            assert_safe_identifier(id, label)?;
+        }
+    }
+
+    let mut authority_digests = Vec::with_capacity(scenario.authorities.len());
+    for authority in &scenario.authorities {
+        assert_safe_identifier(&authority.id, "authority id")?;
+        authority_digests.push((authority.id.clone(), authority_digest(authority)?));
+    }
+
+    let (delegation_chain_id, delegation_chain_digest) = match &scenario.delegation {
+        Some(chain) => {
+            assert_safe_identifier(&chain.chain_id, "delegation chain id")?;
+            (
+                Some(chain.chain_id.clone()),
+                Some(delegation_chain_digest(chain)?),
+            )
+        }
+        None => (None, None),
+    };
+
+    let (resource_context_digest_value, tenant_id) = match &scenario.resource {
+        Some(resource) => (
+            Some(resource_context_digest(resource)?),
+            Some(resource.tenant_id.clone()),
+        ),
+        None => (None, None),
+    };
+
+    let (policy_id, policy_digest_value) = match &scenario.policy {
+        Some(policy) => {
+            assert_safe_identifier(&policy.policy_id, "policy id")?;
+            (Some(policy.policy_id.clone()), Some(policy_digest(policy)?))
+        }
+        None => (None, None),
+    };
+
+    Ok(IdentityBinding {
+        scenario_id: scenario.id.clone(),
+        scenario_digest: digest(scenario)?,
+        objective_id: scenario.objective.id.clone(),
+        principal_set_id: scenario.principals.set_id.clone(),
+        principal_set_digest: principal_set_digest(&scenario.principals)?,
+        initiating_principal_id: bindings.initiating_principal_id.clone(),
+        effective_principal_id: bindings.effective_principal_id.clone(),
+        agent_principal_id: bindings.agent_principal_id.clone(),
+        delegated_subject_id: bindings.delegated_subject_id.clone(),
+        resource_owner_id: bindings.resource_owner_id.clone(),
+        authority_digests,
+        delegation_chain_id,
+        delegation_chain_digest,
+        resource_context_digest: resource_context_digest_value,
+        tenant_id,
+        policy_id,
+        policy_digest: policy_digest_value,
+    })
+}
+
+/// Bind a scenario to the corpus vector it references.
+///
+/// A scenario that names a vector must be run against that vector. A different
+/// entry, or one whose content no longer matches the pinned digest, is refused
+/// rather than quietly evaluated in the named vector's place.
+pub fn bind_corpus(
+    scenario: &crate::model::IdentitySecurityScenario,
+    entry: &crate::model::IdentityCorpusEntry,
+) -> Result<String> {
+    let Some(reference) = scenario.vector.as_ref() else {
+        return Err(IdentitySecurityError::invalid(format!(
+            "scenario `{}` references no corpus vector, so it cannot be bound to `{}`",
+            scenario.id, entry.id
+        )));
+    };
+    if reference.corpus_id != entry.id {
+        return Err(IdentitySecurityError::DigestMismatch(format!(
+            "scenario `{}` references vector `{}` but was given `{}`",
+            scenario.id, reference.corpus_id, entry.id
+        )));
+    }
+    let actual = digest(entry)?;
+    if let Some(pinned) = &reference.corpus_digest {
+        if pinned != &actual {
+            return Err(IdentitySecurityError::DigestMismatch(format!(
+                "corpus vector `{}` does not match the digest the scenario pinned",
+                entry.id
+            )));
+        }
+    }
+    Ok(actual)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

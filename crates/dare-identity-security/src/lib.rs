@@ -49,6 +49,7 @@ pub mod corpus;
 pub mod coverage;
 pub mod delegation;
 pub mod error;
+pub mod evidence_bridge;
 pub mod harness;
 pub mod invariant;
 pub mod local_synthetic;
@@ -58,6 +59,7 @@ pub mod operation;
 pub mod principal;
 pub mod replay;
 pub mod resource;
+pub mod result;
 pub mod schema;
 pub mod simulated;
 pub mod source;
@@ -92,6 +94,7 @@ pub use operation::{Operation, OperationDifference, OperationField, OperationPro
 pub use principal::{Principal, PrincipalBindings, PrincipalSet};
 pub use replay::{load_trace, parse_trace, LoadedTrace, ReplayAdapter, ReplayTrace};
 pub use resource::{ResourceClassification, ResourceContext};
+pub use result::{run_scenario, IdentitySecurityResult, IdentityTrialRecord};
 pub use simulated::{stage, SimulatedAdapter};
 pub use source::{
     CorpusClass, DelegationKind, IdentitySourceKind, PrincipalKind, PrincipalRole, ScenarioClass,
