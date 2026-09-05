@@ -1,7 +1,7 @@
 # Cycle 013 — Tasks
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-05
 
 ## task-001 — Reconcile Cycle 012 baseline and freeze compatibility constraints
 
