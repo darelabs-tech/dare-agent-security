@@ -160,6 +160,11 @@ pub const SCENARIO_SCHEMA_V1_ID: &str =
 pub const SCENARIO_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/identity-security/v1/scenario.schema.json");
 
+pub const TRACE_SCHEMA_V1_ID: &str =
+    "https://darelabs.tech/schemas/identity-security/v1/trace.schema.json";
+pub const TRACE_SCHEMA_V1_JSON: &str =
+    include_str!("../../../schemas/identity-security/v1/trace.schema.json");
+
 /// Refuse a document larger than the approved ceiling, before parsing it.
 pub fn enforce_document_size(raw: &[u8], label: &str) -> Result<()> {
     if raw.len() > MAX_DOCUMENT_BYTES {
@@ -398,6 +403,46 @@ fn scenario_validator() -> Result<jsonschema::Validator> {
         )
         .build(&scenario)
         .map_err(|err| IdentitySecurityError::schema(format!("scenario schema: {err}")))
+}
+
+/// The replay-trace schema, with its referenced schemas resolved from memory.
+fn trace_validator() -> Result<jsonschema::Validator> {
+    let parse = |json: &str, label: &str| -> Result<Value> {
+        serde_json::from_str(json)
+            .map_err(|err| IdentitySecurityError::schema(format!("{label} schema: {err}")))
+    };
+
+    let trace = parse(TRACE_SCHEMA_V1_JSON, "trace")?;
+
+    jsonschema::options()
+        .should_validate_formats(true)
+        .with_resource(
+            RESOURCE_CONTEXT_SCHEMA_V1_ID.to_owned(),
+            jsonschema::Resource::from_contents(parse(
+                RESOURCE_CONTEXT_SCHEMA_V1_JSON,
+                "resource-context",
+            )?),
+        )
+        .with_resource(
+            OPERATION_SCHEMA_V1_ID.to_owned(),
+            jsonschema::Resource::from_contents(parse(OPERATION_SCHEMA_V1_JSON, "operation")?),
+        )
+        .build(&trace)
+        .map_err(|err| IdentitySecurityError::schema(format!("trace schema: {err}")))
+}
+
+/// Validate a replay trace: version, hostile fields, then schema.
+pub fn validate_trace_document(value: &Value) -> Result<()> {
+    assert_supported_version(value, "replay trace")?;
+    assert_no_hostile_fields(value, "replay trace")?;
+    let validator = trace_validator()?;
+    if let Err(error) = validator.validate(value) {
+        return Err(IdentitySecurityError::schema(format!(
+            "replay trace: {error} at {}",
+            error.instance_path()
+        )));
+    }
+    Ok(())
 }
 
 /// Validate a scenario: version, hostile fields, then schema.

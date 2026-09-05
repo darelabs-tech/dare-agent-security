@@ -48,14 +48,19 @@ pub mod canonical;
 pub mod coverage;
 pub mod delegation;
 pub mod error;
+pub mod harness;
 pub mod invariant;
+pub mod local_synthetic;
 pub mod model;
 pub mod observation;
 pub mod operation;
 pub mod principal;
+pub mod replay;
 pub mod resource;
 pub mod schema;
+pub mod simulated;
 pub mod source;
+pub mod trials;
 
 pub use authority::{
     Authority, AuthorityAxis, AuthorityDimension, AuthorityExcess, LogicalTime, ValidityWindow,
@@ -69,7 +74,11 @@ pub use coverage::{
 pub use dare_security_evidence::Verdict;
 pub use delegation::{ChainDefect, DelegationChain, DelegationEdge};
 pub use error::{IdentitySecurityError, Result};
+pub use harness::{
+    normalize, normalize_checked, HarnessAdapter, HarnessMode, RawTrialOutput, TrialRequest,
+};
 pub use invariant::{evaluate, supported_invariants, IdentityInvariantOutcome, IdentityViolation};
+pub use local_synthetic::{synthetic_budget, IdentityControlSnapshot, LocalSyntheticAdapter};
 pub use model::{
     IdentityCorpusEntry, IdentityInvariantType, IdentityLabSpec, IdentityObjective,
     IdentityProperty, IdentitySecurityScenario, ReferenceBehavior,
@@ -79,11 +88,14 @@ pub use observation::{
 };
 pub use operation::{Operation, OperationDifference, OperationField, OperationProjection};
 pub use principal::{Principal, PrincipalBindings, PrincipalSet};
+pub use replay::{load_trace, parse_trace, LoadedTrace, ReplayAdapter, ReplayTrace};
 pub use resource::{ResourceClassification, ResourceContext};
+pub use simulated::{stage, SimulatedAdapter};
 pub use source::{
     CorpusClass, DelegationKind, IdentitySourceKind, PrincipalKind, PrincipalRole, ScenarioClass,
     TrustLevel,
 };
+pub use trials::{BudgetSnapshot, StopReason, TrialGuard, TrialLedger, TrialPlan};
 
 /// Published crate name for workspace identity checks.
 pub const CRATE_NAME: &str = "dare-identity-security";
