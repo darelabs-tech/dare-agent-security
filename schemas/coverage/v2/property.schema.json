@@ -41,7 +41,7 @@
         "authorization_present","dynamic_authorization_allowed","execution_integrity_supported","confused_deputy_supported",
         "agent_present","memory_present","rag_present","multi_agent_present","code_execution_present",
         "human_approval_present","delegated_identity_present","external_components_present","stateful_agent_present",
-        "runtime_dynamic_allowed"
+        "runtime_dynamic_allowed","user_prompt_present","untrusted_external_content_present"
       ]}}}
     },
     "supported_modes":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","enum":["static","dynamic","passive"]}},
