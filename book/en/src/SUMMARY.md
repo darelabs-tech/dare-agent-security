@@ -59,5 +59,6 @@
 - [Environment Variables](reference/environment.md)
 - [Generated Artifacts](reference/artifacts.md)
 - [Adding Security Properties](reference/adding-security-properties.md)
+- [Extending Prompt Injection Validation](reference/extending-prompt-injection.md)
 
 [Troubleshooting](troubleshooting.md)
