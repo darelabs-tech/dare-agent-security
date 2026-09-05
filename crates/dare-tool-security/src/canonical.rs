@@ -46,6 +46,32 @@ pub fn corpus_entry_digest(entry: &ToolCorpusEntry) -> Result<String> {
     digest(entry)
 }
 
+/// Digest of an observed tool surface when the recorder captured none.
+///
+/// Hashes exactly what was recorded — the surface identity and its tool list,
+/// in the order recorded — so the observation carries a digest of itself rather
+/// than borrowing the approved one. Each part is length-prefixed, so no two
+/// distinct observations can collide by concatenation.
+pub fn observed_surface_digest(surface_id: &str, tool_ids: &[String]) -> String {
+    use sha2::{Digest, Sha256};
+
+    let mut hasher = Sha256::new();
+    for part in std::iter::once(surface_id).chain(tool_ids.iter().map(String::as_str)) {
+        hasher.update(part.len().to_string().as_bytes());
+        hasher.update(b":");
+        hasher.update(part.as_bytes());
+        hasher.update(b"|");
+    }
+    format!(
+        "sha256:{}",
+        hasher
+            .finalize()
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
+    )
+}
+
 /// Per-tool digest, so an individual tool entry can be pinned.
 pub fn tool_entry_digest(tool: &crate::model::ToolEntry) -> Result<String> {
     // The declared `digest` field is the *claim*; it must not feed the digest
