@@ -11,6 +11,7 @@ mod facts;
 mod math;
 mod plan;
 mod profile;
+mod prompt_injection_standards;
 mod property;
 mod report;
 mod risk_family;
@@ -36,6 +37,13 @@ pub use profile::{
     agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
     resolve_profile, validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel,
     AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
+};
+pub use prompt_injection_standards::{
+    load_prompt_injection_provenance, validate_prompt_injection_provenance,
+    validate_prompt_injection_standards, DeferredTopic, PromptInjectionProvenance,
+    PromptInjectionSource, PropertyMapping, TaxonomyDistinction, VectorClass,
+    EXTERNAL_CONTENT_BOUNDARY_PROPERTY, INSTRUCTION_INTEGRITY_PROPERTY,
+    PROMPT_INJECTION_PROVENANCE_JSON, USER_INPUT_BOUNDARY_PROPERTY,
 };
 pub use property::{
     agentic_registry, builtin_registry, load_registry, validate_property_instance,

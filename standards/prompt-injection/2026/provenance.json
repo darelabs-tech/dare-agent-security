@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0.0",
+  "recorded_at": "2026-09-05",
+  "fetch_policy": "OFFLINE_LOCAL_SNAPSHOT",
+  "fetch_policy_note": "This manifest is a committed local snapshot of upstream references. DARE Agent Security performs no network fetch of standards at validation time. Canonical references are recorded for attribution and traceability only.",
+  "sources": [
+    {
+      "id": "OWASP_LLM_TOP10_2025",
+      "title": "OWASP Top 10 for Large Language Model Applications",
+      "version": "2025",
+      "published_at": "2024-11-18",
+      "canonical_reference": "https://genai.owasp.org/llm-top-10/",
+      "status": "NORMATIVE",
+      "mapping_notes": "LLM01 Prompt Injection is the upstream reference for direct and indirect prompt-injection vectors. DARE properties are narrower, deterministically decidable security invariants and are not one-to-one restatements of LLM01."
+    },
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026",
+      "title": "OWASP Top 10 for Agentic Applications for 2026",
+      "version": "2026",
+      "published_at": "2025-12-09",
+      "canonical_reference": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "status": "NORMATIVE",
+      "mapping_notes": "ASI01 Agent Goal Hijacking is the agentic-risk parent for the Cycle 013 properties. Goal hijacking is an outcome class; prompt injection is one delivery technique among several that may or may not achieve it."
+    },
+    {
+      "id": "DARE_CYCLE_013",
+      "title": "DARE Agent Security Cycle 013 Prompt Injection Validation Contract",
+      "version": "1.0.0",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/013-direct-indirect-prompt-injection/DESIGN.md",
+      "status": "INFORMATIVE",
+      "mapping_notes": "Local project contract binding upstream prompt-injection guidance to deterministic, evidence-backed DARE security invariants with bounded local execution."
+    }
+  ],
+  "taxonomy_distinction": {
+    "statement": "Prompt Injection and Agent Goal Hijacking are related but not equivalent.",
+    "prompt_injection": "A delivery technique: untrusted content supplied as data is interpreted as instruction by the model.",
+    "agent_goal_hijack": "An outcome: the agent's authorized objective is replaced or subverted, with security-relevant consequence.",
+    "non_equivalence_rules": [
+      "A successful prompt injection does not by itself prove an agent goal hijack.",
+      "An observed model-response manipulation without an explicit security-invariant violation is not a FAIL.",
+      "An agent goal hijack may occur through techniques other than prompt injection; Cycle 013 covers only the direct and indirect prompt-injection delivery paths.",
+      "Cycle 013 maps to ASI01 as a contributing validation technique, never as a claim of full ASI01 coverage."
+    ]
+  },
+  "vector_classes": [
+    {
+      "id": "DIRECT",
+      "description": "Injection content originates in the user-controlled prompt channel.",
+      "primary_source": "OWASP_LLM_TOP10_2025",
+      "primary_reference": "LLM01 Prompt Injection — direct prompt injection",
+      "dare_property": "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY"
+    },
+    {
+      "id": "INDIRECT",
+      "description": "Injection content arrives inside untrusted external content the agent ingests as data.",
+      "primary_source": "OWASP_LLM_TOP10_2025",
+      "primary_reference": "LLM01 Prompt Injection — indirect prompt injection",
+      "dare_property": "AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY"
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "AGENT.GOAL.INSTRUCTION_INTEGRITY",
+      "relation": "PARENT_INVARIANT",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI01 Agent Goal Hijacking"],
+      "note": "Unchanged Cycle 012 property. Cycle 013 specializes it by source boundary and does not alter its definition or applicability."
+    },
+    {
+      "property_id": "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY",
+      "relation": "SPECIALIZES",
+      "sources": ["OWASP_LLM_TOP10_2025", "OWASP_AGENTIC_TOP10_2026"],
+      "references": ["LLM01 Prompt Injection", "ASI01 Agent Goal Hijacking"],
+      "note": "Narrower invariant over the user-prompt trust boundary. Contributes evidence toward ASI01; does not assert ASI01 equivalence or completeness."
+    },
+    {
+      "property_id": "AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY",
+      "relation": "SPECIALIZES",
+      "sources": ["OWASP_LLM_TOP10_2025", "OWASP_AGENTIC_TOP10_2026"],
+      "references": ["LLM01 Prompt Injection", "ASI01 Agent Goal Hijacking"],
+      "note": "Narrower invariant over untrusted external content ingested as data. Tool-description poisoning, RAG retrieval poisoning and A2A message injection are deliberately excluded and remain deferred to later cycles."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    {"topic": "tool description and tool output poisoning", "deferred_to": "Cycle 014"},
+    {"topic": "generalized memory poisoning", "deferred_to": "Cycle 016"},
+    {"topic": "RAG retrieval poisoning", "deferred_to": "Cycle 017"},
+    {"topic": "agent-to-agent prompt injection", "deferred_to": "Cycle 020"},
+    {"topic": "multi-turn trust grooming and adaptive attack loops", "deferred_to": "Cycle 021"},
+    {"topic": "model-safety jailbreak benchmarking unrelated to an application security invariant", "deferred_to": "OUT_OF_PRODUCT_SCOPE"}
+  ]
+}
