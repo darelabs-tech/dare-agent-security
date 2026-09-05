@@ -27,11 +27,20 @@
 //! Cycle 013.
 
 pub mod error;
+pub mod model;
 pub mod schema;
 pub mod source;
 
 pub use dare_security_evidence::Verdict;
 pub use error::{Result, ToolSecurityError};
+pub use model::{
+    ApprovedArgument, ApprovedTool, ApprovedToolPolicy, ChainPolicy, DeclaredSensitivity,
+    InvocationPolicy, OperationClass, ParameterType, ReferenceBehavior, SemanticClass,
+    ToolAnnotations, ToolBoundaryProperty, ToolEntry, ToolFamily, ToolInputSchema,
+    ToolInvariantSpec, ToolInvariantType, ToolLabSpec, ToolObjective, ToolParameter,
+    ToolSafetySpec, ToolSecurityMetadata, ToolSecurityScenario, ToolSourceBoundary,
+    ToolStandardRef, ToolSurfaceSnapshot, ToolTrialSpec, ToolVectorRef,
+};
 pub use source::{
     CorpusClass, MisuseFamily, MisuseSurface, PoisoningFamily, ScenarioClass, ToolSourceKind,
     ToolSurfaceArea, TrustLevel,
