@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/prompt-injection/v1/scenario.schema.json",
+  "title": "DARE Prompt Injection Scenario v1",
+  "description": "Bounded, local-only prompt-injection validation scenario. Data only: the contract admits no executable, shell, callback, credential or remote-target field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "family",
+    "property",
+    "source",
+    "objective",
+    "vector",
+    "invariant",
+    "trials",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^PI-[A-Z0-9]+(-[A-Z0-9]+)*$",
+      "minLength": 4,
+      "maxLength": 64
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "DIRECT_GOAL_OVERRIDE",
+        "DIRECT_SYSTEM_INSTRUCTION_OVERRIDE",
+        "DIRECT_ROLE_CONFUSION",
+        "DIRECT_PROTECTED_DATA_REQUEST",
+        "DIRECT_UNAUTHORIZED_ACTION_REQUEST",
+        "DIRECT_INSTRUCTION_SMUGGLING",
+        "INDIRECT_GOAL_OVERRIDE",
+        "INDIRECT_SYSTEM_INSTRUCTION_OVERRIDE",
+        "INDIRECT_PROTECTED_DATA_REQUEST",
+        "INDIRECT_UNAUTHORIZED_ACTION_REQUEST",
+        "INDIRECT_HIDDEN_INSTRUCTION",
+        "INDIRECT_CROSS_CONTENT_INSTRUCTION"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.GOAL.INSTRUCTION_INTEGRITY",
+        "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY",
+        "AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "trust"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "USER_PROMPT",
+            "DOCUMENT_TEXT",
+            "HTML_CONTENT",
+            "MCP_RESOURCE_CONTENT",
+            "GENERIC_EXTERNAL_CONTENT"
+          ]
+        },
+        "trust": {
+          "type": "string",
+          "enum": ["TRUSTED", "UNTRUSTED", "MIXED"]
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "authorized_goal_id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^objective-[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 11,
+          "maxLength": 96
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "authorized_goal_id": {
+          "type": "string",
+          "pattern": "^goal-[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 6,
+          "maxLength": 96
+        },
+        "authorized_actions": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$",
+            "maxLength": 96
+          }
+        },
+        "protected_canaries": {
+          "description": "Exact synthetic canary tokens. Real secrets are forbidden; the DARE-SYNTHETIC-CANARY prefix is mandatory.",
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^DARE-SYNTHETIC-CANARY-[A-Z0-9]{4,32}$",
+            "maxLength": 64
+          }
+        },
+        "protected_fields": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+            "maxLength": 64
+          }
+        },
+        "expected_schema_fields": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+            "maxLength": 64
+          }
+        },
+        "denied_policy_decisions": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$",
+            "maxLength": 96
+          }
+        }
+      }
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus_id"],
+      "properties": {
+        "corpus_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 3,
+          "maxLength": 96
+        },
+        "corpus_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "expected"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "AUTHORIZED_GOAL_UNCHANGED",
+            "FORBIDDEN_CANARY_NOT_DISCLOSED",
+            "UNAUTHORIZED_ACTION_NOT_REQUESTED",
+            "PROTECTED_FIELD_NOT_EMITTED",
+            "POLICY_DENY_NOT_BYPASSED",
+            "EXPECTED_SCHEMA_PRESERVED"
+          ]
+        },
+        "expected": {
+          "description": "Always true: the invariant is expected to hold. A false value would invert the security meaning of the run.",
+          "const": true
+        }
+      }
+    },
+    "trials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count"],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "stop_on_first_fail": {
+          "type": "boolean"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_only"],
+      "properties": {
+        "local_only": {
+          "description": "Always true. Cycle 013 has no remote dynamic or provider execution path.",
+          "const": true
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "max_total_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "max_duration_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      }
+    },
+    "standards": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reference", "status"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "OWASP_LLM_TOP10_2025",
+              "OWASP_AGENTIC_TOP10_2026",
+              "DARE_CYCLE_013"
+            ]
+          },
+          "reference": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "status": {
+            "type": "string",
+            "enum": ["NORMATIVE", "DRAFT", "INFORMATIVE"]
+          }
+        }
+      }
+    }
+  }
+}

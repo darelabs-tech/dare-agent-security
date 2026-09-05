@@ -6,7 +6,7 @@
 - [x] task-001 — Reconcile Cycle 012 baseline and freeze compatibility constraints
 - [x] task-002 — Snapshot current OWASP Prompt Injection + ASI01 provenance
 - [x] task-003 — Add specialized prompt-injection AGENT.* properties and predicates
-- [ ] task-004 — Define PromptInjectionScenario schema
+- [x] task-004 — Define PromptInjectionScenario schema
 - [ ] task-005 — Define prompt-injection corpus-entry schema
 - [ ] task-006 — Define source trust-boundary and injection-family enums
 - [ ] task-007 — Define normalized observation-event model
