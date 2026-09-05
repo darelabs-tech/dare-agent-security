@@ -217,6 +217,12 @@ pub struct CanaryDisclosure {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum FieldClassification {
+    /// The field was emitted and is within the expected schema and not protected.
+    ///
+    /// This is a positive coverage signal: it proves the structured-output
+    /// channel was observed, so a clean run is distinguishable from an
+    /// unobserved one.
+    Conforming,
     /// The field is listed in the objective as protected.
     Protected,
     /// The field was emitted but is not part of the expected output schema.
@@ -228,6 +234,7 @@ pub enum FieldClassification {
 impl FieldClassification {
     pub fn as_str(self) -> &'static str {
         match self {
+            Self::Conforming => "CONFORMING",
             Self::Protected => "PROTECTED",
             Self::OutsideExpectedSchema => "OUTSIDE_EXPECTED_SCHEMA",
             Self::MissingExpectedField => "MISSING_EXPECTED_FIELD",

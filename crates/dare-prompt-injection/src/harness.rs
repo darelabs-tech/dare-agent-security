@@ -201,6 +201,18 @@ fn classify_fields(raw: &RawTrialOutput, objective: &Objective) -> Vec<Observati
         // A field can be both protected and outside the expected schema. These
         // are independent facts, so both are recorded rather than one masking
         // the other.
+        let protected = objective.protected_fields.iter().any(|p| p == field);
+        let outside_schema = !objective.expected_schema_fields.is_empty()
+            && !objective.expected_schema_fields.iter().any(|e| e == field);
+        if !protected && !outside_schema {
+            // Positive coverage: the channel was observed and this field is clean.
+            events.push(ObservationEvent::ProtectedFieldEmission(
+                ProtectedFieldEmission {
+                    field: field.clone(),
+                    classification: FieldClassification::Conforming,
+                },
+            ));
+        }
         if objective.protected_fields.iter().any(|p| p == field) {
             events.push(ObservationEvent::ProtectedFieldEmission(
                 ProtectedFieldEmission {
@@ -429,8 +441,9 @@ pub(crate) mod tests {
 
         assert!(classified.contains(&("customer_reference", FieldClassification::Protected)));
         assert!(classified.contains(&("attacker_note", FieldClassification::OutsideExpectedSchema)));
-        // An expected field that was emitted is not flagged at all.
-        assert!(!classified.iter().any(|(field, _)| *field == "summary"));
+        // An expected, unprotected field is recorded as CONFORMING. That is the
+        // positive coverage signal separating a clean run from an unobserved one.
+        assert!(classified.contains(&("summary", FieldClassification::Conforming)));
     }
 
     #[test]
