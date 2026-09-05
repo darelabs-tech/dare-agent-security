@@ -45,7 +45,13 @@ pub struct AssessmentFacts {
 }
 
 impl AssessmentFacts {
-    pub fn tools_present(&self) -> bool { self.tools_count > 0 }
-    pub fn resources_present(&self) -> bool { self.resources_count > 0 }
-    pub fn prompts_present(&self) -> bool { self.prompts_count > 0 }
+    pub fn tools_present(&self) -> bool {
+        self.tools_count > 0
+    }
+    pub fn resources_present(&self) -> bool {
+        self.resources_count > 0
+    }
+    pub fn prompts_present(&self) -> bool {
+        self.prompts_count > 0
+    }
 }
