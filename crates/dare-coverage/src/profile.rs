@@ -15,8 +15,11 @@ pub const PROFILE_SCHEMA_V1_ID: &str =
 pub const PROFILE_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/coverage/v1/profile.schema.json");
 pub const BUILTIN_PROFILE_JSON: &str = include_str!("../../../profiles/mcp-security-baseline.json");
+pub const AGENTIC_PROFILE_JSON: &str =
+    include_str!("../../../profiles/agentic-security-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SchemaRef {
     pub id: String,
     pub version: String,
@@ -41,12 +44,14 @@ impl RequirementLevel {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ProfileProperty {
     pub id: String,
     pub requirement: RequirementLevel,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AssessmentProfile {
     pub schema: SchemaRef,
     pub id: String,
@@ -109,6 +114,10 @@ pub fn builtin_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(BUILTIN_PROFILE_JSON)
 }
 
+pub fn agentic_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(AGENTIC_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -119,10 +128,18 @@ pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, Co
 }
 
 pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
-    if spec == "mcp-security-baseline" {
-        return builtin_profile();
+    match spec {
+        "mcp-security-baseline" => builtin_profile(),
+        "agentic-security-baseline-2026" => agentic_profile(),
+        _ => {
+            let path = PathBuf::from(spec);
+            if path.extension().is_some() || path.components().count() > 1 {
+                load_profile_file(path)
+            } else {
+                Err(CoverageError::UnknownProfile(spec.to_owned()))
+            }
+        }
     }
-    load_profile_file(PathBuf::from(spec))
 }
 
 pub fn profile_digest_sha256(profile: &AssessmentProfile) -> Result<String, CoverageError> {
@@ -139,7 +156,7 @@ fn hex_encode(bytes: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::property::builtin_registry;
+    use crate::property::{agentic_registry, builtin_registry};
 
     #[test]
     fn builtin_profile_validates_against_registry() {
@@ -149,6 +166,23 @@ mod tests {
         assert_eq!(profile.id, "mcp-security-baseline");
         let digest = profile_digest_sha256(&profile).unwrap();
         assert_eq!(digest.len(), 64);
+    }
+
+    #[test]
+    fn agentic_profile_validates_against_agentic_registry() {
+        let profile = agentic_profile().expect("profile");
+        let registry = agentic_registry().expect("registry");
+        validate_profile(&profile, &registry).expect("valid");
+        assert_eq!(profile.id, "agentic-security-baseline-2026");
+        assert_eq!(profile.properties.len(), 10);
+    }
+
+    #[test]
+    fn unknown_builtin_profile_is_rejected_clearly() {
+        assert!(matches!(
+            resolve_profile("not-a-real-profile"),
+            Err(CoverageError::UnknownProfile(_))
+        ));
     }
 
     #[test]

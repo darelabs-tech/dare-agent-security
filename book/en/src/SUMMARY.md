@@ -12,6 +12,7 @@
 
 - [Evidence](concepts/evidence.md)
 - [Assessment Coverage](concepts/assessment-coverage.md)
+- [Agentic Security Registry 2026](concepts/agentic-security-registry.md)
 - [Attack Graph](concepts/attack-graph.md)
 - [Validation Modes](concepts/validation.md)
 
@@ -56,5 +57,6 @@
 - [Exit Codes](reference/exit-codes.md)
 - [Environment Variables](reference/environment.md)
 - [Generated Artifacts](reference/artifacts.md)
+- [Adding Security Properties](reference/adding-security-properties.md)
 
 [Troubleshooting](troubleshooting.md)

@@ -1,4 +1,4 @@
-//! Unified assessment orchestrator — product UX over Cycles 001–010.
+//! Unified assessment orchestrator — product UX over DARE security engines.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -13,8 +13,8 @@ use dare_attack_graph::{
 };
 use dare_continuous::{analyze, load_fixture as load_continuous_fixture, RunMode};
 use dare_coverage::{
-    builtin_registry, resolve_profile, run_assessment as run_coverage_assessment, AssessmentFacts,
-    CoveragePolicy, PropertyExecution,
+    registry_for_profile, resolve_profile, run_assessment as run_coverage_assessment,
+    AssessmentFacts, CoveragePolicy, PropertyExecution,
 };
 
 use crate::classification::Classification;
@@ -110,7 +110,6 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
     }
 
     let guard = EgressGuard::from_policy(&policy);
-    // v1 product assess never enables telemetry, regardless of network mode.
     {
         let mut telemetry = EgressGuard::deny_all();
         let denied = telemetry
@@ -156,9 +155,37 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
         }
     }
 
-    let gate = fixture
-        .gate
-        .unwrap_or_else(|| derive_gate(&findings, overall, required));
+    let agentic_without_coverage = config.assessment.profile == "agentic-security-baseline-2026"
+        && fixture.coverage_facts.is_none();
+    let gate = if agentic_without_coverage {
+        GateResult::Inconclusive
+    } else {
+        fixture
+            .gate
+            .unwrap_or_else(|| derive_gate(&findings, overall, required))
+    };
+    let summary_overall = if agentic_without_coverage {
+        0.0
+    } else {
+        fixture.overall_coverage.unwrap_or(overall)
+    };
+    let summary_required = if agentic_without_coverage {
+        0.0
+    } else {
+        fixture.required_coverage.unwrap_or(required)
+    };
+    let mut limitations = if fixture.limitations.is_empty() {
+        default_limitations(&policy)
+    } else {
+        fixture.limitations.clone()
+    };
+    if agentic_without_coverage {
+        limitations.push(
+            "Agentic profile selected without coverage facts: no Agentic security properties were tested; gate forced to INCONCLUSIVE."
+                .to_owned(),
+        );
+    }
+
     let now = OffsetDateTime::now_utc()
         .format(&Rfc3339)
         .unwrap_or_else(|_| "1970-01-01T00:00:00Z".to_owned());
@@ -172,8 +199,8 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
             profile: config.assessment.profile.clone(),
             profile_version: "1.0.0".to_owned(),
             gate,
-            overall_coverage: fixture.overall_coverage.unwrap_or(overall),
-            required_coverage: fixture.required_coverage.unwrap_or(required),
+            overall_coverage: summary_overall,
+            required_coverage: summary_required,
             severity_counts: SeverityCounts::default(),
             top_finding_ids: vec![],
             attack_path_summary: fixture
@@ -184,11 +211,7 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
                 .validation_status
                 .clone()
                 .unwrap_or(validation_status),
-            limitations: if fixture.limitations.is_empty() {
-                default_limitations(&policy)
-            } else {
-                fixture.limitations.clone()
-            },
+            limitations,
             classification: config.classification.clone(),
             privacy_mode: format!("{:?}", policy.mode).to_ascii_lowercase(),
             offline: policy.offline || policy.prohibits_egress(),
@@ -210,7 +233,6 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
     assert_no_secrets("executive.html", &executive).map_err(ProductError::internal)?;
     assert_no_secrets("technical.html", &technical).map_err(ProductError::internal)?;
 
-    // Marker proving assess stayed local.
     fs::write(
         paths.evidence_dir.join("privacy-mode.json"),
         serde_json::to_vec_pretty(&serde_json::json!({
@@ -246,7 +268,6 @@ fn load_product_fixture(target: &Path) -> Result<ProductFixture> {
             return Ok(fixture);
         }
     }
-    // Minimal synthetic fixture when assessing an initialized project without demos.
     Ok(ProductFixture {
         findings: vec![],
         gate: Some(GateResult::Pass),
@@ -273,7 +294,8 @@ fn build_coverage(
     if let Some(facts) = &fixture.coverage_facts {
         let profile = resolve_profile(&config.assessment.profile)
             .map_err(|e| ProductError::configuration(e.to_string()))?;
-        let registry = builtin_registry().map_err(|e| ProductError::internal(e.to_string()))?;
+        let registry =
+            registry_for_profile(&profile).map_err(|e| ProductError::internal(e.to_string()))?;
         let report = run_coverage_assessment(
             &profile,
             &registry,
@@ -406,7 +428,7 @@ fn default_limitations(policy: &PrivacyPolicy) -> Vec<String> {
     let mut out = vec![
         "Safe defaults: static/passive/plan-only; no AUTHORIZED_DYNAMIC without Cycle 009 ROE."
             .to_owned(),
-        "Product layer orchestrates Cycles 001–010; it does not add a new security engine."
+        "Product layer orchestrates DARE security engines; Cycle 012 adds registry/coverage metadata, not a new active attack engine."
             .to_owned(),
     ];
     if policy.prohibits_egress() {

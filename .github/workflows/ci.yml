@@ -20,13 +20,8 @@ jobs:
         run: cargo fmt --all --check
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
-      # Cycle 003 coaz-integrity: offline schema validation, secure/vulnerable
-      # vector matrix, secret canaries, standards snapshot, and operator docs
-      # are asserted by the workspace test suite (no extra job required).
       - name: Test
         run: cargo test --workspace
-      # Cycle 005 synthetic MCP lab corpus (MCP-LAB-001..010 secure/vulnerable matrix)
-      # is covered by `cargo test -p dare-mcp-lab` inside the workspace suite above.
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked
       - name: Audit
@@ -135,6 +130,39 @@ jobs:
       - name: Demo fixture assess (secure)
         run: |
           cargo run -p dare-agent-security -- assess examples/secure-mcp --offline --run run-ci-secure
+
+  agentic-registry-2026:
+    name: Cycle 012 Agentic registry security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Agentic registry, provenance, hostile fixtures and legacy compatibility
+        run: cargo test -p dare-coverage --test agentic_registry -- --nocapture
+      - name: Full coverage crate regression
+        run: cargo test -p dare-coverage -- --nocapture
+      - name: Agentic CLI profile selection and family artifact
+        run: |
+          rm -rf .dare-agent-security/cycle012-ci
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile agentic-security-baseline-2026 \
+            --facts fixtures/coverage/agentic-all-capabilities.json \
+            --output-dir .dare-agent-security/cycle012-ci
+          test -f .dare-agent-security/cycle012-ci/coverage-report.json
+          test -f .dare-agent-security/cycle012-ci/risk-family-coverage.json
+          grep -q 'UNASSESSED' .dare-agent-security/cycle012-ci/risk-family-coverage.json
+          if grep -q '"assessment_state": "SECURE"' .dare-agent-security/cycle012-ci/risk-family-coverage.json; then exit 1; fi
+      - name: Legacy MCP CLI compatibility
+        run: |
+          rm -rf .dare-agent-security/cycle012-mcp-ci
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-security-baseline \
+            --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+            --output-dir .dare-agent-security/cycle012-mcp-ci
+          test -f .dare-agent-security/cycle012-mcp-ci/coverage-report.json
+          test ! -f .dare-agent-security/cycle012-mcp-ci/risk-family-coverage.json
+      - name: Confidential offline Agentic product regression
+        run: cargo test -p dare-product --test agentic_offline -- --nocapture
 
   docs-build:
     name: mdBook documentation gate

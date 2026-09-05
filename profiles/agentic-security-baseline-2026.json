@@ -1,0 +1,18 @@
+{
+  "schema":{"id":"https://darelabs.tech/schemas/coverage/v1/profile.schema.json","version":"1.0.0"},
+  "id":"agentic-security-baseline-2026",
+  "version":"1.0.0",
+  "title":"Agentic Security Baseline 2026",
+  "properties":[
+    {"id":"AGENT.GOAL.INSTRUCTION_INTEGRITY","requirement":"REQUIRED"},
+    {"id":"AGENT.TOOL.AUTHORIZATION_BOUNDARY","requirement":"CONDITIONAL"},
+    {"id":"AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION","requirement":"CONDITIONAL"},
+    {"id":"AGENT.SUPPLY_CHAIN.COMPONENT_PROVENANCE","requirement":"CONDITIONAL"},
+    {"id":"AGENT.CODE_EXECUTION.BOUNDARY","requirement":"CONDITIONAL"},
+    {"id":"AGENT.MEMORY.CONTEXT_INTEGRITY","requirement":"CONDITIONAL"},
+    {"id":"AGENT.A2A.MESSAGE_AUTHENTICITY","requirement":"CONDITIONAL"},
+    {"id":"AGENT.FAILURE.RETRY_AMPLIFICATION","requirement":"REQUIRED"},
+    {"id":"AGENT.HUMAN_APPROVAL.INTENT_BINDING","requirement":"CONDITIONAL"},
+    {"id":"AGENT.ROGUE.CAPABILITY_DRIFT","requirement":"REQUIRED"}
+  ]
+}

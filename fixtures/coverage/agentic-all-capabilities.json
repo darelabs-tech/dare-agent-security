@@ -1,0 +1,21 @@
+{
+  "tools_count": 4,
+  "resources_count": 3,
+  "prompts_count": 2,
+  "transport": "http",
+  "authorization_present": true,
+  "dynamic_authorization_allowed": false,
+  "execution_integrity_supported": true,
+  "confused_deputy_supported": true,
+  "agent_present": true,
+  "memory_present": true,
+  "rag_present": true,
+  "multi_agent_present": true,
+  "code_execution_present": true,
+  "human_approval_present": true,
+  "delegated_identity_present": true,
+  "external_components_present": true,
+  "stateful_agent_present": true,
+  "runtime_dynamic_allowed": false,
+  "out_of_scope_property_ids": []
+}

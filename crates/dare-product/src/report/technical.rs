@@ -2,12 +2,13 @@
 
 use crate::error::{ProductError, Result};
 use crate::redaction::{escape_html, redact_product_text};
-use crate::report::{document_shell, finalize_html, vm_title};
+use crate::report::{agentic_report_section, document_shell, finalize_html, vm_title};
 use crate::view_model::ProductViewModel;
 
 pub fn render_technical_html(vm: &ProductViewModel) -> Result<String> {
     let banner = vm.summary.classification.banner_text();
     let title = vm_title(vm, "Technical Report");
+    let agentic = agentic_report_section(vm, true).map_err(ProductError::internal)?;
 
     let rows = vm
         .findings
@@ -67,6 +68,7 @@ pub fn render_technical_html(vm: &ProductViewModel) -> Result<String> {
 {rows}
 </table>
 </section>
+{agentic}
 "#,
         title = escape_html(&redact_product_text(&title)),
         run = escape_html(&vm.summary.run_id),
@@ -77,6 +79,7 @@ pub fn render_technical_html(vm: &ProductViewModel) -> Result<String> {
         } else {
             rows
         },
+        agentic = agentic,
     );
 
     let html = document_shell(&title, &banner, &body);

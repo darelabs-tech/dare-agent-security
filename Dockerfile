@@ -10,6 +10,7 @@ COPY labs ./labs
 COPY schemas ./schemas
 COPY vectors ./vectors
 COPY profiles ./profiles
+COPY standards ./standards
 COPY integrations ./integrations
 COPY benchmark ./benchmark
 COPY fixtures ./fixtures

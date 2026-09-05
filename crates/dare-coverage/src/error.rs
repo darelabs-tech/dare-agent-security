@@ -10,6 +10,8 @@ pub enum CoverageError {
     UnknownProperty(String),
     #[error("unknown predicate: {0}")]
     UnknownPredicate(String),
+    #[error("unknown profile id: {0}")]
+    UnknownProfile(String),
     #[error("duplicate property id: {0}")]
     DuplicateProperty(String),
     #[error("invalid coverage state: {0}")]
