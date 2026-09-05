@@ -319,3 +319,24 @@ re-triggered:
   branch head `dceb710` differs from it only by the corrected gate assertions.
 
 The corrected gate will execute on the next PR opened against `main`.
+
+### Why the defect was not caught locally, and what now prevents it
+
+The local verification before the PR exercised the assertions I *intended*,
+written by hand alongside the workflow. The workflow file itself shipped looser
+substring matches. Checking a paraphrase of the artifact instead of the artifact
+is what let `grep -q 'SECURE'` pass review.
+
+`scripts/run-ci-job-locally.py` (commit `4bb3b01`) closes that gap: it extracts a
+job's `run:` steps from the workflow YAML and executes them verbatim under
+`bash -e`, as GitHub does. Verified in both directions against the current
+workflow:
+
+- all **22 of 22** steps of `prompt-injection-2026` pass locally, including the
+  `Agentic baseline regression` step that failed in CI and the
+  `MCP baseline regression` step that was skipped as a consequence;
+- temporarily reintroducing the original bare-token grep reproduces the exact CI
+  failure message, so the runner catches this class of defect rather than merely
+  reporting green.
+
+The contributor guide now directs anyone touching the gate to run it this way.
