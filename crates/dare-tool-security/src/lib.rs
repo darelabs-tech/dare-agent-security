@@ -30,12 +30,14 @@ pub mod canonical;
 pub mod corpus;
 pub mod coverage;
 pub mod error;
+pub mod evidence_bridge;
 pub mod harness;
 pub mod invariant;
 pub mod local_synthetic;
 pub mod model;
 pub mod observation;
 pub mod replay;
+pub mod result;
 pub mod schema;
 pub mod simulated;
 pub mod source;
@@ -49,6 +51,7 @@ pub use coverage::{
 };
 pub use dare_security_evidence::Verdict;
 pub use error::{Result, ToolSecurityError};
+pub use evidence_bridge::{build_evidence, build_trial_evidence, evidence_id, evidence_ids};
 pub use harness::{
     normalize, normalize_checked, observed_chain_depth, retained_bytes, RawToolTrialOutput,
     ToolHarnessAdapter, ToolHarnessMode, ToolTrialRequest,
@@ -71,6 +74,7 @@ pub use observation::{
     ToolOutputObserved, ToolRequested, ToolSelected, ToolSurfaceObserved, REDACTION_MARKER,
 };
 pub use replay::{ToolReplayAdapter, ToolTrace, ToolTraceTrial};
+pub use result::{run_scenario, ToolDigestRecord, ToolSecurityResult, ToolTrialRecord};
 pub use simulated::{stage, ToolSimulatedAdapter};
 pub use source::{
     CorpusClass, MisuseFamily, MisuseSurface, PoisoningFamily, ScenarioClass, ToolSourceKind,
