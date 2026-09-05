@@ -115,11 +115,13 @@ mod tests {
             runtime_dynamic_allowed: false,
             out_of_scope_property_ids: vec![],
         };
-        let report = run_assessment(&profile, &registry, &facts, &[], CoveragePolicy::default())
-            .unwrap();
+        let report =
+            run_assessment(&profile, &registry, &facts, &[], CoveragePolicy::default()).unwrap();
         let groups = derive_risk_family_coverage(&report, &registry);
         assert_eq!(groups.len(), 10);
-        assert!(groups.iter().all(|group| group.assessment_state != "SECURE"));
+        assert!(groups
+            .iter()
+            .all(|group| group.assessment_state != "SECURE"));
         assert!(groups.iter().all(|group| group.tested == 0));
     }
 }
