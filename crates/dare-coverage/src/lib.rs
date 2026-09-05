@@ -16,6 +16,7 @@ mod property;
 mod report;
 mod risk_family;
 mod status;
+mod tool_security_standards;
 
 pub use agentic::{
     load_mcp_crosswalk, load_provenance, validate_agentic_assets,
@@ -35,9 +36,10 @@ pub use math::{
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
     agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
-    prompt_injection_profile, resolve_profile, validate_profile, AssessmentProfile,
-    ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID,
-    PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
+    prompt_injection_profile, resolve_profile, tool_security_profile, validate_profile,
+    AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
+    PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
+    TOOL_SECURITY_PROFILE_JSON,
 };
 pub use prompt_injection_standards::{
     load_prompt_injection_provenance, validate_prompt_injection_provenance,
@@ -59,6 +61,15 @@ pub use report::{
 };
 pub use risk_family::{derive_risk_family_coverage, RiskFamilyCoverage};
 pub use status::CoverageStatus;
+pub use tool_security_standards::{
+    load_tool_security_provenance, validate_tool_security_provenance,
+    validate_tool_security_standards, InheritedLesson, ToolDeferredTopic, ToolPropertyMapping,
+    ToolSecurityProvenance, ToolSecuritySource, ToolSurfaceClass, ToolTaxonomyDistinction,
+    TOOL_ARGUMENT_INTEGRITY_PROPERTY, TOOL_AUTHORIZATION_BOUNDARY_PROPERTY,
+    TOOL_CHAIN_BOUNDARY_PROPERTY, TOOL_METADATA_TRUST_BOUNDARY_PROPERTY,
+    TOOL_OUTPUT_TRUST_BOUNDARY_PROPERTY, TOOL_SECURITY_PROVENANCE_JSON,
+    TOOL_SELECTION_INTENT_BINDING_PROPERTY,
+};
 
 pub const CRATE_NAME: &str = "dare-coverage";
 
@@ -106,6 +117,6 @@ mod tests {
         let mcp = builtin_profile().unwrap();
         assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
         let agentic = agentic_profile().unwrap();
-        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 22);
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 26);
     }
 }

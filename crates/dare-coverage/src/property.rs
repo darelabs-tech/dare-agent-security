@@ -64,6 +64,9 @@ pub enum Predicate {
     RuntimeDynamicAllowed,
     UserPromptPresent,
     UntrustedExternalContentPresent,
+    ToolMetadataPresent,
+    ToolOutputPresent,
+    ToolChainingPresent,
 }
 
 impl Predicate {
@@ -90,6 +93,9 @@ impl Predicate {
             Self::RuntimeDynamicAllowed => "runtime_dynamic_allowed",
             Self::UserPromptPresent => "user_prompt_present",
             Self::UntrustedExternalContentPresent => "untrusted_external_content_present",
+            Self::ToolMetadataPresent => "tool_metadata_present",
+            Self::ToolOutputPresent => "tool_output_present",
+            Self::ToolChainingPresent => "tool_chaining_present",
         }
     }
 
@@ -114,6 +120,9 @@ impl Predicate {
                 | Self::StatefulAgentPresent
                 | Self::UserPromptPresent
                 | Self::UntrustedExternalContentPresent
+                | Self::ToolMetadataPresent
+                | Self::ToolOutputPresent
+                | Self::ToolChainingPresent
         )
     }
 }
@@ -368,7 +377,7 @@ mod tests {
     #[test]
     fn agentic_registry_loads_and_all_families_are_represented() {
         let registry = agentic_registry().expect("agentic registry");
-        assert_eq!(registry.properties.len(), 22);
+        assert_eq!(registry.properties.len(), 26);
         let families: HashSet<_> = registry
             .properties
             .iter()

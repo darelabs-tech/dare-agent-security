@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0.0",
+  "recorded_at": "2026-09-05",
+  "fetch_policy": "OFFLINE_LOCAL_SNAPSHOT",
+  "fetch_policy_note": "This manifest is a committed local snapshot of upstream references. DARE Agent Security performs no network fetch of standards at validation time. Canonical references are recorded for attribution and traceability only.",
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026",
+      "title": "OWASP Top 10 for Agentic Applications for 2026",
+      "version": "2026",
+      "published_at": "2025-12-09",
+      "canonical_reference": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "status": "NORMATIVE",
+      "mapping_notes": "ASI02 Tool Misuse and Exploitation is the risk-family parent for Cycle 014. DARE properties are narrower, deterministically decidable security invariants and are not one-to-one restatements of ASI02."
+    },
+    {
+      "id": "DARE_CYCLE_014",
+      "title": "DARE Agent Security Cycle 014 Tool Security Validation Contract",
+      "version": "1.0.0",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/014-tool-poisoning-tool-misuse-validation/DESIGN.md",
+      "status": "INFORMATIVE",
+      "mapping_notes": "Local project contract binding ASI02 guidance to deterministic, evidence-backed DARE tool-security invariants under bounded local execution."
+    }
+  ],
+  "taxonomy_distinction": {
+    "statement": "Tool poisoning and tool misuse are related but distinct, and neither is equivalent to ASI02 as a whole.",
+    "tool_poisoning": "Corruption of the tool surface: description, input schema, annotations, security metadata or tool output is manipulated so that untrusted data is treated as authority.",
+    "tool_misuse": "An outcome: a legitimate tool is selected, argued, chained or invoked outside the authorized objective and approved policy.",
+    "non_equivalence_rules": [
+      "Poisoned tool metadata does not by itself prove misuse; misuse requires an observed selection, request, argument, chain or policy fact.",
+      "Observed misuse does not by itself prove poisoning; the tool surface may be entirely benign.",
+      "A model response describing a tool action is not a tool action. Only typed structured observations decide a verdict.",
+      "Cycle 014 maps to ASI02 as a contributing validation technique, never as a claim of full ASI02 coverage.",
+      "Identity, credential and privilege abuse belong to ASI03 and are deferred to Cycle 015; arbitrary code execution belongs to ASI05 and is out of scope."
+    ]
+  },
+  "surface_classes": [
+    {
+      "id": "TOOL_POISONING",
+      "description": "The tool surface itself is manipulated: description, schema, annotations, security metadata or output.",
+      "primary_source": "OWASP_AGENTIC_TOP10_2026",
+      "primary_reference": "ASI02 Tool Misuse and Exploitation — tool poisoning",
+      "dare_properties": [
+        "AGENT.TOOL.METADATA_TRUST_BOUNDARY",
+        "AGENT.TOOL.OUTPUT_TRUST_BOUNDARY"
+      ]
+    },
+    {
+      "id": "TOOL_MISUSE",
+      "description": "A legitimate tool is selected, argued, chained or invoked outside the approved objective and policy.",
+      "primary_source": "OWASP_AGENTIC_TOP10_2026",
+      "primary_reference": "ASI02 Tool Misuse and Exploitation — tool misuse",
+      "dare_properties": [
+        "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+        "AGENT.TOOL.SELECTION_INTENT_BINDING",
+        "AGENT.TOOL.ARGUMENT_INTEGRITY",
+        "AGENT.TOOL.CHAIN_BOUNDARY"
+      ]
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+      "relation": "PARENT_INVARIANT",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI02 Tool Misuse and Exploitation"],
+      "note": "Unchanged Cycle 012 property. Cycle 014 specializes around it and does not alter its definition or applicability."
+    },
+    {
+      "property_id": "AGENT.TOOL.OUTPUT_TRUST_BOUNDARY",
+      "relation": "PARENT_INVARIANT",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI02 Tool Misuse and Exploitation"],
+      "note": "Unchanged Cycle 012 property. Cycle 014 validates it deterministically without redefining it."
+    },
+    {
+      "property_id": "AGENT.TOOL.METADATA_TRUST_BOUNDARY",
+      "relation": "SPECIALIZES",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI02 Tool Misuse and Exploitation"],
+      "note": "Narrower invariant over tool description, schema and annotation metadata. Contributes evidence toward ASI02; asserts no equivalence or completeness."
+    },
+    {
+      "property_id": "AGENT.TOOL.SELECTION_INTENT_BINDING",
+      "relation": "SPECIALIZES",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI02 Tool Misuse and Exploitation"],
+      "note": "Narrower invariant binding an observed tool selection to the authorized objective and approved policy."
+    },
+    {
+      "property_id": "AGENT.TOOL.ARGUMENT_INTEGRITY",
+      "relation": "SPECIALIZES",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI02 Tool Misuse and Exploitation"],
+      "note": "Narrower invariant over argument substitution, parameter pollution and dangerous-operation requests. Requests are observed as structured data and never dispatched."
+    },
+    {
+      "property_id": "AGENT.TOOL.CHAIN_BOUNDARY",
+      "relation": "SPECIALIZES",
+      "sources": ["OWASP_AGENTIC_TOP10_2026"],
+      "references": ["ASI02 Tool Misuse and Exploitation"],
+      "note": "Narrower invariant over chain membership and chain depth within the approved tool policy."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    {"topic": "identity, credential inheritance and privilege escalation", "deferred_to": "Cycle 015"},
+    {"topic": "generalized memory poisoning", "deferred_to": "Cycle 016"},
+    {"topic": "RAG retrieval poisoning", "deferred_to": "Cycle 017"},
+    {"topic": "broad agentic supply chain and AI-BOM provenance", "deferred_to": "Cycle 019"},
+    {"topic": "agent-to-agent tool delegation", "deferred_to": "Cycle 020"},
+    {"topic": "adaptive multi-turn attack loops", "deferred_to": "Cycle 021"},
+    {"topic": "remote authorized dynamic validation against live tools", "deferred_to": "Cycle 022"},
+    {"topic": "arbitrary code execution (ASI05)", "deferred_to": "OUT_OF_PRODUCT_SCOPE"}
+  ],
+  "inherited_lessons": [
+    {
+      "id": "INDEPENDENT_FACTS",
+      "source_cycle": "013",
+      "lesson": "Independently true violations must be emitted independently; one classification must never mask another.",
+      "cycle_014_rule": "Multi-violation capture is mandatory and regression-tested by TOOL-LAB-019."
+    },
+    {
+      "id": "POSITIVE_COVERAGE",
+      "source_cycle": "013",
+      "lesson": "Absence of evidence is not evidence of absence.",
+      "cycle_014_rule": "Every invariant declares the observation channel required before PASS; absence yields INCONCLUSIVE."
+    },
+    {
+      "id": "CLEAN_OBSERVATION_SIGNAL",
+      "source_cycle": "013",
+      "lesson": "A clean run needs an explicit positive signal, or it is indistinguishable from an unobserved one.",
+      "cycle_014_rule": "Coverage channels are explicit rather than inferred from the absence of violations."
+    },
+    {
+      "id": "FULL_VALUE_SECRET_SCAN",
+      "source_cycle": "013",
+      "lesson": "Credential detection must scan the whole bounded value, not only a prefix.",
+      "cycle_014_rule": "Secret and canary screening runs over complete bounded values before persistence."
+    },
+    {
+      "id": "EXACT_CI_ASSERTIONS",
+      "source_cycle": "013",
+      "lesson": "An ambiguous substring assertion failed a healthy CI run by matching an unrelated identifier.",
+      "cycle_014_rule": "CI assertions match exact structured fields, and the real workflow job runs locally through scripts/run-ci-job-locally.py before PR open."
+    }
+  ]
+}

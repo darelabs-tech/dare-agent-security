@@ -81,14 +81,21 @@ fn read_trace(path: &Path) -> Vec<String> {
 }
 
 /// CI runners can observe the trace file slightly after the CLI exits; retry briefly.
+/// Wait for the lab's trace dump to appear.
+///
+/// The lab writes it as the child process exits, so the file can lag the
+/// parent's read. The budget is generous because it costs nothing when the
+/// dump is already there: a short one made this test flake under the parallel
+/// load of a full-workspace run.
 fn read_trace_after_discover(path: &Path) -> Vec<String> {
-    for attempt in 0..20 {
+    const ATTEMPTS: u32 = 100;
+    for attempt in 0..ATTEMPTS {
         let methods = read_trace(path);
         if !methods.is_empty() {
             return methods;
         }
-        if attempt + 1 < 20 {
-            std::thread::sleep(std::time::Duration::from_millis(25));
+        if attempt + 1 < ATTEMPTS {
+            std::thread::sleep(std::time::Duration::from_millis(50));
         }
     }
     read_trace(path)

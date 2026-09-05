@@ -1,0 +1,238 @@
+{
+  "schema_version": "1",
+  "scenario_id": "TOOL-LAB-001",
+  "recorded_at": "2026-09-05",
+  "trials": [
+    {
+      "index": 0,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "selections": [
+        {
+          "tool_id": "ticket_search"
+        }
+      ],
+      "requests": [
+        {
+          "tool_id": "ticket_search",
+          "operation_class": "SEARCH"
+        }
+      ],
+      "outputs": [
+        {
+          "tool_id": "ticket_search",
+          "content": "Ticket 42 is open.",
+          "treatment": "TREATED_AS_DATA"
+        }
+      ]
+    }
+  ]
+}

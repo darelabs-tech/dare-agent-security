@@ -1,0 +1,14 @@
+{
+  "schema_version": "1",
+  "corpus_id": "malformed-corpus",
+  "version": "1.0.0",
+  "title": "lab corpus pinning a substituted digest; must be refused",
+  "entries": [
+    {
+      "id": "misuse-unapproved-selection",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-unapproved-selection.json",
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

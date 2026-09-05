@@ -1,0 +1,13 @@
+{
+  "schema_version": "1",
+  "corpus_id": "executable-field-corpus",
+  "version": "1.0.0",
+  "title": "lab corpus carrying an executable field; must be refused",
+  "entries": [
+    {
+      "id": "misuse-unapproved-selection",
+      "class": "MISUSE_ATTACK",
+      "path": "misuse/misuse-unapproved-selection.json"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "tool-security-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE Tool Security Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.TOOL.OUTPUT_TRUST_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.TOOL.METADATA_TRUST_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.TOOL.SELECTION_INTENT_BINDING",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.TOOL.ARGUMENT_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.TOOL.CHAIN_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    }
+  ]
+}

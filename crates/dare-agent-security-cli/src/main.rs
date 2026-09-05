@@ -15,6 +15,7 @@ use dare_agent_security::discover::run_discover;
 use dare_agent_security::exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
 use dare_agent_security::product::{run_assess, run_doctor_cmd, run_init, run_report};
 use dare_agent_security::prompt_injection::run_prompt_injection;
+use dare_agent_security::tool_security::run_tool_security;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> ExitCode {
@@ -40,6 +41,9 @@ async fn main() -> ExitCode {
                 ValidateSubcommand::Continuous(args) => ExitCode::from(run_continuous(args) as u8),
                 ValidateSubcommand::PromptInjection(args) => {
                     ExitCode::from(run_prompt_injection(args) as u8)
+                }
+                ValidateSubcommand::ToolSecurity(args) => {
+                    ExitCode::from(run_tool_security(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

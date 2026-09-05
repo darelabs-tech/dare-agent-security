@@ -1,0 +1,229 @@
+{
+  "schema_version": "1",
+  "title": "DARE Cycle 014 adversarial parser fixtures",
+  "note": "Every document listed here is invalid by design and must be refused before execution. They are deliberately absent from registry.json.",
+  "cases": [
+    {
+      "id": "unknown-top-level-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-top-level-field.json",
+      "reason": "an unknown top-level field must not be ignored"
+    },
+    {
+      "id": "unknown-nested-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-nested-field.json",
+      "reason": "an unknown field nested inside provenance must not be ignored"
+    },
+    {
+      "id": "unknown-enum-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-enum-value.json",
+      "reason": "an unknown family must fail closed rather than degrade to a default"
+    },
+    {
+      "id": "unknown-reference-behavior",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-reference-behavior.json",
+      "reason": "an unknown reference behavior must fail closed"
+    },
+    {
+      "id": "unsupported-schema-version",
+      "kind": "CORPUS_ENTRY",
+      "path": "unsupported-schema-version.json",
+      "reason": "a future schema version must be refused, not best-effort parsed"
+    },
+    {
+      "id": "downgraded-schema-version",
+      "kind": "CORPUS_ENTRY",
+      "path": "downgraded-schema-version.json",
+      "reason": "a downgraded schema version must be refused just as firmly"
+    },
+    {
+      "id": "executable-shell-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-shell-field.json",
+      "reason": "a shell field must be refused at the top level"
+    },
+    {
+      "id": "executable-script-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-script-field.json",
+      "reason": "a script field must be refused"
+    },
+    {
+      "id": "executable-eval-field-nested",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-eval-field-nested.json",
+      "reason": "an eval field must be refused at any depth, not only the top level"
+    },
+    {
+      "id": "executable-callback-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-callback-field.json",
+      "reason": "a callback field must be refused"
+    },
+    {
+      "id": "remote-endpoint-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-endpoint-field.json",
+      "reason": "a remote endpoint must be refused; Cycle 014 has no network path"
+    },
+    {
+      "id": "remote-mcp-server-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-mcp-server-field.json",
+      "reason": "a live MCP server reference must be refused"
+    },
+    {
+      "id": "expected-verdict-smuggling",
+      "kind": "CORPUS_ENTRY",
+      "path": "expected-verdict-smuggling.json",
+      "reason": "a fixture must never carry the verdict the engine computes"
+    },
+    {
+      "id": "should-fail-smuggling",
+      "kind": "CORPUS_ENTRY",
+      "path": "should-fail-smuggling.json",
+      "reason": "a boolean shorthand for the verdict is still the verdict"
+    },
+    {
+      "id": "nested-verdict-smuggling",
+      "kind": "CORPUS_ENTRY",
+      "path": "nested-verdict-smuggling.json",
+      "reason": "a verdict hidden inside provenance is still a verdict"
+    },
+    {
+      "id": "credential-shaped-payload",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-shaped-payload.json",
+      "reason": "credential-shaped content must never enter the corpus"
+    },
+    {
+      "id": "bearer-credential-payload",
+      "kind": "CORPUS_ENTRY",
+      "path": "bearer-credential-payload.json",
+      "reason": "a bearer credential must never enter the corpus"
+    },
+    {
+      "id": "hostile-unicode-identifier",
+      "kind": "CORPUS_ENTRY",
+      "path": "hostile-unicode-identifier.json",
+      "reason": "a direction override inside an identifier must be refused"
+    },
+    {
+      "id": "zero-width-identifier",
+      "kind": "CORPUS_ENTRY",
+      "path": "zero-width-identifier.json",
+      "reason": "a zero-width character makes two different ids render identically"
+    },
+    {
+      "id": "log-injection-title",
+      "kind": "CORPUS_ENTRY",
+      "path": "log-injection-title.json",
+      "reason": "terminal control sequences must never reach a rendered report line"
+    },
+    {
+      "id": "carriage-return-payload",
+      "kind": "CORPUS_ENTRY",
+      "path": "carriage-return-payload.json",
+      "reason": "a carriage return can overwrite a rendered line"
+    },
+    {
+      "id": "oversized-surface-note",
+      "kind": "CORPUS_ENTRY",
+      "path": "oversized-surface-note.json",
+      "reason": "oversized metadata must be refused by the declared bound"
+    },
+    {
+      "id": "oversized-payload",
+      "kind": "CORPUS_ENTRY",
+      "path": "oversized-payload.json",
+      "reason": "oversized fixture output must be refused by the declared bound"
+    },
+    {
+      "id": "attack-declared-compliant",
+      "kind": "CORPUS_ENTRY",
+      "path": "attack-declared-compliant.json",
+      "reason": "an attack whose reference agent complies is a control, not an attack"
+    },
+    {
+      "id": "benign-control-noncompliant",
+      "kind": "CORPUS_ENTRY",
+      "path": "benign-control-noncompliant.json",
+      "reason": "a benign control must declare compliant reference behavior"
+    },
+    {
+      "id": "poisoning-class-misuse-family",
+      "kind": "CORPUS_ENTRY",
+      "path": "poisoning-class-misuse-family.json",
+      "reason": "a poisoning class must not borrow a misuse family"
+    },
+    {
+      "id": "missing-tools-precondition",
+      "kind": "CORPUS_ENTRY",
+      "path": "missing-tools-precondition.json",
+      "reason": "every tool-security entry must declare the tools_present precondition"
+    },
+    {
+      "id": "duplicate-registry-id",
+      "kind": "CORPUS_REGISTRY",
+      "path": "duplicate-registry-id.json",
+      "reason": "a duplicate entry id must be refused, not last-write-wins"
+    },
+    {
+      "id": "duplicate-registry-path",
+      "kind": "CORPUS_REGISTRY",
+      "path": "duplicate-registry-path.json",
+      "reason": "two ids pointing at one file is a substitution, not a convenience"
+    },
+    {
+      "id": "path-traversal-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "path-traversal-registry.json",
+      "reason": "a parent-traversal path must be refused before any file is opened"
+    },
+    {
+      "id": "absolute-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "absolute-path-registry.json",
+      "reason": "an absolute path escapes the corpus root"
+    },
+    {
+      "id": "url-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "url-path-registry.json",
+      "reason": "a corpus entry must never be fetched from a URL"
+    },
+    {
+      "id": "trace-claims-dispatch",
+      "kind": "TRACE",
+      "path": "trace-claims-dispatch.json",
+      "reason": "a trace must not be able to claim a tool call was dispatched"
+    },
+    {
+      "id": "trace-duplicate-trial-index",
+      "kind": "TRACE",
+      "path": "trace-duplicate-trial-index.json",
+      "reason": "a repeated trial index makes replay ambiguous"
+    },
+    {
+      "id": "trace-unknown-treatment",
+      "kind": "TRACE",
+      "path": "trace-unknown-treatment.json",
+      "reason": "an unknown output treatment must fail closed"
+    },
+    {
+      "id": "trace-over-limit-trials",
+      "kind": "TRACE",
+      "path": "trace-over-limit-trials.json",
+      "reason": "a trace above the hard trial maximum must be refused, not truncated"
+    },
+    {
+      "id": "trace-remote-exfiltration-field",
+      "kind": "TRACE",
+      "path": "trace-remote-exfiltration-field.json",
+      "reason": "a remote field smuggled into a trial must be refused"
+    }
+  ]
+}

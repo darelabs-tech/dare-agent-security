@@ -19,6 +19,8 @@ pub const AGENTIC_PROFILE_JSON: &str =
     include_str!("../../../profiles/agentic-security-baseline-2026.json");
 pub const PROMPT_INJECTION_PROFILE_JSON: &str =
     include_str!("../../../profiles/prompt-injection-baseline-2026.json");
+pub const TOOL_SECURITY_PROFILE_JSON: &str =
+    include_str!("../../../profiles/tool-security-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -128,6 +130,14 @@ pub fn prompt_injection_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(PROMPT_INJECTION_PROFILE_JSON)
 }
 
+/// Cycle 014 tool-security baseline.
+///
+/// Additive: it selects the six `AGENT.TOOL.*` properties from the same v2
+/// registry and leaves every earlier profile, and every denominator, untouched.
+pub fn tool_security_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(TOOL_SECURITY_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -142,6 +152,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "mcp-security-baseline" => builtin_profile(),
         "agentic-security-baseline-2026" => agentic_profile(),
         "prompt-injection-baseline-2026" => prompt_injection_profile(),
+        "tool-security-baseline-2026" => tool_security_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

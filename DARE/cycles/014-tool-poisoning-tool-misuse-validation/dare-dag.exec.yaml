@@ -1,0 +1,77 @@
+cycle: "014-tool-poisoning-tool-misuse-validation"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+approval_file: DARE/cycles/014-tool-poisoning-tool-misuse-validation/APPROVAL.md
+base_branch: main
+baseline_commit: 1fa9ba04e55e53e25d71621675cba9a70d174e8e
+branch: agent/cycle-014-tool-poisoning-tool-misuse-validation
+
+execution_rules:
+  order: dependency_dag
+  task_specs_dir: DARE/cycles/014-tool-poisoning-tool-misuse-validation/EXECUTION
+  task_count: 31
+  ralph_loop: [build, test, lint, review]
+  fail_closed: true
+  no_llm_final_judge: true
+  no_remote_execution: true
+  no_real_state_change: true
+  positive_pass_coverage_required: true
+  pr_open_only_ci: true
+  pre_pr_local_workflow_job: tool-security-2026
+
+tasks:
+  - {id: task-001, depends_on: []}
+  - {id: task-002, depends_on: [task-001]}
+  - {id: task-003, depends_on: [task-001, task-002]}
+  - {id: task-004, depends_on: [task-003]}
+  - {id: task-005, depends_on: [task-003, task-004]}
+  - {id: task-006, depends_on: [task-004, task-005]}
+  - {id: task-007, depends_on: [task-003, task-004, task-005, task-006]}
+  - {id: task-008, depends_on: [task-004, task-005, task-007]}
+  - {id: task-009, depends_on: [task-008]}
+  - {id: task-010, depends_on: [task-008, task-009]}
+  - {id: task-011, depends_on: [task-004, task-005, task-006, task-007]}
+  - {id: task-012, depends_on: [task-004, task-005, task-010, task-011]}
+  - {id: task-013, depends_on: [task-006, task-008, task-009, task-010, task-011, task-012]}
+  - {id: task-014, depends_on: [task-008, task-009, task-010, task-011, task-012]}
+  - {id: task-015, depends_on: [task-010, task-011, task-012, task-013, task-014]}
+  - {id: task-016, depends_on: [task-006, task-007, task-009, task-010]}
+  - {id: task-017, depends_on: [task-006, task-007, task-009, task-010]}
+  - {id: task-018, depends_on: [task-016, task-017]}
+  - {id: task-019, depends_on: [task-004, task-005, task-006, task-007, task-011, task-012]}
+  - {id: task-020, depends_on: [task-008, task-009, task-010, task-016, task-017]}
+  - {id: task-021, depends_on: [task-008, task-010, task-018, task-019, task-020]}
+  - {id: task-022, depends_on: [task-010, task-011, task-012, task-013, task-014, task-015, task-020, task-021]}
+  - {id: task-023, depends_on: [task-003, task-022]}
+  - {id: task-024, depends_on: [task-013, task-014, task-015, task-022, task-023]}
+  - {id: task-025, depends_on: [task-022, task-023, task-024]}
+  - {id: task-026, depends_on: [task-015, task-022, task-023, task-024, task-025]}
+  - {id: task-027, depends_on: [task-016, task-017, task-018, task-019, task-020, task-021, task-024, task-026]}
+  - {id: task-028, depends_on: [task-024, task-025, task-026]}
+  - {id: task-029, depends_on: [task-003, task-006, task-009, task-010, task-016, task-017, task-019]}
+  - {id: task-030, depends_on: [task-023, task-024, task-025, task-026, task-027, task-028, task-029]}
+  - {id: task-031, depends_on: [task-030]}
+
+hard_bounds:
+  default_trials: 3
+  hard_max_trials: 10
+  stop_on_first_fail: true
+  max_tool_requests_per_trial: 8
+  hard_max_chain_depth: 3
+  hard_max_total_tool_requests: 24
+  max_output_bytes_per_trial: 16384
+  max_total_output_bytes: 65536
+  max_duration_seconds_per_trial: 30
+  max_state_changes: 0
+  external_egress_bytes: 0
+
+completion_gates:
+  - cargo fmt --all --check
+  - cargo clippy --workspace --all-targets -- -D warnings
+  - cargo test --workspace
+  - cargo audit
+  - python scripts/run-ci-job-locally.py .github/workflows/ci.yml tool-security-2026
+  - Cycle 013 prompt-injection regression
+  - Agentic baseline regression
+  - MCP baseline regression
+  - all 61 DESIGN acceptance criteria mapped in PROOF.md
