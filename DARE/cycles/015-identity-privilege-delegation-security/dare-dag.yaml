@@ -1,0 +1,84 @@
+cycle: "015-identity-privilege-delegation-security"
+status: READY_FOR_REVIEW
+approval: PENDING
+base_branch: main
+baseline_commit: 2f9c02b4f4f94daa5478a0785f74814fb2d021a2
+branch: agent/cycle-015-identity-privilege-delegation-security
+
+tasks:
+  - id: task-001
+    depends_on: []
+  - id: task-002
+    depends_on: [task-001]
+  - id: task-003
+    depends_on: [task-001, task-002]
+  - id: task-004
+    depends_on: [task-003]
+  - id: task-005
+    depends_on: [task-003, task-004]
+  - id: task-006
+    depends_on: [task-004, task-005]
+  - id: task-007
+    depends_on: [task-004]
+  - id: task-008
+    depends_on: [task-004, task-005, task-007]
+  - id: task-009
+    depends_on: [task-004, task-005, task-007, task-008]
+  - id: task-010
+    depends_on: [task-004, task-005, task-006, task-007, task-008, task-009]
+  - id: task-011
+    depends_on: [task-003, task-004, task-006, task-010]
+  - id: task-012
+    depends_on: [task-004, task-005, task-006, task-007, task-008, task-009, task-010, task-011]
+  - id: task-013
+    depends_on: [task-004, task-005, task-006, task-007, task-008, task-009]
+  - id: task-014
+    depends_on: [task-013]
+  - id: task-015
+    depends_on: [task-013, task-014]
+  - id: task-016
+    depends_on: [task-005, task-013, task-014, task-015]
+  - id: task-017
+    depends_on: [task-006, task-013, task-014, task-015, task-016]
+  - id: task-018
+    depends_on: [task-008, task-009, task-012, task-013, task-014, task-015]
+  - id: task-019
+    depends_on: [task-010, task-012, task-015, task-016, task-017, task-018]
+  - id: task-020
+    depends_on: [task-010, task-012, task-013, task-014, task-015, task-019]
+  - id: task-021
+    depends_on: [task-012, task-013, task-014, task-015, task-019]
+  - id: task-022
+    depends_on: [task-015, task-018, task-019, task-020, task-021]
+  - id: task-023
+    depends_on: [task-010, task-011, task-014, task-015, task-016, task-017]
+  - id: task-024
+    depends_on: [task-007, task-010, task-011, task-014, task-015, task-016]
+  - id: task-025
+    depends_on: [task-008, task-009, task-010, task-014, task-015, task-018]
+  - id: task-026
+    depends_on: [task-023, task-024, task-025]
+  - id: task-027
+    depends_on: [task-010, task-011, task-012, task-019]
+  - id: task-028
+    depends_on: [task-013, task-015, task-023, task-024, task-025, task-026, task-027]
+  - id: task-029
+    depends_on: [task-012, task-015, task-018, task-019, task-020, task-021, task-022, task-028]
+  - id: task-030
+    depends_on: [task-003, task-029]
+  - id: task-031
+    depends_on: [task-020, task-021, task-022, task-029, task-030]
+  - id: task-032
+    depends_on: [task-029, task-030, task-031]
+  - id: task-033
+    depends_on: [task-023, task-024, task-025, task-026, task-027, task-028, task-030, task-031, task-032]
+  - id: task-034
+    depends_on: [task-030, task-031, task-032, task-033]
+  - id: task-035
+    depends_on: [task-033, task-034]
+
+execution_gate:
+  requires_approval_file: DARE/cycles/015-identity-privilege-delegation-security/APPROVAL.md
+  approval_file_must_exist_before_execute: true
+  approval_file_present: false
+  required_pre_pr_local_workflow_job: identity-security-2026
