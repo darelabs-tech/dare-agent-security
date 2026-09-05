@@ -206,6 +206,114 @@ pub fn validate_corpus_registry(registry: &Value) -> Result<()> {
     Ok(())
 }
 
+/// A loaded, validated corpus.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Corpus {
+    pub corpus_id: String,
+    pub version: String,
+    pub entries: Vec<crate::model::CorpusEntry>,
+}
+
+impl Corpus {
+    /// Look up one vector by id.
+    pub fn get(&self, id: &str) -> Option<&crate::model::CorpusEntry> {
+        self.entries.iter().find(|entry| entry.id == id)
+    }
+
+    /// Look up one vector by id, failing closed when it is absent.
+    pub fn require(&self, id: &str) -> Result<&crate::model::CorpusEntry> {
+        self.get(id)
+            .ok_or_else(|| PromptInjectionError::invalid(format!("corpus has no vector `{id}`")))
+    }
+
+    /// Entries of one class.
+    pub fn by_class(&self, class: crate::source::CorpusClass) -> Vec<&crate::model::CorpusEntry> {
+        self.entries
+            .iter()
+            .filter(|entry| entry.class == class)
+            .collect()
+    }
+}
+
+/// Load and validate an entire corpus directory from its registry.
+///
+/// Every entry path is root-confined, size-bounded and validated. A registry
+/// entry whose file is missing, whose id disagrees with the file, or whose
+/// pinned digest does not match is refused; nothing is silently skipped.
+pub fn load_corpus(root: &std::path::Path) -> Result<Corpus> {
+    let registry_path = root.join("registry.json");
+    let raw = std::fs::read(&registry_path)?;
+    crate::schema::enforce_document_size(&raw, "corpus registry")?;
+    let registry: Value = serde_json::from_slice(&raw).map_err(|err| {
+        PromptInjectionError::schema(format!("corpus registry is not valid JSON: {err}"))
+    })?;
+    validate_corpus_registry(&registry)?;
+
+    let listed = registry
+        .get("entries")
+        .and_then(Value::as_array)
+        .ok_or_else(|| PromptInjectionError::schema("corpus registry has no entries"))?;
+
+    let mut entries = Vec::new();
+    for listed_entry in listed {
+        let id = listed_entry
+            .get("id")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let path = listed_entry
+            .get("path")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        assert_root_confined(path)?;
+
+        let file = root.join(path);
+        let raw = std::fs::read(&file).map_err(|err| {
+            PromptInjectionError::invalid(format!("corpus vector `{id}` unreadable: {err}"))
+        })?;
+        crate::schema::enforce_document_size(&raw, "corpus entry")?;
+        let value: Value = serde_json::from_slice(&raw).map_err(|err| {
+            PromptInjectionError::schema(format!("corpus vector `{id}` is not valid JSON: {err}"))
+        })?;
+        validate_corpus_entry(&value)?;
+        let entry: crate::model::CorpusEntry = serde_json::from_value(value)?;
+
+        if entry.id != id {
+            return Err(PromptInjectionError::DigestMismatch(format!(
+                "corpus registry lists `{id}` but the file declares `{}`",
+                entry.id
+            )));
+        }
+        if let Some(pinned) = listed_entry.get("digest").and_then(Value::as_str) {
+            crate::canonical::verify_digest(&entry, pinned, "corpus vector")?;
+        }
+        entries.push(entry);
+    }
+
+    Ok(Corpus {
+        corpus_id: registry
+            .get("corpus_id")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned(),
+        version: registry
+            .get("version")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned(),
+        entries,
+    })
+}
+
+/// Path of the corpus shipped with the workspace.
+pub fn builtin_corpus_root() -> std::path::PathBuf {
+    std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../corpus/prompt-injection/v1")
+}
+
+/// Load the corpus shipped with the workspace.
+pub fn builtin_corpus() -> Result<Corpus> {
+    load_corpus(&builtin_corpus_root())
+}
+
 /// Refuse any path that could escape the corpus root.
 pub fn assert_root_confined(path: &str) -> Result<()> {
     if path.is_empty() {

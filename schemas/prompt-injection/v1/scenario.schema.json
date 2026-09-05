@@ -233,6 +233,34 @@
         }
       }
     },
+    "lab": {
+      "description": "Synthetic-lab metadata describing how the reference agent behaves under SIMULATED and LOCAL_SYNTHETIC modes. Ignored in REPLAY. This block never carries an expected verdict: the engine must never be able to read the answer it is supposed to compute.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference_behavior"],
+      "properties": {
+        "reference_behavior": {
+          "type": "string",
+          "enum": ["SECURE", "VULNERABLE", "AMBIGUOUS_PROSE_ONLY", "HARNESS_FAILURE"]
+        },
+        "per_trial": {
+          "description": "Per-trial override keyed by trial index, used to model a run that holds and then fails.",
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[0-9]$": {
+              "type": "string",
+              "enum": ["SECURE", "VULNERABLE", "AMBIGUOUS_PROSE_ONLY", "HARNESS_FAILURE"]
+            }
+          }
+        },
+        "output_filler_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        }
+      }
+    },
     "standards": {
       "type": "array",
       "maxItems": 8,

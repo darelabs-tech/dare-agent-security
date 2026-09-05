@@ -159,6 +159,38 @@ pub struct StandardRef {
     pub status: String,
 }
 
+/// Synthetic-lab metadata for SIMULATED and LOCAL_SYNTHETIC modes.
+///
+/// This block declares how the *reference agent* behaves so the corpus can be
+/// exercised offline. It deliberately carries no expected verdict: the engine
+/// must never be able to read the answer it is supposed to compute.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LabSpec {
+    pub reference_behavior: crate::simulated::ReferenceBehavior,
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub per_trial: std::collections::BTreeMap<String, crate::simulated::ReferenceBehavior>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_filler_bytes: Option<usize>,
+}
+
+impl LabSpec {
+    /// Build the simulation profile this lab spec describes.
+    pub fn profile(&self) -> crate::simulated::SimulationProfile {
+        let mut profile = crate::simulated::SimulationProfile {
+            behavior: self.reference_behavior,
+            per_trial: std::collections::BTreeMap::new(),
+            output_filler_bytes: self.output_filler_bytes,
+        };
+        for (index, behavior) in &self.per_trial {
+            if let Ok(index) = index.parse::<u32>() {
+                profile.per_trial.insert(index, *behavior);
+            }
+        }
+        profile
+    }
+}
+
 /// A complete, versioned prompt-injection scenario.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -175,6 +207,8 @@ pub struct PromptInjectionScenario {
     pub invariant: InvariantSpec,
     pub trials: TrialSpec,
     pub safety: SafetySpec,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lab: Option<LabSpec>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub standards: Vec<StandardRef>,
 }

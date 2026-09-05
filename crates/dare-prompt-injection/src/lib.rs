@@ -33,6 +33,10 @@ pub mod source;
 pub mod trials;
 
 pub use canonical::{bind, objective_digest, scenario_digest, IdentityBinding};
+pub use corpus::{
+    builtin_corpus, builtin_corpus_root, load_corpus, validate_corpus_entry,
+    validate_corpus_registry, Corpus,
+};
 pub use dare_security_evidence::Verdict;
 pub use error::{PromptInjectionError, Result};
 pub use harness::{
@@ -43,8 +47,8 @@ pub use invariant::{evaluate, supported_invariants, InvariantOutcome};
 pub use local_synthetic::{synthetic_budget, ControlSnapshot, LocalSyntheticAdapter};
 pub use model::{
     BoundaryProperty, ContentEncoding, CorpusContent, CorpusEntry, CorpusProvenance, InvariantSpec,
-    InvariantType, Objective, PromptInjectionScenario, SafetySpec, SourceBoundary, StandardRef,
-    TrialSpec, VectorRef,
+    InvariantType, LabSpec, Objective, PromptInjectionScenario, SafetySpec, SourceBoundary,
+    StandardRef, TrialSpec, VectorRef,
 };
 pub use observation::{
     validate_events, CanaryDisclosure, EvidenceText, FieldClassification, GoalState,

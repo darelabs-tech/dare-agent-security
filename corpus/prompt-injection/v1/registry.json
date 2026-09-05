@@ -1,0 +1,88 @@
+{
+  "schema_version": "1",
+  "corpus_id": "prompt-injection-v1",
+  "version": "1.0.0",
+  "title": "DARE prompt-injection corpus v1 (synthetic)",
+  "entries": [
+    {
+      "id": "benign-direct-canary-discussion-001",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-direct-canary-discussion-001.json"
+    },
+    {
+      "id": "benign-direct-security-question-001",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-direct-security-question-001.json"
+    },
+    {
+      "id": "benign-indirect-html-article-001",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-indirect-html-article-001.json"
+    },
+    {
+      "id": "benign-indirect-policy-document-001",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-indirect-policy-document-001.json"
+    },
+    {
+      "id": "direct-goal-override-001",
+      "class": "DIRECT_ATTACK",
+      "path": "direct/direct-goal-override-001.json"
+    },
+    {
+      "id": "direct-instruction-smuggling-001",
+      "class": "DIRECT_ATTACK",
+      "path": "direct/direct-instruction-smuggling-001.json"
+    },
+    {
+      "id": "direct-protected-data-request-001",
+      "class": "DIRECT_ATTACK",
+      "path": "direct/direct-protected-data-request-001.json"
+    },
+    {
+      "id": "direct-role-confusion-001",
+      "class": "DIRECT_ATTACK",
+      "path": "direct/direct-role-confusion-001.json"
+    },
+    {
+      "id": "direct-system-instruction-override-001",
+      "class": "DIRECT_ATTACK",
+      "path": "direct/direct-system-instruction-override-001.json"
+    },
+    {
+      "id": "direct-unauthorized-action-request-001",
+      "class": "DIRECT_ATTACK",
+      "path": "direct/direct-unauthorized-action-request-001.json"
+    },
+    {
+      "id": "indirect-cross-content-instruction-001",
+      "class": "INDIRECT_ATTACK",
+      "path": "indirect/indirect-cross-content-instruction-001.json"
+    },
+    {
+      "id": "indirect-document-instruction-001",
+      "class": "INDIRECT_ATTACK",
+      "path": "indirect/indirect-document-instruction-001.json"
+    },
+    {
+      "id": "indirect-html-hidden-instruction-001",
+      "class": "INDIRECT_ATTACK",
+      "path": "indirect/indirect-html-hidden-instruction-001.json"
+    },
+    {
+      "id": "indirect-protected-data-request-001",
+      "class": "INDIRECT_ATTACK",
+      "path": "indirect/indirect-protected-data-request-001.json"
+    },
+    {
+      "id": "indirect-system-instruction-override-001",
+      "class": "INDIRECT_ATTACK",
+      "path": "indirect/indirect-system-instruction-override-001.json"
+    },
+    {
+      "id": "indirect-unauthorized-action-request-001",
+      "class": "INDIRECT_ATTACK",
+      "path": "indirect/indirect-unauthorized-action-request-001.json"
+    }
+  ]
+}
