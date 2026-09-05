@@ -32,6 +32,7 @@ pub mod coverage;
 pub mod error;
 pub mod harness;
 pub mod invariant;
+pub mod local_synthetic;
 pub mod model;
 pub mod observation;
 pub mod replay;
@@ -53,6 +54,7 @@ pub use harness::{
     ToolHarnessAdapter, ToolHarnessMode, ToolTrialRequest,
 };
 pub use invariant::{evaluate, supported_invariants, ToolInvariantOutcome, ToolViolation};
+pub use local_synthetic::{synthetic_budget, ToolControlSnapshot, ToolLocalSyntheticAdapter};
 pub use model::{
     ApprovedArgument, ApprovedTool, ApprovedToolPolicy, ChainPolicy, DeclaredSensitivity,
     InvocationPolicy, OperationClass, ParameterType, ReferenceBehavior, SemanticClass,

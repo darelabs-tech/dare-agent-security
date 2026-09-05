@@ -17,7 +17,7 @@
 - [x] task-012 — Implement bounded trials, tool-request counts and chain-depth enforcement
 - [x] task-013 — Implement replay adapter
 - [x] task-014 — Implement simulated adapter
-- [ ] task-015 — Integrate local-synthetic harness with Cycle 009 controls
+- [x] task-015 — Integrate local-synthetic harness with Cycle 009 controls
 - [ ] task-016 — Build Tool Poisoning corpus with paired secure/vulnerable fixtures
 - [ ] task-017 — Build Tool Misuse corpus with paired secure/vulnerable fixtures
 - [ ] task-018 — Add benign controls and false-positive regressions
