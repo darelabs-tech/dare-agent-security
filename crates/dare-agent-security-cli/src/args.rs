@@ -66,6 +66,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local prompt-injection validation (Cycle 013).
     #[command(name = "prompt-injection")]
     PromptInjection(crate::prompt_injection::PromptInjectionArgs),
+    /// Run bounded local tool poisoning and tool misuse validation (Cycle 014).
+    #[command(name = "tool-security")]
+    ToolSecurity(crate::tool_security::ToolSecurityArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

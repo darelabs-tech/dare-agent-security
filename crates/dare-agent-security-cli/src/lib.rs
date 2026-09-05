@@ -10,6 +10,7 @@ pub mod continuous;
 pub mod coverage;
 pub mod product;
 pub mod prompt_injection;
+pub mod tool_security;
 
 pub mod args;
 pub mod coaz_integrity;
