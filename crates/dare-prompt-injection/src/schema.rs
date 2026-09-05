@@ -144,7 +144,7 @@ pub fn validate_scenario_document(value: &Value) -> Result<()> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use serde_json::json;
 

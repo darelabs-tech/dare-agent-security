@@ -8,7 +8,7 @@
 - [x] task-003 — Add specialized prompt-injection AGENT.* properties and predicates
 - [x] task-004 — Define PromptInjectionScenario schema
 - [x] task-005 — Define prompt-injection corpus-entry schema
-- [ ] task-006 — Define source trust-boundary and injection-family enums
+- [x] task-006 — Define source trust-boundary and injection-family enums
 - [ ] task-007 — Define normalized observation-event model
 - [ ] task-008 — Implement deterministic invariant evaluator registry
 - [ ] task-009 — Implement canonical digests and scenario/corpus/objective binding

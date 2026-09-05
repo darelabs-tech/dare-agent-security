@@ -245,7 +245,7 @@ pub fn assert_root_confined(path: &str) -> Result<()> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use serde_json::json;
 

@@ -20,10 +20,18 @@
 
 pub mod corpus;
 pub mod error;
+pub mod model;
 pub mod schema;
+pub mod source;
 
 pub use dare_security_evidence::Verdict;
 pub use error::{PromptInjectionError, Result};
+pub use model::{
+    BoundaryProperty, ContentEncoding, CorpusContent, CorpusEntry, CorpusProvenance, InvariantSpec,
+    InvariantType, Objective, PromptInjectionScenario, SafetySpec, SourceBoundary, StandardRef,
+    TrialSpec, VectorRef,
+};
+pub use source::{CorpusClass, InjectionDirection, InjectionFamily, SourceKind, TrustLevel};
 
 /// Published crate name for workspace identity checks.
 pub const CRATE_NAME: &str = "dare-prompt-injection";
