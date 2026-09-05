@@ -26,12 +26,17 @@
 //! kill-switch controls from Cycle 009; observation/evaluator patterns from
 //! Cycle 013.
 
+pub mod coverage;
 pub mod error;
 pub mod model;
 pub mod observation;
 pub mod schema;
 pub mod source;
 
+pub use coverage::{
+    all_contracts, assess_coverage, coverage_contract, ChannelRequirement, CoverageContract,
+    CoverageDecision,
+};
 pub use dare_security_evidence::Verdict;
 pub use error::{Result, ToolSecurityError};
 pub use model::{

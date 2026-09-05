@@ -11,7 +11,7 @@
 - [ ] task-006 — Define tool-security corpus-entry and replay trace schemas
 - [x] task-007 — Define poisoning/misuse/source/trust closed enums
 - [x] task-008 — Define normalized Tool Observation event model
-- [ ] task-009 — Define invariant-specific positive PASS coverage contracts
+- [x] task-009 — Define invariant-specific positive PASS coverage contracts
 - [ ] task-010 — Implement deterministic Tool Security invariant evaluator registry
 - [ ] task-011 — Implement canonical scenario/corpus/objective/policy/tool-surface digest binding
 - [ ] task-012 — Implement bounded trials, tool-request counts and chain-depth enforcement
