@@ -176,3 +176,18 @@ cargo test -p dare-coverage --test prompt_injection_properties
 If you added a vector, confirm the hostile fixture suite still refuses
 everything it should, and that the two existing baselines
 (`agentic-security-baseline-2026` and `mcp-security-baseline`) are untouched.
+
+### If you touch the CI gate
+
+Run the job itself, not an approximation of it:
+
+```bash
+python scripts/run-ci-job-locally.py .github/workflows/ci.yml prompt-injection-2026
+```
+
+This extracts the `run:` steps from the workflow and executes them verbatim
+under `bash -e`, exactly as GitHub does. It exists because a Cycle 013 gate
+assertion once passed local review and still failed in CI: the local check
+exercised the assertion that was *intended*, while the workflow shipped a looser
+one that matched a substring of an unrelated identifier. Verifying the artifact
+rather than a paraphrase of it closes that gap.
