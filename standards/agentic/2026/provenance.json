@@ -21,6 +21,15 @@
       "mapping_notes": "Control-oriented reference for inspectability, traceability, middleware hooks and runtime policy enforcement. Cycle 012 records provenance only and does not implement runtime enforcement."
     },
     {
+      "id": "OWASP_LLM_TOP10_2025",
+      "title": "OWASP Top 10 for Large Language Model Applications",
+      "version": "2025",
+      "published_at": "2024-11-18",
+      "canonical_reference": "https://genai.owasp.org/llm-top-10/",
+      "status": "NORMATIVE",
+      "mapping_notes": "LLM01 Prompt Injection reference added in Cycle 013 for the direct/indirect prompt-injection instruction-boundary properties. Prompt injection is a delivery technique and is not equivalent to ASI01 Agent Goal Hijacking."
+    },
+    {
       "id": "DARE_CYCLE_012",
       "title": "DARE Agent Security Cycle 012 Registry Contract",
       "version": "1.0.0",

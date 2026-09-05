@@ -1,0 +1,23 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "prompt-injection-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE Prompt Injection Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.GOAL.INSTRUCTION_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    }
+  ]
+}

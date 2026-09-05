@@ -27,6 +27,7 @@ dare-attack-graph = { path = "../dare-attack-graph" }
 dare-adversarial = { path = "../dare-adversarial" }
 dare-continuous = { path = "../dare-continuous" }
 dare-product = { path = "../dare-product" }
+dare-prompt-injection = { path = "../dare-prompt-injection" }
 jsonschema = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

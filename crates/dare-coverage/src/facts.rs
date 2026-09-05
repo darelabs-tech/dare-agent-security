@@ -40,6 +40,12 @@ pub struct AssessmentFacts {
     pub stateful_agent_present: bool,
     #[serde(default)]
     pub runtime_dynamic_allowed: bool,
+    /// Cycle 013: the target ingests user-controlled prompt content.
+    #[serde(default)]
+    pub user_prompt_present: bool,
+    /// Cycle 013: the target ingests untrusted external content as data.
+    #[serde(default)]
+    pub untrusted_external_content_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

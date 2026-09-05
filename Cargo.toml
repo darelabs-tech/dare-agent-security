@@ -12,6 +12,7 @@ members = [
     "crates/dare-adversarial",
     "crates/dare-continuous",
     "crates/dare-product",
+    "crates/dare-prompt-injection",
     "labs/synthetic-mcp",
 ]
 

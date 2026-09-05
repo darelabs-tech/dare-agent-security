@@ -62,6 +62,8 @@ pub enum Predicate {
     ExternalComponentsPresent,
     StatefulAgentPresent,
     RuntimeDynamicAllowed,
+    UserPromptPresent,
+    UntrustedExternalContentPresent,
 }
 
 impl Predicate {
@@ -86,6 +88,8 @@ impl Predicate {
             Self::ExternalComponentsPresent => "external_components_present",
             Self::StatefulAgentPresent => "stateful_agent_present",
             Self::RuntimeDynamicAllowed => "runtime_dynamic_allowed",
+            Self::UserPromptPresent => "user_prompt_present",
+            Self::UntrustedExternalContentPresent => "untrusted_external_content_present",
         }
     }
 
@@ -108,6 +112,8 @@ impl Predicate {
                 | Self::DelegatedIdentityPresent
                 | Self::ExternalComponentsPresent
                 | Self::StatefulAgentPresent
+                | Self::UserPromptPresent
+                | Self::UntrustedExternalContentPresent
         )
     }
 }
@@ -362,7 +368,7 @@ mod tests {
     #[test]
     fn agentic_registry_loads_and_all_families_are_represented() {
         let registry = agentic_registry().expect("agentic registry");
-        assert_eq!(registry.properties.len(), 20);
+        assert_eq!(registry.properties.len(), 22);
         let families: HashSet<_> = registry
             .properties
             .iter()

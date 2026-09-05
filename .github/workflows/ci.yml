@@ -1,8 +1,9 @@
 name: ci
 
 on:
-  push:
   pull_request:
+    branches: [main]
+    types: [opened]
 
 permissions:
   contents: read
@@ -163,6 +164,202 @@ jobs:
           test ! -f .dare-agent-security/cycle012-mcp-ci/risk-family-coverage.json
       - name: Confidential offline Agentic product regression
         run: cargo test -p dare-product --test agentic_offline -- --nocapture
+
+  prompt-injection-2026:
+    name: Cycle 013 Prompt Injection security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Engine unit tests (schemas, enums, invariants, trials, adapters)
+        run: cargo test -p dare-prompt-injection --lib -- --nocapture
+      - name: Corpus, schemas and direct secure/vulnerable pairs
+        run: cargo test -p dare-prompt-injection --test corpus_direct -- --nocapture
+      - name: Indirect secure/vulnerable pairs and source boundaries
+        run: cargo test -p dare-prompt-injection --test corpus_indirect -- --nocapture
+      - name: Benign controls and false-positive regressions
+        run: cargo test -p dare-prompt-injection --test benign_controls -- --nocapture
+      - name: Hostile parser fixtures, executable-field and enum refusal
+        run: cargo test -p dare-prompt-injection --test hostile_fixtures -- --nocapture
+      - name: Canary, protected-field and unauthorized-action detectors
+        run: cargo test -p dare-prompt-injection --test deterministic_checks -- --nocapture
+      - name: Offline, confidential and no-remote-target regressions
+        run: cargo test -p dare-prompt-injection --test offline_confidential -- --nocapture
+      - name: Prompt-injection profile and coverage integration
+        run: cargo test -p dare-coverage --test prompt_injection_profile -- --nocapture
+      - name: Additive product metadata and bounded-claim wording
+        run: cargo test -p dare-product prompt_injection -- --nocapture
+      - name: CLI flag surface (no remote, provider or credential flag)
+        run: cargo test -p dare-agent-security --lib prompt_injection -- --nocapture
+
+      - name: Offline CLI - direct secure pair
+        run: |
+          rm -rf .dare-agent-security/cycle013-direct
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle013-direct
+          test -f .dare-agent-security/cycle013-direct/prompt-injection-result.json
+          test -f .dare-agent-security/cycle013-direct/prompt-injection-trials.json
+          test -f .dare-agent-security/cycle013-direct/prompt-injection-evidence.json
+          test -f .dare-agent-security/cycle013-direct/summary.md
+          grep -q '"verdict": "PASS"' .dare-agent-security/cycle013-direct/prompt-injection-result.json
+
+      - name: Offline CLI - direct vulnerable pair exits non-zero
+        run: |
+          rm -rf .dare-agent-security/cycle013-vuln
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-002 \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/cycle013-vuln
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed violation, got $code"
+            exit 1
+          fi
+          grep -q '"verdict": "FAIL"' .dare-agent-security/cycle013-vuln/prompt-injection-result.json
+
+      - name: Offline CLI - indirect vulnerable pair
+        run: |
+          rm -rf .dare-agent-security/cycle013-indirect
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-008 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle013-indirect
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed violation, got $code"
+            exit 1
+          fi
+          grep -q '| INDIRECT | TESTED |' .dare-agent-security/cycle013-indirect/summary.md
+
+      - name: Offline CLI - ambiguous prose is INCONCLUSIVE, never FAIL
+        run: |
+          rm -rf .dare-agent-security/cycle013-inconclusive
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-010 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle013-inconclusive
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an inconclusive run, got $code"
+            exit 1
+          fi
+          grep -q '"verdict": "INCONCLUSIVE"' .dare-agent-security/cycle013-inconclusive/prompt-injection-result.json
+          if grep -q '"verdict": "FAIL"' .dare-agent-security/cycle013-inconclusive/prompt-injection-result.json; then
+            echo "ambiguous prose must never produce FAIL"
+            exit 1
+          fi
+
+      - name: Offline CLI - replay mode reads only a local transcript
+        run: |
+          rm -rf .dare-agent-security/cycle013-replay
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 \
+            --mode replay \
+            --transcript fixtures/prompt-injection/transcripts/PI-LAB-001-secure.json \
+            --output-dir .dare-agent-security/cycle013-replay
+          grep -q '"mode": "REPLAY"' .dare-agent-security/cycle013-replay/prompt-injection-result.json
+
+      - name: Trial hard maximum is enforced
+        run: |
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 --trials 11 --output-dir .dare-agent-security/cycle013-bounds
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "--trials 11 must be refused"
+            exit 1
+          fi
+
+      - name: Stop-on-first-fail and output budget exhaustion
+        run: |
+          rm -rf .dare-agent-security/cycle013-stop .dare-agent-security/cycle013-budget
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-013 --mode simulated \
+            --output-dir .dare-agent-security/cycle013-stop
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-014 --mode simulated \
+            --output-dir .dare-agent-security/cycle013-budget
+          set -e
+          grep -q '"reason": "FIRST_FAIL"' .dare-agent-security/cycle013-stop/prompt-injection-result.json
+          grep -q '"reason": "BUDGET_EXHAUSTED"' .dare-agent-security/cycle013-budget/prompt-injection-result.json
+
+      - name: Canary redaction and evidence hygiene
+        run: |
+          rm -rf .dare-agent-security/cycle013-canary
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-015 --mode simulated \
+            --output-dir .dare-agent-security/cycle013-canary
+          set -e
+          for f in .dare-agent-security/cycle013-canary/*; do
+            if grep -q 'DARE-SYNTHETIC-CANARY-ALPHA1' "$f"; then
+              echo "artifact $f leaked the canary token"
+              exit 1
+            fi
+          done
+
+      - name: Remote target and credential flags are absent
+        run: |
+          set +e
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 --url https://example.invalid --output-dir out
+          url_code=$?
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 --api-key placeholder --output-dir out
+          key_code=$?
+          set -e
+          if [ "$url_code" -eq 0 ]; then
+            echo "--url must not be accepted"
+            exit 1
+          fi
+          if [ "$key_code" -eq 0 ]; then
+            echo "--api-key must not be accepted"
+            exit 1
+          fi
+
+      - name: Report wording carries no universal security claim
+        run: |
+          for f in .dare-agent-security/cycle013-*/summary.md; do
+            if grep -qiE 'prompt injection secure|immune|fully protected|guaranteed secure|cannot be injected' "$f"; then
+              echo "summary $f contains an unbounded security claim"
+              exit 1
+            fi
+          done
+
+      - name: Agentic baseline regression (Cycle 012)
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          cargo test -p dare-coverage --test prompt_injection_properties -- --nocapture
+          rm -rf .dare-agent-security/cycle013-agentic
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile agentic-security-baseline-2026 \
+            --facts fixtures/coverage/agentic-all-capabilities.json \
+            --output-dir .dare-agent-security/cycle013-agentic
+          test -f .dare-agent-security/cycle013-agentic/coverage-report.json
+          if grep -q '"assessment_state": "SECURE"' .dare-agent-security/cycle013-agentic/risk-family-coverage.json; then
+            echo "no untested family may render as SECURE"
+            exit 1
+          fi
+
+      - name: MCP baseline regression
+        run: |
+          rm -rf .dare-agent-security/cycle013-mcp
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-security-baseline \
+            --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+            --output-dir .dare-agent-security/cycle013-mcp
+          test -f .dare-agent-security/cycle013-mcp/coverage-report.json
+          test ! -f .dare-agent-security/cycle013-mcp/risk-family-coverage.json
 
   docs-build:
     name: mdBook documentation gate

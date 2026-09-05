@@ -1,0 +1,78 @@
+cycle: "013-direct-indirect-prompt-injection"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED_2026-09-05
+base_branch: main
+baseline_commit: 09e1279cd9ee2b2319d85272af35775b64ccba5c
+branch: agent/cycle-013-direct-indirect-prompt-injection
+mode: execute-only
+
+execution_rules:
+  - follow_design_and_blueprint: true
+  - read_task_spec_before_execution: true
+  - preserve_backward_compatibility: true
+  - fail_closed_on_unknown_or_unsupported_input: true
+  - no_llm_final_security_judge: true
+  - no_remote_dynamic_execution: true
+  - no_remote_provider_adapter: true
+  - no_api_key_or_token_flags: true
+  - no_arbitrary_code_fields: true
+  - no_shell_interpolation: true
+  - no_state_changing_action_execution: true
+  - no_real_data_exfiltration: true
+  - no_adaptive_attack_loop: true
+  - local_offline_first: true
+  - synthetic_canaries_only: true
+  - hard_trial_and_output_budgets: true
+  - preserve_cycle001_evidence: true
+  - preserve_cycle006_coverage_math: true
+  - reuse_cycle009_safety_controls: true
+  - preserve_cycle012_existing_ids: true
+
+approved_limits:
+  default_trials: 3
+  hard_max_trials: 10
+  stop_on_first_fail: true
+  max_output_bytes_per_trial: 16384
+  max_total_output_bytes: 65536
+  max_duration_seconds_per_trial: 30
+
+mandatory_final_gates:
+  - "cargo fmt --all --check"
+  - "cargo clippy --workspace --all-targets -- -D warnings"
+  - "cargo test --workspace"
+  - "cargo audit"
+
+ci_policy:
+  trigger: "pull_request opened to main"
+  pre_pr_requirement: "all mandatory and task-specific gates must pass locally before PR creation"
+  do_not_expect_rerun_on_later_pushes: true
+
+tasks:
+  - { id: task-001, depends_on: [], spec: EXECUTION/task-001.md }
+  - { id: task-002, depends_on: [task-001], spec: EXECUTION/task-002.md }
+  - { id: task-003, depends_on: [task-001, task-002], spec: EXECUTION/task-003.md }
+  - { id: task-004, depends_on: [task-003], spec: EXECUTION/task-004.md }
+  - { id: task-005, depends_on: [task-002, task-003], spec: EXECUTION/task-005.md }
+  - { id: task-006, depends_on: [task-003, task-004, task-005], spec: EXECUTION/task-006.md }
+  - { id: task-007, depends_on: [task-004, task-006], spec: EXECUTION/task-007.md }
+  - { id: task-008, depends_on: [task-007], spec: EXECUTION/task-008.md }
+  - { id: task-009, depends_on: [task-004, task-005, task-006], spec: EXECUTION/task-009.md }
+  - { id: task-010, depends_on: [task-004, task-009], spec: EXECUTION/task-010.md }
+  - { id: task-011, depends_on: [task-007, task-008, task-009, task-010], spec: EXECUTION/task-011.md }
+  - { id: task-012, depends_on: [task-007, task-008, task-009, task-010], spec: EXECUTION/task-012.md }
+  - { id: task-013, depends_on: [task-008, task-009, task-010, task-011, task-012], spec: EXECUTION/task-013.md }
+  - { id: task-014, depends_on: [task-005, task-006, task-008], spec: EXECUTION/task-014.md }
+  - { id: task-015, depends_on: [task-005, task-006, task-008], spec: EXECUTION/task-015.md }
+  - { id: task-016, depends_on: [task-014, task-015], spec: EXECUTION/task-016.md }
+  - { id: task-017, depends_on: [task-004, task-005, task-006, task-009], spec: EXECUTION/task-017.md }
+  - { id: task-018, depends_on: [task-007, task-008, task-014, task-015], spec: EXECUTION/task-018.md }
+  - { id: task-019, depends_on: [task-008, task-009, task-010, task-011, task-012, task-013, task-018], spec: EXECUTION/task-019.md }
+  - { id: task-020, depends_on: [task-003, task-019], spec: EXECUTION/task-020.md }
+  - { id: task-021, depends_on: [task-011, task-012, task-013, task-019, task-020], spec: EXECUTION/task-021.md }
+  - { id: task-022, depends_on: [task-019, task-020, task-021], spec: EXECUTION/task-022.md }
+  - { id: task-023, depends_on: [task-013, task-019, task-020, task-021, task-022], spec: EXECUTION/task-023.md }
+  - { id: task-024, depends_on: [task-014, task-015, task-016, task-017, task-018, task-021, task-023], spec: EXECUTION/task-024.md }
+  - { id: task-025, depends_on: [task-021, task-022, task-023], spec: EXECUTION/task-025.md }
+  - { id: task-026, depends_on: [task-003, task-005, task-008, task-014, task-015, task-017], spec: EXECUTION/task-026.md }
+  - { id: task-027, depends_on: [task-020, task-021, task-022, task-023, task-024, task-025, task-026], spec: EXECUTION/task-027.md }
+  - { id: task-028, depends_on: [task-027], spec: EXECUTION/task-028.md }

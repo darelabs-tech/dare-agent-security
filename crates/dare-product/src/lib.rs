@@ -11,6 +11,7 @@ pub mod egress;
 pub mod error;
 pub mod init;
 pub mod privacy;
+pub mod prompt_injection_metadata;
 pub mod redaction;
 pub mod report;
 pub mod store;
@@ -25,6 +26,12 @@ pub use egress::{assert_offline_allowed, EgressGuard, NetworkClass};
 pub use error::{ErrorCategory, ProductError, Result};
 pub use init::{init_project, InitOptions};
 pub use privacy::{PrivacyMode, PrivacyPolicy};
+pub use prompt_injection_metadata::{
+    assert_bounded_claim, build_prompt_injection_metadata, DirectionState, PromptInjectionCounts,
+    PromptInjectionMetadata, PromptInjectionScenarioSummary, ScenarioOutcome,
+    BOUNDED_INCONCLUSIVE_NOTE, BOUNDED_PASS_NOTE, BOUNDED_VIOLATION_NOTE,
+    PROMPT_INJECTION_METADATA_SCHEMA_ID,
+};
 pub use redaction::{assert_no_secrets, escape_html, redact_product_text, REDACTED};
 pub use report::{render_executive_html, render_technical_html};
 pub use store::{

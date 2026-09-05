@@ -97,6 +97,8 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::ExternalComponentsPresent => facts.external_components_present,
         Predicate::StatefulAgentPresent => facts.stateful_agent_present,
         Predicate::RuntimeDynamicAllowed => facts.runtime_dynamic_allowed,
+        Predicate::UserPromptPresent => facts.user_prompt_present,
+        Predicate::UntrustedExternalContentPresent => facts.untrusted_external_content_present,
     }
 }
 
@@ -126,6 +128,8 @@ mod tests {
             external_components_present: false,
             stateful_agent_present: false,
             runtime_dynamic_allowed: false,
+            user_prompt_present: false,
+            untrusted_external_content_present: false,
             out_of_scope_property_ids: Vec::new(),
         }
     }

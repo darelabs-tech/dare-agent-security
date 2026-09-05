@@ -433,6 +433,7 @@ dependencies = [
  "dare-coverage",
  "dare-mcp-discovery",
  "dare-product",
+ "dare-prompt-injection",
  "dare-security-evidence",
  "jsonschema",
  "serde",
@@ -561,6 +562,22 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "time",
+]
+
+[[package]]
+name = "dare-prompt-injection"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-adversarial",
+ "dare-coverage",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
  "sha2",
  "tempfile",
  "thiserror",

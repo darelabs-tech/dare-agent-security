@@ -63,6 +63,9 @@ pub enum ValidateSubcommand {
     Adversarial(crate::adversarial::AdversarialArgs),
     /// Plan deterministic continuous security revalidation (Cycle 010).
     Continuous(crate::continuous::ContinuousArgs),
+    /// Run bounded local prompt-injection validation (Cycle 013).
+    #[command(name = "prompt-injection")]
+    PromptInjection(crate::prompt_injection::PromptInjectionArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

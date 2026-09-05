@@ -11,6 +11,7 @@ mod facts;
 mod math;
 mod plan;
 mod profile;
+mod prompt_injection_standards;
 mod property;
 mod report;
 mod risk_family;
@@ -34,8 +35,16 @@ pub use math::{
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
     agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
-    resolve_profile, validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel,
-    AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
+    prompt_injection_profile, resolve_profile, validate_profile, AssessmentProfile,
+    ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON, PROFILE_SCHEMA_V1_ID,
+    PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
+};
+pub use prompt_injection_standards::{
+    load_prompt_injection_provenance, validate_prompt_injection_provenance,
+    validate_prompt_injection_standards, DeferredTopic, PromptInjectionProvenance,
+    PromptInjectionSource, PropertyMapping, TaxonomyDistinction, VectorClass,
+    EXTERNAL_CONTENT_BOUNDARY_PROPERTY, INSTRUCTION_INTEGRITY_PROPERTY,
+    PROMPT_INJECTION_PROVENANCE_JSON, USER_INPUT_BOUNDARY_PROPERTY,
 };
 pub use property::{
     agentic_registry, builtin_registry, load_registry, validate_property_instance,
@@ -57,6 +66,7 @@ pub fn registry_for_profile(
     profile: &AssessmentProfile,
 ) -> Result<PropertyRegistry, CoverageError> {
     if profile.id == "agentic-security-baseline-2026"
+        || profile.id == "prompt-injection-baseline-2026"
         || profile
             .properties
             .iter()
@@ -96,6 +106,6 @@ mod tests {
         let mcp = builtin_profile().unwrap();
         assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
         let agentic = agentic_profile().unwrap();
-        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 20);
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 22);
     }
 }

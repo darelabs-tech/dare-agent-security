@@ -15,6 +15,7 @@
 - [Agentic Security Registry 2026](concepts/agentic-security-registry.md)
 - [Attack Graph](concepts/attack-graph.md)
 - [Validation Modes](concepts/validation.md)
+- [Prompt Injection Validation](concepts/prompt-injection.md)
 
 # Commands
 
@@ -58,5 +59,6 @@
 - [Environment Variables](reference/environment.md)
 - [Generated Artifacts](reference/artifacts.md)
 - [Adding Security Properties](reference/adding-security-properties.md)
+- [Extending Prompt Injection Validation](reference/extending-prompt-injection.md)
 
 [Troubleshooting](troubleshooting.md)

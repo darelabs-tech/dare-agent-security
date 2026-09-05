@@ -113,6 +113,8 @@ mod tests {
             external_components_present: true,
             stateful_agent_present: true,
             runtime_dynamic_allowed: false,
+            user_prompt_present: true,
+            untrusted_external_content_present: true,
             out_of_scope_property_ids: vec![],
         };
         let report =
