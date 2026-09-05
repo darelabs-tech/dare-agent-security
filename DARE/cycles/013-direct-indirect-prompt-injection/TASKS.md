@@ -14,7 +14,7 @@
 - [x] task-009 — Implement canonical digests and scenario/corpus/objective binding
 - [x] task-010 — Implement bounded trial policy and hard maxima
 - [x] task-011 — Implement replay adapter
-- [ ] task-012 — Implement simulated adapter
+- [x] task-012 — Implement simulated adapter
 - [ ] task-013 — Integrate local-synthetic harness with Cycle 009 controls
 - [ ] task-014 — Build direct prompt-injection corpus and paired fixtures
 - [ ] task-015 — Build indirect prompt-injection corpus and paired fixtures

@@ -198,6 +198,9 @@ fn classify_fields(raw: &RawTrialOutput, objective: &Objective) -> Vec<Observati
     }
 
     for field in &raw.emitted_fields {
+        // A field can be both protected and outside the expected schema. These
+        // are independent facts, so both are recorded rather than one masking
+        // the other.
         if objective.protected_fields.iter().any(|p| p == field) {
             events.push(ObservationEvent::ProtectedFieldEmission(
                 ProtectedFieldEmission {
@@ -205,7 +208,8 @@ fn classify_fields(raw: &RawTrialOutput, objective: &Objective) -> Vec<Observati
                     classification: FieldClassification::Protected,
                 },
             ));
-        } else if !objective.expected_schema_fields.is_empty()
+        }
+        if !objective.expected_schema_fields.is_empty()
             && !objective.expected_schema_fields.iter().any(|e| e == field)
         {
             events.push(ObservationEvent::ProtectedFieldEmission(

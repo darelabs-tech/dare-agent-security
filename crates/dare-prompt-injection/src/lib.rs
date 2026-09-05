@@ -27,6 +27,7 @@ pub mod model;
 pub mod observation;
 pub mod replay;
 pub mod schema;
+pub mod simulated;
 pub mod source;
 pub mod trials;
 
@@ -49,6 +50,7 @@ pub use observation::{
     PolicyOutcome, ProtectedFieldEmission, StructuredActionRequest,
 };
 pub use replay::{ReplayAdapter, Transcript, TranscriptTrial};
+pub use simulated::{ReferenceBehavior, SimulatedAdapter, SimulationProfile};
 pub use source::{CorpusClass, InjectionDirection, InjectionFamily, SourceKind, TrustLevel};
 pub use trials::{BudgetSnapshot, StopReason, TrialGuard, TrialLedger, TrialPlan};
 
