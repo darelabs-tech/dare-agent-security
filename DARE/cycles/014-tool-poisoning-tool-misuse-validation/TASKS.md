@@ -32,7 +32,7 @@
 - [x] task-027 — Add dedicated Cycle 014 CI security gate and execute workflow job locally
 - [x] task-028 — Document operator safe-use semantics and limitations
 - [x] task-029 — Document contributor corpus/property/evaluator extension process
-- [ ] task-030 — Run complete workspace, Cycle 013, Agentic and MCP compatibility regression
+- [x] task-030 — Run complete workspace, Cycle 013, Agentic and MCP compatibility regression
 - [ ] task-031 — Final DARE proof and Cycle 014 completion gate
 
 Execution order and dependencies are authoritative in `dare-dag.exec.yaml`. Each task must read its `EXECUTION/task-NNN.md` before implementation.
