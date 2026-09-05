@@ -35,6 +35,7 @@ pub mod model;
 pub mod observation;
 pub mod schema;
 pub mod source;
+pub mod trials;
 
 pub use canonical::{bind, bind_corpus, ToolIdentityBinding};
 pub use corpus::{builtin_corpus, builtin_corpus_root, load_corpus, ToolCorpus};
@@ -63,6 +64,9 @@ pub use observation::{
 pub use source::{
     CorpusClass, MisuseFamily, MisuseSurface, PoisoningFamily, ScenarioClass, ToolSourceKind,
     ToolSurfaceArea, TrustLevel,
+};
+pub use trials::{
+    ToolBudgetSnapshot, ToolStopReason, ToolTrialGuard, ToolTrialLedger, ToolTrialPlan,
 };
 
 /// Published crate name for workspace identity checks.

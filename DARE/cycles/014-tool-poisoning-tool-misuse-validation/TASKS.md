@@ -14,7 +14,7 @@
 - [x] task-009 — Define invariant-specific positive PASS coverage contracts
 - [x] task-010 — Implement deterministic Tool Security invariant evaluator registry
 - [x] task-011 — Implement canonical scenario/corpus/objective/policy/tool-surface digest binding
-- [ ] task-012 — Implement bounded trials, tool-request counts and chain-depth enforcement
+- [x] task-012 — Implement bounded trials, tool-request counts and chain-depth enforcement
 - [ ] task-013 — Implement replay adapter
 - [ ] task-014 — Implement simulated adapter
 - [ ] task-015 — Integrate local-synthetic harness with Cycle 009 controls
