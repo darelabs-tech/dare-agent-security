@@ -27,7 +27,7 @@
 - [x] task-022 — Implement ToolSecurityResult and Cycle 001 evidence bridge
 - [x] task-023 — Add `tool-security-baseline-2026` profile and coverage integration
 - [x] task-024 — Add `validate tool-security` CLI integration
-- [ ] task-025 — Add product/report integration with bounded-claim wording
+- [x] task-025 — Add product/report integration with bounded-claim wording
 - [ ] task-026 — Add confidential/offline/no-remote-tool regressions
 - [ ] task-027 — Add dedicated Cycle 014 CI security gate and execute workflow job locally
 - [ ] task-028 — Document operator safe-use semantics and limitations

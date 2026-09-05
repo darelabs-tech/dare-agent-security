@@ -15,6 +15,7 @@ pub mod prompt_injection_metadata;
 pub mod redaction;
 pub mod report;
 pub mod store;
+pub mod tool_security_metadata;
 pub mod view_model;
 
 pub use agentic_metadata::build_agentic_metadata;
@@ -32,6 +33,19 @@ pub use prompt_injection_metadata::{
     BOUNDED_INCONCLUSIVE_NOTE, BOUNDED_PASS_NOTE, BOUNDED_VIOLATION_NOTE,
     PROMPT_INJECTION_METADATA_SCHEMA_ID,
 };
+// The tool-security block has its own bounded-claim vocabulary, so the
+// colliding names are re-exported under Cycle 014 spellings rather than
+// shadowing the Cycle 013 ones.
+pub use tool_security_metadata::{
+    assert_bounded_claim as assert_bounded_tool_security_claim, build_tool_security_metadata,
+    SurfaceState, ToolScenarioOutcome, ToolSecurityCounts, ToolSecurityMetadata,
+    ToolSecurityScenarioSummary, ToolSurfaceAvailability,
+    BOUNDED_INCONCLUSIVE_NOTE as TOOL_SECURITY_BOUNDED_INCONCLUSIVE_NOTE,
+    BOUNDED_PASS_NOTE as TOOL_SECURITY_BOUNDED_PASS_NOTE,
+    BOUNDED_VIOLATION_NOTE as TOOL_SECURITY_BOUNDED_VIOLATION_NOTE,
+    TOOL_SECURITY_METADATA_SCHEMA_ID,
+};
+
 pub use redaction::{assert_no_secrets, escape_html, redact_product_text, REDACTED};
 pub use report::{render_executive_html, render_technical_html};
 pub use store::{
