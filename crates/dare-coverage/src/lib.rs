@@ -8,6 +8,7 @@ mod correlate;
 mod cycle005;
 mod error;
 mod facts;
+mod identity_security_standards;
 mod math;
 mod plan;
 mod profile;
@@ -29,17 +30,27 @@ pub use correlate::{correlate, CorrelatedRow, EvidenceRef, PropertyExecution};
 pub use cycle005::{load_scenario_property_map, map_corpus, ScenarioMapping, LAB_SCENARIO_IDS};
 pub use error::CoverageError;
 pub use facts::{AssessmentFacts, TransportKind};
+pub use identity_security_standards::{
+    load_identity_security_provenance, validate_identity_security_provenance,
+    validate_identity_security_standards, AuthorityModelStatement, IdentityDeferredTopic,
+    IdentityInheritedLesson, IdentityPropertyMapping, IdentitySecurityProvenance,
+    IdentitySecuritySource, IdentitySurfaceClass,
+    IDENTITY_AUTHORIZATION_EXECUTION_BINDING_PROPERTY, IDENTITY_DELEGATION_INTEGRITY_PROPERTY,
+    IDENTITY_DELEGATION_SCOPE_BOUNDARY_PROPERTY, IDENTITY_PRINCIPAL_BINDING_PROPERTY,
+    IDENTITY_PRIVILEGE_AMPLIFICATION_PROPERTY, IDENTITY_SECURITY_PROVENANCE_JSON,
+    IDENTITY_TENANT_RESOURCE_BOUNDARY_PROPERTY,
+};
 pub use math::{
     coverage_ratio, eligible_count, finalize_row, required_eligible_count, required_tested_count,
     tested_count, validate_pair, CoverageCounts, CoveragePolicy, CoverageTotals, DENOMINATOR_DOC,
 };
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
-    agentic_profile, builtin_profile, load_profile, load_profile_file, profile_digest_sha256,
-    prompt_injection_profile, resolve_profile, tool_security_profile, validate_profile,
-    AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
-    PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
-    TOOL_SECURITY_PROFILE_JSON,
+    agentic_profile, builtin_profile, identity_security_profile, load_profile, load_profile_file,
+    profile_digest_sha256, prompt_injection_profile, resolve_profile, tool_security_profile,
+    validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
+    IDENTITY_SECURITY_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
+    PROMPT_INJECTION_PROFILE_JSON, TOOL_SECURITY_PROFILE_JSON,
 };
 pub use prompt_injection_standards::{
     load_prompt_injection_provenance, validate_prompt_injection_provenance,
@@ -117,6 +128,6 @@ mod tests {
         let mcp = builtin_profile().unwrap();
         assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
         let agentic = agentic_profile().unwrap();
-        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 26);
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 30);
     }
 }

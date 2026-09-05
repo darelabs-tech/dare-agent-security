@@ -1,0 +1,109 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-identity-lab-001",
+  "scenario_id": "IDENTITY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "description": "Recorded on-behalf-of read within the delegated ceiling.",
+  "trials": [
+    {
+      "principals": [
+        {
+          "role": "INITIATING",
+          "principal_id": "user-7",
+          "kind": "HUMAN",
+          "tenant_id": "tenant-a"
+        },
+        {
+          "role": "EFFECTIVE",
+          "principal_id": "user-7",
+          "kind": "HUMAN",
+          "tenant_id": "tenant-a"
+        },
+        {
+          "role": "AGENT",
+          "principal_id": "agent-1",
+          "kind": "AGENT"
+        },
+        {
+          "role": "DELEGATED_SUBJECT",
+          "principal_id": "user-7",
+          "kind": "HUMAN"
+        },
+        {
+          "role": "RESOURCE_OWNER",
+          "principal_id": "user-7",
+          "kind": "HUMAN"
+        }
+      ],
+      "effective_authorities": [
+        {
+          "principal_id": "user-7",
+          "authority_id": "authority-agent-read",
+          "source_ceiling_id": "authority-user-read"
+        }
+      ],
+      "delegation_edges": [
+        {
+          "edge_id": "edge-user-to-agent",
+          "kind": "ON_BEHALF_OF",
+          "delegator_principal_id": "user-7",
+          "delegatee_principal_id": "agent-1",
+          "delegated_subject_id": "user-7",
+          "authority_ceiling_id": "authority-agent-read"
+        }
+      ],
+      "resources": [
+        {
+          "resource_id": "document-123",
+          "resource_type": "document",
+          "tenant_id": "tenant-a",
+          "owner_principal_id": "user-7",
+          "classification": "SYNTHETIC_INTERNAL"
+        }
+      ],
+      "credential_contexts": [
+        {
+          "credential_context_id": "cred-index-admin",
+          "owner_principal_id": "svc-index",
+          "capability_labels": [
+            "index.admin"
+          ],
+          "tenant_labels": [
+            "tenant-a",
+            "tenant-b"
+          ],
+          "capability_authority_id": "authority-service-admin"
+        }
+      ],
+      "authorization_decisions": [
+        {
+          "decision_id": "decision-authorized",
+          "effect": "PERMIT",
+          "subject_id": "user-7",
+          "policy_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "bound_operation_id": "op-authorized",
+          "issued_at": 150
+        }
+      ],
+      "policy_decisions": [
+        {
+          "operation_key": "document.read",
+          "effect": "PERMIT",
+          "policy_id": "policy-support-desk"
+        }
+      ],
+      "final_operations": [
+        {
+          "operation_id": "op-authorized",
+          "subject_id": "user-7",
+          "action": "read",
+          "resource_id": "document-123",
+          "resource_type": "document",
+          "tenant_id": "tenant-a",
+          "objective_id": "objective-summarize-ticket"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "identity-security-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE Identity Security Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.IDENTITY.DELEGATION_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.IDENTITY.PRINCIPAL_BINDING",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.IDENTITY.DELEGATION_SCOPE_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.IDENTITY.TENANT_RESOURCE_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.IDENTITY.AUTHORIZATION_EXECUTION_BINDING",
+      "requirement": "REQUIRED"
+    }
+  ]
+}

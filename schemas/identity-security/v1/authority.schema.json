@@ -1,0 +1,479 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/authority.schema.json",
+  "title": "DARE Identity Security Authority v1",
+  "description": "A declarative authority ceiling or effective authority. Set constraints only: no expression language, no scripting and no executable rule. An authority is compared, never executed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "actions": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "resource_ids": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "resource_types": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "tenant_ids": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "scopes": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "purposes": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "audiences": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "validity": {
+      "description": "Half-open window in synthetic logical time. Never a wall clock.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "valid_from",
+        "valid_until"
+      ],
+      "properties": {
+        "valid_from": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000
+        },
+        "valid_until": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000
+        }
+      }
+    }
+  }
+}

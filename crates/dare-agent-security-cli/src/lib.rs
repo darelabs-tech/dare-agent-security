@@ -8,6 +8,7 @@ pub mod ci_output;
 pub mod ci_result;
 pub mod continuous;
 pub mod coverage;
+pub mod identity_security;
 pub mod product;
 pub mod prompt_injection;
 pub mod tool_security;

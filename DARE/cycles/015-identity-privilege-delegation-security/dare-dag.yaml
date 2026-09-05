@@ -1,0 +1,14 @@
+cycle: "015-identity-privilege-delegation-security"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+base_branch: main
+baseline_commit: 2f9c02b4f4f94daa5478a0785f74814fb2d021a2
+branch: agent/cycle-015-identity-privilege-delegation-security
+execution_dag: DARE/cycles/015-identity-privilege-delegation-security/dare-dag.exec.yaml
+execution_gate:
+  requires_approval_file: DARE/cycles/015-identity-privilege-delegation-security/APPROVAL.md
+  approval_file_must_exist_before_execute: true
+  approval_file_present: true
+  execution_authorized: true
+  required_pre_pr_local_workflow_job: identity-security-2026
+  pr_open_only_after_local_gates_green: true

@@ -99,6 +99,24 @@ dare-agent-security validate continuous \
 Offline and never grants `AUTHORIZED_DYNAMIC`; the Cycle 009 ROE requirement
 still applies. See [Continuous Validation](../assessments/continuous.md).
 
+## `validate identity-security`
+
+Run bounded local identity, privilege and delegation validation (Cycle 015).
+
+```bash
+dare-agent-security validate identity-security   --scenario IDENTITY-LAB-001   --mode simulated   --output-dir .dare-agent-security/identity-security
+```
+
+Modes are `replay`, `simulated` and `local-synthetic`; all three are local and
+offline. There is no `--url`, `--endpoint`, `--issuer`, `--jwks`, `--token`,
+`--bearer`, `--client-secret`, `--api-key`, `--pdp-url`, `--authzen-url`,
+`--remote` or `--command` flag, and no credential is read from the environment.
+
+Operations are observed and never dispatched: no identity provider,
+authorization server or resource is contacted, no token is parsed, and no real
+tenant data is touched to demonstrate a boundary crossing. See
+[Identity, Privilege and Delegation Validation](../concepts/identity-security.md).
+
 ## Exit codes
 
 Each subcommand has its own table — see [Exit Codes](../reference/exit-codes.md).

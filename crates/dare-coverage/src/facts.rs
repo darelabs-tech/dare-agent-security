@@ -55,6 +55,18 @@ pub struct AssessmentFacts {
     /// Cycle 014: the target composes tools into chains.
     #[serde(default)]
     pub tool_chaining_present: bool,
+    /// Cycle 015: the target distinguishes an initiating from an effective principal.
+    #[serde(default)]
+    pub principal_context_present: bool,
+    /// Cycle 015: the target produces authorization decisions bound to operations.
+    #[serde(default)]
+    pub authorization_decision_present: bool,
+    /// Cycle 015: the target scopes resources by tenant.
+    #[serde(default)]
+    pub tenant_context_present: bool,
+    /// Cycle 015: the target records a resource owner distinct from the caller.
+    #[serde(default)]
+    pub resource_owner_context_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

@@ -13,6 +13,7 @@ use dare_agent_security::continuous::run_continuous;
 use dare_agent_security::coverage::run_coverage;
 use dare_agent_security::discover::run_discover;
 use dare_agent_security::exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET};
+use dare_agent_security::identity_security::run_identity_security;
 use dare_agent_security::product::{run_assess, run_doctor_cmd, run_init, run_report};
 use dare_agent_security::prompt_injection::run_prompt_injection;
 use dare_agent_security::tool_security::run_tool_security;
@@ -44,6 +45,9 @@ async fn main() -> ExitCode {
                 }
                 ValidateSubcommand::ToolSecurity(args) => {
                     ExitCode::from(run_tool_security(args) as u8)
+                }
+                ValidateSubcommand::IdentitySecurity(args) => {
+                    ExitCode::from(run_identity_security(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

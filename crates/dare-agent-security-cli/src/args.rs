@@ -69,6 +69,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local tool poisoning and tool misuse validation (Cycle 014).
     #[command(name = "tool-security")]
     ToolSecurity(crate::tool_security::ToolSecurityArgs),
+    /// Run bounded local identity, privilege and delegation validation (Cycle 015).
+    #[command(name = "identity-security")]
+    IdentitySecurity(crate::identity_security::IdentitySecurityArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.
