@@ -93,10 +93,14 @@ fn run_coverage_inner(args: CoverageArgs) -> Result<i32, String> {
         fs::write(&report_path, bytes).map_err(|e| e.to_string())?;
 
         if profile.id == "agentic-security-baseline-2026"
-            || profile.properties.iter().any(|entry| entry.id.starts_with("AGENT."))
+            || profile
+                .properties
+                .iter()
+                .any(|entry| entry.id.starts_with("AGENT."))
         {
             let family_view = derive_risk_family_coverage(&report, &registry);
-            let family_bytes = serde_json::to_vec_pretty(&family_view).map_err(|e| e.to_string())?;
+            let family_bytes =
+                serde_json::to_vec_pretty(&family_view).map_err(|e| e.to_string())?;
             fs::write(output_dir.join("risk-family-coverage.json"), family_bytes)
                 .map_err(|e| e.to_string())?;
         }
