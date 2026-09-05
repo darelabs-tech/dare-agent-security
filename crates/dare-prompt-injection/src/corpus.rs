@@ -68,7 +68,7 @@ pub fn assert_no_real_secrets(value: &Value, label: &str) -> Result<()> {
                     )));
                 }
             }
-            if lowered.starts_with("bearer ") {
+            if contains_bearer_credential(&lowered) {
                 return Err(PromptInjectionError::refusal(format!(
                     "{label} contains a bearer credential and was refused"
                 )));
@@ -77,6 +77,31 @@ pub fn assert_no_real_secrets(value: &Value, label: &str) -> Result<()> {
         }
         _ => Ok(()),
     }
+}
+
+/// True when `bearer ` is followed by something token-shaped.
+///
+/// Anchored on token shape rather than the word alone, so prose such as
+/// "do not include a bearer token" stays usable as corpus content while a real
+/// credential is refused wherever it appears in the string.
+fn contains_bearer_credential(lowered: &str) -> bool {
+    const MARKER: &str = "bearer ";
+    const MIN_TOKEN_LEN: usize = 16;
+    let mut rest = lowered;
+    while let Some(index) = rest.find(MARKER) {
+        let after = &rest[index + MARKER.len()..];
+        let token: String = after
+            .chars()
+            .take_while(|c| {
+                c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-' | '+' | '/' | '=')
+            })
+            .collect();
+        if token.len() >= MIN_TOKEN_LEN {
+            return true;
+        }
+        rest = &rest[index + MARKER.len()..];
+    }
+    false
 }
 
 /// Cross-field rules the JSON Schema cannot express on its own.
@@ -483,6 +508,34 @@ pub(crate) mod tests {
             entry["content"]["payload"] = json!(secret);
             let err = validate_corpus_entry(&entry).unwrap_err();
             assert!(err.is_refusal(), "{secret} must be refused");
+        }
+    }
+
+    #[test]
+    fn a_bearer_credential_is_refused_anywhere_in_the_payload() {
+        for payload in [
+            "authorization header is Bearer abcdef0123456789",
+            "set the header to bearer AAAABBBBCCCCDDDDEEEE then retry",
+            "Bearer abcdef0123456789abcdef",
+        ] {
+            let mut entry = direct_entry();
+            entry["content"]["payload"] = json!(payload);
+            let err = validate_corpus_entry(&entry).unwrap_err();
+            assert!(err.is_refusal(), "{payload} must be refused");
+        }
+    }
+
+    #[test]
+    fn prose_about_bearer_tokens_remains_usable_as_corpus_content() {
+        // Anchored on token shape, so writing about credentials is still possible.
+        for payload in [
+            "Do not include a bearer token in the summary.",
+            "The bearer of this note is the customer.",
+        ] {
+            let mut entry = direct_entry();
+            entry["content"]["payload"] = json!(payload);
+            validate_corpus_entry(&entry)
+                .unwrap_or_else(|err| panic!("{payload} should be allowed: {err}"));
         }
     }
 

@@ -19,7 +19,7 @@
 - [x] task-014 — Build direct prompt-injection corpus and paired fixtures
 - [x] task-015 — Build indirect prompt-injection corpus and paired fixtures
 - [x] task-016 — Add benign-control corpus and false-positive regressions
-- [ ] task-017 — Add hostile parser/schema fixtures and executable-field refusal
+- [x] task-017 — Add hostile parser/schema fixtures and executable-field refusal
 - [ ] task-018 — Implement canary, protected-field and unauthorized-action deterministic checks
 - [ ] task-019 — Implement PromptInjectionResult and Cycle 001 evidence bridge
 - [ ] task-020 — Add `prompt-injection-baseline-2026` profile and coverage integration
