@@ -21,12 +21,14 @@
 pub mod canonical;
 pub mod corpus;
 pub mod error;
+pub mod evidence_bridge;
 pub mod harness;
 pub mod invariant;
 pub mod local_synthetic;
 pub mod model;
 pub mod observation;
 pub mod replay;
+pub mod result;
 pub mod schema;
 pub mod simulated;
 pub mod source;
@@ -39,6 +41,7 @@ pub use corpus::{
 };
 pub use dare_security_evidence::Verdict;
 pub use error::{PromptInjectionError, Result};
+pub use evidence_bridge::{build_evidence, build_trial_evidence, evidence_id, EVIDENCE_SCHEMA_ID};
 pub use harness::{
     normalize, HarnessAdapter, HarnessMode, RawAction, RawHarnessError, RawPolicyDecision,
     RawTrialOutput, TrialRequest,
@@ -56,6 +59,7 @@ pub use observation::{
     PolicyOutcome, ProtectedFieldEmission, StructuredActionRequest,
 };
 pub use replay::{ReplayAdapter, Transcript, TranscriptTrial};
+pub use result::{run_scenario, PromptInjectionResult, TrialRecord, RESULT_SCHEMA_ID};
 pub use simulated::{ReferenceBehavior, SimulatedAdapter, SimulationProfile};
 pub use source::{CorpusClass, InjectionDirection, InjectionFamily, SourceKind, TrustLevel};
 pub use trials::{BudgetSnapshot, StopReason, TrialGuard, TrialLedger, TrialPlan};
