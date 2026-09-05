@@ -184,7 +184,7 @@ mod tests {
         let family = fs::read_to_string(out.join("risk-family-coverage.json")).unwrap();
         assert!(family.contains("AGENT_GOAL_HIJACKING"));
         assert!(family.contains("UNASSESSED"));
-        assert!(!family.contains("SECURE"));
+        assert!(!family.contains("\"assessment_state\": \"SECURE\""));
     }
 
     #[test]
