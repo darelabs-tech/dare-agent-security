@@ -1,7 +1,7 @@
 # Cycle 017 — Tasks
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED
 
 ## task-001 — Freeze post-Cycle-016 baseline and compatibility contracts
 ## task-002 — Record LLM09:2026 / adjacent standards provenance snapshot

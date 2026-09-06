@@ -1,10 +1,12 @@
 cycle: "017-rag-retrieval-security"
 status: APPROVED_FOR_EXECUTION
 approval: APPROVED
+approved_at: 2026-09-06
 base_branch: main
 baseline_commit: c0cd5edbb5a157d285b20177b7bd20a23b1811cc
 branch: agent/cycle-017-rag-retrieval-security
 approval_file: DARE/cycles/017-rag-retrieval-security/APPROVAL.md
+execution_order: [task-001, task-002, task-003, task-004, task-005, task-006, task-007, task-008, task-009, task-010, task-011, task-012, task-013, task-014, task-015, task-016, task-017, task-018, task-019, task-020, task-021, task-022, task-023, task-024, task-025, task-026, task-027, task-028, task-029, task-030, task-031, task-032, task-033, task-034, task-035, task-036, task-037, task-038]
 execution_gate:
   approval_file_present: true
   execution_authorized: true
