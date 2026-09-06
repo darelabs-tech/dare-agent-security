@@ -1,0 +1,289 @@
+{
+  "description": "Sanitized synthetic replay of MEMORY-LAB-001, recorded locally.",
+  "mode": "REPLAY",
+  "scenario_id": "MEMORY-LAB-001",
+  "schema_version": "1",
+  "synthetic": true,
+  "trace_id": "trace-memory-lab-001",
+  "trials": [
+    {
+      "influences": [
+        {
+          "baseline_value": "objective-summarize-ticket",
+          "changed": false,
+          "memory_id": "mem-preference",
+          "observed_value": "objective-summarize-ticket",
+          "target": "OBJECTIVE"
+        },
+        {
+          "baseline_value": "objective-summarize-ticket",
+          "changed": false,
+          "memory_id": "mem-policy-note",
+          "observed_value": "objective-summarize-ticket",
+          "target": "OBJECTIVE"
+        }
+      ],
+      "recall_requests": [
+        {
+          "request_id": "recall-1",
+          "requested_memory_ids": [
+            "mem-preference",
+            "mem-policy-note"
+          ],
+          "requested_namespace_id": "ns-support",
+          "requested_owner_principal_id": "user-7",
+          "requested_tenant_id": "tenant-a",
+          "requester_principal_id": "user-7"
+        }
+      ],
+      "recall_results": [
+        {
+          "at": 150,
+          "memory_ids": [
+            "mem-preference",
+            "mem-policy-note"
+          ],
+          "request_id": "recall-1",
+          "requester_principal_id": "user-7"
+        }
+      ],
+      "snapshots": [
+        {
+          "item_count": 5,
+          "item_digests": [
+            {
+              "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "memory_id": "mem-preference",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+              "memory_id": "mem-policy-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+              "memory_id": "mem-stale-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+              "memory_id": "mem-revoked-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+              "memory_id": "mem-other-tenant",
+              "version": 1
+            }
+          ],
+          "store_digest": "sha256:4efda19276d15ab354b76ac79fd42701f4c627b465246305a548101051040d6d",
+          "store_id": "store-support"
+        }
+      ],
+      "writes": [
+        {
+          "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "memory_id": "mem-preference",
+          "namespace_id": "ns-support",
+          "provenance": {
+            "author_principal_id": "user-7",
+            "recorded_at": 100,
+            "source_id": "turn-12",
+            "source_kind": "USER_INPUT"
+          },
+          "stored_trust_class": "CONSTRAINED",
+          "tenant_id": "tenant-a",
+          "version": 1,
+          "writer_principal_id": "user-7"
+        }
+      ]
+    },
+    {
+      "influences": [
+        {
+          "baseline_value": "objective-summarize-ticket",
+          "changed": false,
+          "memory_id": "mem-preference",
+          "observed_value": "objective-summarize-ticket",
+          "target": "OBJECTIVE"
+        },
+        {
+          "baseline_value": "objective-summarize-ticket",
+          "changed": false,
+          "memory_id": "mem-policy-note",
+          "observed_value": "objective-summarize-ticket",
+          "target": "OBJECTIVE"
+        }
+      ],
+      "recall_requests": [
+        {
+          "request_id": "recall-1",
+          "requested_memory_ids": [
+            "mem-preference",
+            "mem-policy-note"
+          ],
+          "requested_namespace_id": "ns-support",
+          "requested_owner_principal_id": "user-7",
+          "requested_tenant_id": "tenant-a",
+          "requester_principal_id": "user-7"
+        }
+      ],
+      "recall_results": [
+        {
+          "at": 150,
+          "memory_ids": [
+            "mem-preference",
+            "mem-policy-note"
+          ],
+          "request_id": "recall-1",
+          "requester_principal_id": "user-7"
+        }
+      ],
+      "snapshots": [
+        {
+          "item_count": 5,
+          "item_digests": [
+            {
+              "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "memory_id": "mem-preference",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+              "memory_id": "mem-policy-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+              "memory_id": "mem-stale-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+              "memory_id": "mem-revoked-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+              "memory_id": "mem-other-tenant",
+              "version": 1
+            }
+          ],
+          "store_digest": "sha256:4efda19276d15ab354b76ac79fd42701f4c627b465246305a548101051040d6d",
+          "store_id": "store-support"
+        }
+      ],
+      "writes": [
+        {
+          "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "memory_id": "mem-preference",
+          "namespace_id": "ns-support",
+          "provenance": {
+            "author_principal_id": "user-7",
+            "recorded_at": 100,
+            "source_id": "turn-12",
+            "source_kind": "USER_INPUT"
+          },
+          "stored_trust_class": "CONSTRAINED",
+          "tenant_id": "tenant-a",
+          "version": 1,
+          "writer_principal_id": "user-7"
+        }
+      ]
+    },
+    {
+      "influences": [
+        {
+          "baseline_value": "objective-summarize-ticket",
+          "changed": false,
+          "memory_id": "mem-preference",
+          "observed_value": "objective-summarize-ticket",
+          "target": "OBJECTIVE"
+        },
+        {
+          "baseline_value": "objective-summarize-ticket",
+          "changed": false,
+          "memory_id": "mem-policy-note",
+          "observed_value": "objective-summarize-ticket",
+          "target": "OBJECTIVE"
+        }
+      ],
+      "recall_requests": [
+        {
+          "request_id": "recall-1",
+          "requested_memory_ids": [
+            "mem-preference",
+            "mem-policy-note"
+          ],
+          "requested_namespace_id": "ns-support",
+          "requested_owner_principal_id": "user-7",
+          "requested_tenant_id": "tenant-a",
+          "requester_principal_id": "user-7"
+        }
+      ],
+      "recall_results": [
+        {
+          "at": 150,
+          "memory_ids": [
+            "mem-preference",
+            "mem-policy-note"
+          ],
+          "request_id": "recall-1",
+          "requester_principal_id": "user-7"
+        }
+      ],
+      "snapshots": [
+        {
+          "item_count": 5,
+          "item_digests": [
+            {
+              "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "memory_id": "mem-preference",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+              "memory_id": "mem-policy-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+              "memory_id": "mem-stale-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+              "memory_id": "mem-revoked-note",
+              "version": 1
+            },
+            {
+              "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+              "memory_id": "mem-other-tenant",
+              "version": 1
+            }
+          ],
+          "store_digest": "sha256:4efda19276d15ab354b76ac79fd42701f4c627b465246305a548101051040d6d",
+          "store_id": "store-support"
+        }
+      ],
+      "writes": [
+        {
+          "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "memory_id": "mem-preference",
+          "namespace_id": "ns-support",
+          "provenance": {
+            "author_principal_id": "user-7",
+            "recorded_at": 100,
+            "source_id": "turn-12",
+            "source_kind": "USER_INPUT"
+          },
+          "stored_trust_class": "CONSTRAINED",
+          "tenant_id": "tenant-a",
+          "version": 1,
+          "writer_principal_id": "user-7"
+        }
+      ]
+    }
+  ]
+}

@@ -11,6 +11,7 @@ pub mod egress;
 pub mod error;
 pub mod identity_security_metadata;
 pub mod init;
+pub mod memory_security_metadata;
 pub mod privacy;
 pub mod prompt_injection_metadata;
 pub mod redaction;
@@ -59,6 +60,20 @@ pub use identity_security_metadata::{
     BOUNDED_PASS_NOTE as IDENTITY_SECURITY_BOUNDED_PASS_NOTE,
     BOUNDED_VIOLATION_NOTE as IDENTITY_SECURITY_BOUNDED_VIOLATION_NOTE, CREDENTIAL_RULE,
     IDENTITY_SECURITY_METADATA_SCHEMA_ID, STANDARDS_NOTE,
+};
+
+// Same treatment for the Cycle 016 block: its bounded-claim vocabulary collides
+// with the earlier ones by design, since each cycle forbids the overstatements
+// of its own subject. The names are re-exported under Cycle 016 spellings.
+pub use memory_security_metadata::{
+    assert_bounded_claim as assert_bounded_memory_security_claim, build_memory_security_metadata,
+    MemoryScenarioOutcome, MemorySecurityCounts, MemorySecurityMetadata,
+    MemorySecurityScenarioSummary, MemorySurfaceAvailability, MemorySurfaceState,
+    AVAILABILITY_RULE, BOUNDED_INCONCLUSIVE_NOTE as MEMORY_SECURITY_BOUNDED_INCONCLUSIVE_NOTE,
+    BOUNDED_PASS_NOTE as MEMORY_SECURITY_BOUNDED_PASS_NOTE,
+    BOUNDED_VIOLATION_NOTE as MEMORY_SECURITY_BOUNDED_VIOLATION_NOTE,
+    MEMORY_SECURITY_METADATA_SCHEMA_ID, MEMORY_TRUST_RELATION, SCOPE_BOUNDARY_NOTE,
+    STANDARDS_NOTE as MEMORY_SECURITY_STANDARDS_NOTE,
 };
 
 pub use redaction::{assert_no_secrets, escape_html, redact_product_text, REDACTED};

@@ -271,6 +271,20 @@ pub trait HarnessAdapter {
     fn trial_capacity(&self) -> u32 {
         crate::limits::HARD_MAX_TRIALS
     }
+
+    /// Whether these observations describe something other than a production
+    /// agent, and so must never be reported as production evidence.
+    ///
+    /// Defaults to whether the mode *stages* observations, which is the honest
+    /// answer for the two staged adapters. Replay is the case the default gets
+    /// wrong: a replayed observation was recorded rather than staged, so the
+    /// mode alone says "not staged" — while every trace Cycle 016 will admit is
+    /// required to declare itself synthetic. The replay adapter therefore
+    /// answers from the trace it actually loaded, so a replayed run cannot be
+    /// filed as real-world memory validation.
+    fn observations_are_synthetic(&self) -> bool {
+        self.mode().is_synthetic()
+    }
 }
 
 /// Convert raw adapter output into normalized, typed observation events.

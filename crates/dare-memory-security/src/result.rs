@@ -419,7 +419,7 @@ pub fn run_scenario(
         source_kind: scenario.source.kind,
         source_trust: scenario.source.trust,
         mode: adapter.mode(),
-        synthetic: adapter.mode().is_synthetic(),
+        synthetic: adapter.observations_are_synthetic(),
         invariant: scenario.invariant.type_,
         trials_planned: plan.trials,
         trials_executed: trials.len() as u32,

@@ -214,6 +214,15 @@ impl HarnessAdapter for ReplayAdapter {
         self.available_trials()
     }
 
+    /// Answered from the loaded trace rather than from the mode.
+    ///
+    /// `validate` refuses any trace that does not declare itself synthetic, so
+    /// this is always true in practice — but it is read from the document
+    /// rather than hard-coded, so the artifact says what the trace said.
+    fn observations_are_synthetic(&self) -> bool {
+        self.loaded.trace.synthetic
+    }
+
     fn observe(&self, request: &TrialRequest<'_>) -> Result<RawTrialOutput> {
         self.loaded.trace.assert_matches(request.scenario)?;
         self.verify_binding()?;
@@ -237,6 +246,18 @@ impl HarnessAdapter for ReplayAdapter {
 
 #[cfg(test)]
 pub(crate) mod tests {
+    #[test]
+    fn a_replayed_run_still_reports_its_observations_as_synthetic() {
+        // The mode alone says "not staged", which is true and misleading: a
+        // replayed observation was recorded rather than invented, but every
+        // trace Cycle 016 admits declares itself synthetic. Reading the answer
+        // from the trace keeps a replayed run from being filed as production
+        // evidence.
+        let adapter = adapter();
+        assert!(!adapter.mode().is_synthetic());
+        assert!(adapter.observations_are_synthetic());
+    }
+
     use super::*;
     use crate::harness::tests::scenario;
     use crate::harness::{normalize_checked, observed_recall_items};
