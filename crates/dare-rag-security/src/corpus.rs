@@ -404,6 +404,43 @@ impl RagCorpus {
             .ok_or_else(|| RagSecurityError::invalid(format!("corpus has no vector `{id}`")))
     }
 
+    /// Resolve the corpus vector a scenario names.
+    ///
+    /// Three outcomes, and keeping them apart is the point:
+    ///
+    /// - the scenario names no vector, or names the corpus as a whole
+    ///   (`corpus_id` equal to this corpus's own id) — `Ok(None)`. Nothing
+    ///   single is bound, and `load_corpus` has already verified every pinned
+    ///   entry digest, so the corpus as a whole was checked;
+    /// - the scenario names one entry that exists — `Ok(Some(entry))`, which
+    ///   the run then binds and pins;
+    /// - the scenario names something this corpus does not have — an error.
+    ///
+    /// The third case is why this exists. A bare [`RagCorpus::get`] answers
+    /// `None` to both the first and the third, so a scenario naming a vector
+    /// that had been renamed, removed or substituted would run exactly as
+    /// though it had named nothing — the reference silently ignored, the digest
+    /// never pinned, and the artifact showing a clean run against a corpus
+    /// entry that was not there.
+    pub fn resolve(
+        &self,
+        reference: Option<&crate::model::RagVectorRef>,
+    ) -> Result<Option<&crate::model::RagCorpusEntry>> {
+        let Some(reference) = reference else {
+            return Ok(None);
+        };
+        if reference.corpus_id == self.corpus_id {
+            return Ok(None);
+        }
+        match self.get(&reference.corpus_id) {
+            Some(entry) => Ok(Some(entry)),
+            None => Err(RagSecurityError::invalid(format!(
+                "scenario names corpus vector `{}`, which corpus `{}` does not contain",
+                reference.corpus_id, self.corpus_id
+            ))),
+        }
+    }
+
     pub fn by_class(
         &self,
         class: crate::source::CorpusClass,
@@ -556,6 +593,57 @@ pub(crate) mod tests {
         entry["class"] = json!("BENIGN_CONTROL");
         entry["reference_behavior"] = json!("COMPLIANT");
         entry
+    }
+
+    fn loaded_corpus() -> RagCorpus {
+        RagCorpus {
+            corpus_id: "rag-security-v1".to_owned(),
+            version: "1.0.0".to_owned(),
+            entries: vec![serde_json::from_value(attack_entry()).expect("decodes")],
+        }
+    }
+
+    fn reference(id: &str) -> crate::model::RagVectorRef {
+        crate::model::RagVectorRef {
+            corpus_id: id.to_owned(),
+            corpus_digest: None,
+        }
+    }
+
+    #[test]
+    fn a_scenario_naming_a_vector_the_corpus_does_not_have_is_refused() {
+        // The fail-open this method exists to close. `get` answers `None` both
+        // to "the corpus as a whole" and to "no such vector", so a caller using
+        // it directly would run a scenario whose named vector had been renamed,
+        // removed or substituted exactly as though the scenario had named
+        // nothing at all — reference ignored, digest never pinned, and a clean
+        // artifact against a corpus entry that was not there.
+        let corpus = loaded_corpus();
+        let missing = reference("isolation-vector-that-was-renamed");
+
+        assert!(corpus.get(&missing.corpus_id).is_none());
+        let err = corpus
+            .resolve(Some(&missing))
+            .expect_err("a missing vector must be refused");
+        assert!(err.to_string().contains("does not contain"));
+    }
+
+    #[test]
+    fn naming_one_vector_binds_it_and_naming_the_corpus_binds_nothing() {
+        // Two legitimate references, kept apart. Naming the corpus as a whole
+        // is not an error: loading it has already verified every pinned entry
+        // digest, and there is simply no single vector to bind.
+        let corpus = loaded_corpus();
+
+        let one = reference("isolation-cross-tenant-document-returned");
+        assert_eq!(
+            corpus.resolve(Some(&one)).expect("resolves").map(|e| &e.id),
+            Some(&"isolation-cross-tenant-document-returned".to_owned())
+        );
+
+        let whole = reference("rag-security-v1");
+        assert!(corpus.resolve(Some(&whole)).expect("resolves").is_none());
+        assert!(corpus.resolve(None).expect("resolves").is_none());
     }
 
     #[test]

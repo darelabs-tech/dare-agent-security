@@ -38,6 +38,6 @@
 - [x] task-033 — Implement RAGSecurityResult and Cycle 001 evidence bridge
 - [x] task-034 — Add rag-security-baseline-2026 and coverage/registry integration
 - [x] task-035 — Add validate rag-security CLI and bounded product/report artifacts
-- [ ] task-036 — Add dedicated CI job and actual local workflow execution
+- [x] task-036 — Add dedicated CI job and actual local workflow execution
 - [ ] task-037 — Document operator safe-use, retrieval trust model and Cycle 018 boundary
 - [ ] task-038 — Run full regression suite and produce REGRESSION.md + PROOF.md

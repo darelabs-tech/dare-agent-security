@@ -353,11 +353,17 @@ fn run_inner(args: RagSecurityArgs) -> Result<i32, RagSecurityError> {
     // The corpus is loaded whenever the scenario names a vector, in every mode.
     // A substituted vector must be refused even when the run itself would have
     // replayed a trace.
+    //
+    // `resolve` is what makes that refusal happen. A scenario may name the
+    // corpus as a whole, in which case loading it has already verified every
+    // pinned entry digest and there is no single vector to bind; or it may name
+    // one entry, which is then bound and pinned. Naming a vector the corpus does
+    // not contain is neither, and is refused rather than treated as naming
+    // nothing.
     let entry: Option<RagCorpusEntry> = match scenario.vector.as_ref() {
-        Some(vector) => {
-            let corpus = load_corpus_for(&args)?;
-            corpus.get(&vector.corpus_id).cloned()
-        }
+        Some(_) => load_corpus_for(&args)?
+            .resolve(scenario.vector.as_ref())?
+            .cloned(),
         None => None,
     };
 
