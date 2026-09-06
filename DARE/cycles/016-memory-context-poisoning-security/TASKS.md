@@ -34,7 +34,7 @@
 - [x] task-029 — Add benign controls and no-influence positive-coverage regressions
 - [x] task-030 — Add hostile parser/credential/verdict/executable fixtures
 - [x] task-031 — Implement independent multi-violation capture and redaction-before-persistence
-- [ ] task-032 — Implement MemorySecurityResult and Cycle 001 evidence bridge
+- [x] task-032 — Implement MemorySecurityResult and Cycle 001 evidence bridge
 - [ ] task-033 — Add `memory-security-baseline-2026` and coverage/registry integration
 - [ ] task-034 — Add `validate memory-security` CLI and bounded product/report artifacts
 - [ ] task-035 — Add dedicated CI job, offline/confidential/no-live-store regressions and execute actual workflow job locally

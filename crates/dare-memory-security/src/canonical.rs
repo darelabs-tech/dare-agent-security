@@ -130,6 +130,87 @@ pub struct MemoryBinding {
     pub namespace_id: String,
 }
 
+/// Bind a scenario to the identity of everything it evaluates.
+///
+/// Called before any observation. If the store, policy or context a run is
+/// about were substituted between approval and execution, the digests recorded
+/// here differ from the approved ones and the substitution is visible in the
+/// artifact rather than invisible inside it.
+///
+/// Per-item digests are recorded alongside the store digest on purpose. A
+/// store digest changes when anything in the store changes, which tells an
+/// operator that *something* moved; the per-item list tells them which. Content
+/// digests are kept separately again, because a substitution moves content
+/// while leaving the item's identity — its id, owner, tenant and namespace —
+/// exactly where it was.
+pub fn bind(scenario: &crate::model::MemorySecurityScenario) -> Result<MemoryBinding> {
+    let policy_digest = match &scenario.policy {
+        Some(policy) => Some(policy_digest(policy)?),
+        None => None,
+    };
+
+    Ok(MemoryBinding {
+        scenario_id: scenario.id.clone(),
+        scenario_digest: digest(scenario)?,
+        objective_id: scenario.objective.authorized_objective_id.clone(),
+        store_id: scenario.store.store_id.clone(),
+        store_digest: store_digest(&scenario.store)?,
+        item_digests: scenario
+            .store
+            .items
+            .iter()
+            .map(|item| Ok((item.memory_id.clone(), item_digest(item)?)))
+            .collect::<Result<Vec<_>>>()?,
+        content_digests: scenario
+            .store
+            .items
+            .iter()
+            .map(|item| (item.memory_id.clone(), item.content_digest.clone()))
+            .collect(),
+        policy_id: scenario
+            .policy
+            .as_ref()
+            .map(|policy| policy.policy_id.clone()),
+        policy_digest,
+        context_id: scenario.context.context_id.clone(),
+        context_digest: context_digest(&scenario.context)?,
+        acting_principal_id: scenario.context.acting_principal_id.clone(),
+        tenant_id: scenario.context.tenant_id.clone(),
+        namespace_id: scenario.context.namespace_id.clone(),
+    })
+}
+
+/// Bind a scenario to the corpus vector it claims to exercise.
+///
+/// Returns the vector's digest, refusing a scenario that names one vector and
+/// pins another's digest. Without this a run could report a finding against a
+/// vector nobody reviewed.
+pub fn bind_corpus(
+    scenario: &crate::model::MemorySecurityScenario,
+    entry: &crate::model::MemoryCorpusEntry,
+) -> Result<String> {
+    let actual = digest(entry)?;
+    let Some(reference) = &scenario.vector else {
+        return Ok(actual);
+    };
+
+    if reference.corpus_id != entry.id && reference.corpus_id != "memory-security-v1" {
+        return Err(MemorySecurityError::DigestMismatch(format!(
+            "scenario `{}` names corpus vector `{}` but was run against `{}`",
+            scenario.id, reference.corpus_id, entry.id
+        )));
+    }
+    if let Some(pinned) = &reference.corpus_digest {
+        if pinned != &actual {
+            return Err(MemorySecurityError::DigestMismatch(format!(
+                "corpus vector `{}` does not match the digest scenario `{}` pinned",
+                entry.id, scenario.id
+            )));
+        }
+    }
+    Ok(actual)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

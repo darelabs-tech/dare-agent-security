@@ -54,6 +54,7 @@ pub mod compat;
 pub mod corpus;
 pub mod coverage;
 pub mod error;
+pub mod evidence_bridge;
 pub mod harness;
 pub mod invariant;
 pub mod lifecycle;
@@ -63,13 +64,14 @@ pub mod model;
 pub mod observation;
 pub mod policy;
 pub mod replay;
+pub mod result;
 pub mod schema;
 pub mod simulated;
 pub mod source;
 pub mod trials;
 
 pub use binding::{MemoryContext, MemoryPrincipal, PrincipalKind};
-pub use canonical::{assert_safe_identifier, digest, verify_digest, MemoryBinding};
+pub use canonical::{assert_safe_identifier, bind, digest, verify_digest, MemoryBinding};
 pub use compat::{
     acting_principal_originates_authority, assert_identity_agreement, composed_boundary_properties,
     injection_source_for, memory_principal_from_identity,
@@ -81,6 +83,7 @@ pub use coverage::{
 };
 pub use dare_security_evidence::Verdict;
 pub use error::{MemorySecurityError, Result};
+pub use evidence_bridge::{build_evidence, build_trial_evidence, evidence_id, EVIDENCE_SCHEMA_ID};
 pub use harness::{
     normalize, normalize_checked, HarnessAdapter, HarnessMode, RawTrialOutput, TrialRequest,
 };
@@ -98,6 +101,7 @@ pub use observation::{
 };
 pub use policy::{MemoryPolicy, PolicyDimension, TrustElevationGrant};
 pub use replay::{load_trace, parse_trace, LoadedTrace, MemoryTrace, ReplayAdapter};
+pub use result::{run_scenario, MemorySecurityResult, MemoryTrialRecord, RESULT_SCHEMA_ID};
 pub use simulated::{stage, SimulatedAdapter};
 pub use source::{
     CorpusClass, LifecycleState, MemorySourceKind, PoisoningFamily, ScenarioClass, SourceKind,
