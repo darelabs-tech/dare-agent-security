@@ -11,17 +11,25 @@
 //! inside the acting tenant, or that a filter was satisfied. It can only say
 //! what was returned, and the corpus decides what that means.
 //!
+//! Query and candidate declarations in a replay are observations too, not
+//! authority. Before a trial can be replayed, their authorization-relevant
+//! semantics must match the approved scenario. A trace therefore cannot widen
+//! collections, top-k, filters or candidate membership and then ask the
+//! evaluator to judge the widened declaration as though it were approved.
+//!
 //! It also cannot claim to be production evidence: `synthetic` is fixed to
 //! `true` by the schema and re-checked here, and the result artifact reads that
 //! flag from the trace rather than inferring it from the mode.
 
+use std::collections::BTreeSet;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
 use crate::error::{RagSecurityError, Result};
-use crate::harness::{HarnessAdapter, HarnessMode, RawTrialOutput, TrialRequest};
+use crate::harness::{HarnessAdapter, HarnessMode, RawCandidateSet, RawTrialOutput, TrialRequest};
 use crate::model::RagSecurityScenario;
+use crate::query::{CandidateSet, QueryRequest};
 
 /// A recorded retrieval run.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -100,7 +108,7 @@ impl RagTrace {
             }
             // A result set answering a query the same trial never recorded
             // cannot be inspected: nothing says what was asked for.
-            let recorded: std::collections::BTreeSet<&str> = trial
+            let recorded: BTreeSet<&str> = trial
                 .queries
                 .iter()
                 .map(|query| query.query_id.as_str())
@@ -118,7 +126,13 @@ impl RagTrace {
         Ok(())
     }
 
-    /// Refuse a trace recorded against a different scenario.
+    /// Refuse a trace that is not semantically bound to the approved scenario.
+    ///
+    /// `scenario_id` is identity, not authority. The replay also carries query
+    /// and candidate observations, and those fields can affect collection,
+    /// filter, top-k and result-set decisions. They must therefore agree with
+    /// the scenario on the authorization-relevant projection before any
+    /// evaluator sees them.
     pub fn assert_matches(&self, scenario: &RagSecurityScenario) -> Result<()> {
         if self.scenario_id != scenario.id {
             return Err(RagSecurityError::DigestMismatch(format!(
@@ -127,8 +141,112 @@ impl RagTrace {
                 self.trace_id, self.scenario_id, scenario.id
             )));
         }
+
+        for (trial_index, trial) in self.trials.iter().enumerate() {
+            for observed in &trial.queries {
+                let approved = scenario.query(&observed.query_id).ok_or_else(|| {
+                    RagSecurityError::DigestMismatch(format!(
+                        "trace `{}` trial {trial_index} names a query the approved scenario does \
+                         not declare",
+                        self.trace_id
+                    ))
+                })?;
+                assert_query_semantics_match(observed, approved, &self.trace_id, trial_index)?;
+            }
+
+            for observed in &trial.candidate_sets {
+                let approved = scenario.candidate_set(&observed.query_id).ok_or_else(|| {
+                    RagSecurityError::DigestMismatch(format!(
+                        "trace `{}` trial {trial_index} names a candidate set the approved \
+                         scenario does not declare",
+                        self.trace_id
+                    ))
+                })?;
+                assert_candidate_semantics_match(observed, approved, &self.trace_id, trial_index)?;
+            }
+
+            // These records do not carry authority themselves, but an unknown
+            // query id would detach the observation from the scenario's query
+            // policy and can otherwise trigger broader fallback semantics.
+            for query_id in trial
+                .result_sets
+                .iter()
+                .map(|set| set.query_id.as_str())
+                .chain(
+                    trial
+                        .filter_decisions
+                        .iter()
+                        .map(|decision| decision.query_id.as_str()),
+                )
+            {
+                if scenario.query(query_id).is_none() {
+                    return Err(RagSecurityError::DigestMismatch(format!(
+                        "trace `{}` trial {trial_index} references a query the approved scenario \
+                         does not declare",
+                        self.trace_id
+                    )));
+                }
+            }
+        }
         Ok(())
     }
+}
+
+/// Compare only authorization-relevant query semantics.
+///
+/// A human-readable query label is deliberately excluded: changing prose does
+/// not widen authority. Collections, top-k, mandatory filters and objective do.
+fn assert_query_semantics_match(
+    observed: &QueryRequest,
+    approved: &QueryRequest,
+    trace_id: &str,
+    trial_index: usize,
+) -> Result<()> {
+    if observed.collection_ids != approved.collection_ids
+        || observed.requested_top_k != approved.requested_top_k
+        || observed.filter != approved.filter
+        || observed.objective_id != approved.objective_id
+    {
+        return Err(RagSecurityError::DigestMismatch(format!(
+            "trace `{trace_id}` trial {trial_index} changes authorization-relevant semantics of \
+             query `{}`",
+            observed.query_id
+        )));
+    }
+    Ok(())
+}
+
+/// Compare candidate authority by `(chunk_id, document_id)` membership.
+///
+/// Score and ordering are intentionally excluded because Cycle 017 treats them
+/// as ranking evidence, never authorization. The trace may record a different
+/// score, but it may not introduce, remove or rebind a candidate and then use
+/// its own declaration as the approved side of the comparison.
+fn assert_candidate_semantics_match(
+    observed: &RawCandidateSet,
+    approved: &CandidateSet,
+    trace_id: &str,
+    trial_index: usize,
+) -> Result<()> {
+    let observed_members: BTreeSet<(&str, &str)> = observed
+        .candidates
+        .iter()
+        .map(|candidate| (candidate.chunk_id.as_str(), candidate.document_id.as_str()))
+        .collect();
+    let approved_members: BTreeSet<(&str, &str)> = approved
+        .candidates
+        .iter()
+        .map(|candidate| (candidate.chunk_id.as_str(), candidate.document_id.as_str()))
+        .collect();
+
+    if observed_members != approved_members {
+        return Err(RagSecurityError::DigestMismatch(format!(
+            "trace `{trace_id}` trial {trial_index} changes the approved candidate membership \
+             for query `{}`",
+            observed.query_id
+        )));
+    }
+    Ok(())
 }
 
 /// A trace that has passed every gate.
@@ -272,6 +390,11 @@ pub(crate) mod tests {
         ReplayAdapter::new(parse_trace(&raw, "trace").expect("parses"))
     }
 
+    fn adapter_from_value(value: serde_json::Value) -> ReplayAdapter {
+        let raw = serde_json::to_vec(&value).expect("serializes");
+        ReplayAdapter::new(parse_trace(&raw, "trace").expect("parses"))
+    }
+
     #[test]
     fn a_well_formed_trace_parses_and_replays() {
         let adapter = adapter();
@@ -306,10 +429,7 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn a_replayed_run_still_reports_its_observations_as_synthetic() {
-        // The mode alone says "not staged", which is true and misleading. Every
-        // trace Cycle 017 admits declares itself synthetic, and the artifact
-        // must say so or a replayed run could be read as production evidence.
+    fn a_replayed_observation_still_reports_as_synthetic() {
         let adapter = adapter();
         assert!(!adapter.mode().is_synthetic());
         assert!(adapter.observations_are_synthetic());
@@ -326,6 +446,111 @@ pub(crate) mod tests {
                 scenario: &other,
             })
             .expect_err("must be refused");
+        assert!(matches!(err, RagSecurityError::DigestMismatch(_)));
+    }
+
+    #[test]
+    fn an_unknown_query_id_cannot_create_its_own_scope() {
+        let mut value = trace_value();
+        for trial in value["trials"].as_array_mut().expect("trials") {
+            trial["queries"][0]["query_id"] = json!("query-shadow");
+            trial["candidate_sets"][0]["query_id"] = json!("query-shadow");
+            for decision in trial["filter_decisions"].as_array_mut().expect("filters") {
+                decision["query_id"] = json!("query-shadow");
+            }
+            trial["result_sets"][0]["query_id"] = json!("query-shadow");
+        }
+        let adapter = adapter_from_value(value);
+        let approved = scenario();
+        let err = adapter
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &approved,
+            })
+            .expect_err("unknown query must be refused");
+        assert!(matches!(err, RagSecurityError::DigestMismatch(_)));
+    }
+
+    #[test]
+    fn replay_cannot_widen_collections_or_top_k_or_remove_filters() {
+        let approved = scenario();
+
+        let mut collections = trace_value();
+        collections["trials"][0]["queries"][0]["collection_ids"] =
+            json!(["col-support", "col-runbooks", "col-hr"]);
+        assert!(adapter_from_value(collections)
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &approved,
+            })
+            .is_err());
+
+        let mut top_k = trace_value();
+        top_k["trials"][0]["queries"][0]["requested_top_k"] = json!(4);
+        assert!(adapter_from_value(top_k)
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &approved,
+            })
+            .is_err());
+
+        let mut filter = trace_value();
+        filter["trials"][0]["queries"][0]["filter"]["mandatory"] = json!([]);
+        assert!(adapter_from_value(filter)
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &approved,
+            })
+            .is_err());
+    }
+
+    #[test]
+    fn replay_candidate_set_cannot_expand_its_own_authority() {
+        let approved = scenario();
+        let mut value = trace_value();
+        value["trials"][0]["candidate_sets"][0]["candidates"]
+            .as_array_mut()
+            .expect("candidates")
+            .push(json!({
+                "chunk_id": "chunk-doc-external",
+                "document_id": "doc-external",
+                "score": 0.99
+            }));
+        let adapter = adapter_from_value(value);
+        let err = adapter
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &approved,
+            })
+            .expect_err("candidate expansion must be refused");
+        assert!(matches!(err, RagSecurityError::DigestMismatch(_)));
+    }
+
+    #[test]
+    fn replay_may_change_scores_without_changing_candidate_authority() {
+        let approved = scenario();
+        let mut value = trace_value();
+        value["trials"][0]["candidate_sets"][0]["candidates"][0]["score"] = json!(0.01);
+        let adapter = adapter_from_value(value);
+        adapter
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &approved,
+            })
+            .expect("score is ranking evidence, not authority");
+    }
+
+    #[test]
+    fn a_same_id_scenario_with_different_query_semantics_is_refused() {
+        let adapter = adapter();
+        let mut changed = scenario();
+        changed.queries[0].requested_top_k = 2;
+        let err = adapter
+            .observe(&TrialRequest {
+                trial_index: 0,
+                scenario: &changed,
+            })
+            .expect_err("same id is not sufficient binding");
         assert!(matches!(err, RagSecurityError::DigestMismatch(_)));
     }
 
@@ -354,24 +579,20 @@ pub(crate) mod tests {
             .iter()
             .find_map(|event| match event {
                 crate::observation::RagObservationEvent::RetrievedChunk {
-                    chunk_id,
                     claimed_document_id,
                     bound_document_id,
                     ..
-                } if chunk_id == "chunk-doc-external" => {
-                    Some((claimed_document_id.clone(), bound_document_id.clone()))
-                }
+                } => Some((claimed_document_id.as_str(), bound_document_id.as_str())),
                 _ => None,
             })
-            .expect("the chunk was recorded");
-        assert_eq!(claimed, "doc-handbook");
-        assert_eq!(bound, "doc-external", "the corpus binding won");
+            .expect("a retrieved chunk was recorded");
+
+        assert_eq!(claimed, "doc-handbook", "the claim is recorded");
+        assert_eq!(bound, "doc-external", "the binding is the corpus's");
     }
 
     #[test]
     fn a_result_set_answering_an_unrecorded_query_is_refused() {
-        // Nothing says what was asked for, so nothing can say whether the
-        // answer was in bounds.
         let mut value = trace_value();
         value["trials"][0]["queries"] = json!([]);
         let raw = serde_json::to_vec(&value).expect("serializes");
@@ -392,7 +613,6 @@ pub(crate) mod tests {
 
     #[test]
     fn asking_a_trace_for_a_trial_it_never_recorded_is_a_bounded_failure() {
-        // Not an opportunity to reuse an earlier trial's observations.
         let adapter = adapter();
         let scenario = scenario();
         let err = adapter
