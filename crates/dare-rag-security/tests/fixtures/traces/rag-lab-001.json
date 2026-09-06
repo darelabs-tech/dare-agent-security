@@ -1,0 +1,376 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-rag-lab-001",
+  "scenario_id": "RAG-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "description": "Sanitized synthetic replay of RAG-LAB-001, recorded locally.",
+  "trials": [
+    {
+      "queries": [
+        {
+          "query_id": "query-1",
+          "query_label": "how do I escalate a ticket",
+          "collection_ids": [
+            "col-support",
+            "col-runbooks"
+          ],
+          "requested_top_k": 3,
+          "filter": {
+            "mandatory": [
+              {
+                "field": "department",
+                "operator": "EQUALS",
+                "values": [
+                  "support"
+                ]
+              }
+            ]
+          },
+          "objective_id": "objective-answer-ticket"
+        }
+      ],
+      "candidate_sets": [
+        {
+          "query_id": "query-1",
+          "candidates": [
+            {
+              "chunk_id": "chunk-doc-handbook",
+              "document_id": "doc-handbook",
+              "score": 0.91
+            },
+            {
+              "chunk_id": "chunk-doc-runbook",
+              "document_id": "doc-runbook",
+              "score": 0.77
+            },
+            {
+              "chunk_id": "chunk-doc-upload",
+              "document_id": "doc-upload",
+              "score": 0.62
+            }
+          ]
+        }
+      ],
+      "filter_decisions": [
+        {
+          "query_id": "query-1",
+          "document_id": "doc-handbook",
+          "admitted": true
+        },
+        {
+          "query_id": "query-1",
+          "document_id": "doc-runbook",
+          "admitted": true
+        },
+        {
+          "query_id": "query-1",
+          "document_id": "doc-upload",
+          "admitted": true
+        }
+      ],
+      "result_sets": [
+        {
+          "query_id": "query-1",
+          "results": [
+            {
+              "chunk_id": "chunk-doc-handbook",
+              "document_id": "doc-handbook",
+              "rank": 0,
+              "score": 0.91,
+              "from_fallback": false
+            },
+            {
+              "chunk_id": "chunk-doc-runbook",
+              "document_id": "doc-runbook",
+              "rank": 1,
+              "score": 0.77,
+              "from_fallback": false
+            },
+            {
+              "chunk_id": "chunk-doc-upload",
+              "document_id": "doc-upload",
+              "rank": 2,
+              "score": 0.62,
+              "from_fallback": false
+            }
+          ],
+          "used_fallback": false
+        }
+      ],
+      "influences": [
+        {
+          "document_id": "doc-handbook",
+          "chunk_id": "chunk-doc-handbook",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "TRUSTED_POLICY"
+        },
+        {
+          "document_id": "doc-runbook",
+          "chunk_id": "chunk-doc-runbook",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "TRUSTED_POLICY"
+        },
+        {
+          "document_id": "doc-upload",
+          "chunk_id": "chunk-doc-upload",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "REFERENCE"
+        }
+      ]
+    },
+    {
+      "queries": [
+        {
+          "query_id": "query-1",
+          "query_label": "how do I escalate a ticket",
+          "collection_ids": [
+            "col-support",
+            "col-runbooks"
+          ],
+          "requested_top_k": 3,
+          "filter": {
+            "mandatory": [
+              {
+                "field": "department",
+                "operator": "EQUALS",
+                "values": [
+                  "support"
+                ]
+              }
+            ]
+          },
+          "objective_id": "objective-answer-ticket"
+        }
+      ],
+      "candidate_sets": [
+        {
+          "query_id": "query-1",
+          "candidates": [
+            {
+              "chunk_id": "chunk-doc-handbook",
+              "document_id": "doc-handbook",
+              "score": 0.91
+            },
+            {
+              "chunk_id": "chunk-doc-runbook",
+              "document_id": "doc-runbook",
+              "score": 0.77
+            },
+            {
+              "chunk_id": "chunk-doc-upload",
+              "document_id": "doc-upload",
+              "score": 0.62
+            }
+          ]
+        }
+      ],
+      "filter_decisions": [
+        {
+          "query_id": "query-1",
+          "document_id": "doc-handbook",
+          "admitted": true
+        },
+        {
+          "query_id": "query-1",
+          "document_id": "doc-runbook",
+          "admitted": true
+        },
+        {
+          "query_id": "query-1",
+          "document_id": "doc-upload",
+          "admitted": true
+        }
+      ],
+      "result_sets": [
+        {
+          "query_id": "query-1",
+          "results": [
+            {
+              "chunk_id": "chunk-doc-handbook",
+              "document_id": "doc-handbook",
+              "rank": 0,
+              "score": 0.91,
+              "from_fallback": false
+            },
+            {
+              "chunk_id": "chunk-doc-runbook",
+              "document_id": "doc-runbook",
+              "rank": 1,
+              "score": 0.77,
+              "from_fallback": false
+            },
+            {
+              "chunk_id": "chunk-doc-upload",
+              "document_id": "doc-upload",
+              "rank": 2,
+              "score": 0.62,
+              "from_fallback": false
+            }
+          ],
+          "used_fallback": false
+        }
+      ],
+      "influences": [
+        {
+          "document_id": "doc-handbook",
+          "chunk_id": "chunk-doc-handbook",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "TRUSTED_POLICY"
+        },
+        {
+          "document_id": "doc-runbook",
+          "chunk_id": "chunk-doc-runbook",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "TRUSTED_POLICY"
+        },
+        {
+          "document_id": "doc-upload",
+          "chunk_id": "chunk-doc-upload",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "REFERENCE"
+        }
+      ]
+    },
+    {
+      "queries": [
+        {
+          "query_id": "query-1",
+          "query_label": "how do I escalate a ticket",
+          "collection_ids": [
+            "col-support",
+            "col-runbooks"
+          ],
+          "requested_top_k": 3,
+          "filter": {
+            "mandatory": [
+              {
+                "field": "department",
+                "operator": "EQUALS",
+                "values": [
+                  "support"
+                ]
+              }
+            ]
+          },
+          "objective_id": "objective-answer-ticket"
+        }
+      ],
+      "candidate_sets": [
+        {
+          "query_id": "query-1",
+          "candidates": [
+            {
+              "chunk_id": "chunk-doc-handbook",
+              "document_id": "doc-handbook",
+              "score": 0.91
+            },
+            {
+              "chunk_id": "chunk-doc-runbook",
+              "document_id": "doc-runbook",
+              "score": 0.77
+            },
+            {
+              "chunk_id": "chunk-doc-upload",
+              "document_id": "doc-upload",
+              "score": 0.62
+            }
+          ]
+        }
+      ],
+      "filter_decisions": [
+        {
+          "query_id": "query-1",
+          "document_id": "doc-handbook",
+          "admitted": true
+        },
+        {
+          "query_id": "query-1",
+          "document_id": "doc-runbook",
+          "admitted": true
+        },
+        {
+          "query_id": "query-1",
+          "document_id": "doc-upload",
+          "admitted": true
+        }
+      ],
+      "result_sets": [
+        {
+          "query_id": "query-1",
+          "results": [
+            {
+              "chunk_id": "chunk-doc-handbook",
+              "document_id": "doc-handbook",
+              "rank": 0,
+              "score": 0.91,
+              "from_fallback": false
+            },
+            {
+              "chunk_id": "chunk-doc-runbook",
+              "document_id": "doc-runbook",
+              "rank": 1,
+              "score": 0.77,
+              "from_fallback": false
+            },
+            {
+              "chunk_id": "chunk-doc-upload",
+              "document_id": "doc-upload",
+              "rank": 2,
+              "score": 0.62,
+              "from_fallback": false
+            }
+          ],
+          "used_fallback": false
+        }
+      ],
+      "influences": [
+        {
+          "document_id": "doc-handbook",
+          "chunk_id": "chunk-doc-handbook",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "TRUSTED_POLICY"
+        },
+        {
+          "document_id": "doc-runbook",
+          "chunk_id": "chunk-doc-runbook",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "TRUSTED_POLICY"
+        },
+        {
+          "document_id": "doc-upload",
+          "chunk_id": "chunk-doc-upload",
+          "target": "OBJECTIVE",
+          "baseline_value": "objective-answer-ticket",
+          "observed_value": "objective-answer-ticket",
+          "changed": false,
+          "treated_as_trust_class": "REFERENCE"
+        }
+      ]
+    }
+  ]
+}

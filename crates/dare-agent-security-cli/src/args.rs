@@ -75,6 +75,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local memory and context poisoning validation (Cycle 016).
     #[command(name = "memory-security")]
     MemorySecurity(crate::memory_security::MemorySecurityArgs),
+    /// Run bounded local RAG and retrieval security validation (Cycle 017).
+    #[command(name = "rag-security")]
+    RagSecurity(crate::rag_security::RagSecurityArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

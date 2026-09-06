@@ -14,6 +14,7 @@ pub mod init;
 pub mod memory_security_metadata;
 pub mod privacy;
 pub mod prompt_injection_metadata;
+pub mod rag_security_metadata;
 pub mod redaction;
 pub mod report;
 pub mod store;
@@ -74,6 +75,21 @@ pub use memory_security_metadata::{
     BOUNDED_VIOLATION_NOTE as MEMORY_SECURITY_BOUNDED_VIOLATION_NOTE,
     MEMORY_SECURITY_METADATA_SCHEMA_ID, MEMORY_TRUST_RELATION, SCOPE_BOUNDARY_NOTE,
     STANDARDS_NOTE as MEMORY_SECURITY_STANDARDS_NOTE,
+};
+
+// And the same for Cycle 017. Its vocabulary collides with the earlier blocks
+// for the same reason: each cycle forbids the overstatements of its own
+// subject, so the shared names are re-exported under Cycle 017 spellings.
+pub use rag_security_metadata::{
+    assert_bounded_claim as assert_bounded_rag_security_claim, build_rag_security_metadata,
+    RagScenarioOutcome, RagSecurityCounts, RagSecurityMetadata, RagSecurityScenarioSummary,
+    RagSurfaceAvailability, RagSurfaceState,
+    BOUNDED_INCONCLUSIVE_NOTE as RAG_SECURITY_BOUNDED_INCONCLUSIVE_NOTE,
+    BOUNDED_PASS_NOTE as RAG_SECURITY_BOUNDED_PASS_NOTE,
+    BOUNDED_VIOLATION_NOTE as RAG_SECURITY_BOUNDED_VIOLATION_NOTE, RAG_SECURITY_METADATA_SCHEMA_ID,
+    RAG_SURFACES, RANKING_RULE, RETRIEVAL_TRUST_RELATION,
+    SCOPE_BOUNDARY_NOTE as RAG_SECURITY_SCOPE_BOUNDARY_NOTE,
+    STANDARDS_NOTE as RAG_SECURITY_STANDARDS_NOTE,
 };
 
 pub use redaction::{assert_no_secrets, escape_html, redact_product_text, REDACTED};
