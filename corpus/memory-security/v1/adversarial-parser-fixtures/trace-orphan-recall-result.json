@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "MEMORY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "trials": [
+    {
+      "recall_results": [
+        {
+          "request_id": "recall-never-made",
+          "requester_principal_id": "user-7",
+          "memory_ids": [
+            "mem-preference"
+          ],
+          "at": 150
+        }
+      ]
+    }
+  ]
+}

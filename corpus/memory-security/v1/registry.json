@@ -1,0 +1,152 @@
+{
+  "schema_version": "1",
+  "corpus_id": "memory-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 016 memory and context poisoning corpus",
+  "entries": [
+    {
+      "id": "provenance-dropped-on-write",
+      "class": "MEMORY_ATTACK",
+      "path": "provenance/provenance-dropped-on-write.json",
+      "digest": "sha256:0c39f015f0ca1182cf1d1f9275f682dde3c6c6859b38cbef85d1f2834ed66aed"
+    },
+    {
+      "id": "trust-source-ceiling-exceeded",
+      "class": "MEMORY_ATTACK",
+      "path": "trust-boundary/trust-source-ceiling-exceeded.json",
+      "digest": "sha256:c123220c5d394b2f056445ab3e34dd1dab7bab6405e5689f4770baa3961b5782"
+    },
+    {
+      "id": "trust-untrusted-promoted-to-policy",
+      "class": "MEMORY_ATTACK",
+      "path": "trust-boundary/trust-untrusted-promoted-to-policy.json",
+      "digest": "sha256:483b652c2dbaf9efe911e65d111faafb1c1c3ea6e67484aac95253de8b74c26f"
+    },
+    {
+      "id": "trust-write-outside-policy",
+      "class": "MEMORY_ATTACK",
+      "path": "trust-boundary/trust-write-outside-policy.json",
+      "digest": "sha256:12fb8258568bec7f5f0787ef108fc93f47614f8358d6dcd798d75b08081acab6"
+    },
+    {
+      "id": "integrity-content-substituted-in-place",
+      "class": "MEMORY_ATTACK",
+      "path": "trust-boundary/integrity-content-substituted-in-place.json",
+      "digest": "sha256:461ec2338463d7bcc418f46f21111ab88aeef02985fc18b1ccd4aeb4b9770555"
+    },
+    {
+      "id": "recall-crosses-principal-boundary",
+      "class": "MEMORY_ATTACK",
+      "path": "tenant-principal/recall-crosses-principal-boundary.json",
+      "digest": "sha256:4faa5d9e98c992c54729ace7b023b1417f30df7e02edf62c41ae34ca01924962"
+    },
+    {
+      "id": "recall-crosses-tenant-boundary",
+      "class": "MEMORY_ATTACK",
+      "path": "tenant-principal/recall-crosses-tenant-boundary.json",
+      "digest": "sha256:3fc4de441a3739c1c276d35219e34b174c72dff98168747e7f38d8b7394be6f0"
+    },
+    {
+      "id": "recall-crosses-namespace-boundary",
+      "class": "MEMORY_ATTACK",
+      "path": "tenant-principal/recall-crosses-namespace-boundary.json",
+      "digest": "sha256:dfa1eb9968a2aaec7c57d0d87640a97fe2c5c896b23ae3daf1899ca9cd262ac9"
+    },
+    {
+      "id": "recall-answers-a-different-request",
+      "class": "MEMORY_ATTACK",
+      "path": "tenant-principal/recall-answers-a-different-request.json",
+      "digest": "sha256:20db01202c7b87c786c5439f248c6b88c71a740f230f7aaa52d0c93e2de7117c"
+    },
+    {
+      "id": "lifecycle-expired-memory-used",
+      "class": "MEMORY_ATTACK",
+      "path": "lifecycle/lifecycle-expired-memory-used.json",
+      "digest": "sha256:caf846811b419be6ef826beb4555d70010e951b87f1f3192e7b22924b9f34226"
+    },
+    {
+      "id": "lifecycle-revoked-memory-used",
+      "class": "MEMORY_ATTACK",
+      "path": "lifecycle/lifecycle-revoked-memory-used.json",
+      "digest": "sha256:f6dfbb2852c6d09fdbe267217a41bfaa6336c432e88938e5468eccf6d1d1d9da"
+    },
+    {
+      "id": "influence-objective-replaced",
+      "class": "MEMORY_ATTACK",
+      "path": "decision-influence/influence-objective-replaced.json",
+      "digest": "sha256:ad64097c39fb37d7edcccd724e3218c155755c540b77ad8986606b3085588701"
+    },
+    {
+      "id": "influence-tool-selection-changed",
+      "class": "MEMORY_ATTACK",
+      "path": "decision-influence/influence-tool-selection-changed.json",
+      "digest": "sha256:c9f2382a040a64fd425c5b61bd114fd1c1586ef5cb3ebb1cbcd1b623b3d557dd"
+    },
+    {
+      "id": "influence-tool-argument-substituted",
+      "class": "MEMORY_ATTACK",
+      "path": "decision-influence/influence-tool-argument-substituted.json",
+      "digest": "sha256:0fbed503bc98336698008bac0b29933ce5f349e2e2ae308d687d3263cf6d2e53"
+    },
+    {
+      "id": "influence-protected-field-populated",
+      "class": "MEMORY_ATTACK",
+      "path": "decision-influence/influence-protected-field-populated.json",
+      "digest": "sha256:800a3addce8440a69f7fbe9d71c85afa67aefc0e5ca188a62ea4ffb2f21a563b"
+    },
+    {
+      "id": "benign-provenance-retained",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-provenance-retained.json",
+      "digest": "sha256:0e1ddceed177d795e2f2528a79760e7ef83feba0aff55a1f5ed00464103a8a0e"
+    },
+    {
+      "id": "benign-untrusted-memory-stays-data",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-untrusted-memory-stays-data.json",
+      "digest": "sha256:3099e06d79b38dc6314074ddca145a7f7025dbabd5f66c11e60bf3a597d9460c"
+    },
+    {
+      "id": "benign-authorized-update-applied",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-authorized-update-applied.json",
+      "digest": "sha256:1cfd2b9c43950a43490b314208e451d90a8635ab8adb6b9113dc7c2fc8bae2b0"
+    },
+    {
+      "id": "benign-same-tenant-recall",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-same-tenant-recall.json",
+      "digest": "sha256:fdb9b11c88df5f02ef58ad8760ecd648346e64b369c41fe03dc51ad6c8837f4c"
+    },
+    {
+      "id": "benign-own-principal-recall",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-own-principal-recall.json",
+      "digest": "sha256:4c9548373e88e3ba801e242bc7014ccb07996f70d86332289fbd9d371127d5f7"
+    },
+    {
+      "id": "benign-same-namespace-recall",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-same-namespace-recall.json",
+      "digest": "sha256:3a23ff62d1ad372eadd9969be742e2ca66378f79fe0dfd49fa5c13a2138db394"
+    },
+    {
+      "id": "benign-valid-memory-recalled",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-valid-memory-recalled.json",
+      "digest": "sha256:53e86750d986076a368985724f5adf57f26e576e8c7d97203f81d7f3dccf9a29"
+    },
+    {
+      "id": "benign-recalled-without-influence",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-recalled-without-influence.json",
+      "digest": "sha256:9317205ce6e162472d68a20888d894a762d43b082fff6e9e78f1ed1c10873d1b"
+    },
+    {
+      "id": "benign-protected-field-left-alone",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-protected-field-left-alone.json",
+      "digest": "sha256:a2042da510f471537bd73dd5eef39f9a76fdacc04f061b030998ba67af0a0022"
+    }
+  ]
+}

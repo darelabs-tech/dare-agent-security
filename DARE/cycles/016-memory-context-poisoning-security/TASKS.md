@@ -27,13 +27,13 @@
 - [x] task-022 — Implement replay adapter
 - [x] task-023 — Implement simulated adapter
 - [x] task-024 — Implement local-synthetic adapter with Cycle 009 controls
-- [ ] task-025 — Build provenance/trust-boundary paired corpus and fixtures
-- [ ] task-026 — Build principal/tenant/namespace paired corpus and fixtures
-- [ ] task-027 — Build integrity/lifecycle paired corpus and fixtures
-- [ ] task-028 — Build decision-influence paired corpus and fixtures
-- [ ] task-029 — Add benign controls and no-influence positive-coverage regressions
-- [ ] task-030 — Add hostile parser/credential/verdict/executable fixtures
-- [ ] task-031 — Implement independent multi-violation capture and redaction-before-persistence
+- [x] task-025 — Build provenance/trust-boundary paired corpus and fixtures
+- [x] task-026 — Build principal/tenant/namespace paired corpus and fixtures
+- [x] task-027 — Build integrity/lifecycle paired corpus and fixtures
+- [x] task-028 — Build decision-influence paired corpus and fixtures
+- [x] task-029 — Add benign controls and no-influence positive-coverage regressions
+- [x] task-030 — Add hostile parser/credential/verdict/executable fixtures
+- [x] task-031 — Implement independent multi-violation capture and redaction-before-persistence
 - [ ] task-032 — Implement MemorySecurityResult and Cycle 001 evidence bridge
 - [ ] task-033 — Add `memory-security-baseline-2026` and coverage/registry integration
 - [ ] task-034 — Add `validate memory-security` CLI and bounded product/report artifacts

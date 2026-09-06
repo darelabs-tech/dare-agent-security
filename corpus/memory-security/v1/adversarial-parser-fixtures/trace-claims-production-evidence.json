@@ -1,0 +1,10 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "MEMORY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": false,
+  "trials": [
+    {}
+  ]
+}

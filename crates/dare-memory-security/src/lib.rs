@@ -51,6 +51,7 @@
 pub mod binding;
 pub mod canonical;
 pub mod compat;
+pub mod corpus;
 pub mod coverage;
 pub mod error;
 pub mod harness;
@@ -73,6 +74,7 @@ pub use compat::{
     acting_principal_originates_authority, assert_identity_agreement, composed_boundary_properties,
     injection_source_for, memory_principal_from_identity,
 };
+pub use corpus::{builtin_corpus, load_corpus, MemoryCorpus};
 pub use coverage::{
     all_contracts, assess_coverage, coverage_contract, ChannelRequirement, CoverageContract,
     CoverageDecision,
