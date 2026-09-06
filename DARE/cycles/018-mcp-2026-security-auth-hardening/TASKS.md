@@ -1,7 +1,7 @@
 # Cycle 018 — Tasks
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED
 
 - [ ] task-001 — Freeze post-Cycle-017 baseline and compatibility contracts
 - [ ] task-002 — Record MCP 2026 / OAuth / AuthZEN / COAZ standards status snapshot
