@@ -35,7 +35,7 @@
 - [x] task-030 — Add hostile parser/credential/verdict/executable fixtures
 - [x] task-031 — Implement independent multi-violation capture and redaction-before-persistence
 - [x] task-032 — Implement MemorySecurityResult and Cycle 001 evidence bridge
-- [ ] task-033 — Add `memory-security-baseline-2026` and coverage/registry integration
+- [x] task-033 — Add `memory-security-baseline-2026` and coverage/registry integration
 - [ ] task-034 — Add `validate memory-security` CLI and bounded product/report artifacts
 - [ ] task-035 — Add dedicated CI job, offline/confidential/no-live-store regressions and execute actual workflow job locally
 - [ ] task-036 — Document operator safe-use, memory provenance/trust model and Cycle 017 RAG separation
