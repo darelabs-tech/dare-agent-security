@@ -101,6 +101,7 @@ impl RagTrace {
                          maximum is {}",
                         self.trace_id,
                         set.results.len(),
+                        set.query_id,
                         crate::limits::HARD_MAX_RESULTS_PER_QUERY
                     )));
                 }
@@ -161,12 +162,7 @@ impl RagTrace {
                         self.trace_id
                     ))
                 })?;
-                assert_candidate_semantics_match(
-                    observed,
-                    approved,
-                    &self.trace_id,
-                    trial_index,
-                )?;
+                assert_candidate_semantics_match(observed, approved, &self.trace_id, trial_index)?;
             }
 
             // These records do not carry authority themselves, but an unknown
