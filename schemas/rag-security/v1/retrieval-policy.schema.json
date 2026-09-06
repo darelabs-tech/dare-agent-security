@@ -1,0 +1,429 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/rag-security/v1/retrieval-policy.schema.json",
+  "title": "DARE RAG Security Retrieval Policy v1",
+  "description": "What the acting principal may reach. Every dimension is structural, so a boundary crossing is decided by comparing identifiers rather than by weighing a similarity score.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "acting_principal_id",
+    "max_classification",
+    "trust_ceiling",
+    "top_k"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "acting_principal_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "allowed_tenants": {
+      "description": "One axis of the policy. ONLY lists what is permitted; ANY permits everything on this axis. An absent dimension defaults to ONLY with no values, which permits nothing — a dimension nobody declared must not become one nobody enforces.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ONLY",
+            "ANY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ANY"
+              }
+            },
+            "required": [
+              "constraint"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "allowed_collections": {
+      "description": "One axis of the policy. ONLY lists what is permitted; ANY permits everything on this axis. An absent dimension defaults to ONLY with no values, which permits nothing — a dimension nobody declared must not become one nobody enforces.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ONLY",
+            "ANY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ANY"
+              }
+            },
+            "required": [
+              "constraint"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "allowed_documents": {
+      "description": "One axis of the policy. ONLY lists what is permitted; ANY permits everything on this axis. An absent dimension defaults to ONLY with no values, which permits nothing — a dimension nobody declared must not become one nobody enforces.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ONLY",
+            "ANY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ANY"
+              }
+            },
+            "required": [
+              "constraint"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "allowed_owners": {
+      "description": "One axis of the policy. ONLY lists what is permitted; ANY permits everything on this axis. An absent dimension defaults to ONLY with no values, which permits nothing — a dimension nobody declared must not become one nobody enforces.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ONLY",
+            "ANY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ANY"
+              }
+            },
+            "required": [
+              "constraint"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "max_classification": {
+      "type": "string",
+      "enum": [
+        "PUBLIC",
+        "INTERNAL",
+        "CONFIDENTIAL",
+        "RESTRICTED"
+      ]
+    },
+    "trust_ceiling": {
+      "type": "string",
+      "enum": [
+        "UNTRUSTED",
+        "REFERENCE",
+        "TRUSTED_POLICY"
+      ]
+    },
+    "metadata_filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mandatory": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "field",
+              "operator",
+              "values"
+            ],
+            "properties": {
+              "field": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "EQUALS",
+                  "NOT_EQUALS",
+                  "IN",
+                  "NOT_IN"
+                ]
+              },
+              "values": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "protected": {
+      "description": "Documents and classes that must never be returned, checked independently of every other dimension.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "document_ids": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "classifications": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "INTERNAL",
+              "CONFIDENTIAL",
+              "RESTRICTED"
+            ]
+          }
+        },
+        "labels": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "top_k": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_top_k"
+      ],
+      "properties": {
+        "max_top_k": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        }
+      }
+    },
+    "fallback": {
+      "description": "What a broadened retrieval may do. Every axis it might widen is named, so 'fallback' cannot come to mean 'search everything'.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed"
+      ],
+      "properties": {
+        "allowed": {
+          "type": "boolean"
+        },
+        "may_widen_tenant": {
+          "type": "boolean"
+        },
+        "may_widen_collection": {
+          "type": "boolean"
+        },
+        "may_widen_owner": {
+          "type": "boolean"
+        },
+        "may_widen_classification": {
+          "type": "boolean"
+        },
+        "may_widen_document_set": {
+          "type": "boolean"
+        }
+      }
+    },
+    "cross_tenant_allowed": {
+      "type": "boolean"
+    },
+    "cross_owner_allowed": {
+      "type": "boolean"
+    },
+    "allowed_objective_ids": {
+      "description": "One axis of the policy. ONLY lists what is permitted; ANY permits everything on this axis. An absent dimension defaults to ONLY with no values, which permits nothing — a dimension nobody declared must not become one nobody enforces.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ONLY",
+            "ANY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ANY"
+              }
+            },
+            "required": [
+              "constraint"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

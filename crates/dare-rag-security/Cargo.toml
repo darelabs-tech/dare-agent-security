@@ -1,0 +1,33 @@
+[package]
+name = "dare-rag-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Bounded, evidence-first, offline-first RAG and retrieval security validation (Cycle 017)"
+publish = false
+
+[lib]
+name = "dare_rag_security"
+path = "src/lib.rs"
+
+# No HTTP client, no database driver, no vector-store SDK and no embedding
+# runtime appears here or transitively. That absence is the security boundary:
+# there is no dependency through which this crate could reach a retriever.
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-identity-security = { path = "../dare-identity-security" }
+dare-memory-security = { path = "../dare-memory-security" }
+dare-prompt-injection = { path = "../dare-prompt-injection" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

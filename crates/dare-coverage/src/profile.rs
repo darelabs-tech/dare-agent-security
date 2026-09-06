@@ -25,6 +25,8 @@ pub const IDENTITY_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/identity-security-baseline-2026.json");
 pub const MEMORY_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/memory-security-baseline-2026.json");
+pub const RAG_SECURITY_PROFILE_JSON: &str =
+    include_str!("../../../profiles/rag-security-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -169,6 +171,30 @@ pub fn memory_security_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(MEMORY_SECURITY_PROFILE_JSON)
 }
 
+/// Cycle 017 RAG and retrieval-security baseline.
+///
+/// Additive in the same way as the four before it. It selects the six
+/// `AGENT.RAG.*` properties from the same v2 registry; every earlier profile
+/// keeps its identifiers, its requirement levels and its property count, so no
+/// denominator moves and no assessment already filed means something different
+/// than it did when it was produced.
+///
+/// Two of the six are CONDITIONAL, for a reason specific to each. A target
+/// whose corpus holds nothing untrusted has no promotion to answer for, and a
+/// policy that designates no protected document or class has nothing to
+/// withhold. Marking either REQUIRED would report a gap against a target that
+/// has honestly nothing to report, and make it score worse than one that simply
+/// declares less.
+///
+/// The other four are REQUIRED because where they apply at all, there is no
+/// honest way to decline them: a retrieval with a policy must stay inside its
+/// authority, one with a tenant context and a document ACL must respect both,
+/// one whose documents carry provenance must preserve it, and one that returns
+/// a result set must have drawn it from the approved candidates.
+pub fn rag_security_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(RAG_SECURITY_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -186,6 +212,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "tool-security-baseline-2026" => tool_security_profile(),
         "identity-security-baseline-2026" => identity_security_profile(),
         "memory-security-baseline-2026" => memory_security_profile(),
+        "rag-security-baseline-2026" => rag_security_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

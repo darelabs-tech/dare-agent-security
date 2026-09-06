@@ -1,0 +1,12 @@
+cycle: "017-rag-retrieval-security"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+base_branch: main
+baseline_commit: c0cd5edbb5a157d285b20177b7bd20a23b1811cc
+branch: agent/cycle-017-rag-retrieval-security
+approval_file: DARE/cycles/017-rag-retrieval-security/APPROVAL.md
+execution_gate:
+  approval_file_present: true
+  execution_authorized: true
+  required_pre_pr_local_workflow_job: rag-security-2026
+  pr_open_only_after_local_gates_green: true

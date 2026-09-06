@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/rag-security/v1/document-store.schema.json",
+  "title": "DARE RAG Security Document Store v1",
+  "description": "A bounded synthetic corpus of collections, documents and chunks. Nothing here is fetched, indexed or persisted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "store_id",
+    "collections",
+    "documents"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "store_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "collections": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "collection_id",
+          "tenant_id"
+        ],
+        "properties": {
+          "collection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "tenant_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://darelabs.tech/schemas/rag-security/v1/document.schema.json",
+        "title": "DARE RAG Security Document v1",
+        "description": "One indexed synthetic document. Identity, tenant, owner, collection, classification and trust are declared; the body never is. A verdict is reached by comparing declared identifiers, never by reading content.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_id",
+          "collection_id",
+          "tenant_id",
+          "owner_principal_id",
+          "provenance",
+          "trust_class",
+          "classification",
+          "content_digest",
+          "metadata_digest"
+        ],
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "collection_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "tenant_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "owner_principal_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "provenance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provenance_id",
+              "source_kind"
+            ],
+            "properties": {
+              "provenance_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "source_kind": {
+                "type": "string",
+                "enum": [
+                  "INTERNAL_AUTHORED",
+                  "TENANT_UPLOAD",
+                  "EXTERNAL_INGESTED",
+                  "AGENT_GENERATED",
+                  "IMPORTED_CORPUS",
+                  "TOOL_OUTPUT"
+                ]
+              },
+              "source_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "author_principal_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "source_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            }
+          },
+          "trust_class": {
+            "type": "string",
+            "enum": [
+              "UNTRUSTED",
+              "REFERENCE",
+              "TRUSTED_POLICY"
+            ]
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "INTERNAL",
+              "CONFIDENTIAL",
+              "RESTRICTED"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUPERSEDED",
+              "WITHDRAWN"
+            ]
+          },
+          "content_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "metadata_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "metadata": {
+            "description": "Opaque labels a filter may constrain. Bounded so a document cannot carry an unbounded map.",
+            "type": "object",
+            "maxProperties": 32,
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "content_excerpt": {
+            "description": "A short human-legible excerpt. No evaluator reads it.",
+            "type": "string",
+            "maxLength": 4096
+          },
+          "labels": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      }
+    },
+    "chunks": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "chunk_id",
+          "document_id",
+          "provenance_id",
+          "content_digest"
+        ],
+        "properties": {
+          "chunk_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "document_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "provenance_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "content_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "content_excerpt": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "vector": {
+            "description": "A short synthetic vector, present only so a fixture resembles a real index record. Cycle 017 never computes or compares embeddings; the bound keeps this field from becoming a channel for arbitrary binary data.",
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  }
+}

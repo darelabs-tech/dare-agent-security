@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0.0",
+  "recorded_at": "2026-09-06",
+  "fetch_policy": "OFFLINE_LOCAL_SNAPSHOT",
+  "fetch_policy_note": "This snapshot is recorded locally and versioned in the repository. Nothing in Cycle 017 fetches a standard at runtime, resolves a canonical reference over the network, or treats an upstream document as a live dependency. A reference is an attribution, not a retrieval target.",
+  "conformance_disclaimer": "DARE maps its retrieval-security properties onto these documents for context and traceability. That is attribution and not conformance: DARE is not certified against any of these documents, does not claim to implement them, and no artifact produced by this engine may state or imply otherwise. This disclaimer denies conformance; it does not assert it.",
+  "taxonomy_note": "LLM09:2026 belongs to the OWASP Top 10 for LLM Applications. It is not an OWASP Agentic Top 10 risk family. The ten Agentic families are a separate taxonomy and remain exactly ten; no RAG family is added to them, and no equivalence with ASI04, ASI06 or any other ASI identifier is asserted here.",
+  "sources": [
+    {
+      "id": "OWASP_LLM_TOP10_2026",
+      "title": "OWASP Top 10 for Large Language Model Applications 2026",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "OWASP Top 10 for LLM Applications 2026",
+      "status": "NORMATIVE",
+      "usage": "PRIMARY_RISK_CONTEXT",
+      "mapping_notes": "The document this cycle's primary risk identifier is drawn from. Used as risk taxonomy and context for retrieval and embedding weaknesses."
+    },
+    {
+      "id": "OWASP_LLM09_2026",
+      "title": "LLM09:2026 Vector and Embedding Weaknesses",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "OWASP Top 10 for LLM Applications 2026, LLM09:2026 Vector and Embedding Weaknesses",
+      "status": "NORMATIVE",
+      "usage": "PRIMARY_MAPPING",
+      "mapping_notes": "The primary mapping for every AGENT.RAG.* property. Treats similarity search and retrieval as a trust boundary and names poisoned embeddings or data, cross-context leakage, and insufficient authorization or isolation around vector and embedding systems. This cycle validates the authorization, isolation, provenance and result-integrity aspects of that risk; it does not evaluate embedding quality."
+    },
+    {
+      "id": "OWASP_LLM01_2026",
+      "title": "LLM01:2026 Prompt Injection",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "OWASP Top 10 for LLM Applications 2026, LLM01:2026 Prompt Injection",
+      "status": "NORMATIVE",
+      "usage": "ADJACENT_CONTEXT",
+      "mapping_notes": "Adjacent but not equivalent. Retrieved content that becomes an instruction is a prompt-injection question, and Cycle 013 remains the final judge for instruction-boundary properties. Cycle 017 reuses the trust-boundary vocabulary and observes whether retrieved content was promoted to authority; it does not re-decide whether text reads as an instruction."
+    },
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026",
+      "title": "OWASP Agentic Top 10 2026",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "OWASP Agentic Top 10 2026",
+      "status": "NORMATIVE",
+      "usage": "ADDITIVE_CONTEXT_ONLY",
+      "mapping_notes": "Referenced only to state what this cycle does not do to it. The ten Agentic risk families are unchanged and no eleventh family is introduced for retrieval. AGENT.RAG.* properties carry no risk_family and therefore never enter the Agentic family coverage view."
+    },
+    {
+      "id": "NIST_AI_600_1",
+      "title": "NIST AI 600-1 Generative AI Profile",
+      "version": "1.0",
+      "published_at": "2024-07",
+      "canonical_reference": "NIST AI 600-1, Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+      "status": "INFORMATIVE",
+      "usage": "BACKGROUND",
+      "mapping_notes": "Background framing for information-integrity and data-provenance risk. No control in this cycle is derived from it and no conformance is claimed."
+    },
+    {
+      "id": "DARE_CYCLE_013",
+      "title": "DARE Cycle 013 — Direct and Indirect Prompt Injection",
+      "version": "1",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/013-direct-indirect-prompt-injection",
+      "status": "INTERNAL_CONTRACT",
+      "usage": "REUSED_CONTRACT",
+      "mapping_notes": "Owns the untrusted-content instruction boundary and stays the final judge for it. Cycle 017 composes with its vocabulary rather than re-deriving it."
+    },
+    {
+      "id": "DARE_CYCLE_015",
+      "title": "DARE Cycle 015 — Identity, Privilege and Delegation",
+      "version": "1",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/015-identity-privilege-delegation-security",
+      "status": "INTERNAL_CONTRACT",
+      "usage": "REUSED_CONTRACT",
+      "mapping_notes": "Owns principal and tenant semantics. Retrieval documents carry tenant and owner labels but may not reinterpret an identity Cycle 015 has already fixed."
+    },
+    {
+      "id": "DARE_CYCLE_016",
+      "title": "DARE Cycle 016 — Memory and Context Poisoning",
+      "version": "1",
+      "published_at": "2026-09-06",
+      "canonical_reference": "DARE/cycles/016-memory-context-poisoning-security",
+      "status": "INTERNAL_CONTRACT",
+      "usage": "ADJACENT_BOUNDARY",
+      "mapping_notes": "Owns persisted memory and context state. Retrieved content is not memory: it becomes memory only when a separate, explicit memory event persists it, and Cycle 017 records no such event."
+    }
+  ],
+  "retrieval_trust_statement": {
+    "core_relation": "similarity_match != permission",
+    "content_rule": "retrieved_content != trusted_instruction",
+    "score_rule": "high_score != safe_source",
+    "authorization_rule": "A document may be highly relevant to a query and still lie outside the acting principal's authority. Relevance is a property of the query; authorization is a property of the policy.",
+    "ranking_rule": "Score, embedding output, ranking position and reranker order are evidence about ordering. None of them may widen what policy allows, and none of them may be the final security judge.",
+    "memory_rule": "Retrieved content is not persisted memory. It becomes memory only when a distinct memory event stores it, which is Cycle 016's question and not this cycle's."
+  },
+  "surface_classes": [
+    {
+      "id": "RETRIEVAL_AUTHORIZATION",
+      "title": "Retrieval authorization boundary",
+      "description": "Whether the acting principal, tenant and collection scope of a retrieval was respected, and whether a fallback or broadened search widened that scope."
+    },
+    {
+      "id": "DOCUMENT_ISOLATION",
+      "title": "Document ACL and tenant isolation",
+      "description": "Whether returned documents were inside the acting tenant and the allowed document set, and whether declared metadata filters were actually enforced."
+    },
+    {
+      "id": "PROVENANCE",
+      "title": "Document and chunk provenance",
+      "description": "Whether a returned chunk was still bound to the document and source it was declared to come from."
+    },
+    {
+      "id": "RESULT_INTEGRITY",
+      "title": "Candidate and result-set integrity",
+      "description": "Whether the ranked result set stayed a subset of the approved candidate set and inside the approved top-k bound."
+    },
+    {
+      "id": "CONTENT_TRUST",
+      "title": "Retrieved-content trust boundary",
+      "description": "Whether untrusted retrieved content remained data rather than being promoted into authority over a decision."
+    },
+    {
+      "id": "PROTECTED_NONDISCLOSURE",
+      "title": "Protected-document nondisclosure",
+      "description": "Whether a document or class the policy marks protected stayed out of the result, independently of score, candidacy, filters and tenant."
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "AGENT.RAG.RETRIEVAL_AUTHORIZATION_BOUNDARY",
+      "standard": "OWASP_LLM_TOP10_2026",
+      "reference": "LLM09:2026 Vector and Embedding Weaknesses",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Insufficient authorization around a retrieval surface. Covers principal, collection and fallback scope."
+    },
+    {
+      "property_id": "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+      "standard": "OWASP_LLM_TOP10_2026",
+      "reference": "LLM09:2026 Vector and Embedding Weaknesses",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Cross-context leakage between tenants sharing an index, and document ACL and metadata-filter enforcement."
+    },
+    {
+      "property_id": "AGENT.RAG.PROVENANCE_INTEGRITY",
+      "standard": "OWASP_LLM_TOP10_2026",
+      "reference": "LLM09:2026 Vector and Embedding Weaknesses",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Whether a returned chunk is still attributable to the document and source it claims. Poisoned or substituted data is invisible without this binding."
+    },
+    {
+      "property_id": "AGENT.RAG.CONTENT_TRUST_BOUNDARY",
+      "standard": "OWASP_LLM_TOP10_2026",
+      "reference": "LLM09:2026 Vector and Embedding Weaknesses",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Retrieved content remaining data rather than becoming authority. LLM01:2026 is adjacent context; Cycle 013 remains the final judge for the instruction boundary itself."
+    },
+    {
+      "property_id": "AGENT.RAG.RESULT_SET_INTEGRITY",
+      "standard": "OWASP_LLM_TOP10_2026",
+      "reference": "LLM09:2026 Vector and Embedding Weaknesses",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Whether the ranked result set stayed inside the approved candidate set and the approved top-k bound."
+    },
+    {
+      "property_id": "AGENT.RAG.PROTECTED_DOCUMENT_NONDISCLOSURE",
+      "standard": "OWASP_LLM_TOP10_2026",
+      "reference": "LLM09:2026 Vector and Embedding Weaknesses",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "A protected document or class must not be returned even when it is in the candidate set, passes filters, scores highly and belongs to the acting tenant."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    {
+      "topic": "Live vector databases and hosted retrieval services",
+      "deferred_to": "NOT_PLANNED",
+      "note": "Pinecone, Weaviate, Qdrant, Redis, PostgreSQL/pgvector, OpenSearch, Elasticsearch, Chroma, Milvus and SaaS retrieval APIs are never contacted. There is no adapter, dependency, flag or connection string for any of them."
+    },
+    {
+      "topic": "Embedding inference and embedding quality",
+      "deferred_to": "NOT_PLANNED",
+      "note": "No model is loaded, downloaded or called. Scores and orderings are evidence supplied by a fixture or trace; the engine never judges whether an embedding is semantically correct."
+    },
+    {
+      "topic": "Answer factuality, hallucination and relevance benchmarking",
+      "deferred_to": "NOT_PLANNED",
+      "note": "Whether retrieval produced a good answer is a quality question, not a security boundary."
+    },
+    {
+      "topic": "Prompt-injection adjudication",
+      "deferred_to": "CYCLE_013",
+      "note": "Cycle 013 remains the final judge for instruction-boundary properties. Cycle 017 observes authority promotion structurally and does not re-decide whether text reads as an instruction."
+    },
+    {
+      "topic": "Persisted memory semantics",
+      "deferred_to": "CYCLE_016",
+      "note": "Retrieved content is not memory. Cycle 016 owns what happens once something is stored."
+    },
+    {
+      "topic": "OAuth, OIDC, JWT, JWKS, IdP, PDP, remote AuthZEN and MCP auth hardening",
+      "deferred_to": "CYCLE_018",
+      "note": "Protocol and cryptographic identity are out of scope here; authority is modelled declaratively."
+    }
+  ],
+  "inherited_lessons": [
+    {
+      "id": "RELEVANCE_IS_NOT_AUTHORIZATION",
+      "from_cycle": "016",
+      "lesson": "A refusal message is a persistence surface. Sweep hostile values before a schema validator can quote them back, and name the offending object rather than its content."
+    },
+    {
+      "id": "SCORE_IS_NOT_AUTHORITY",
+      "from_cycle": "016",
+      "lesson": "Stage a behaviour against the invariant it actually bears on. A test that stages one violation while judging an unrelated invariant passes and proves nothing."
+    },
+    {
+      "id": "REFUSAL_IS_A_PERSISTENCE_SURFACE",
+      "from_cycle": "016",
+      "lesson": "An adapter must not assert a fact it has no standing to know. Traces name objects by id; the declared corpus supplies the bindings."
+    },
+    {
+      "id": "STAGE_AGAINST_THE_INVARIANT_JUDGED",
+      "from_cycle": "016",
+      "lesson": "PASS on silence is the default failure mode of an evidence engine. Every invariant needs a positive coverage contract."
+    },
+    {
+      "id": "AN_ADAPTER_ASSERTS_ONLY_WHAT_IT_OBSERVED",
+      "from_cycle": "015",
+      "lesson": "Availability of a capability is not authority to use it. The retrieval analogue is that a document being reachable by a query is not permission to return it."
+    },
+    {
+      "id": "ABSENCE_OF_EVIDENCE_IS_NOT_A_PASS",
+      "from_cycle": "013",
+      "lesson": "External content is data until something makes it an instruction. Persistence does not change that, and neither does retrieval."
+    },
+    {
+      "id": "GENERATE_FIXTURES_NEVER_HAND_EDIT_THEM",
+      "from_cycle": "016",
+      "lesson": "Generate fixtures rather than hand-editing them, and make drift a CI failure with a --check mode."
+    },
+    {
+      "id": "RUN_THE_REAL_CI_JOB_LOCALLY",
+      "from_cycle": "013",
+      "lesson": "Run the real CI job locally. A hand-written equivalent shipped a broken gate once already."
+    }
+  ]
+}

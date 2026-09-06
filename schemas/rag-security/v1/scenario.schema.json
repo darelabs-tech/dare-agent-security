@@ -1,0 +1,493 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/rag-security/v1/scenario.schema.json",
+  "title": "DARE RAG Security Scenario v1",
+  "description": "A complete synthetic retrieval scenario. It names the invariant it is evaluated against and describes how a reference retriever behaved; it never declares a verdict, because a fixture that could state its own outcome would make the evaluator ceremonial.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "property",
+    "source",
+    "objective",
+    "store",
+    "context",
+    "policy",
+    "queries",
+    "invariant",
+    "trials",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "class": {
+      "type": "string",
+      "enum": [
+        "RETRIEVAL_AUTHORIZATION",
+        "DOCUMENT_ISOLATION",
+        "PROVENANCE",
+        "RESULT_INTEGRITY",
+        "CONTENT_TRUST",
+        "PROTECTED_NONDISCLOSURE"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.RAG.RETRIEVAL_AUTHORIZATION_BOUNDARY",
+        "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+        "AGENT.RAG.PROVENANCE_INTEGRITY",
+        "AGENT.RAG.CONTENT_TRUST_BOUNDARY",
+        "AGENT.RAG.RESULT_SET_INTEGRITY",
+        "AGENT.RAG.PROTECTED_DOCUMENT_NONDISCLOSURE"
+      ]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "CROSS_PRINCIPAL_RETRIEVAL",
+        "CROSS_TENANT_RETRIEVAL",
+        "CROSS_COLLECTION_RETRIEVAL",
+        "UNAUTHORIZED_DOCUMENT_RETRIEVAL",
+        "METADATA_FILTER_BYPASS",
+        "PROVENANCE_MISMATCH",
+        "CHUNK_DOCUMENT_SUBSTITUTION",
+        "NON_CANDIDATE_RESULT_INJECTION",
+        "TOP_K_OVERFLOW",
+        "UNTRUSTED_CONTENT_PROMOTION",
+        "PROTECTED_DOCUMENT_DISCLOSURE",
+        "FALLBACK_AUTHORITY_WIDENING"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "trust"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "SYNTHETIC_CORPUS",
+            "REPLAY_TRACE",
+            "DECLARED_RETRIEVAL_POLICY"
+          ]
+        },
+        "trust": {
+          "type": "string",
+          "enum": [
+            "TRUSTED",
+            "UNTRUSTED",
+            "MIXED"
+          ]
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "authorized_objective_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "authorized_objective_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "protected_canaries": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      }
+    },
+    "store": {
+      "$ref": "https://darelabs.tech/schemas/rag-security/v1/document-store.schema.json"
+    },
+    "context": {
+      "$ref": "https://darelabs.tech/schemas/rag-security/v1/retrieval-context.schema.json"
+    },
+    "policy": {
+      "$ref": "https://darelabs.tech/schemas/rag-security/v1/retrieval-policy.schema.json"
+    },
+    "queries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "query_id",
+          "collection_ids",
+          "requested_top_k"
+        ],
+        "properties": {
+          "query_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "query_label": {
+            "description": "A label for a human reading the fixture. Never parsed, never matched against document text.",
+            "type": "string",
+            "maxLength": 300
+          },
+          "collection_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "requested_top_k": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16
+          },
+          "filter": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "mandatory": {
+                "type": "array",
+                "maxItems": 16,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "field",
+                    "operator",
+                    "values"
+                  ],
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "operator": {
+                      "type": "string",
+                      "enum": [
+                        "EQUALS",
+                        "NOT_EQUALS",
+                        "IN",
+                        "NOT_IN"
+                      ]
+                    },
+                    "values": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 32,
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "objective_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "candidate_sets": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "query_id",
+          "candidates"
+        ],
+        "properties": {
+          "query_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "candidates": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "chunk_id",
+                "document_id"
+              ],
+              "properties": {
+                "chunk_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "document_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "score": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_id"
+      ],
+      "properties": {
+        "corpus_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "corpus_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "invariant": {
+      "description": "The invariant only. There is deliberately no field in which a fixture could state the verdict it wants.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "RETRIEVAL_PRINCIPAL_BOUNDARY_PRESERVED",
+            "RETRIEVAL_TENANT_BOUNDARY_PRESERVED",
+            "RETRIEVAL_COLLECTION_BOUNDARY_PRESERVED",
+            "DOCUMENT_ACL_ENFORCED",
+            "METADATA_FILTER_ENFORCED",
+            "PROTECTED_DOCUMENT_NOT_RETRIEVED",
+            "RETRIEVAL_PROVENANCE_PRESERVED",
+            "CHUNK_DOCUMENT_BINDING_PRESERVED",
+            "RESULT_SET_WITHIN_APPROVED_CANDIDATES",
+            "TOP_K_BOUND_PRESERVED",
+            "UNTRUSTED_RETRIEVED_CONTENT_NOT_PROMOTED_TO_AUTHORITY",
+            "RETRIEVAL_FALLBACK_DOES_NOT_WIDEN_AUTHORITY"
+          ]
+        }
+      }
+    },
+    "trials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "stop_on_first_fail": {
+          "type": "boolean"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_only"
+      ],
+      "properties": {
+        "local_only": {
+          "description": "Fixed. Cycle 017 has no non-local execution path.",
+          "const": true
+        },
+        "max_queries_per_trial": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "max_total_queries": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "max_results_per_query": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "max_total_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "max_duration_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      }
+    },
+    "lab": {
+      "description": "How a reference retriever behaved. A behavior, never a verdict.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_behavior"
+      ],
+      "properties": {
+        "reference_behavior": {
+          "type": "string",
+          "enum": [
+            "COMPLIANT",
+            "CROSS_PRINCIPAL_RESULT",
+            "CROSS_TENANT_RESULT",
+            "CROSS_COLLECTION_RESULT",
+            "UNAUTHORIZED_DOCUMENT_RESULT",
+            "METADATA_FILTER_BYPASSED",
+            "PROTECTED_DOCUMENT_RETURNED",
+            "PROVENANCE_DETACHED",
+            "CHUNK_REBOUND_TO_ANOTHER_DOCUMENT",
+            "NON_CANDIDATE_RESULT_INJECTED",
+            "TOP_K_EXCEEDED",
+            "UNTRUSTED_CONTENT_PROMOTED",
+            "RETRIEVED_WITHOUT_PROMOTION",
+            "FALLBACK_WITHIN_AUTHORITY",
+            "FALLBACK_WIDENED_AUTHORITY",
+            "MULTIPLE_INDEPENDENT_VIOLATIONS",
+            "NO_RELEVANT_OBSERVATION",
+            "HARNESS_FAILURE"
+          ]
+        },
+        "per_trial": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "COMPLIANT",
+              "CROSS_PRINCIPAL_RESULT",
+              "CROSS_TENANT_RESULT",
+              "CROSS_COLLECTION_RESULT",
+              "UNAUTHORIZED_DOCUMENT_RESULT",
+              "METADATA_FILTER_BYPASSED",
+              "PROTECTED_DOCUMENT_RETURNED",
+              "PROVENANCE_DETACHED",
+              "CHUNK_REBOUND_TO_ANOTHER_DOCUMENT",
+              "NON_CANDIDATE_RESULT_INJECTED",
+              "TOP_K_EXCEEDED",
+              "UNTRUSTED_CONTENT_PROMOTED",
+              "RETRIEVED_WITHOUT_PROMOTION",
+              "FALLBACK_WITHIN_AUTHORITY",
+              "FALLBACK_WIDENED_AUTHORITY",
+              "MULTIPLE_INDEPENDENT_VIOLATIONS",
+              "NO_RELEVANT_OBSERVATION",
+              "HARNESS_FAILURE"
+            ]
+          }
+        }
+      }
+    },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]+(_[A-Z0-9]+)*$",
+            "maxLength": 64
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "status": {
+            "description": "The upstream document's own status. A draft stays a draft; it never becomes a conformance claim.",
+            "type": "string",
+            "enum": [
+              "NORMATIVE",
+              "FINAL_SPECIFICATION",
+              "DRAFT",
+              "OPEN_PROPOSAL",
+              "INFORMATIVE"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

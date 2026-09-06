@@ -1,0 +1,35 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "rag-security-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE RAG and Retrieval Security Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.RAG.RETRIEVAL_AUTHORIZATION_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.RAG.PROVENANCE_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.RAG.CONTENT_TRUST_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.RAG.RESULT_SET_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.RAG.PROTECTED_DOCUMENT_NONDISCLOSURE",
+      "requirement": "CONDITIONAL"
+    }
+  ]
+}

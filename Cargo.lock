@@ -436,6 +436,7 @@ dependencies = [
  "dare-memory-security",
  "dare-product",
  "dare-prompt-injection",
+ "dare-rag-security",
  "dare-security-evidence",
  "dare-tool-security",
  "jsonschema",
@@ -612,6 +613,25 @@ version = "1.0.0-rc1"
 dependencies = [
  "dare-adversarial",
  "dare-coverage",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "time",
+]
+
+[[package]]
+name = "dare-rag-security"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-adversarial",
+ "dare-coverage",
+ "dare-identity-security",
+ "dare-memory-security",
+ "dare-prompt-injection",
  "dare-security-evidence",
  "jsonschema",
  "serde",

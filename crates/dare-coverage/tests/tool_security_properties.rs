@@ -53,6 +53,11 @@ fn facts(tools: bool, metadata: bool, output: bool, chaining: bool) -> Assessmen
         memory_recall_present: false,
         memory_lifecycle_present: false,
         memory_namespace_present: false,
+        retrieval_trace_present: false,
+        retrieval_policy_present: false,
+        document_acl_present: false,
+        retrieval_provenance_present: false,
+        retrieval_tenant_context_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }

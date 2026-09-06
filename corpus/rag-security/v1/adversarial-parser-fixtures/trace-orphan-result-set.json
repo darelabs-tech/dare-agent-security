@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "RAG-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "trials": [
+    {
+      "result_sets": [
+        {
+          "request_id": "query-never-made",
+          "requester_principal_id": "user-7",
+          "results": [
+            "mem-preference"
+          ],
+          "at": 150
+        }
+      ]
+    }
+  ]
+}

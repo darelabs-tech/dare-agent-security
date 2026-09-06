@@ -1637,6 +1637,580 @@ jobs:
           test -f .dare-agent-security/regression-mcp-016/coverage-report.json
           test ! -f .dare-agent-security/regression-mcp-016/risk-family-coverage.json
 
+  rag-security-2026:
+    name: Cycle 017 RAG and Retrieval security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (schemas, enums, invariants, bounds, adapters)
+        run: cargo test -p dare-rag-security --lib -- --nocapture
+      - name: The 24 RAG-LAB fixtures end to end
+        run: cargo test -p dare-rag-security --test lab_scenarios -- --nocapture
+      - name: Hostile parser fixtures fail closed
+        run: cargo test -p dare-rag-security --test hostile_fixtures -- --nocapture
+      - name: Independent multi-violation capture and redaction hygiene
+        run: cargo test -p dare-rag-security --test violations_and_hygiene -- --nocapture
+      - name: Offline, confidential and no-remote-retriever regressions
+        run: cargo test -p dare-rag-security --test offline_confidential -- --nocapture
+      - name: RAG-security profile and coverage integration
+        run: cargo test -p dare-coverage --test rag_security_profile -- --nocapture
+      - name: RAG-security properties and standards provenance
+        run: |
+          cargo test -p dare-coverage --test rag_security_properties -- --nocapture
+          cargo test -p dare-coverage --lib rag_security_standards -- --nocapture
+      - name: Additive product metadata and bounded-claim wording
+        run: cargo test -p dare-product --lib rag_security_metadata -- --nocapture
+      - name: CLI flag surface (no store, provider, credential or remote flag)
+        run: cargo test -p dare-agent-security --lib rag_security -- --nocapture
+      - name: CLI end-to-end matrix and product reporting bridge
+        run: |
+          cargo test -p dare-agent-security --test rag_security_cli -- --nocapture
+          cargo test -p dare-agent-security --test rag_security_product -- --nocapture
+
+      - name: Corpus, scenarios and hostile fixtures are generated, not hand-edited
+        run: |
+          python scripts/gen-rag-security-corpus.py --check
+          python scripts/gen-rag-security-scenarios.py --check
+          python scripts/gen-rag-security-hostile-fixtures.py --check
+
+      - name: Offline CLI - an authorized retrieval stays inside every boundary
+        run: |
+          rm -rf .dare-agent-security/cycle017-benign
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-benign
+          test -f .dare-agent-security/cycle017-benign/rag-security-result.json
+          test -f .dare-agent-security/cycle017-benign/rag-security-trials.json
+          test -f .dare-agent-security/cycle017-benign/rag-security-evidence.json
+          test -f .dare-agent-security/cycle017-benign/summary.md
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-benign/rag-security-result.json \
+            verdict=PASS class=DOCUMENT_ISOLATION mode=SIMULATED synthetic=true \
+            invariant=RETRIEVAL_TENANT_BOUNDARY_PRESERVED \
+            property_id=AGENT.RAG.TENANT_DOCUMENT_ISOLATION \
+            trials_planned=3 trials_executed=3 \
+            stop_reason.reason=PLAN_COMPLETED redaction_state=REDACTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            acting_principal_id=user-7 tenant_id=tenant-a \
+            store_id=store-support policy_id=policy-support-retrieval \
+            objective_id=objective-answer-ticket \
+            --present scenario_digest store_digest context_digest policy_digest \
+                      document_digests chunk_digests
+
+      - name: A document from another tenant is a finding, however relevant
+        run: |
+          rm -rf .dare-agent-security/cycle017-tenant
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-002 \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/cycle017-tenant
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a cross-tenant result, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-tenant/rag-security-result.json \
+            verdict=FAIL class=DOCUMENT_ISOLATION mode=LOCAL_SYNTHETIC \
+            invariant=RETRIEVAL_TENANT_BOUNDARY_PRESERVED \
+            stop_reason.reason=FIRST_FAIL trials_executed=1 \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: A document outside the allowed set fails, and so does a bypassed filter
+        run: |
+          for pair in "RAG-LAB-004:cycle017-acl:DOCUMENT_ACL_ENFORCED" \
+                      "RAG-LAB-006:cycle017-filter:METADATA_FILTER_ENFORCED"; do
+            lab="${pair%%:*}"
+            rest="${pair#*:}"
+            dir="${rest%%:*}"
+            invariant="${rest##*:}"
+            rm -rf ".dare-agent-security/$dir"
+            set +e
+            cargo run -p dare-agent-security -- validate rag-security \
+              --scenario "$lab" \
+              --mode simulated \
+              --output-dir ".dare-agent-security/$dir"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $lab, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py \
+              ".dare-agent-security/$dir/rag-security-result.json" \
+              verdict=FAIL class=DOCUMENT_ISOLATION "invariant=$invariant"
+          done
+
+      - name: Provenance detached from returned content is a finding, not a gap
+        run: |
+          rm -rf .dare-agent-security/cycle017-provenance
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-008 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-provenance
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for detached provenance, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-provenance/rag-security-result.json \
+            verdict=FAIL class=PROVENANCE \
+            invariant=RETRIEVAL_PROVENANCE_PRESERVED \
+            trials.0.verdict=FAIL
+
+      - name: A result that was never a candidate, and a result set past top-k
+        run: |
+          for pair in "RAG-LAB-010:cycle017-candidates:RESULT_SET_WITHIN_APPROVED_CANDIDATES" \
+                      "RAG-LAB-012:cycle017-topk:TOP_K_BOUND_PRESERVED"; do
+            lab="${pair%%:*}"
+            rest="${pair#*:}"
+            dir="${rest%%:*}"
+            invariant="${rest##*:}"
+            rm -rf ".dare-agent-security/$dir"
+            set +e
+            cargo run -p dare-agent-security -- validate rag-security \
+              --scenario "$lab" \
+              --mode simulated \
+              --output-dir ".dare-agent-security/$dir"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $lab, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py \
+              ".dare-agent-security/$dir/rag-security-result.json" \
+              verdict=FAIL class=RESULT_INTEGRITY "invariant=$invariant" \
+              budget.state_changes=0 budget.external_egress_bytes=0
+          done
+
+      - name: Retrieving untrusted content does not make it authoritative
+        run: |
+          rm -rf .dare-agent-security/cycle017-trust
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-014 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-trust
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an observed trust promotion, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-trust/rag-security-result.json \
+            verdict=FAIL class=CONTENT_TRUST \
+            invariant=UNTRUSTED_RETRIEVED_CONTENT_NOT_PROMOTED_TO_AUTHORITY
+
+      - name: A protected document ranked first is still a disclosure
+        run: |
+          rm -rf .dare-agent-security/cycle017-protected
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-016 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-protected
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a disclosed protected document, got $code"
+            exit 1
+          fi
+          # The document is staged at the top of the ranking on purpose. The
+          # verdict must turn on the boundary and say nothing about the score,
+          # because that is the whole claim of this cycle.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-protected/rag-security-result.json \
+            verdict=FAIL class=PROTECTED_NONDISCLOSURE \
+            invariant=PROTECTED_DOCUMENT_NOT_RETRIEVED
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle017-protected/rag-security-result.json \
+            --contains 'protected document' \
+            --forbidden 'score was too high' 'ranked too highly' 'similarity threshold'
+
+      - name: A broadened retrieval must not widen the authority it runs under
+        run: |
+          for pair in "RAG-LAB-018:cycle017-fallback:RETRIEVAL_FALLBACK_DOES_NOT_WIDEN_AUTHORITY" \
+                      "RAG-LAB-020:cycle017-collection:RETRIEVAL_COLLECTION_BOUNDARY_PRESERVED"; do
+            lab="${pair%%:*}"
+            rest="${pair#*:}"
+            dir="${rest%%:*}"
+            invariant="${rest##*:}"
+            rm -rf ".dare-agent-security/$dir"
+            set +e
+            cargo run -p dare-agent-security -- validate rag-security \
+              --scenario "$lab" \
+              --mode simulated \
+              --output-dir ".dare-agent-security/$dir"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $lab, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py \
+              ".dare-agent-security/$dir/rag-security-result.json" \
+              verdict=FAIL class=RETRIEVAL_AUTHORIZATION "invariant=$invariant"
+          done
+
+      - name: Retrieval without promotion passes only on positive evidence
+        run: |
+          rm -rf .dare-agent-security/cycle017-nopromotion
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-013 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-nopromotion
+          # The PASS rests on recorded non-promotion observations, not on the
+          # absence of a finding. An empty trial would be INCONCLUSIVE instead.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-nopromotion/rag-security-result.json \
+            verdict=PASS class=CONTENT_TRUST \
+            --all "trials.*.coverage_satisfied=true" --min-matches 1
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-nopromotion/rag-security-result.json \
+            --all "trials.*.events.*.changed=false" --min-matches 1
+
+      - name: Absence of evidence is INCONCLUSIVE, never PASS and never FAIL
+        run: |
+          rm -rf .dare-agent-security/cycle017-inconclusive
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-021 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-inconclusive
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an inconclusive run, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-inconclusive/rag-security-result.json \
+            verdict=INCONCLUSIVE \
+            --all "trials.*.verdict=INCONCLUSIVE" --min-matches 1
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-inconclusive/rag-security-result.json \
+            --all "trials.*.coverage_satisfied=false" --min-matches 1
+
+      - name: Independent violations are all recorded, never masked
+        run: |
+          rm -rf .dare-agent-security/cycle017-multi
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-022 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle017-multi
+          set -e
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-multi/rag-security-result.json \
+            verdict=FAIL --min-total "trials.*.violations=1"
+          # One CLI run evaluates the scenario's declared invariant, so a single
+          # artifact cannot show independence across invariants. LAB-022 stages
+          # tenant, chunk-binding and protected-document violations together and
+          # the crate suite (violations_and_hygiene) is where all three are
+          # asserted at once, along with the invariant that must stay unaffected.
+
+      - name: Replay reads only a local trace and stays offline
+        run: |
+          rm -rf .dare-agent-security/cycle017-replay
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-001 \
+            --mode replay \
+            --trace crates/dare-rag-security/tests/fixtures/traces/rag-lab-001.json \
+            --output-dir .dare-agent-security/cycle017-replay
+          # A replayed observation is still synthetic: every admitted trace
+          # declares itself so, and a report must not present it as production
+          # evidence.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-replay/rag-security-result.json \
+            mode=REPLAY synthetic=true verdict=PASS \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: A trace recorded against another scenario is refused
+        run: |
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-002 \
+            --mode replay \
+            --trace crates/dare-rag-security/tests/fixtures/traces/rag-lab-001.json \
+            --output-dir .dare-agent-security/cycle017-trace-mismatch
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "a trace from another scenario must not be replayed"
+            exit 1
+          fi
+          if [ -e .dare-agent-security/cycle017-trace-mismatch ]; then
+            echo "a refused run must write no artifact"
+            exit 1
+          fi
+
+      - name: An over-bound or smuggling scenario is refused before evaluation
+        run: |
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-023 \
+            --output-dir .dare-agent-security/cycle017-overbound
+          overbound_code=$?
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-024 \
+            --output-dir .dare-agent-security/cycle017-smuggling
+          smuggling_code=$?
+          set -e
+          for pair in "over-bound corpus:$overbound_code" "smuggled fixture:$smuggling_code"; do
+            label="${pair%%:*}"
+            code="${pair##*:}"
+            if [ "$code" -ne 3 ]; then
+              echo "a refused scenario ($label) must exit 3, got $code"
+              exit 1
+            fi
+          done
+          for dir in cycle017-overbound cycle017-smuggling; do
+            if [ -e ".dare-agent-security/$dir" ]; then
+              echo "a refused run must write no artifact ($dir)"
+              exit 1
+            fi
+          done
+
+      - name: Trial hard maximum is enforced and never clamped upward
+        run: |
+          rm -rf .dare-agent-security/cycle017-bounds .dare-agent-security/cycle017-bounds-ok
+          set +e
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-001 --trials 11 \
+            --output-dir .dare-agent-security/cycle017-bounds
+          over_code=$?
+          set -e
+          if [ "$over_code" -eq 0 ]; then
+            echo "--trials 11 must be refused"
+            exit 1
+          fi
+          if [ -e .dare-agent-security/cycle017-bounds ]; then
+            echo "a refused run must write no artifact"
+            exit 1
+          fi
+          cargo run -p dare-agent-security -- validate rag-security \
+            --scenario RAG-LAB-001 --trials 10 \
+            --output-dir .dare-agent-security/cycle017-bounds-ok
+          # The scenario asks for at most 4 results per query, tighter than the
+          # hard maximum of 16, and the plan honours the narrower of the two. A
+          # scenario may always narrow a bound; nothing can widen one, which is
+          # what the --trials 11 refusal above establishes. The run-wide query
+          # ceiling stays at its hard value and does not reset per trial.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle017-bounds-ok/rag-security-result.json \
+            trials_planned=10 \
+            budget.max_total_queries=24 \
+            budget.result_bound_per_query=4 \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: Store, provider, credential and remote flags do not exist
+        run: |
+          set +e
+          for flag in --url --endpoint --pinecone --weaviate --qdrant --redis \
+                      --postgres --opensearch --elasticsearch --api-key --token \
+                      --connection-string --remote --command --provider --index \
+                      --embedding-model; do
+            cargo run -p dare-agent-security -- validate rag-security \
+              --scenario RAG-LAB-001 "$flag" placeholder \
+              --output-dir .dare-agent-security/cycle017-flag >/dev/null 2>&1
+            flag_code=$?
+            if [ "$flag_code" -eq 0 ]; then
+              set -e
+              echo "$flag must not be accepted by this capability"
+              exit 1
+            fi
+          done
+          set -e
+          echo "no store, provider, credential or remote flag is accepted"
+
+      - name: No live or remote retrieval mode can be selected
+        run: |
+          set +e
+          for mode in live remote provider vector-db http production pinecone \
+                      elasticsearch; do
+            cargo run -p dare-agent-security -- validate rag-security \
+              --scenario RAG-LAB-001 --mode "$mode" \
+              --output-dir .dare-agent-security/cycle017-mode >/dev/null 2>&1
+            mode_code=$?
+            if [ "$mode_code" -eq 0 ]; then
+              set -e
+              echo "--mode $mode must not be accepted"
+              exit 1
+            fi
+          done
+          set -e
+          echo "only replay, simulated and local-synthetic are selectable"
+
+      - name: Report wording carries no universal RAG-security claim
+        run: |
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle017-*/summary.md' \
+            --min-files 15 \
+            --contains 'no result here should be read as a claim of universal RAG security' \
+            --forbidden 'RAG Secure' 'Vector Database Secure' 'No Leakage Possible' \
+                        'Fully Protected' 'No Retrieval Attack Possible' 'Immune' \
+                        'guaranteed secure' 'leakage impossible' 'LLM09 compliant'
+
+      - name: The approved bounded wording is used verbatim on a pass
+        run: |
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle017-benign/summary.md \
+            --contains 'No RAG/retrieval-security invariant violation was observed for the tested vectors under the recorded conditions'
+
+      - name: Summaries report each surface separately and name untested ones
+        run: |
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle017-benign/summary.md \
+            --row '| RETRIEVAL_AUTHORIZATION | NOT TESTED |' \
+                  '| DOCUMENT_ISOLATION | TESTED |' \
+                  '| PROVENANCE | NOT TESTED |' \
+                  '| RESULT_INTEGRITY | NOT TESTED |' \
+                  '| CONTENT_TRUST | NOT TESTED |' \
+                  '| PROTECTED_NONDISCLOSURE | NOT TESTED |' \
+                  '| Synthetic observations | yes |' \
+                  '| Documents indexed | 0 |' \
+                  '| Embeddings computed | 0 |' \
+                  '| State changes | 0 |' \
+                  '| External egress bytes | 0 |'
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle017-protected/summary.md \
+            --row '| PROTECTED_NONDISCLOSURE | TESTED |' \
+                  '| DOCUMENT_ISOLATION | NOT TESTED |'
+          python scripts/assert-text.py \
+            .dare-agent-security/cycle017-replay/summary.md \
+            --row '| Mode | REPLAY |' \
+                  '| Synthetic observations | yes |'
+
+      - name: Every summary states the relation and the neighbouring cycles
+        run: |
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle017-*/summary.md' \
+            --min-files 15 \
+            --contains 'similarity match is not a permission' \
+            --forbidden 'instruction following validated' 'memory validated' \
+                        'prompt injection validated' 'token verification validated'
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle017-*/summary.md' \
+            --min-files 15 \
+            --contains 'No embedding was computed or compared'
+
+      - name: No artifact leaks a canary, credential or store endpoint
+        run: |
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle017-*/*' \
+            --min-files 60 \
+            --secret-markers
+          python scripts/assert-text.py \
+            --glob '.dare-agent-security/cycle017-*/*.json' \
+            --min-files 45 \
+            --forbidden 'redis://' 'postgresql://' 'mongodb://' 'connection_string' \
+                        'api_key' 'access_token' 'client_secret' \
+                        'pinecone.io' 'qdrant.tech' 'example.invalid'
+
+      - name: Memory Security regression (Cycle 016)
+        run: |
+          cargo test -p dare-memory-security -- --nocapture
+          cargo test -p dare-coverage --test memory_security_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-memory-017
+          cargo run -p dare-agent-security -- validate memory-security \
+            --scenario MEMORY-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-memory-017
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-memory-017/memory-security-result.json \
+            verdict=PASS mode=SIMULATED
+          # Retrieval is not memory. Cycle 016 must still report zero memory
+          # writes after Cycle 017 exists alongside it.
+          python scripts/assert-text.py \
+            .dare-agent-security/regression-memory-017/summary.md \
+            --row '| Memory items written | 0 |'
+
+      - name: Identity Security regression (Cycle 015)
+        run: |
+          cargo test -p dare-identity-security -- --nocapture
+          cargo test -p dare-coverage --test identity_security_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-identity-017
+          cargo run -p dare-agent-security -- validate identity-security \
+            --scenario IDENTITY-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-identity-017
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-identity-017/identity-security-result.json \
+            verdict=PASS mode=SIMULATED
+
+      - name: Tool Security regression (Cycle 014)
+        run: |
+          cargo test -p dare-tool-security -- --nocapture
+          cargo test -p dare-coverage --test tool_security_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-tool-security-017
+          cargo run -p dare-agent-security -- validate tool-security \
+            --scenario TOOL-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-tool-security-017
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-tool-security-017/tool-security-result.json \
+            verdict=PASS mode=SIMULATED
+
+      - name: Prompt Injection regression (Cycle 013)
+        run: |
+          cargo test -p dare-prompt-injection -- --nocapture
+          cargo test -p dare-coverage --test prompt_injection_profile -- --nocapture
+          rm -rf .dare-agent-security/regression-prompt-injection-017
+          cargo run -p dare-agent-security -- validate prompt-injection \
+            --scenario PI-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/regression-prompt-injection-017
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-prompt-injection-017/prompt-injection-result.json \
+            verdict=PASS mode=SIMULATED
+
+      - name: Adversarial and evidence regression (Cycles 009 and 001)
+        run: |
+          cargo test -p dare-adversarial -- --nocapture
+          cargo test -p dare-security-evidence -- --nocapture
+
+      - name: Agentic baseline regression (Cycle 012)
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          rm -rf .dare-agent-security/regression-agentic-017
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile agentic-security-baseline-2026 \
+            --facts fixtures/coverage/agentic-all-capabilities.json \
+            --output-dir .dare-agent-security/regression-agentic-017
+          test -f .dare-agent-security/regression-agentic-017/coverage-report.json
+          # Six AGENT.RAG.* properties were added and none of them created an
+          # eleventh risk family: retrieval is not an Agentic risk family, and
+          # neither is LLM09.
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-agentic-017/risk-family-coverage.json \
+            --count "=10" \
+            --all "*.properties=1" --min-matches 10
+
+      - name: No untested risk family renders as SECURE
+        run: |
+          python scripts/assert-risk-family-state.py \
+            .dare-agent-security/regression-agentic-017/risk-family-coverage.json
+
+      - name: MCP baseline regression
+        run: |
+          rm -rf .dare-agent-security/regression-mcp-017
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-security-baseline \
+            --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+            --output-dir .dare-agent-security/regression-mcp-017
+          test -f .dare-agent-security/regression-mcp-017/coverage-report.json
+          test ! -f .dare-agent-security/regression-mcp-017/risk-family-coverage.json
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

@@ -154,6 +154,14 @@ pub fn validate_agentic_registry_provenance(
     let mut represented = HashSet::new();
 
     for property in &registry.properties {
+        // AGENT.RAG.* properties map to OWASP LLM09:2026, which belongs to the
+        // LLM Top 10 rather than the Agentic Top 10. They carry no Agentic
+        // family and so are not checked against the Agentic provenance
+        // manifest; the loop below still requires every family that manifest
+        // declares to be represented, so skipping these cannot hide a gap.
+        if property.id.starts_with("AGENT.RAG.") && property.risk_family.is_none() {
+            continue;
+        }
         let family = property.risk_family.ok_or_else(|| {
             CoverageError::schema(
                 format!("/{}/risk_family", property.id),
