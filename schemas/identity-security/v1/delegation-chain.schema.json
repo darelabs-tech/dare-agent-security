@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/delegation-chain.schema.json",
+  "title": "DARE Identity Security Delegation Chain v1",
+  "description": "A bounded, acyclic delegation chain. Edges are declarative: no delegation token, assertion signature or credential is stored or accepted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "chain_id",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "chain_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "edges": {
+      "description": "Bounded at the approved hard maximum of 12 edges.",
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edge_id",
+          "kind",
+          "delegator_principal_id",
+          "delegatee_principal_id",
+          "authority_ceiling_id"
+        ],
+        "properties": {
+          "edge_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "minLength": 2,
+            "maxLength": 96
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ON_BEHALF_OF",
+              "AGENT_HANDOFF",
+              "SERVICE_DELEGATION"
+            ]
+          },
+          "delegator_principal_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "delegatee_principal_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "delegated_subject_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "authority_ceiling_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "purpose_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "audience": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          },
+          "validity": {
+            "description": "Half-open window in synthetic logical time. Never a wall clock.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "valid_from",
+              "valid_until"
+            ],
+            "properties": {
+              "valid_from": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "valid_until": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "IDENTITY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "trials": [
+    {
+      "principals": [
+        {
+          "role": "INITIATING",
+          "principal_id": "user-7",
+          "kind": "HUMAN"
+        }
+      ],
+      "final_operations": [
+        {
+          "operation_id": "op-1",
+          "subject_id": "user-7",
+          "action": "read",
+          "resource_id": "document-123",
+          "resource_type": "document",
+          "tenant_id": "tenant-a",
+          "dispatched": true
+        }
+      ]
+    }
+  ]
+}

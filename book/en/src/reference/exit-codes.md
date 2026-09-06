@@ -78,3 +78,15 @@ Categorized errors print as `[category] message`, where category is one of:
 | 1 | Harness, schema, serialization, or I/O error. |
 | 2 | Regression gate failed or requires explicit review. |
 | 3 | Usage or safety refusal, including any implicit dynamic approval. |
+
+## `validate identity-security`
+
+| Code | Meaning |
+|---|---|
+| 0 | No identity-security invariant violation was observed for the tested vectors. |
+| 1 | Harness or environment error. |
+| 2 | A deterministic invariant violation was observed, or evidence was inconclusive. |
+| 3 | Usage error or safety refusal. |
+
+A refusal writes no artifact and is never a verdict about the scenario it
+declined to run.

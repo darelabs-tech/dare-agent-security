@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/trace.schema.json",
+  "title": "DARE Identity Security Replay Trace v1",
+  "description": "A sanitized, local, previously recorded identity and authorization trace. Replay evaluates what a trace says was observed; it never contacts an identity provider, authorization server or resource, and it never performs an operation. The trace carries observations only: it declares no verdict, and any field that would let it dictate one is rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trace_id",
+    "scenario_id",
+    "mode",
+    "synthetic",
+    "trials"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "trace_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "scenario_id": {
+      "description": "The scenario this trace was recorded against. Replay refuses a trace recorded against a different scenario.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "mode": {
+      "description": "Fixed. A trace can only ever be replayed.",
+      "const": "REPLAY"
+    },
+    "synthetic": {
+      "description": "Fixed. Every Cycle 015 trace is synthetic; a trace claiming to be production evidence is refused.",
+      "const": true
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "trials": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/$defs/trial"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "principals": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "role",
+              "principal_id",
+              "kind"
+            ],
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "INITIATING",
+                  "EFFECTIVE",
+                  "AGENT",
+                  "DELEGATED_SUBJECT",
+                  "RESOURCE_OWNER"
+                ]
+              },
+              "principal_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "HUMAN",
+                  "AGENT",
+                  "WORKLOAD",
+                  "SERVICE"
+                ]
+              },
+              "tenant_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "effective_authorities": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "principal_id",
+              "authority_id"
+            ],
+            "properties": {
+              "principal_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "authority_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "source_ceiling_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "delegation_edges": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "edge_id",
+              "kind",
+              "delegator_principal_id",
+              "delegatee_principal_id",
+              "authority_ceiling_id"
+            ],
+            "properties": {
+              "edge_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "ON_BEHALF_OF",
+                  "AGENT_HANDOFF",
+                  "SERVICE_DELEGATION"
+                ]
+              },
+              "delegator_principal_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "delegatee_principal_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "delegated_subject_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "authority_ceiling_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "delegation_assertions": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "asserted_by_principal_id",
+              "backed_by_declared_chain"
+            ],
+            "properties": {
+              "asserted_by_principal_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "delegated_subject_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "purpose_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "backed_by_declared_chain": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "resources": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "https://darelabs.tech/schemas/identity-security/v1/resource-context.schema.json"
+          }
+        },
+        "credential_contexts": {
+          "description": "Synthetic credential metadata only. Capability labels describe what a runtime identity could do; they grant nothing, and no secret material may appear here.",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "credential_context_id",
+              "owner_principal_id"
+            ],
+            "properties": {
+              "credential_context_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "owner_principal_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "capability_labels": {
+                "type": "array",
+                "maxItems": 16,
+                "items": {
+                  "type": "string",
+                  "maxLength": 64
+                }
+              },
+              "tenant_labels": {
+                "type": "array",
+                "maxItems": 16,
+                "items": {
+                  "type": "string",
+                  "maxLength": 64
+                }
+              },
+              "capability_authority_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "authorization_decisions": {
+          "description": "Decisions name the operation they were made about. The binding digest is computed from that operation during normalization, never read from the trace.",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "decision_id",
+              "effect",
+              "subject_id",
+              "policy_digest",
+              "bound_operation_id"
+            ],
+            "properties": {
+              "decision_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "effect": {
+                "type": "string",
+                "enum": [
+                  "PERMIT",
+                  "DENY"
+                ]
+              },
+              "subject_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "policy_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "bound_operation_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "issued_at": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "operation_requests": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "https://darelabs.tech/schemas/identity-security/v1/operation.schema.json"
+          }
+        },
+        "final_operations": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "https://darelabs.tech/schemas/identity-security/v1/operation.schema.json"
+          }
+        },
+        "policy_decisions": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operation_key",
+              "effect"
+            ],
+            "properties": {
+              "operation_key": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "maxLength": 160
+              },
+              "effect": {
+                "type": "string",
+                "enum": [
+                  "PERMIT",
+                  "DENY"
+                ]
+              },
+              "policy_id": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "harness_error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "detail"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "ADAPTER_FAILURE",
+                "MALFORMED_TRACE",
+                "BUDGET_EXHAUSTED",
+                "TIMEOUT",
+                "SCHEMA_VIOLATION",
+                "KILL_SWITCH_TRIGGERED"
+              ]
+            },
+            "detail": {
+              "type": "string",
+              "maxLength": 512
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/authorization.schema.json",
+  "title": "DARE Identity Security Authorization Policy v1",
+  "description": "A provider-neutral declarative authorization policy. Set constraints only: no rule expression, no PDP call and no AuthZEN request. Resemblance to a Subject-Action-Resource-Context model is not conformance with it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "objective_id"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "objective_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "subjects": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "actions": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "resource_types": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "tenants": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "purposes": {
+      "description": "One authority dimension. ANY must be written explicitly; an omitted dimension permits nothing, because absence of a rule is never permission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "constraint": {
+              "const": "ANY"
+            }
+          },
+          "required": [
+            "constraint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "constraint": {
+              "const": "ONLY"
+            },
+            "values": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+              }
+            }
+          },
+          "required": [
+            "constraint",
+            "values"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,127}$"
+          }
+        }
+      }
+    },
+    "denied_operation_keys": {
+      "description": "Operation keys the policy declares denied, as resource_type.action.",
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+([-_][a-z0-9]+)*\\.[a-z0-9]+([-_][a-z0-9]+)*$",
+        "maxLength": 96
+      }
+    }
+  }
+}

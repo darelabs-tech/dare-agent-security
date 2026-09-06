@@ -1,0 +1,51 @@
+cycle: "015-identity-privilege-delegation-security"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+approved_at: 2026-09-05
+base_branch: main
+baseline_commit: 2f9c02b4f4f94daa5478a0785f74814fb2d021a2
+branch: agent/cycle-015-identity-privilege-delegation-security
+approval_file: DARE/cycles/015-identity-privilege-delegation-security/APPROVAL.md
+
+tasks:
+  - {id: task-001, depends_on: [], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-001.md}
+  - {id: task-002, depends_on: [task-001], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-002.md}
+  - {id: task-003, depends_on: [task-001, task-002], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-003.md}
+  - {id: task-004, depends_on: [task-003], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-004.md}
+  - {id: task-005, depends_on: [task-003, task-004], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-005.md}
+  - {id: task-006, depends_on: [task-004, task-005], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-006.md}
+  - {id: task-007, depends_on: [task-004], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-007.md}
+  - {id: task-008, depends_on: [task-004, task-005, task-007], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-008.md}
+  - {id: task-009, depends_on: [task-004, task-005, task-007, task-008], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-009.md}
+  - {id: task-010, depends_on: [task-004, task-005, task-006, task-007, task-008, task-009], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-010.md}
+  - {id: task-011, depends_on: [task-003, task-004, task-006, task-010], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-011.md}
+  - {id: task-012, depends_on: [task-004, task-005, task-006, task-007, task-008, task-009, task-010, task-011], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-012.md}
+  - {id: task-013, depends_on: [task-004, task-005, task-006, task-007, task-008, task-009], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-013.md}
+  - {id: task-014, depends_on: [task-013], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-014.md}
+  - {id: task-015, depends_on: [task-013, task-014], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-015.md}
+  - {id: task-016, depends_on: [task-005, task-013, task-014, task-015], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-016.md}
+  - {id: task-017, depends_on: [task-006, task-013, task-014, task-015, task-016], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-017.md}
+  - {id: task-018, depends_on: [task-008, task-009, task-012, task-013, task-014, task-015], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-018.md}
+  - {id: task-019, depends_on: [task-010, task-012, task-015, task-016, task-017, task-018], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-019.md}
+  - {id: task-020, depends_on: [task-010, task-012, task-013, task-014, task-015, task-019], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-020.md}
+  - {id: task-021, depends_on: [task-012, task-013, task-014, task-015, task-019], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-021.md}
+  - {id: task-022, depends_on: [task-015, task-018, task-019, task-020, task-021], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-022.md}
+  - {id: task-023, depends_on: [task-010, task-011, task-014, task-015, task-016, task-017], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-023.md}
+  - {id: task-024, depends_on: [task-007, task-010, task-011, task-014, task-015, task-016], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-024.md}
+  - {id: task-025, depends_on: [task-008, task-009, task-010, task-014, task-015, task-018], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-025.md}
+  - {id: task-026, depends_on: [task-023, task-024, task-025], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-026.md}
+  - {id: task-027, depends_on: [task-010, task-011, task-012, task-019], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-027.md}
+  - {id: task-028, depends_on: [task-013, task-015, task-023, task-024, task-025, task-026, task-027], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-028.md}
+  - {id: task-029, depends_on: [task-012, task-015, task-018, task-019, task-020, task-021, task-022, task-028], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-029.md}
+  - {id: task-030, depends_on: [task-003, task-029], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-030.md}
+  - {id: task-031, depends_on: [task-020, task-021, task-022, task-029, task-030], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-031.md}
+  - {id: task-032, depends_on: [task-029, task-030, task-031], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-032.md}
+  - {id: task-033, depends_on: [task-023, task-024, task-025, task-026, task-027, task-028, task-030, task-031, task-032], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-033.md}
+  - {id: task-034, depends_on: [task-030, task-031, task-032, task-033], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-034.md}
+  - {id: task-035, depends_on: [task-033, task-034], spec_file: DARE/cycles/015-identity-privilege-delegation-security/EXECUTION/task-035.md}
+
+execution_gate:
+  approval_file_present: true
+  execution_authorized: true
+  required_pre_pr_local_workflow_job: identity-security-2026
+  pr_open_only_after_local_gates_green: true

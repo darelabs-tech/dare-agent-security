@@ -17,6 +17,7 @@
 - [Validation Modes](concepts/validation.md)
 - [Prompt Injection Validation](concepts/prompt-injection.md)
 - [Tool Security Validation](concepts/tool-security.md)
+- [Identity, Privilege and Delegation Validation](concepts/identity-security.md)
 
 # Commands
 
@@ -62,5 +63,6 @@
 - [Adding Security Properties](reference/adding-security-properties.md)
 - [Extending Prompt Injection Validation](reference/extending-prompt-injection.md)
 - [Extending Tool Security Validation](reference/extending-tool-security.md)
+- [Extending Identity Security Validation](reference/extending-identity-security.md)
 
 [Troubleshooting](troubleshooting.md)

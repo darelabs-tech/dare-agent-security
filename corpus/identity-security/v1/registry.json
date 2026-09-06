@@ -1,0 +1,200 @@
+{
+  "schema_version": "1",
+  "corpus_id": "identity-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 015 identity, privilege and delegation corpus",
+  "entries": [
+    {
+      "id": "principal-initiating-substituted",
+      "class": "IDENTITY_ATTACK",
+      "path": "principal-binding/principal-initiating-substituted.json",
+      "digest": "sha256:cbb4690295bab890f97f0329deace722b5c17e7ddfbbba31400c9284ccfd3c7c"
+    },
+    {
+      "id": "principal-agent-substituted-for-user",
+      "class": "IDENTITY_ATTACK",
+      "path": "principal-binding/principal-agent-substituted-for-user.json",
+      "digest": "sha256:fa2f344d599fe6fe560b9fd1f8bb18edb7a456d432495992d55ebe981d2af555"
+    },
+    {
+      "id": "principal-service-identity-acts-for-user",
+      "class": "IDENTITY_ATTACK",
+      "path": "principal-binding/principal-service-identity-acts-for-user.json",
+      "digest": "sha256:a60055fee4396601174d95e56c5833691d6c2f89c5177c00e271b7eafc716fae"
+    },
+    {
+      "id": "delegation-obo-subject-mismatch",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/delegation-obo-subject-mismatch.json",
+      "digest": "sha256:0db55d878fae7b3269b39c0afc18936fa58b3605f066511b5a5cd058a359d870"
+    },
+    {
+      "id": "delegation-unbacked-assertion",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/delegation-unbacked-assertion.json",
+      "digest": "sha256:5d08482b13859dda21dc8318262383a52f04f9d1e1cbacc1cf42a7ef0aee172d"
+    },
+    {
+      "id": "delegation-scope-exceeded",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/delegation-scope-exceeded.json",
+      "digest": "sha256:617634bc0834e66a64cb11b440ce922ef0c52a748d520b441eb22b3976e7a33e"
+    },
+    {
+      "id": "delegation-chain-amplified-privilege",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/delegation-chain-amplified-privilege.json",
+      "digest": "sha256:006c7d1517caafb49819b8d413e4923f4dfbc0ada89c2e2bc70d475a8bb6317d"
+    },
+    {
+      "id": "delegation-expired-at-use",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/delegation-expired-at-use.json",
+      "digest": "sha256:58d7230b9d8c50166d3bcd41419ff5f5565780994258e68fcf657beadb72d7a7"
+    },
+    {
+      "id": "privilege-effective-above-ceiling",
+      "class": "IDENTITY_ATTACK",
+      "path": "privilege/privilege-effective-above-ceiling.json",
+      "digest": "sha256:32b9144ca383c4bb38d594d28514a684edead3b044bf42ab24ea26fe33927623"
+    },
+    {
+      "id": "privilege-credential-expands-authority",
+      "class": "IDENTITY_ATTACK",
+      "path": "privilege/privilege-credential-expands-authority.json",
+      "digest": "sha256:504879e6ed593a7f7ad41621ba4cd8fcf462c859b1df7f214856513c6da94508"
+    },
+    {
+      "id": "privilege-readonly-user-inherits-runtime-admin",
+      "class": "IDENTITY_ATTACK",
+      "path": "privilege/privilege-readonly-user-inherits-runtime-admin.json",
+      "digest": "sha256:3e71cda4c6a858070af828f7badc27bdfda6a15995f082b4dec024047a9ef8b3"
+    },
+    {
+      "id": "tenant-cross-tenant-intent",
+      "class": "IDENTITY_ATTACK",
+      "path": "tenant-resource/tenant-cross-tenant-intent.json",
+      "digest": "sha256:bb4d761972a9499d23c25bae47eb6664c382e5065c9603007befb5df12994ef7"
+    },
+    {
+      "id": "tenant-confused-deputy-service-credential",
+      "class": "IDENTITY_ATTACK",
+      "path": "tenant-resource/tenant-confused-deputy-service-credential.json",
+      "digest": "sha256:e6335a31b875092030b2de2b4ddcb53be90e6295a724000c3cbcb5f7018fa0ab"
+    },
+    {
+      "id": "resource-owner-mismatch",
+      "class": "IDENTITY_ATTACK",
+      "path": "tenant-resource/resource-owner-mismatch.json",
+      "digest": "sha256:d9e3cea56da3eac511039719ae2134f85247d10e5a599485fca809ab26ec9ca1"
+    },
+    {
+      "id": "authorization-post-permit-resource-mutation",
+      "class": "IDENTITY_ATTACK",
+      "path": "authorization-binding/authorization-post-permit-resource-mutation.json",
+      "digest": "sha256:4645c259742b5d9c5b3aa05c3432604470cd29f48288569579c01c1612c25367"
+    },
+    {
+      "id": "authorization-post-permit-argument-mutation",
+      "class": "IDENTITY_ATTACK",
+      "path": "authorization-binding/authorization-post-permit-argument-mutation.json",
+      "digest": "sha256:ee8f00ae8d4adeb5ddc7fdeb6f1b697d9d1f51b5b61259108833979eecc9c48e"
+    },
+    {
+      "id": "authorization-stale-permit-reused",
+      "class": "IDENTITY_ATTACK",
+      "path": "authorization-binding/authorization-stale-permit-reused.json",
+      "digest": "sha256:36ce173f068dc3ca278c23ba8a791d103ee09aad924ad6d951ce2c1ff36c2308"
+    },
+    {
+      "id": "authorization-deny-bypassed",
+      "class": "IDENTITY_ATTACK",
+      "path": "authorization-binding/authorization-deny-bypassed.json",
+      "digest": "sha256:3bc984b700bfa5172e2e5eabe7e5a9280ac6ede93b6a25d3436632f9054eb96b"
+    },
+    {
+      "id": "benign-initiating-principal-preserved",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-initiating-principal-preserved.json",
+      "digest": "sha256:9ac3c3f996eaf90ee7103214545ef484087fdb9fababf4cddd5b485e6798653d"
+    },
+    {
+      "id": "benign-user-authority-not-substituted",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-user-authority-not-substituted.json",
+      "digest": "sha256:35d261381f5e90e0abfc74f78efe6a403f8c50c5c94938916105a03bda9dfd4b"
+    },
+    {
+      "id": "benign-delegated-subject-preserved",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-delegated-subject-preserved.json",
+      "digest": "sha256:8ed27456a7f2a8a7738ca52e57390543835f37ceddd75a5385f7a9a40bb0886c"
+    },
+    {
+      "id": "benign-delegation-within-scope",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-delegation-within-scope.json",
+      "digest": "sha256:501dd6ac5eef1f4c5006b9f80438fd04341514404fff428e0a53ec6a171686c0"
+    },
+    {
+      "id": "benign-chain-narrows-authority",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-chain-narrows-authority.json",
+      "digest": "sha256:52aac4d8485a93530de0bd6b56d5a68e902f0d069743973860df54d37957bc5c"
+    },
+    {
+      "id": "benign-delegation-valid-at-use",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-delegation-valid-at-use.json",
+      "digest": "sha256:298bfbd5617fcdbc41bd4ffde9121087cd0f6e5edaf22d98a028eb48af3e8c51"
+    },
+    {
+      "id": "benign-effective-within-ceiling",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-effective-within-ceiling.json",
+      "digest": "sha256:01f998f26694e01292b0a7b2f2e0d82150480ac0924580a94662c08dbd856be2"
+    },
+    {
+      "id": "benign-credential-present-not-exercised",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-credential-present-not-exercised.json",
+      "digest": "sha256:31f7f7e38edd3759ce4d1f3a8ab575024ad99460a9ff4d179ad27a5576bf33ae"
+    },
+    {
+      "id": "benign-service-principal-within-delegated-ceiling",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-service-principal-within-delegated-ceiling.json",
+      "digest": "sha256:f0c0eb775cfd3883f513eadda8bf20232bf8042f178ee74953b42b6cc016f240"
+    },
+    {
+      "id": "benign-same-tenant-access",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-same-tenant-access.json",
+      "digest": "sha256:3d1364bcb9a7cbe9a63ee3a21ede2b7bf744bda8b9b341474a1a83a23ee5f2ca"
+    },
+    {
+      "id": "benign-correct-resource-owner",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-correct-resource-owner.json",
+      "digest": "sha256:2fcbf2aacc7cd0d493f5f8d40540f4705fca89a757c10340e2e0ac2b4b02168a"
+    },
+    {
+      "id": "benign-authorization-bound-operation",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-authorization-bound-operation.json",
+      "digest": "sha256:03f27872e8421fd34dfd31e850776d539f26c0645cbf7bfe2a374e46937ea8ce"
+    },
+    {
+      "id": "benign-deny-respected",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-deny-respected.json",
+      "digest": "sha256:b8a0605dfaaf206148eedcbe7ee15a65b19d50e630b6564b37ea0018c0c53fe4"
+    },
+    {
+      "id": "benign-security-vocabulary-is-not-a-violation",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-security-vocabulary-is-not-a-violation.json",
+      "digest": "sha256:a632e4a24ddf12d94dcc9e6df7a8ba4c4ed31bde91ebd9344c357beb26e5d216"
+    }
+  ]
+}

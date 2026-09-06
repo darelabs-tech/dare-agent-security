@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/corpus-entry.schema.json",
+  "title": "DARE Identity Security Corpus Entry v1",
+  "description": "One inert, synthetic identity-security vector or control. An entry declares how a reference agent behaves and which invariant is evaluated; it never declares a verdict, carries no credential material, names no remote target and contains nothing executable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "surface",
+    "property",
+    "source_kind",
+    "trust",
+    "preconditions",
+    "reference_behavior",
+    "expected_invariant",
+    "safety_class",
+    "standards",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "class": {
+      "type": "string",
+      "enum": [
+        "IDENTITY_ATTACK",
+        "BENIGN_CONTROL"
+      ]
+    },
+    "surface": {
+      "type": "string",
+      "enum": [
+        "PRINCIPAL_BINDING",
+        "DELEGATION",
+        "PRIVILEGE",
+        "TENANT_RESOURCE",
+        "AUTHORIZATION_BINDING"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.IDENTITY.DELEGATION_INTEGRITY",
+        "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+        "AGENT.IDENTITY.PRINCIPAL_BINDING",
+        "AGENT.IDENTITY.DELEGATION_SCOPE_BOUNDARY",
+        "AGENT.IDENTITY.TENANT_RESOURCE_BOUNDARY",
+        "AGENT.IDENTITY.AUTHORIZATION_EXECUTION_BINDING"
+      ]
+    },
+    "source_kind": {
+      "type": "string",
+      "enum": [
+        "DECLARED_IDENTITY_CONTEXT",
+        "DELEGATION_ASSERTION",
+        "AUTHORIZATION_DECISION_RECORD",
+        "SYNTHETIC_IDENTITY_CONTEXT",
+        "REPLAY_TRACE"
+      ]
+    },
+    "trust": {
+      "type": "string",
+      "enum": [
+        "TRUSTED",
+        "UNTRUSTED",
+        "MIXED"
+      ]
+    },
+    "preconditions": {
+      "description": "Applicability facts the target must exhibit for this vector to mean anything. Never a verdict, and never an assertion about the target's security.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+        "maxLength": 64
+      }
+    },
+    "surface_note": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "reference_behavior": {
+      "description": "What a reference agent did. A behavior, never a verdict: the evaluator decides what it means.",
+      "type": "string",
+      "enum": [
+        "COMPLIANT",
+        "INITIATING_PRINCIPAL_SUBSTITUTED",
+        "AGENT_AUTHORITY_SUBSTITUTED_FOR_USER",
+        "DELEGATED_SUBJECT_MISMATCHED",
+        "DELEGATION_SCOPE_EXCEEDED",
+        "DELEGATION_CHAIN_AMPLIFIED_PRIVILEGE",
+        "EFFECTIVE_AUTHORITY_ABOVE_CEILING",
+        "TENANT_BOUNDARY_CROSSED",
+        "RESOURCE_OWNER_MISMATCHED",
+        "OPERATION_MUTATED_AFTER_PERMIT",
+        "STALE_PERMIT_REUSED",
+        "DENY_BYPASSED",
+        "CREDENTIAL_CONTEXT_EXPANDED_AUTHORITY",
+        "DELEGATION_EXPIRED_AT_USE",
+        "MULTIPLE_INDEPENDENT_VIOLATIONS",
+        "NO_RELEVANT_OBSERVATION",
+        "HARNESS_FAILURE"
+      ]
+    },
+    "expected_invariant": {
+      "description": "Which invariant this entry is evaluated against. Not an expected outcome for that invariant.",
+      "type": "string",
+      "enum": [
+        "INITIATING_PRINCIPAL_PRESERVED",
+        "AGENT_AUTHORITY_NOT_SUBSTITUTED_FOR_USER",
+        "DELEGATED_SUBJECT_PRESERVED",
+        "DELEGATION_SCOPE_NOT_EXCEEDED",
+        "DELEGATION_CHAIN_NO_PRIVILEGE_AMPLIFICATION",
+        "EFFECTIVE_AUTHORITY_WITHIN_SOURCE_CEILING",
+        "TENANT_BOUNDARY_PRESERVED",
+        "RESOURCE_OWNER_BOUNDARY_PRESERVED",
+        "AUTHORIZATION_BOUND_TO_FINAL_OPERATION",
+        "DENY_NOT_BYPASSED",
+        "CREDENTIAL_CONTEXT_NOT_EXPAND_AUTHORITY",
+        "DELEGATION_VALID_AT_USE"
+      ]
+    },
+    "safety_class": {
+      "description": "Fixed. Every Cycle 015 vector is a synthetic no-op: nothing is dispatched, nothing changes state, nothing leaves the process.",
+      "const": "SYNTHETIC_NOOP"
+    },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]+(_[A-Z0-9]+)*$",
+            "maxLength": 64
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "status": {
+            "description": "The upstream document's own status. A draft or proposal stays a draft or proposal; it never becomes a conformance claim.",
+            "type": "string",
+            "enum": [
+              "NORMATIVE",
+              "FINAL_SPECIFICATION",
+              "DRAFT",
+              "OPEN_PROPOSAL",
+              "INFORMATIVE"
+            ]
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin",
+        "created_at",
+        "license"
+      ],
+      "properties": {
+        "origin": {
+          "description": "Fixed. Corpus content is authored for the synthetic lab; no captured production identity data may enter it.",
+          "const": "DARE_SYNTHETIC"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "created_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    }
+  }
+}

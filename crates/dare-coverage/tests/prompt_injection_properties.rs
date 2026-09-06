@@ -41,6 +41,10 @@ fn facts(user_prompt: bool, external_content: bool) -> AssessmentFacts {
         tool_metadata_present: true,
         tool_output_present: true,
         tool_chaining_present: true,
+        principal_context_present: true,
+        authorization_decision_present: true,
+        tenant_context_present: true,
+        resource_owner_context_present: true,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -87,7 +91,8 @@ fn cycle012_instruction_integrity_property_is_unchanged() {
 fn registry_growth_is_purely_additive() {
     let registry = agentic_registry().expect("registry");
     // Grows additively with each cycle; Cycle 014 appended four AGENT.TOOL.* properties.
-    assert_eq!(registry.properties.len(), 26);
+    // Additive growth only: Cycle 015 appended four properties and renamed none.
+    assert_eq!(registry.properties.len(), 30);
 
     // Every Cycle 012 id is still present and unique.
     let ids: Vec<&str> = registry

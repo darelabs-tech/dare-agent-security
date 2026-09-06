@@ -45,6 +45,10 @@ fn facts(tools: bool, metadata: bool, output: bool, chaining: bool) -> Assessmen
         tool_metadata_present: metadata,
         tool_output_present: output,
         tool_chaining_present: chaining,
+        principal_context_present: false,
+        authorization_decision_present: false,
+        tenant_context_present: false,
+        resource_owner_context_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -111,7 +115,8 @@ fn the_two_cycle_012_tool_properties_are_unchanged() {
 #[test]
 fn registry_growth_is_purely_additive() {
     let registry = agentic_registry().expect("registry");
-    assert_eq!(registry.properties.len(), 26);
+    // Additive growth only: Cycle 015 appended four properties and renamed none.
+    assert_eq!(registry.properties.len(), 30);
 
     let ids: Vec<&str> = registry
         .properties

@@ -1,0 +1,404 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/scenario.schema.json",
+  "title": "DARE Identity Security Scenario v1",
+  "description": "One bounded, local identity, delegation, privilege or authorization scenario. Every referenced object is declared inline and digest-bindable. No live identity provider, authorization server, PDP or MCP server can be named, because no field exists that could name one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "property",
+    "source",
+    "objective",
+    "principals",
+    "authorities",
+    "invariant",
+    "trials",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^IDENTITY-[A-Z0-9]+(-[A-Z0-9]+)*$",
+      "maxLength": 64
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "class": {
+      "type": "string",
+      "enum": [
+        "PRINCIPAL_BINDING",
+        "DELEGATION",
+        "PRIVILEGE",
+        "TENANT_RESOURCE",
+        "AUTHORIZATION_BINDING"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.IDENTITY.DELEGATION_INTEGRITY",
+        "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+        "AGENT.IDENTITY.PRINCIPAL_BINDING",
+        "AGENT.IDENTITY.DELEGATION_SCOPE_BOUNDARY",
+        "AGENT.IDENTITY.TENANT_RESOURCE_BOUNDARY",
+        "AGENT.IDENTITY.AUTHORIZATION_EXECUTION_BINDING"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "trust"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "DECLARED_IDENTITY_CONTEXT",
+            "DELEGATION_ASSERTION",
+            "AUTHORIZATION_DECISION_RECORD",
+            "SYNTHETIC_IDENTITY_CONTEXT",
+            "REPLAY_TRACE"
+          ]
+        },
+        "trust": {
+          "type": "string",
+          "enum": [
+            "TRUSTED",
+            "UNTRUSTED",
+            "MIXED"
+          ]
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "authorized_purpose_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "maxLength": 96
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 400
+        },
+        "authorized_purpose_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "maxLength": 96
+        },
+        "protected_canaries": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "maxLength": 128
+          }
+        }
+      }
+    },
+    "principals": {
+      "$ref": "https://darelabs.tech/schemas/identity-security/v1/principal-set.schema.json"
+    },
+    "authorities": {
+      "description": "Every authority the scenario references, declared inline.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": {
+        "$ref": "https://darelabs.tech/schemas/identity-security/v1/authority.schema.json"
+      }
+    },
+    "delegation": {
+      "$ref": "https://darelabs.tech/schemas/identity-security/v1/delegation-chain.schema.json"
+    },
+    "resource": {
+      "$ref": "https://darelabs.tech/schemas/identity-security/v1/resource-context.schema.json"
+    },
+    "policy": {
+      "$ref": "https://darelabs.tech/schemas/identity-security/v1/authorization.schema.json"
+    },
+    "credential_contexts": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "description": "Synthetic credential metadata. Capability labels and an owning principal, never secret material: a credential context describes what a runtime identity could do, which is not what a user delegated.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "credential_context_id",
+          "owner_principal_id"
+        ],
+        "properties": {
+          "credential_context_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "owner_principal_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "capability_labels": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string",
+              "maxLength": 96
+            }
+          },
+          "tenant_labels": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+              "maxLength": 96
+            }
+          },
+          "capability_authority_id": {
+            "description": "The authority this credential could exercise if it were delegated. Recorded so amplification is measurable, never so it is granted.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "maxLength": 96
+          }
+        }
+      }
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_id"
+      ],
+      "properties": {
+        "corpus_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "maxLength": 96
+        },
+        "corpus_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "INITIATING_PRINCIPAL_PRESERVED",
+            "AGENT_AUTHORITY_NOT_SUBSTITUTED_FOR_USER",
+            "DELEGATED_SUBJECT_PRESERVED",
+            "DELEGATION_SCOPE_NOT_EXCEEDED",
+            "DELEGATION_CHAIN_NO_PRIVILEGE_AMPLIFICATION",
+            "EFFECTIVE_AUTHORITY_WITHIN_SOURCE_CEILING",
+            "TENANT_BOUNDARY_PRESERVED",
+            "RESOURCE_OWNER_BOUNDARY_PRESERVED",
+            "AUTHORIZATION_BOUND_TO_FINAL_OPERATION",
+            "DENY_NOT_BYPASSED",
+            "CREDENTIAL_CONTEXT_NOT_EXPAND_AUTHORITY",
+            "DELEGATION_VALID_AT_USE"
+          ]
+        }
+      }
+    },
+    "evaluation_time": {
+      "description": "The synthetic logical tick the scenario is evaluated at. Used for delegation validity; never a wall clock.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "trials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "stop_on_first_fail": {
+          "type": "boolean"
+        }
+      }
+    },
+    "safety": {
+      "description": "Requested safety envelope. Every value is clamped by a hard maximum that input cannot raise.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_only"
+      ],
+      "properties": {
+        "local_only": {
+          "const": true
+        },
+        "max_operations_per_trial": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "max_total_operations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "max_authorization_decisions_per_trial": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "max_delegation_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "max_total_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "max_duration_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        }
+      }
+    },
+    "lab": {
+      "description": "Synthetic-lab reference behavior. Describes how a reference agent behaves; it never carries the verdict, which the evaluator computes.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_behavior"
+      ],
+      "properties": {
+        "reference_behavior": {
+          "type": "string",
+          "enum": [
+            "COMPLIANT",
+            "INITIATING_PRINCIPAL_SUBSTITUTED",
+            "AGENT_AUTHORITY_SUBSTITUTED_FOR_USER",
+            "DELEGATED_SUBJECT_MISMATCHED",
+            "DELEGATION_SCOPE_EXCEEDED",
+            "DELEGATION_CHAIN_AMPLIFIED_PRIVILEGE",
+            "EFFECTIVE_AUTHORITY_ABOVE_CEILING",
+            "TENANT_BOUNDARY_CROSSED",
+            "RESOURCE_OWNER_MISMATCHED",
+            "OPERATION_MUTATED_AFTER_PERMIT",
+            "STALE_PERMIT_REUSED",
+            "DENY_BYPASSED",
+            "CREDENTIAL_CONTEXT_EXPANDED_AUTHORITY",
+            "DELEGATION_EXPIRED_AT_USE",
+            "MULTIPLE_INDEPENDENT_VIOLATIONS",
+            "NO_RELEVANT_OBSERVATION",
+            "HARNESS_FAILURE"
+          ]
+        },
+        "per_trial": {
+          "type": "object",
+          "maxProperties": 10,
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "COMPLIANT",
+              "INITIATING_PRINCIPAL_SUBSTITUTED",
+              "AGENT_AUTHORITY_SUBSTITUTED_FOR_USER",
+              "DELEGATED_SUBJECT_MISMATCHED",
+              "DELEGATION_SCOPE_EXCEEDED",
+              "DELEGATION_CHAIN_AMPLIFIED_PRIVILEGE",
+              "EFFECTIVE_AUTHORITY_ABOVE_CEILING",
+              "TENANT_BOUNDARY_CROSSED",
+              "RESOURCE_OWNER_MISMATCHED",
+              "OPERATION_MUTATED_AFTER_PERMIT",
+              "STALE_PERMIT_REUSED",
+              "DENY_BYPASSED",
+              "CREDENTIAL_CONTEXT_EXPANDED_AUTHORITY",
+              "DELEGATION_EXPIRED_AT_USE",
+              "MULTIPLE_INDEPENDENT_VIOLATIONS",
+              "NO_RELEVANT_OBSERVATION",
+              "HARNESS_FAILURE"
+            ]
+          }
+        },
+        "output_filler_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        }
+      }
+    },
+    "standards": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "OWASP_AGENTIC_TOP10_2026",
+              "OPENID_AUTHZEN_1_0",
+              "COAZ_FRAMEWORK_1_0",
+              "COAZ_MCP_BINDING_1_0",
+              "AUTHORIZATION_TO_EXECUTION_BINDING",
+              "DARE_CYCLE_015"
+            ]
+          },
+          "reference": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NORMATIVE",
+              "FINAL_SPECIFICATION",
+              "DRAFT",
+              "OPEN_PROPOSAL",
+              "INFORMATIVE"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

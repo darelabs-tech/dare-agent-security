@@ -1,0 +1,379 @@
+{
+  "schema_version": "1",
+  "title": "DARE Cycle 015 adversarial parser fixtures",
+  "note": "Every document listed here is invalid by design and must be refused before evaluation. They are deliberately absent from registry.json. No fixture contains real credential material; credential-shaped values are synthetic placeholders.",
+  "cases": [
+    {
+      "id": "unknown-top-level-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-top-level-field.json",
+      "reason": "an unknown top-level field must not be ignored"
+    },
+    {
+      "id": "unknown-nested-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-nested-field.json",
+      "reason": "an unknown field nested inside provenance must not be ignored"
+    },
+    {
+      "id": "unknown-enum-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-enum-value.json",
+      "reason": "an unknown surface must fail closed rather than degrade to a default"
+    },
+    {
+      "id": "unknown-reference-behavior",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-reference-behavior.json",
+      "reason": "an unknown reference behavior must fail closed"
+    },
+    {
+      "id": "unknown-invariant",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-invariant.json",
+      "reason": "an unknown invariant has no evaluator and must be refused"
+    },
+    {
+      "id": "unsupported-schema-version",
+      "kind": "CORPUS_ENTRY",
+      "path": "unsupported-schema-version.json",
+      "reason": "a future schema version must be refused rather than parsed optimistically"
+    },
+    {
+      "id": "downgraded-schema-version",
+      "kind": "CORPUS_ENTRY",
+      "path": "downgraded-schema-version.json",
+      "reason": "an older schema version must be refused rather than silently upgraded"
+    },
+    {
+      "id": "verdict-smuggling-expected-verdict",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-expected-verdict.json",
+      "reason": "a fixture must never be able to state the verdict it wants"
+    },
+    {
+      "id": "verdict-smuggling-verdict",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-verdict.json",
+      "reason": "a fixture must never be able to state the verdict it wants"
+    },
+    {
+      "id": "verdict-smuggling-expected-outcome",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-expected-outcome.json",
+      "reason": "a fixture must never be able to state the verdict it wants"
+    },
+    {
+      "id": "verdict-smuggling-should-pass",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-should-pass.json",
+      "reason": "a fixture must never be able to state the verdict it wants"
+    },
+    {
+      "id": "nested-verdict-smuggling",
+      "kind": "CORPUS_ENTRY",
+      "path": "nested-verdict-smuggling.json",
+      "reason": "a verdict hidden inside provenance must be refused at any depth"
+    },
+    {
+      "id": "credential-field-access-token",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-access-token.json",
+      "reason": "a credential field must be refused before anything is persisted"
+    },
+    {
+      "id": "credential-field-client-secret",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-client-secret.json",
+      "reason": "a credential field must be refused before anything is persisted"
+    },
+    {
+      "id": "credential-field-api-key",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-api-key.json",
+      "reason": "a credential field must be refused before anything is persisted"
+    },
+    {
+      "id": "credential-field-private-key",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-private-key.json",
+      "reason": "a credential field must be refused before anything is persisted"
+    },
+    {
+      "id": "credential-field-password",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-password.json",
+      "reason": "a credential field must be refused before anything is persisted"
+    },
+    {
+      "id": "bearer-credential-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "bearer-credential-value.json",
+      "reason": "a bearer credential in a free-text value must be refused by shape"
+    },
+    {
+      "id": "jwt-shaped-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "jwt-shaped-value.json",
+      "reason": "a JWT-shaped value must be refused even though Cycle 015 parses no tokens"
+    },
+    {
+      "id": "api-key-shaped-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "api-key-shaped-value.json",
+      "reason": "an API-key-shaped value must be refused wherever it appears"
+    },
+    {
+      "id": "private-key-shaped-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "private-key-shaped-value.json",
+      "reason": "private-key material must be refused wherever it appears"
+    },
+    {
+      "id": "executable-field-command",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-command.json",
+      "reason": "an executable field must be refused; nothing in the corpus is ever run"
+    },
+    {
+      "id": "executable-field-shell",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-shell.json",
+      "reason": "an executable field must be refused; nothing in the corpus is ever run"
+    },
+    {
+      "id": "executable-field-script",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-script.json",
+      "reason": "an executable field must be refused; nothing in the corpus is ever run"
+    },
+    {
+      "id": "executable-field-eval",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-eval.json",
+      "reason": "an executable field must be refused; nothing in the corpus is ever run"
+    },
+    {
+      "id": "executable-field-callback",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-callback.json",
+      "reason": "an executable field must be refused; nothing in the corpus is ever run"
+    },
+    {
+      "id": "remote-target-url",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-url.json",
+      "reason": "a remote target must be refused; Cycle 015 contacts no provider"
+    },
+    {
+      "id": "remote-target-endpoint",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-endpoint.json",
+      "reason": "a remote target must be refused; Cycle 015 contacts no provider"
+    },
+    {
+      "id": "remote-target-issuer",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-issuer.json",
+      "reason": "a remote target must be refused; Cycle 015 contacts no provider"
+    },
+    {
+      "id": "remote-target-jwks-uri",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-jwks-uri.json",
+      "reason": "a remote target must be refused; Cycle 015 contacts no provider"
+    },
+    {
+      "id": "remote-target-pdp-url",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-pdp-url.json",
+      "reason": "a remote target must be refused; Cycle 015 contacts no provider"
+    },
+    {
+      "id": "remote-target-mcp-server",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-mcp-server.json",
+      "reason": "a remote target must be refused; Cycle 015 contacts no provider"
+    },
+    {
+      "id": "attack-declared-compliant",
+      "kind": "CORPUS_ENTRY",
+      "path": "attack-declared-compliant.json",
+      "reason": "an attack whose reference agent is compliant is a control, not an attack"
+    },
+    {
+      "id": "benign-control-noncompliant",
+      "kind": "CORPUS_ENTRY",
+      "path": "benign-control-noncompliant.json",
+      "reason": "a benign control with a violating behavior would poison the control set"
+    },
+    {
+      "id": "surface-does-not-own-invariant",
+      "kind": "CORPUS_ENTRY",
+      "path": "surface-does-not-own-invariant.json",
+      "reason": "a vector filed under a family it does not exercise would overstate coverage"
+    },
+    {
+      "id": "missing-principal-precondition",
+      "kind": "CORPUS_ENTRY",
+      "path": "missing-principal-precondition.json",
+      "reason": "an entry that does not require a principal context cannot be applicable"
+    },
+    {
+      "id": "oversized-surface-note",
+      "kind": "CORPUS_ENTRY",
+      "path": "oversized-surface-note.json",
+      "reason": "an unbounded note is an unbounded retention surface"
+    },
+    {
+      "id": "hostile-unicode-identifier",
+      "kind": "CORPUS_ENTRY",
+      "path": "hostile-unicode-identifier.json",
+      "reason": "a right-to-left override in an identifier must be refused, not rendered"
+    },
+    {
+      "id": "zero-width-identifier",
+      "kind": "CORPUS_ENTRY",
+      "path": "zero-width-identifier.json",
+      "reason": "a zero-width joiner makes two distinct ids look identical"
+    },
+    {
+      "id": "log-injection-title",
+      "kind": "CORPUS_ENTRY",
+      "path": "log-injection-title.json",
+      "reason": "a newline in a title can forge a log line"
+    },
+    {
+      "id": "carriage-return-note",
+      "kind": "CORPUS_ENTRY",
+      "path": "carriage-return-note.json",
+      "reason": "a carriage return can overwrite a rendered line"
+    },
+    {
+      "id": "path-traversal-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "path-traversal-registry.json",
+      "reason": "a traversal path must be refused before a file is opened"
+    },
+    {
+      "id": "absolute-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "absolute-path-registry.json",
+      "reason": "an absolute path must be refused"
+    },
+    {
+      "id": "url-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "url-path-registry.json",
+      "reason": "a URL is not a corpus path"
+    },
+    {
+      "id": "drive-prefix-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "drive-prefix-registry.json",
+      "reason": "a drive-prefixed path must be refused"
+    },
+    {
+      "id": "duplicate-registry-id",
+      "kind": "CORPUS_REGISTRY",
+      "path": "duplicate-registry-id.json",
+      "reason": "two entries with one id make the corpus ambiguous"
+    },
+    {
+      "id": "duplicate-registry-path",
+      "kind": "CORPUS_REGISTRY",
+      "path": "duplicate-registry-path.json",
+      "reason": "two ids pointing at one file make provenance ambiguous"
+    },
+    {
+      "id": "trace-claims-dispatch",
+      "kind": "TRACE",
+      "path": "trace-claims-dispatch.json",
+      "reason": "a trace cannot claim an operation was performed; nothing is ever dispatched"
+    },
+    {
+      "id": "trace-claims-production",
+      "kind": "TRACE",
+      "path": "trace-claims-production.json",
+      "reason": "a trace claiming to be production evidence must be refused"
+    },
+    {
+      "id": "trace-live-mode",
+      "kind": "TRACE",
+      "path": "trace-live-mode.json",
+      "reason": "there is no live mode to select"
+    },
+    {
+      "id": "trace-remote-issuer",
+      "kind": "TRACE",
+      "path": "trace-remote-issuer.json",
+      "reason": "a trace must not be able to name an identity provider"
+    },
+    {
+      "id": "trace-over-limit-trials",
+      "kind": "TRACE",
+      "path": "trace-over-limit-trials.json",
+      "reason": "an over-limit trial count must be refused, never clamped upward"
+    },
+    {
+      "id": "trace-orphan-permit",
+      "kind": "TRACE",
+      "path": "trace-orphan-permit.json",
+      "reason": "a permit bound to an operation the trial never observed must be refused"
+    },
+    {
+      "id": "scenario-duplicate-principal",
+      "kind": "SCENARIO",
+      "path": "scenario-duplicate-principal.json",
+      "reason": "two principals with one id make every role binding ambiguous"
+    },
+    {
+      "id": "scenario-unknown-principal",
+      "kind": "SCENARIO",
+      "path": "scenario-unknown-principal.json",
+      "reason": "a role bound to a principal nobody declared must fail closed"
+    },
+    {
+      "id": "scenario-self-delegation",
+      "kind": "SCENARIO",
+      "path": "scenario-self-delegation.json",
+      "reason": "delegating to oneself is not a delegation"
+    },
+    {
+      "id": "scenario-cyclic-delegation",
+      "kind": "SCENARIO",
+      "path": "scenario-cyclic-delegation.json",
+      "reason": "a delegation loop must be refused rather than walked"
+    },
+    {
+      "id": "scenario-duplicate-edge",
+      "kind": "SCENARIO",
+      "path": "scenario-duplicate-edge.json",
+      "reason": "a repeated edge id makes the chain ambiguous"
+    },
+    {
+      "id": "scenario-over-limit-trials",
+      "kind": "SCENARIO",
+      "path": "scenario-over-limit-trials.json",
+      "reason": "a scenario cannot raise the trial ceiling"
+    },
+    {
+      "id": "scenario-over-limit-principals",
+      "kind": "SCENARIO",
+      "path": "scenario-over-limit-principals.json",
+      "reason": "a scenario cannot raise the principal ceiling"
+    },
+    {
+      "id": "scenario-credential-smuggling",
+      "kind": "SCENARIO",
+      "path": "scenario-credential-smuggling.json",
+      "reason": "a credential context holds metadata, never material"
+    },
+    {
+      "id": "scenario-remote-source",
+      "kind": "SCENARIO",
+      "path": "scenario-remote-source.json",
+      "reason": "an identity source is declarative; it cannot name somewhere to call"
+    }
+  ]
+}

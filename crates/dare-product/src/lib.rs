@@ -9,6 +9,7 @@ pub mod config;
 pub mod doctor;
 pub mod egress;
 pub mod error;
+pub mod identity_security_metadata;
 pub mod init;
 pub mod privacy;
 pub mod prompt_injection_metadata;
@@ -44,6 +45,20 @@ pub use tool_security_metadata::{
     BOUNDED_PASS_NOTE as TOOL_SECURITY_BOUNDED_PASS_NOTE,
     BOUNDED_VIOLATION_NOTE as TOOL_SECURITY_BOUNDED_VIOLATION_NOTE,
     TOOL_SECURITY_METADATA_SCHEMA_ID,
+};
+
+// The identity-security block has its own bounded-claim vocabulary too, so the
+// colliding names are re-exported under Cycle 015 spellings rather than
+// shadowing the Cycle 013 or 014 ones.
+pub use identity_security_metadata::{
+    assert_bounded_claim as assert_bounded_identity_security_claim,
+    build_identity_security_metadata, IdentityScenarioOutcome, IdentitySecurityCounts,
+    IdentitySecurityMetadata, IdentitySecurityScenarioSummary, IdentitySurfaceAvailability,
+    IdentitySurfaceState, AUTHORITY_RELATION,
+    BOUNDED_INCONCLUSIVE_NOTE as IDENTITY_SECURITY_BOUNDED_INCONCLUSIVE_NOTE,
+    BOUNDED_PASS_NOTE as IDENTITY_SECURITY_BOUNDED_PASS_NOTE,
+    BOUNDED_VIOLATION_NOTE as IDENTITY_SECURITY_BOUNDED_VIOLATION_NOTE, CREDENTIAL_RULE,
+    IDENTITY_SECURITY_METADATA_SCHEMA_ID, STANDARDS_NOTE,
 };
 
 pub use redaction::{assert_no_secrets, escape_html, redact_product_text, REDACTED};

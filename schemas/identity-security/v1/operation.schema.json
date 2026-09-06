@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/operation.schema.json",
+  "title": "DARE Identity Security Operation v1",
+  "description": "A structured operation. Observed, never dispatched. Authorization-relevant arguments participate in the canonical projection; incidental arguments deliberately do not, which is what makes permit binding semantic rather than raw-byte equality.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operation_id",
+    "subject_id",
+    "action",
+    "resource_id",
+    "resource_type",
+    "tenant_id"
+  ],
+  "properties": {
+    "operation_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "subject_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "maxLength": 96
+    },
+    "action": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 64
+    },
+    "resource_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "maxLength": 96
+    },
+    "resource_type": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "maxLength": 96
+    },
+    "objective_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "maxLength": 96
+    },
+    "tool_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "authorization_relevant_arguments": {
+      "description": "Arguments that change what was authorized. Part of the projection digest.",
+      "type": "object",
+      "maxProperties": 16,
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 256
+      }
+    },
+    "incidental_arguments": {
+      "description": "Arguments irrelevant to authorization, such as a trace id or a page size. Deliberately excluded from the projection digest.",
+      "type": "object",
+      "maxProperties": 16,
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 256
+      }
+    }
+  }
+}

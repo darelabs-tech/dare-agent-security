@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/identity-security/v1/resource-context.schema.json",
+  "title": "DARE Identity Security Resource Context v1",
+  "description": "Synthetic resource context. Identifiers are synthetic labels; no real protected resource is named, reached or accessed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "resource_id",
+    "resource_type",
+    "tenant_id",
+    "owner_principal_id"
+  ],
+  "properties": {
+    "resource_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "resource_type": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 64
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "owner_principal_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "SYNTHETIC_PUBLIC",
+        "SYNTHETIC_INTERNAL",
+        "SYNTHETIC_RESTRICTED"
+      ]
+    }
+  }
+}

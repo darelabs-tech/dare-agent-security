@@ -1,0 +1,18 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "IDENTITY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": false,
+  "trials": [
+    {
+      "principals": [
+        {
+          "role": "INITIATING",
+          "principal_id": "user-7",
+          "kind": "HUMAN"
+        }
+      ]
+    }
+  ]
+}

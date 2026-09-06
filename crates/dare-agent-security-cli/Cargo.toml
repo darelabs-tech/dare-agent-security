@@ -28,6 +28,7 @@ dare-adversarial = { path = "../dare-adversarial" }
 dare-continuous = { path = "../dare-continuous" }
 dare-product = { path = "../dare-product" }
 dare-prompt-injection = { path = "../dare-prompt-injection" }
+dare-identity-security = { path = "../dare-identity-security" }
 dare-tool-security = { path = "../dare-tool-security" }
 jsonschema = { workspace = true }
 serde = { workspace = true }

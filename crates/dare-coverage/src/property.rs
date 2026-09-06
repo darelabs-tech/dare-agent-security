@@ -38,6 +38,9 @@ pub enum PropertyCategory {
     FailureContainment,
     HumanOversight,
     RogueBehavior,
+    PrincipalBinding,
+    TenantIsolation,
+    AuthorizationIntegrity,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -67,6 +70,10 @@ pub enum Predicate {
     ToolMetadataPresent,
     ToolOutputPresent,
     ToolChainingPresent,
+    PrincipalContextPresent,
+    AuthorizationDecisionPresent,
+    TenantContextPresent,
+    ResourceOwnerContextPresent,
 }
 
 impl Predicate {
@@ -96,6 +103,10 @@ impl Predicate {
             Self::ToolMetadataPresent => "tool_metadata_present",
             Self::ToolOutputPresent => "tool_output_present",
             Self::ToolChainingPresent => "tool_chaining_present",
+            Self::PrincipalContextPresent => "principal_context_present",
+            Self::AuthorizationDecisionPresent => "authorization_decision_present",
+            Self::TenantContextPresent => "tenant_context_present",
+            Self::ResourceOwnerContextPresent => "resource_owner_context_present",
         }
     }
 
@@ -123,6 +134,10 @@ impl Predicate {
                 | Self::ToolMetadataPresent
                 | Self::ToolOutputPresent
                 | Self::ToolChainingPresent
+                | Self::PrincipalContextPresent
+                | Self::AuthorizationDecisionPresent
+                | Self::TenantContextPresent
+                | Self::ResourceOwnerContextPresent
         )
     }
 }
@@ -377,7 +392,8 @@ mod tests {
     #[test]
     fn agentic_registry_loads_and_all_families_are_represented() {
         let registry = agentic_registry().expect("agentic registry");
-        assert_eq!(registry.properties.len(), 26);
+        // 26 after Cycle 014; Cycle 015 appended four AGENT.IDENTITY.* properties.
+        assert_eq!(registry.properties.len(), 30);
         let families: HashSet<_> = registry
             .properties
             .iter()

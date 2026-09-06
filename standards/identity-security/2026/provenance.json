@@ -1,0 +1,242 @@
+{
+  "schema_version": "1.0.0",
+  "recorded_at": "2026-09-05",
+  "fetch_policy": "OFFLINE_LOCAL_SNAPSHOT",
+  "fetch_policy_note": "This manifest is a committed local snapshot of upstream references. DARE Agent Security performs no network fetch of standards at validation time, and Cycle 015 contacts no identity provider, authorization server or policy decision point. Canonical references are recorded for attribution and traceability only.",
+  "conformance_disclaimer": "DARE does not claim AuthZEN, COAZ or MCP conformance. Cycle 015 uses a Subject-Action-Resource-Context-shaped internal model because that shape is useful for deterministic comparison, not because the engine implements or is certified against any of those specifications. Resemblance of a data model is not conformance.",
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026",
+      "title": "OWASP Top 10 for Agentic Applications for 2026",
+      "version": "2026",
+      "published_at": "2025-12-09",
+      "canonical_reference": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY_CONTEXT",
+      "mapping_notes": "ASI03 Identity and Privilege Abuse is the risk-family parent for Cycle 015. DARE properties are narrower, deterministically decidable security invariants and are not one-to-one restatements of ASI03."
+    },
+    {
+      "id": "OPENID_AUTHZEN_1_0",
+      "title": "OpenID AuthZEN Authorization API 1.0",
+      "version": "1.0",
+      "published_at": "2026-01",
+      "canonical_reference": "https://openid.net/specs/authorization-api-1_0-final.html",
+      "status": "FINAL_SPECIFICATION",
+      "usage": "INFORMATIVE_MODEL_REFERENCE",
+      "mapping_notes": "The Subject-Action-Resource-Context information model informs how Cycle 015 represents an authorization request internally. The engine is provider-neutral and offline: it issues no AuthZEN request, contacts no PDP, and implements no part of the API surface. This reference informs modeling only and establishes no conformance claim."
+    },
+    {
+      "id": "COAZ_FRAMEWORK_1_0",
+      "title": "COAZ Framework 1.0",
+      "version": "1.0",
+      "published_at": "2026",
+      "canonical_reference": "DARE/cycles/003-coaz-authorization-integrity/DESIGN.md",
+      "status": "DRAFT",
+      "usage": "DRAFT_REFERENCE",
+      "mapping_notes": "Working group draft. May inform how protocol operations map to authorization context. Every mapping derived from it remains marked DRAFT and is never presented as normative compliance."
+    },
+    {
+      "id": "COAZ_MCP_BINDING_1_0",
+      "title": "COAZ-MCP Binding 1.0",
+      "version": "1.0",
+      "published_at": "2026",
+      "canonical_reference": "DARE/cycles/003-coaz-authorization-integrity/DESIGN.md",
+      "status": "DRAFT",
+      "usage": "DRAFT_REFERENCE",
+      "mapping_notes": "Working group draft binding COAZ concepts to MCP operations. Cycle 015 performs no MCP authorization testing; this reference is recorded for traceability of the Cycle 003 lineage only."
+    },
+    {
+      "id": "AUTHORIZATION_TO_EXECUTION_BINDING",
+      "title": "Authorization-to-execution permit binding (stale-permit and post-authorization mutation protection)",
+      "version": "coaz-binding-v1",
+      "published_at": "2026-09-05",
+      "canonical_reference": "crates/dare-coaz-integrity/src/binding.rs",
+      "status": "OPEN_PROPOSAL",
+      "usage": "DARE_INTERNAL_BEHAVIOR",
+      "mapping_notes": "No final upstream standard defines this binding. It is DARE-internal behavior inherited from Cycle 003 and must remain marked OPEN_PROPOSAL. It must never be represented as normative compliance with AuthZEN, COAZ or any other specification."
+    },
+    {
+      "id": "DARE_CYCLE_015",
+      "title": "DARE Agent Security Cycle 015 Identity Security Validation Contract",
+      "version": "1.0.0",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/015-identity-privilege-delegation-security/DESIGN.md",
+      "status": "INFORMATIVE",
+      "usage": "LOCAL_PROJECT_CONTRACT",
+      "mapping_notes": "Local project contract binding ASI03 guidance to deterministic, evidence-backed DARE identity-security invariants under bounded local execution."
+    }
+  ],
+  "authority_model_statement": {
+    "core_relation": "effective_authority <= delegated_or_source_authority_ceiling",
+    "statement": "Authority may remain equal or narrow through delegation. It may never silently expand.",
+    "credential_rule": "Credential availability is not delegated authority. The presence of a more privileged service, workload or technical credential in the runtime does not authorize the agent to exercise those privileges on behalf of the user.",
+    "non_equivalence_rules": [
+      "A capability present in a runtime credential is evidence of capability availability, never evidence that a principal delegated it.",
+      "A delegation edge narrows or preserves authority; an edge that widens it is a violation regardless of who created it.",
+      "An authorization decision is valid only for the authorization-relevant semantics it actually covered; a later operation that changes those semantics does not inherit the permit.",
+      "Observing a principal is not observing an exercise of authority. A verdict requires the operation or authority channel the invariant names.",
+      "Cycle 015 maps to ASI03 as a contributing validation technique, never as a claim of full ASI03 coverage."
+    ]
+  },
+  "surface_classes": [
+    {
+      "id": "PRINCIPAL_BINDING",
+      "title": "Principal binding",
+      "description": "Whether the initiating principal, effective principal, agent principal and delegated subject remain distinct and correctly bound through an operation."
+    },
+    {
+      "id": "DELEGATION",
+      "title": "Delegation integrity and scope",
+      "description": "Whether a delegation chain is referentially valid, acyclic, bounded, temporally valid and authority-non-expanding."
+    },
+    {
+      "id": "PRIVILEGE",
+      "title": "Privilege and authority ceiling",
+      "description": "Whether effective authority stays within the source or delegated ceiling, including when a broader runtime credential is available."
+    },
+    {
+      "id": "TENANT_RESOURCE",
+      "title": "Tenant and resource-owner boundary",
+      "description": "Whether an operation stays inside the tenant and resource-owner boundary the principal actually holds authority over."
+    },
+    {
+      "id": "AUTHORIZATION_BINDING",
+      "title": "Authorization-to-execution binding",
+      "description": "Whether an authorization decision remains bound to the authorization-relevant semantics of the operation finally performed."
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "AGENT.IDENTITY.DELEGATION_INTEGRITY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI03 Identity and Privilege Abuse",
+      "relation": "PARENT_INVARIANT",
+      "status": "NORMATIVE",
+      "notes": "Pre-existing Cycle 012 property. Cycle 015 makes it executable and changes nothing about its definition."
+    },
+    {
+      "property_id": "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI03 Identity and Privilege Abuse",
+      "relation": "PARENT_INVARIANT",
+      "status": "NORMATIVE",
+      "notes": "Pre-existing Cycle 012 property. Cycle 015 makes it executable and changes nothing about its definition."
+    },
+    {
+      "property_id": "AGENT.IDENTITY.PRINCIPAL_BINDING",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI03 Identity and Privilege Abuse",
+      "relation": "SPECIALIZES",
+      "status": "NORMATIVE",
+      "notes": "Narrows ASI03 to the deterministic question of whether initiating, effective, agent and delegated-subject principals stay distinct and correctly bound."
+    },
+    {
+      "property_id": "AGENT.IDENTITY.DELEGATION_SCOPE_BOUNDARY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI03 Identity and Privilege Abuse",
+      "relation": "SPECIALIZES",
+      "status": "NORMATIVE",
+      "notes": "Narrows ASI03 to whether a delegation edge preserves or narrows subject, purpose, audience, tenant, scope and validity."
+    },
+    {
+      "property_id": "AGENT.IDENTITY.TENANT_RESOURCE_BOUNDARY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI03 Identity and Privilege Abuse",
+      "relation": "SPECIALIZES",
+      "status": "NORMATIVE",
+      "notes": "Narrows ASI03 to whether an operation stays within the tenant and resource-owner boundary, proven from synthetic context without touching any real resource."
+    },
+    {
+      "property_id": "AGENT.IDENTITY.AUTHORIZATION_EXECUTION_BINDING",
+      "standard": "OPENID_AUTHZEN_1_0",
+      "reference": "Authorization API 1.0 Subject-Action-Resource-Context model",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The SARC shape informs how an authorization-relevant operation is represented. The binding behavior itself is the OPEN_PROPOSAL inherited from Cycle 003, not an AuthZEN requirement, and this mapping asserts no conformance."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    {
+      "topic": "OAuth 2.0 / OIDC flows, token exchange and on-behalf-of token issuance",
+      "deferred_to": "Cycle 018",
+      "note": "Cycle 015 models delegation declaratively. It issues, parses and validates no token of any kind."
+    },
+    {
+      "topic": "JWT signature, issuer and audience cryptographic validation; JWKS retrieval",
+      "deferred_to": "Cycle 018",
+      "note": "No cryptographic identity verification exists in this cycle."
+    },
+    {
+      "topic": "Live IdP, PDP, AuthZEN endpoint or authorization server integration",
+      "deferred_to": "Cycle 018",
+      "note": "The engine is offline and provider-neutral; no mode can name a remote target."
+    },
+    {
+      "topic": "Remote MCP authorization testing",
+      "deferred_to": "Cycle 018",
+      "note": "No MCP client is reachable from this engine."
+    },
+    {
+      "topic": "SCIM and enterprise identity lifecycle",
+      "deferred_to": "NOT_SCHEDULED",
+      "note": "Identity provisioning is not an authority-boundary question."
+    },
+    {
+      "topic": "Memory poisoning",
+      "deferred_to": "Cycle 016"
+    },
+    {
+      "topic": "RAG retrieval isolation and ACL enforcement",
+      "deferred_to": "Cycle 017"
+    },
+    {
+      "topic": "AI-BOM and supply chain",
+      "deferred_to": "Cycle 019"
+    },
+    {
+      "topic": "Agent-to-agent trust and authentication",
+      "deferred_to": "Cycle 020"
+    },
+    {
+      "topic": "Remote authorized dynamic validation",
+      "deferred_to": "Cycle 022"
+    },
+    {
+      "topic": "Credential harvesting, token replay and production identities",
+      "deferred_to": "NOT_AUTHORIZED",
+      "note": "Never in scope for any cycle as currently planned."
+    }
+  ],
+  "inherited_lessons": [
+    {
+      "id": "POSITIVE_PASS_COVERAGE",
+      "from_cycle": "013",
+      "lesson": "Every invariant must observe its own positive evidence channel before PASS. Missing evidence is INCONCLUSIVE, never PASS, because absence of evidence is not evidence of absence."
+    },
+    {
+      "id": "INDEPENDENT_VIOLATIONS",
+      "from_cycle": "014",
+      "lesson": "Independent facts stay independent. Principal substitution, tenant crossing and privilege amplification can all be true in one trace, and a first-match evaluator would report one while silently losing the others."
+    },
+    {
+      "id": "SYNTHETIC_IS_NOT_PRODUCTION",
+      "from_cycle": "013",
+      "lesson": "Simulated and local-synthetic observations describe a reference agent, not a production one, and must be marked synthetic in every artifact."
+    },
+    {
+      "id": "EXECUTE_THE_ACTUAL_CI_JOB",
+      "from_cycle": "013",
+      "lesson": "Run the shipped workflow job locally before opening the PR. Hand-checking the assertions you intended to write is not the same as running the ones you shipped; Cycle 013 shipped a broken gate that way and Cycle 014's local run caught four defects before CI saw them."
+    },
+    {
+      "id": "EXACT_STRUCTURED_ASSERTIONS",
+      "from_cycle": "013",
+      "lesson": "Assert on parsed structure and whole values. A bare substring search for SECURE matches inside INSECURE_INTER_AGENT_COMMUNICATION and fails a healthy run."
+    },
+    {
+      "id": "NO_RAW_CREDENTIALS_IN_EVIDENCE",
+      "from_cycle": "014",
+      "lesson": "Evidence carries synthetic identifiers, capability labels and digests. Bearer tokens, JWTs, API keys, cookies, client secrets and private keys are refused or redacted before persistence, and identity work raises this from a precaution to a central requirement."
+    }
+  ]
+}

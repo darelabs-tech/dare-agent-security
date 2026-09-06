@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "corpus_id": "hostile-registry",
+  "version": "1.0.0",
+  "entries": [
+    {
+      "id": "some-vector",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/some-vector.json"
+    },
+    {
+      "id": "some-vector",
+      "class": "IDENTITY_ATTACK",
+      "path": "delegation/other.json"
+    }
+  ]
+}
