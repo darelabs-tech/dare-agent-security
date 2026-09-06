@@ -110,6 +110,11 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::MemoryRecallPresent => facts.memory_recall_present,
         Predicate::MemoryLifecyclePresent => facts.memory_lifecycle_present,
         Predicate::MemoryNamespacePresent => facts.memory_namespace_present,
+        Predicate::RetrievalTracePresent => facts.retrieval_trace_present,
+        Predicate::RetrievalPolicyPresent => facts.retrieval_policy_present,
+        Predicate::DocumentAclPresent => facts.document_acl_present,
+        Predicate::RetrievalProvenancePresent => facts.retrieval_provenance_present,
+        Predicate::RetrievalTenantContextPresent => facts.retrieval_tenant_context_present,
     }
 }
 
@@ -152,6 +157,11 @@ mod tests {
             memory_recall_present: false,
             memory_lifecycle_present: false,
             memory_namespace_present: false,
+            retrieval_trace_present: false,
+            retrieval_policy_present: false,
+            document_acl_present: false,
+            retrieval_provenance_present: false,
+            retrieval_tenant_context_present: false,
             out_of_scope_property_ids: Vec::new(),
         }
     }

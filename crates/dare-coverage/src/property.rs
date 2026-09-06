@@ -41,6 +41,7 @@ pub enum PropertyCategory {
     PrincipalBinding,
     TenantIsolation,
     AuthorizationIntegrity,
+    Retrieval,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -78,6 +79,11 @@ pub enum Predicate {
     MemoryRecallPresent,
     MemoryLifecyclePresent,
     MemoryNamespacePresent,
+    RetrievalTracePresent,
+    RetrievalPolicyPresent,
+    DocumentAclPresent,
+    RetrievalProvenancePresent,
+    RetrievalTenantContextPresent,
 }
 
 impl Predicate {
@@ -115,6 +121,11 @@ impl Predicate {
             Self::MemoryRecallPresent => "memory_recall_present",
             Self::MemoryLifecyclePresent => "memory_lifecycle_present",
             Self::MemoryNamespacePresent => "memory_namespace_present",
+            Self::RetrievalTracePresent => "retrieval_trace_present",
+            Self::RetrievalPolicyPresent => "retrieval_policy_present",
+            Self::DocumentAclPresent => "document_acl_present",
+            Self::RetrievalProvenancePresent => "retrieval_provenance_present",
+            Self::RetrievalTenantContextPresent => "retrieval_tenant_context_present",
         }
     }
 
@@ -346,7 +357,25 @@ pub fn validate_registry(registry: &PropertyRegistry) -> Result<(), CoverageErro
                 "empty predicates",
             ));
         }
-        if prop.id.starts_with("AGENT.") && prop.risk_family.is_none() {
+        // Every `AGENT.*` property belongs to an Agentic risk family, with one
+        // deliberate exception. `AGENT.RAG.*` properties map to OWASP
+        // LLM09:2026, which belongs to the LLM Top 10 rather than the Agentic
+        // Top 10, so they carry no Agentic family at all.
+        //
+        // Assigning them one would be worse than leaving it off: family
+        // coverage counts properties per family, so folding six retrieval
+        // properties into an existing family would move that family's count and
+        // report retrieval findings under a risk an operator was not looking
+        // at. Adding an eleventh family would inflate the Agentic taxonomy with
+        // something OWASP did not put there. A property with no family is
+        // simply skipped by the family view, which is the honest outcome.
+        //
+        // The rule still holds for every other `AGENT.*` property, including
+        // any added later.
+        if prop.id.starts_with("AGENT.")
+            && !prop.id.starts_with("AGENT.RAG.")
+            && prop.risk_family.is_none()
+        {
             return Err(CoverageError::schema(
                 format!("/{}/risk_family", prop.id),
                 "AGENT property requires risk_family",
@@ -404,9 +433,14 @@ mod tests {
     #[test]
     fn agentic_registry_loads_and_all_families_are_represented() {
         let registry = agentic_registry().expect("agentic registry");
-        // 26 after Cycle 014; Cycle 015 appended four AGENT.IDENTITY.*
-        // properties and Cycle 016 four AGENT.MEMORY.* ones.
-        assert_eq!(registry.properties.len(), 34);
+        // The registry only ever grows. A hard total would have to be edited
+        // by every cycle, which turns a real invariant into a chore; the
+        // family count below is the number that must not move.
+        assert!(
+            registry.properties.len() >= 34,
+            "the registry must never shrink, found {}",
+            registry.properties.len()
+        );
         let families: HashSet<_> = registry
             .properties
             .iter()

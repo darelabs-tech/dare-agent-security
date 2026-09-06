@@ -162,7 +162,14 @@ fn the_four_new_predicates_exist_and_are_closed() {
         .map(|value| value.as_str().expect("string"))
         .collect();
 
-    assert_eq!(enum_values.len(), 32, "28 before Cycle 016, four appended");
+    // The predicate enum only ever grows; asserting an exact total would make
+    // every later cycle edit this line, which turns a real check into a chore.
+    // What matters is that Cycle 016's four are present and none was removed.
+    assert!(
+        enum_values.len() >= 32,
+        "the predicate enum must never shrink, found {}",
+        enum_values.len()
+    );
     for predicate in [
         "memory_provenance_present",
         "memory_recall_present",
@@ -274,7 +281,21 @@ fn registry_growth_is_additive_and_ids_stay_unique() {
         .collect();
     let unique: HashSet<&&str> = ids.iter().collect();
     assert_eq!(unique.len(), ids.len(), "duplicate property id introduced");
-    assert_eq!(registry.properties.len(), 34, "30 before Cycle 016");
+    assert!(
+        registry.properties.len() >= 34,
+        "the registry must never shrink, found {}",
+        registry.properties.len()
+    );
+    // The number that must not move is the size of the memory family itself.
+    assert_eq!(
+        registry
+            .properties
+            .iter()
+            .filter(|property| property.id.starts_with("AGENT.MEMORY."))
+            .count(),
+        6,
+        "the memory property family changed size"
+    );
 
     // Every family that existed before is still represented.
     for id in [

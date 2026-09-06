@@ -79,6 +79,21 @@ pub struct AssessmentFacts {
     /// Cycle 016: memory is partitioned into namespaces.
     #[serde(default)]
     pub memory_namespace_present: bool,
+    /// Cycle 017: a retrieval trace (query, candidates, results) is observable.
+    #[serde(default)]
+    pub retrieval_trace_present: bool,
+    /// Cycle 017: the target declares a machine-readable retrieval policy.
+    #[serde(default)]
+    pub retrieval_policy_present: bool,
+    /// Cycle 017: documents carry an access-control list or allowed-document set.
+    #[serde(default)]
+    pub document_acl_present: bool,
+    /// Cycle 017: retrieved chunks carry document and source provenance.
+    #[serde(default)]
+    pub retrieval_provenance_present: bool,
+    /// Cycle 017: retrieval runs under a tenant context distinct from others.
+    #[serde(default)]
+    pub retrieval_tenant_context_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }
