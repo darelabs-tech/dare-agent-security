@@ -1,0 +1,152 @@
+{
+  "schema_version": "1",
+  "corpus_id": "rag-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 017 RAG and retrieval security corpus",
+  "entries": [
+    {
+      "id": "authorization-cross-principal-result",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "retrieval-authorization/authorization-cross-principal-result.json",
+      "digest": "sha256:9c5d29aa1af07a428156d2943192cca93e396625a0527c255ac5fac776b0144b"
+    },
+    {
+      "id": "authorization-cross-collection-result",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "retrieval-authorization/authorization-cross-collection-result.json",
+      "digest": "sha256:e47d126ea47e50608cee8962910488412f4940818aee95ed27e96c6493aaad8b"
+    },
+    {
+      "id": "authorization-fallback-widens-scope",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "retrieval-authorization/authorization-fallback-widens-scope.json",
+      "digest": "sha256:58f7354e1fe3680e826730f84dd0078b2b7a14e5f340aded2a18600a213db903"
+    },
+    {
+      "id": "isolation-cross-tenant-document-returned",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "document-isolation/isolation-cross-tenant-document-returned.json",
+      "digest": "sha256:20c9416b35f25297c63d3c446dc904a3326e01c4667e970e755ea6644646080b"
+    },
+    {
+      "id": "isolation-unauthorized-document-returned",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "document-isolation/isolation-unauthorized-document-returned.json",
+      "digest": "sha256:090b5657099ad8f79fbc6c6232faa42747c85fa945679fd285acd71c4676ed11"
+    },
+    {
+      "id": "isolation-metadata-filter-bypassed",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "document-isolation/isolation-metadata-filter-bypassed.json",
+      "digest": "sha256:18972136b0f0aeb6b787df48beb98e960d66590e44866938aed38d866aa7ed64"
+    },
+    {
+      "id": "provenance-detached-from-result",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "provenance/provenance-detached-from-result.json",
+      "digest": "sha256:dde818f4355fb2de30027b43a34626b66ee2332ea7d3b3ad5d524101a831fd55"
+    },
+    {
+      "id": "provenance-chunk-rebound-to-another-document",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "provenance/provenance-chunk-rebound-to-another-document.json",
+      "digest": "sha256:28f5e92d1b7847d9a1aef06275bcf1b8e3f4e06c9fc69af7a8fee7cd162c62fd"
+    },
+    {
+      "id": "result-non-candidate-injected",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "result-integrity/result-non-candidate-injected.json",
+      "digest": "sha256:692bf1985d168bc0b10d1b6b73c09d0ddf18f5c2345183bd2d1f7fc0b920fc53"
+    },
+    {
+      "id": "result-top-k-overflow",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "result-integrity/result-top-k-overflow.json",
+      "digest": "sha256:19b9025165cdcd791c3d9d96cdab3b4d71cdafd77205429471670130b02039a7"
+    },
+    {
+      "id": "trust-untrusted-content-promoted",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "content-trust/trust-untrusted-content-promoted.json",
+      "digest": "sha256:a71840168c668090fba5fe766a91526a19080f8f2420809dbe908c4d893d55cb"
+    },
+    {
+      "id": "protected-document-returned",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "protected-nondisclosure/protected-document-returned.json",
+      "digest": "sha256:8feaead2a40135da2b2248228333ff45c84ab7c73da768450bc1e075848bbe9d"
+    },
+    {
+      "id": "benign-own-principal-retrieval",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-own-principal-retrieval.json",
+      "digest": "sha256:2af259f1909cfd66ec42e86a9c214aa7e25097958f476be07821889b79772e38"
+    },
+    {
+      "id": "benign-fallback-within-authority",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-fallback-within-authority.json",
+      "digest": "sha256:487117f333504b6b40fdac92844f1115a983711938a5a5bd63e4994366fdf707"
+    },
+    {
+      "id": "benign-same-tenant-retrieval",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-same-tenant-retrieval.json",
+      "digest": "sha256:22215d0b7a141589ab9dfa436491fbedc9dd9b1910388e2a19477cd5c49dc2d6"
+    },
+    {
+      "id": "benign-metadata-filter-honoured",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-metadata-filter-honoured.json",
+      "digest": "sha256:c0aa4ebf2c57e564f2cf6d1c72638a138e6b0d87dd9bdad56d1afd48cb083b19"
+    },
+    {
+      "id": "benign-provenance-preserved",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-provenance-preserved.json",
+      "digest": "sha256:4154f693ff3ccc5611cd698d5a780445ceb3c296160f925ec5b72ee4e92cdac1"
+    },
+    {
+      "id": "benign-chunk-binding-preserved",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-chunk-binding-preserved.json",
+      "digest": "sha256:75db91034519f57dcf4de2b9b10021980bba815d55b91a747885361937421c03"
+    },
+    {
+      "id": "benign-result-within-candidates",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-result-within-candidates.json",
+      "digest": "sha256:53d49e1d27153216821c508dcfbb7f49c898782ce357d07a2bd8b1fe5455a408"
+    },
+    {
+      "id": "benign-top-k-within-bound",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-top-k-within-bound.json",
+      "digest": "sha256:bb2e099bfa91feab935479701f0fb16dc914f296ecc703453122db41c14b171e"
+    },
+    {
+      "id": "benign-untrusted-content-stays-data",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-untrusted-content-stays-data.json",
+      "digest": "sha256:925a688182ec55c520f15e5dd38b50565d08f015dc6a55d3d8b76e9b9c221863"
+    },
+    {
+      "id": "benign-protected-document-excluded",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-protected-document-excluded.json",
+      "digest": "sha256:62a73e957513c03bcee6831c03631864689b406954bfa58b14d13c91fc373c07"
+    },
+    {
+      "id": "benign-multi-collection-authorized",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-multi-collection-authorized.json",
+      "digest": "sha256:45b2f60e03ee614a7eac0d0ff23b9d72250548ebe46820202ae49680e0a92a97"
+    },
+    {
+      "id": "benign-authorized-document-returned",
+      "class": "BENIGN_CONTROL",
+      "path": "benign-controls/benign-authorized-document-returned.json",
+      "digest": "sha256:64dab372fb2b062dc220c6cacd054358f90440480cf54edcfb9772d97ba9a9b0"
+    }
+  ]
+}

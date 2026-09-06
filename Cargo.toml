@@ -16,6 +16,7 @@ members = [
     "crates/dare-tool-security",
     "crates/dare-identity-security",
     "crates/dare-memory-security",
+    "crates/dare-rag-security",
     "labs/synthetic-mcp",
 ]
 
