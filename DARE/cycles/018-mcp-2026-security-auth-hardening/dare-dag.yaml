@@ -1,0 +1,116 @@
+cycle: 018
+slug: mcp-2026-security-auth-hardening
+title: MCP 2026 Security & Auth Hardening
+status: READY_FOR_REVIEW
+approval: PENDING
+baseline:
+  branch: main
+  commit: f5906e8b24679b7affffcdc9db5d6116ba9b045d
+execution_branch: agent/cycle-018-mcp-2026-security-auth-hardening
+acceptance_criteria: 76
+execution_authorized: false
+requires_product_owner_approval: true
+
+safety:
+  modes:
+    - REPLAY
+    - SIMULATED
+    - LOCAL_SYNTHETIC
+  max_state_changes: 0
+  external_egress_bytes: 0
+  real_credentials: false
+  production_targets: false
+  live_oauth: false
+  live_oidc: false
+  live_idp: false
+  live_jwks: false
+  live_registration: false
+
+standards:
+  - source: MCP
+    version: 2026-07-28
+    status: NORMATIVE
+  - source: OpenID AuthZEN Authorization API
+    version: '1.0'
+    status: NORMATIVE
+  - source: COAZ
+    version: '1.0 Draft 1'
+    status: DRAFT
+  - source: COAZ-MCP
+    version: '1.0 Draft 1'
+    status: DRAFT
+  - source: openid/authzen#603
+    version: open-proposal
+    status: OPEN_PROPOSAL
+
+future_not_baseline:
+  - DPoP
+  - workload identity federation
+  - ID-JAG
+  - standardized token exchange
+  - Enterprise-Managed Authorization baseline mandate
+
+tasks:
+  task-001: { depends_on: [] }
+  task-002: { depends_on: [task-001] }
+  task-003: { depends_on: [task-001, task-002] }
+  task-004: { depends_on: [task-003] }
+  task-005: { depends_on: [task-003, task-004] }
+  task-006: { depends_on: [task-003, task-004] }
+  task-007: { depends_on: [task-004, task-005, task-006] }
+  task-008: { depends_on: [task-004, task-005, task-006, task-007] }
+  task-009: { depends_on: [task-004, task-007] }
+  task-010: { depends_on: [task-004, task-007] }
+  task-011: { depends_on: [task-005, task-006, task-007] }
+  task-012: { depends_on: [task-007, task-008] }
+  task-013: { depends_on: [task-003, task-004] }
+  task-014: { depends_on: [task-004, task-005, task-006, task-007, task-008, task-009, task-010, task-011, task-012, task-013] }
+  task-015: { depends_on: [task-014] }
+  task-016: { depends_on: [task-014, task-015] }
+  task-017: { depends_on: [task-004, task-005, task-006, task-007, task-008, task-009, task-010, task-011, task-012, task-013, task-014] }
+  task-018: { depends_on: [task-017] }
+  task-019: { depends_on: [task-017, task-018] }
+  task-020: { depends_on: [task-017, task-018, task-019] }
+  task-021: { depends_on: [task-005, task-017, task-018, task-019] }
+  task-022: { depends_on: [task-005, task-006, task-017, task-018, task-019] }
+  task-023: { depends_on: [task-006, task-007, task-017, task-018, task-019] }
+  task-024: { depends_on: [task-008, task-017, task-018, task-019] }
+  task-025: { depends_on: [task-009, task-017, task-018, task-019] }
+  task-026: { depends_on: [task-009, task-017, task-018, task-019] }
+  task-027: { depends_on: [task-010, task-017, task-018, task-019] }
+  task-028: { depends_on: [task-011, task-017, task-018, task-019] }
+  task-029: { depends_on: [task-012, task-017, task-018, task-019] }
+  task-030: { depends_on: [task-013, task-017, task-018, task-019] }
+  task-031: { depends_on: [task-013, task-030] }
+  task-032: { depends_on: [task-007, task-008, task-015, task-019, task-020, task-021, task-022, task-023, task-024, task-025, task-026, task-027, task-028, task-029, task-030, task-031] }
+  task-033: { depends_on: [task-014, task-015, task-019] }
+  task-034: { depends_on: [task-014, task-015, task-016, task-017, task-018, task-019, task-033] }
+  task-035: { depends_on: [task-017, task-018, task-019, task-033] }
+  task-036: { depends_on: [task-017, task-018, task-019, task-033] }
+  task-037: { depends_on: [task-014, task-016, task-018, task-020, task-021, task-022, task-023] }
+  task-038: { depends_on: [task-014, task-016, task-018, task-024, task-025, task-026] }
+  task-039: { depends_on: [task-014, task-016, task-018, task-027, task-028, task-029, task-030, task-031, task-032] }
+  task-040: { depends_on: [task-018, task-019, task-037, task-038, task-039] }
+  task-041: { depends_on: [task-014, task-016, task-033] }
+  task-042: { depends_on: [task-019, task-037, task-038, task-039, task-040, task-041] }
+  task-043: { depends_on: [task-015, task-017, task-019, task-042] }
+  task-044: { depends_on: [task-003, task-043] }
+  task-045: { depends_on: [task-034, task-035, task-036, task-043, task-044] }
+  task-046: { depends_on: [task-037, task-038, task-039, task-040, task-041, task-042, task-044, task-045] }
+  task-047: { depends_on: [task-002, task-044, task-045, task-046] }
+  task-048: { depends_on: [task-046, task-047] }
+
+pre_pr_gates:
+  - cargo fmt --all --check
+  - cargo clippy --workspace --all-targets -- -D warnings
+  - cargo test --workspace
+  - cargo audit
+  - python scripts/run-ci-job-locally.py .github/workflows/ci.yml mcp-auth-security-2026
+  - build English mdBook
+  - build Portuguese mdBook
+
+pr_policy:
+  trigger: pull_request.opened
+  push_trigger_allowed: false
+  final_branch_push_before_pr: true
+  single_pr_after_local_gates: true
