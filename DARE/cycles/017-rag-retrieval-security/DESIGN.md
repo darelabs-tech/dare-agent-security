@@ -369,5 +369,5 @@ The implementation is accepted only if all of the following have executed eviden
 62. fmt/clippy/workspace tests/audit pass;
 63. docs explain retrieval policy, provenance, isolation, LLM09 mapping and boundaries;
 64. `REGRESSION.md` records exact executed gates, defects, deviations and residual risks;
-65. `PROOF.md` maps all 65 criteria to executed evidence;
+65. `PROOF.md` maps all 66 criteria to executed evidence;
 66. no PR opened before final branch push and local job green.
