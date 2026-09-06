@@ -1,7 +1,21 @@
 # Cycle 018 — Tasks
 
-**Status:** APPROVED FOR EXECUTION  
+**Status:** IN PROGRESS — 37/48 tasks closed; the release gate is NOT met and no PR is open
 **Approval:** APPROVED
+
+Tasks 001-036 and 043 are closed with recorded evidence. The engine, its schemas, the
+fourteen invariants, the three offline adapters and the Cycle 001 evidence bridge are
+implemented and green: `cargo test --workspace` reports 2721 passing and 0 failing against
+a 2442 baseline, with `cargo fmt --all --check` and
+`cargo clippy --workspace --all-targets -- -D warnings` both clean.
+
+Still open: 037-042 (the MCP-AUTH-LAB corpus, benign controls, hostile fixtures and the
+multi-violation/redaction suite), 044 (profile), 045 (CLI), 046 (CI job and its real local
+execution), 047 (EN/PT documentation) and 048 (REGRESSION.md, PROOF.md and the PR).
+
+Per the approval's release gate, no pull request may be opened until all 48 tasks close and
+all 76 acceptance criteria map to executed evidence. Neither condition is met, so no PR has
+been opened.
 
 - [x] task-001 — Freeze post-Cycle-017 baseline and compatibility contracts
 - [x] task-002 — Record MCP 2026 / OAuth / AuthZEN / COAZ standards status snapshot
