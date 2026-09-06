@@ -239,6 +239,32 @@ fn document_event_digest(events: &[RagObservationEvent], document_id: &str) -> V
         .collect()
 }
 
+/// Events that establish that fallback was actually used under the recorded
+/// policy. A policy declaration alone is not enough, and a returned chunk alone
+/// does not say whether the result set itself was a fallback. Keeping both
+/// channels makes a "fallback forbidden" finding reproducible from retained
+/// evidence rather than from evaluator state.
+fn fallback_event_digests(events: &[RagObservationEvent]) -> Vec<String> {
+    events
+        .iter()
+        .filter(|event| {
+            matches!(
+                event,
+                RagObservationEvent::RetrievalPolicy { .. }
+                    | RagObservationEvent::RankedResultSet {
+                        used_fallback: true,
+                        ..
+                    }
+                    | RagObservationEvent::RetrievedChunk {
+                        from_fallback: true,
+                        ..
+                    }
+            )
+        })
+        .flat_map(digest_of)
+        .collect()
+}
+
 // --- evaluators --------------------------------------------------------------
 
 /// A returned document owned by a principal the policy does not permit.
@@ -489,7 +515,8 @@ fn metadata_filter(
             violations.push(RagViolation {
                 invariant: RagInvariantType::MetadataFilterEnforced,
                 reason: format!(
-                    "document `{}` appeared in a result for query `{query_id}` while \n                     failing mandatory filter field(s) {}",
+                    "document `{}` appeared in a result for query `{query_id}` while \
+                     failing mandatory filter field(s) {}",
                     document.document_id,
                     fields.join(", ")
                 ),
@@ -498,7 +525,8 @@ fn metadata_filter(
                 chunk_id: None,
                 query_id: Some(query_id.to_owned()),
                 detail: Some(format!(
-                    "no admission decision was recorded for this document, so policy `{}` \n                     was applied to the corpus declaration instead",
+                    "no admission decision was recorded for this document, so policy `{}` \
+                     was applied to the corpus declaration instead",
                     scenario.policy.policy_id
                 )),
             });
@@ -657,7 +685,7 @@ fn chunk_binding(
 
 /// A returned chunk that was never in the approved candidate set.
 fn result_within_candidates(
-    _scenario: &RagSecurityScenario,
+    scenario: &RagSecurityScenario,
     events: &[RagObservationEvent],
 ) -> Vec<RagViolation> {
     let mut violations = Vec::new();
@@ -672,34 +700,22 @@ fn result_within_candidates(
             continue;
         };
 
-        // The approved candidates for this query, as observed.
-        let approved: Option<&Vec<String>> =
-            events
-                .iter()
-                .find_map(|candidate_event| match candidate_event {
-                    RagObservationEvent::CandidateSet {
-                        query_id: candidate_query,
-                        chunk_ids,
-                        ..
-                    } if candidate_query == query_id => Some(chunk_ids),
-                    _ => None,
-                });
-        let Some(approved) = approved else {
-            // No candidate set was observed for this query. That is a coverage
-            // gap, handled by the contract, not a violation — asserting one
-            // here would turn missing evidence into a finding.
+        // Authority comes from the approved scenario, never from the adapter's
+        // self-reported candidate observation. The observation is still needed
+        // by the positive coverage contract, but it cannot define permission.
+        let Some(approved) = scenario.candidate_set(query_id) else {
             continue;
         };
 
         for chunk_id in chunk_ids {
-            if approved.contains(chunk_id) {
+            if approved.contains_chunk(chunk_id) {
                 continue;
             }
             violations.push(RagViolation {
                 invariant: RagInvariantType::ResultSetWithinApprovedCandidates,
                 reason: format!(
                     "chunk `{chunk_id}` was returned for query `{query_id}` without appearing in \
-                     the approved candidate set"
+                     the scenario-approved candidate set"
                 ),
                 deciding_event_digests: digest_of(event),
                 document_id: None,
@@ -906,7 +922,7 @@ fn fallback_authority(
                 fallback_documents.len(),
                 policy.policy_id
             ),
-            deciding_event_digests: Vec::new(),
+            deciding_event_digests: fallback_event_digests(events),
             document_id: None,
             chunk_id: None,
             query_id: None,
@@ -1043,23 +1059,62 @@ mod tests {
     #[test]
     fn every_violation_names_the_events_that_decided_it() {
         let scenario = scenario();
-        for behavior in [
+        let behaviors = [
+            ReferenceBehavior::CrossPrincipalResult,
             ReferenceBehavior::CrossTenantResult,
+            ReferenceBehavior::CrossCollectionResult,
+            ReferenceBehavior::UnauthorizedDocumentResult,
+            ReferenceBehavior::MetadataFilterBypassed,
             ReferenceBehavior::ProtectedDocumentReturned,
+            ReferenceBehavior::ProvenanceDetached,
             ReferenceBehavior::ChunkReboundToAnotherDocument,
             ReferenceBehavior::NonCandidateResultInjected,
-        ] {
+            ReferenceBehavior::TopKExceeded,
+            ReferenceBehavior::UntrustedContentPromoted,
+            ReferenceBehavior::FallbackWidenedAuthority,
+            ReferenceBehavior::MultipleIndependentViolations,
+        ];
+
+        for behavior in behaviors {
             let events = events_for(&scenario, behavior);
+            let retained: std::collections::BTreeSet<String> = events
+                .iter()
+                .filter_map(|event| event.digest().ok())
+                .collect();
+
             for invariant in supported_invariants() {
                 let outcome = evaluate(invariant, &scenario, &events);
                 for violation in &outcome.violations {
                     assert!(
-                        !violation.reason.trim().is_empty(),
-                        "{behavior:?}/{invariant:?} recorded a violation with no reason"
+                        !violation.deciding_event_digests.is_empty(),
+                        "{behavior:?}/{invariant:?} recorded a violation with no deciding event"
                     );
+                    for digest in &violation.deciding_event_digests {
+                        assert!(
+                            retained.contains(digest),
+                            "{behavior:?}/{invariant:?} references a digest not retained by the trial"
+                        );
+                    }
                 }
             }
         }
+    }
+
+    #[test]
+    fn a_forbidden_fallback_binds_the_policy_and_fallback_events() {
+        let mut scenario = scenario();
+        scenario.policy.fallback.allowed = false;
+        let events = events_for(&scenario, ReferenceBehavior::FallbackWidenedAuthority);
+        let outcome = evaluate(
+            RagInvariantType::RetrievalFallbackDoesNotWidenAuthority,
+            &scenario,
+            &events,
+        );
+        assert_eq!(outcome.verdict, Verdict::Fail);
+        assert!(outcome
+            .violations
+            .iter()
+            .all(|violation| !violation.deciding_event_digests.is_empty()));
     }
 
     #[test]
