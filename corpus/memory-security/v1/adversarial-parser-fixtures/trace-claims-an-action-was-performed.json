@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-hostile",
+  "scenario_id": "MEMORY-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "trials": [
+    {
+      "action_intents": [
+        {
+          "action_id": "tool-summarize",
+          "performed": true
+        }
+      ]
+    }
+  ]
+}

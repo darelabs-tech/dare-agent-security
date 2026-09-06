@@ -49,6 +49,10 @@ fn facts(tools: bool, metadata: bool, output: bool, chaining: bool) -> Assessmen
         authorization_decision_present: false,
         tenant_context_present: false,
         resource_owner_context_present: false,
+        memory_provenance_present: false,
+        memory_recall_present: false,
+        memory_lifecycle_present: false,
+        memory_namespace_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -115,8 +119,14 @@ fn the_two_cycle_012_tool_properties_are_unchanged() {
 #[test]
 fn registry_growth_is_purely_additive() {
     let registry = agentic_registry().expect("registry");
-    // Additive growth only: Cycle 015 appended four properties and renamed none.
-    assert_eq!(registry.properties.len(), 30);
+    // "Additive" is the property under test: the registry may grow, must never
+    // shrink, and must keep every id named below. A floor rather than an
+    // equality, so a later cycle appending is not mistaken for a regression.
+    assert!(
+        registry.properties.len() >= 30,
+        "the v2 registry must never shrink, found {}",
+        registry.properties.len()
+    );
 
     let ids: Vec<&str> = registry
         .properties

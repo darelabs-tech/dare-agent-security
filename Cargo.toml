@@ -15,6 +15,7 @@ members = [
     "crates/dare-prompt-injection",
     "crates/dare-tool-security",
     "crates/dare-identity-security",
+    "crates/dare-memory-security",
     "labs/synthetic-mcp",
 ]
 

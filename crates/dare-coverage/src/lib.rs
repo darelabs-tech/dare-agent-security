@@ -10,6 +10,7 @@ mod error;
 mod facts;
 mod identity_security_standards;
 mod math;
+mod memory_security_standards;
 mod plan;
 mod profile;
 mod prompt_injection_standards;
@@ -44,13 +45,18 @@ pub use math::{
     coverage_ratio, eligible_count, finalize_row, required_eligible_count, required_tested_count,
     tested_count, validate_pair, CoverageCounts, CoveragePolicy, CoverageTotals, DENOMINATOR_DOC,
 };
+pub use memory_security_standards::{
+    load_memory_security_provenance, memory_security_provenance,
+    validate_memory_security_provenance, MemorySecurityProvenance, MemoryTrustStatement,
+};
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
     agentic_profile, builtin_profile, identity_security_profile, load_profile, load_profile_file,
-    profile_digest_sha256, prompt_injection_profile, resolve_profile, tool_security_profile,
-    validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
-    IDENTITY_SECURITY_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
-    PROMPT_INJECTION_PROFILE_JSON, TOOL_SECURITY_PROFILE_JSON,
+    memory_security_profile, profile_digest_sha256, prompt_injection_profile, resolve_profile,
+    tool_security_profile, validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel,
+    AGENTIC_PROFILE_JSON, IDENTITY_SECURITY_PROFILE_JSON, MEMORY_SECURITY_PROFILE_JSON,
+    PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
+    TOOL_SECURITY_PROFILE_JSON,
 };
 pub use prompt_injection_standards::{
     load_prompt_injection_provenance, validate_prompt_injection_provenance,
@@ -128,6 +134,6 @@ mod tests {
         let mcp = builtin_profile().unwrap();
         assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
         let agentic = agentic_profile().unwrap();
-        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 30);
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 34);
     }
 }

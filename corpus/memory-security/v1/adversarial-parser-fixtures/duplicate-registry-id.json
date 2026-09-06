@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "corpus_id": "memory-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 016 memory and context poisoning corpus",
+  "entries": [
+    {
+      "id": "provenance-dropped-on-write",
+      "class": "MEMORY_ATTACK",
+      "path": "provenance/provenance-dropped-on-write.json",
+      "digest": "sha256:0c39f015f0ca1182cf1d1f9275f682dde3c6c6859b38cbef85d1f2834ed66aed"
+    },
+    {
+      "id": "provenance-dropped-on-write",
+      "class": "MEMORY_ATTACK",
+      "path": "provenance/provenance-dropped-on-write.json",
+      "digest": "sha256:0c39f015f0ca1182cf1d1f9275f682dde3c6c6859b38cbef85d1f2834ed66aed"
+    }
+  ]
+}

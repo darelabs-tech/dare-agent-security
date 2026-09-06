@@ -117,6 +117,25 @@ authorization server or resource is contacted, no token is parsed, and no real
 tenant data is touched to demonstrate a boundary crossing. See
 [Identity, Privilege and Delegation Validation](../concepts/identity-security.md).
 
+## `validate memory-security`
+
+Run bounded local memory and context poisoning validation (Cycle 016).
+
+```bash
+dare-agent-security validate memory-security   --scenario MEMORY-LAB-001   --mode simulated   --output-dir .dare-agent-security/memory-security
+```
+
+Modes are `replay`, `simulated` and `local-synthetic`; all three are local and
+offline. There is no `--url`, `--redis`, `--postgres`, `--vector-db`,
+`--pinecone`, `--qdrant`, `--provider`, `--token`, `--api-key`, `--remote` or
+`--command` flag, and no connection string is read from the environment.
+
+Memory is described from local synthetic fixtures and never persisted: no Redis,
+PostgreSQL, vector database, SaaS memory service, remote MCP server, production
+agent or customer memory is involved, and lifecycle is evaluated at the logical
+time each scenario declares rather than against the machine's clock. See
+[Memory and Context Poisoning Validation](../concepts/memory-security.md).
+
 ## Exit codes
 
 Each subcommand has its own table — see [Exit Codes](../reference/exit-codes.md).

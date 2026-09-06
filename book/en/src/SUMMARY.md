@@ -18,6 +18,7 @@
 - [Prompt Injection Validation](concepts/prompt-injection.md)
 - [Tool Security Validation](concepts/tool-security.md)
 - [Identity, Privilege and Delegation Validation](concepts/identity-security.md)
+- [Memory and Context Poisoning Validation](concepts/memory-security.md)
 
 # Commands
 
@@ -64,5 +65,6 @@
 - [Extending Prompt Injection Validation](reference/extending-prompt-injection.md)
 - [Extending Tool Security Validation](reference/extending-tool-security.md)
 - [Extending Identity Security Validation](reference/extending-identity-security.md)
+- [Extending Memory Security Validation](reference/extending-memory-security.md)
 
 [Troubleshooting](troubleshooting.md)

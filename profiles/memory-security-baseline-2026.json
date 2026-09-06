@@ -1,0 +1,35 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "memory-security-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE Memory Security Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.MEMORY.CONTEXT_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.MEMORY.TENANT_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.MEMORY.PROVENANCE_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.MEMORY.WRITE_TRUST_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.MEMORY.RECALL_AUTHORITY_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.MEMORY.LIFECYCLE_VALIDITY",
+      "requirement": "CONDITIONAL"
+    }
+  ]
+}

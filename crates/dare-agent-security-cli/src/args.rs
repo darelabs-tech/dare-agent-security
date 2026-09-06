@@ -72,6 +72,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local identity, privilege and delegation validation (Cycle 015).
     #[command(name = "identity-security")]
     IdentitySecurity(crate::identity_security::IdentitySecurityArgs),
+    /// Run bounded local memory and context poisoning validation (Cycle 016).
+    #[command(name = "memory-security")]
+    MemorySecurity(crate::memory_security::MemorySecurityArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

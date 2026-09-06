@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/memory-security/v1/memory-item.schema.json",
+  "title": "DARE Memory Security Memory Item v1",
+  "description": "One persisted, synthetic memory item. Declarative and secret-free: the engine reasons over content_digest, and any excerpt is bounded fixture text that has passed the credential sweep. Provenance is optional so a fixture can describe memory that lost it — the thing under test.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "memory_id",
+    "namespace_id",
+    "owner_principal_id",
+    "tenant_id",
+    "trust_class",
+    "content_digest",
+    "created_at"
+  ],
+  "properties": {
+    "memory_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "namespace_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "owner_principal_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "provenance": {
+      "description": "Where a memory item's content came from. Machine-readable metadata, never authority: a source constrains how far content may be trusted and never elevates it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_kind",
+        "source_id"
+      ],
+      "properties": {
+        "source_kind": {
+          "type": "string",
+          "enum": [
+            "USER_INPUT",
+            "TOOL_OUTPUT",
+            "EXTERNAL_CONTENT",
+            "SYSTEM_AUTHORED",
+            "AGENT_GENERATED",
+            "IMPORTED_CONTEXT"
+          ]
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "author_principal_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "recorded_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000
+        }
+      }
+    },
+    "trust_class": {
+      "type": "string",
+      "enum": [
+        "UNTRUSTED",
+        "CONSTRAINED",
+        "TRUSTED_POLICY"
+      ]
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "content_excerpt": {
+      "description": "Bounded sanitized fixture text. Never a credential and never authoritative; the engine reasons over the digest.",
+      "type": "string",
+      "maxLength": 8192
+    },
+    "created_at": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "valid_from": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "expires_at": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "revoked_at": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1024
+    },
+    "labels": {
+      "description": "Descriptive labels. Holding a label is not authority.",
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "maxLength": 64
+      }
+    }
+  }
+}

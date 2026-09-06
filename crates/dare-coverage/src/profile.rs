@@ -23,6 +23,8 @@ pub const TOOL_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/tool-security-baseline-2026.json");
 pub const IDENTITY_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/identity-security-baseline-2026.json");
+pub const MEMORY_SECURITY_PROFILE_JSON: &str =
+    include_str!("../../../profiles/memory-security-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -150,6 +152,23 @@ pub fn identity_security_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(IDENTITY_SECURITY_PROFILE_JSON)
 }
 
+/// Cycle 016 memory-security baseline.
+///
+/// Additive in the same way. It selects the six `AGENT.MEMORY.*` properties
+/// from the same v2 registry: the two that predate this cycle keep their
+/// identifiers, their applicability predicates and their meaning, the four new
+/// ones are added alongside, no earlier profile's requirements change, and no
+/// denominator moves.
+///
+/// The two recall-shaped properties are CONDITIONAL rather than REQUIRED
+/// because a target that never recalls memory, or never expires it, has nothing
+/// to answer there. Marking them REQUIRED would turn "not applicable" into a
+/// gap and make an honest target look worse than a target with no memory at
+/// all.
+pub fn memory_security_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(MEMORY_SECURITY_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -166,6 +185,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "prompt-injection-baseline-2026" => prompt_injection_profile(),
         "tool-security-baseline-2026" => tool_security_profile(),
         "identity-security-baseline-2026" => identity_security_profile(),
+        "memory-security-baseline-2026" => memory_security_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

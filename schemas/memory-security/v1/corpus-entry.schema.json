@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/memory-security/v1/corpus-entry.schema.json",
+  "title": "DARE Memory Security Corpus Entry v1",
+  "description": "One inert, synthetic memory-security vector or control. An entry declares how a reference agent behaves and which invariant is evaluated; it never declares a verdict, carries no credential material, names no memory store or provider and contains nothing executable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "surface",
+    "property",
+    "family",
+    "source_kind",
+    "trust",
+    "preconditions",
+    "reference_behavior",
+    "expected_invariant",
+    "safety_class",
+    "standards",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "class": {
+      "type": "string",
+      "enum": [
+        "MEMORY_ATTACK",
+        "BENIGN_CONTROL"
+      ]
+    },
+    "surface": {
+      "type": "string",
+      "enum": [
+        "PROVENANCE",
+        "TRUST_BOUNDARY",
+        "TENANT_PRINCIPAL",
+        "LIFECYCLE",
+        "DECISION_INFLUENCE"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.MEMORY.CONTEXT_INTEGRITY",
+        "AGENT.MEMORY.TENANT_BOUNDARY",
+        "AGENT.MEMORY.PROVENANCE_INTEGRITY",
+        "AGENT.MEMORY.WRITE_TRUST_BOUNDARY",
+        "AGENT.MEMORY.RECALL_AUTHORITY_BOUNDARY",
+        "AGENT.MEMORY.LIFECYCLE_VALIDITY"
+      ]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "PROVENANCE_LOSS",
+        "TRUST_PROMOTION",
+        "MEMORY_OVERWRITE_SUBSTITUTION",
+        "CROSS_PRINCIPAL_RECALL",
+        "CROSS_TENANT_RECALL",
+        "CROSS_NAMESPACE_RECALL",
+        "STALE_MEMORY_USE",
+        "REVOKED_MEMORY_USE",
+        "POISONED_RECALL_TO_OBJECTIVE",
+        "POISONED_RECALL_TO_TOOL_SELECTION",
+        "POISONED_RECALL_TO_ARGUMENT",
+        "POISONED_RECALL_TO_PROTECTED_FIELD"
+      ]
+    },
+    "source_kind": {
+      "type": "string",
+      "enum": [
+        "SYNTHETIC_MEMORY_STORE",
+        "REPLAY_TRACE",
+        "DECLARED_MEMORY_POLICY"
+      ]
+    },
+    "trust": {
+      "type": "string",
+      "enum": [
+        "TRUSTED",
+        "UNTRUSTED",
+        "MIXED"
+      ]
+    },
+    "preconditions": {
+      "description": "Applicability facts the target must exhibit. Never a verdict, and never an assertion about the target's security.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+        "maxLength": 64
+      }
+    },
+    "surface_note": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "reference_behavior": {
+      "description": "What a reference agent did. A behavior, never a verdict: the evaluator decides what it means.",
+      "type": "string",
+      "enum": [
+        "COMPLIANT",
+        "PROVENANCE_DROPPED",
+        "TRUST_PROMOTED",
+        "SOURCE_TRUST_EXCEEDED",
+        "WRITE_OUTSIDE_POLICY",
+        "CONTENT_SUBSTITUTED",
+        "AUTHORIZED_UPDATE_APPLIED",
+        "CROSS_PRINCIPAL_RECALL",
+        "CROSS_TENANT_RECALL",
+        "CROSS_NAMESPACE_RECALL",
+        "RECALL_MISMATCHED_REQUEST",
+        "EXPIRED_MEMORY_USED",
+        "REVOKED_MEMORY_USED",
+        "OBJECTIVE_ALTERED",
+        "TOOL_SELECTION_ALTERED",
+        "TOOL_ARGUMENT_ALTERED",
+        "PROTECTED_FIELD_POPULATED",
+        "RECALLED_WITHOUT_INFLUENCE",
+        "MULTIPLE_INDEPENDENT_VIOLATIONS",
+        "NO_RELEVANT_OBSERVATION",
+        "HARNESS_FAILURE"
+      ]
+    },
+    "expected_invariant": {
+      "description": "Which invariant this entry is evaluated against. Not an expected outcome for that invariant.",
+      "type": "string",
+      "enum": [
+        "MEMORY_PROVENANCE_PRESENT",
+        "MEMORY_SOURCE_TRUST_PRESERVED",
+        "UNTRUSTED_MEMORY_NOT_PROMOTED_TO_AUTHORITY",
+        "MEMORY_PRINCIPAL_BOUNDARY_PRESERVED",
+        "MEMORY_TENANT_BOUNDARY_PRESERVED",
+        "MEMORY_NAMESPACE_BOUNDARY_PRESERVED",
+        "MEMORY_INTEGRITY_DIGEST_PRESERVED",
+        "MEMORY_WRITE_WITHIN_POLICY",
+        "EXPIRED_OR_REVOKED_MEMORY_NOT_USED",
+        "RECALLED_MEMORY_MATCHES_REQUESTED_CONTEXT",
+        "MEMORY_INFLUENCE_WITHIN_AUTHORIZED_OBJECTIVE",
+        "PROTECTED_FIELD_NOT_DERIVED_FROM_POISONED_MEMORY"
+      ]
+    },
+    "safety_class": {
+      "description": "Fixed. Every Cycle 016 vector is a synthetic no-op: nothing is dispatched, nothing changes state, nothing leaves the process.",
+      "const": "SYNTHETIC_NOOP"
+    },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]+(_[A-Z0-9]+)*$",
+            "maxLength": 64
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "status": {
+            "description": "The upstream document's own status. A draft stays a draft; it never becomes a conformance claim.",
+            "type": "string",
+            "enum": [
+              "NORMATIVE",
+              "FINAL_SPECIFICATION",
+              "DRAFT",
+              "OPEN_PROPOSAL",
+              "INFORMATIVE"
+            ]
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin",
+        "created_at",
+        "license"
+      ],
+      "properties": {
+        "origin": {
+          "const": "DARE_SYNTHETIC"
+        },
+        "author": {
+          "type": "string",
+          "maxLength": 96
+        },
+        "created_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "license": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    }
+  }
+}

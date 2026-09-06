@@ -67,6 +67,18 @@ pub struct AssessmentFacts {
     /// Cycle 015: the target records a resource owner distinct from the caller.
     #[serde(default)]
     pub resource_owner_context_present: bool,
+    /// Cycle 016: memory items carry machine-readable source/provenance.
+    #[serde(default)]
+    pub memory_provenance_present: bool,
+    /// Cycle 016: the target recalls persisted memory into later decisions.
+    #[serde(default)]
+    pub memory_recall_present: bool,
+    /// Cycle 016: memory items carry expiry/revocation lifecycle metadata.
+    #[serde(default)]
+    pub memory_lifecycle_present: bool,
+    /// Cycle 016: memory is partitioned into namespaces.
+    #[serde(default)]
+    pub memory_namespace_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

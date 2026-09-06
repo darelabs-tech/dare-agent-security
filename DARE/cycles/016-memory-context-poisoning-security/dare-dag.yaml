@@ -1,0 +1,13 @@
+cycle: "016-memory-context-poisoning-security"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+base_branch: main
+baseline_commit: 9d543ae0ec202b7ad05a852179ca5703857a317a
+branch: agent/cycle-016-memory-context-poisoning-security
+approval_file: DARE/cycles/016-memory-context-poisoning-security/APPROVAL.md
+execution_spec: DARE/cycles/016-memory-context-poisoning-security/dare-dag.exec.yaml
+execution_gate:
+  approval_file_present: true
+  execution_authorized: true
+  required_pre_pr_local_workflow_job: memory-security-2026
+  pr_open_only_after_local_gates_green: true

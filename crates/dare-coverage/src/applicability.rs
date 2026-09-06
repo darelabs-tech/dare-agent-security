@@ -106,6 +106,10 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::AuthorizationDecisionPresent => facts.authorization_decision_present,
         Predicate::TenantContextPresent => facts.tenant_context_present,
         Predicate::ResourceOwnerContextPresent => facts.resource_owner_context_present,
+        Predicate::MemoryProvenancePresent => facts.memory_provenance_present,
+        Predicate::MemoryRecallPresent => facts.memory_recall_present,
+        Predicate::MemoryLifecyclePresent => facts.memory_lifecycle_present,
+        Predicate::MemoryNamespacePresent => facts.memory_namespace_present,
     }
 }
 
@@ -144,6 +148,10 @@ mod tests {
             authorization_decision_present: false,
             tenant_context_present: false,
             resource_owner_context_present: false,
+            memory_provenance_present: false,
+            memory_recall_present: false,
+            memory_lifecycle_present: false,
+            memory_namespace_present: false,
             out_of_scope_property_ids: Vec::new(),
         }
     }

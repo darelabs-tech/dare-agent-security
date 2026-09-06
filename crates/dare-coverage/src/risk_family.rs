@@ -122,6 +122,10 @@ mod tests {
             authorization_decision_present: true,
             tenant_context_present: true,
             resource_owner_context_present: true,
+            memory_provenance_present: true,
+            memory_recall_present: true,
+            memory_lifecycle_present: true,
+            memory_namespace_present: true,
             out_of_scope_property_ids: vec![],
         };
         let report =
