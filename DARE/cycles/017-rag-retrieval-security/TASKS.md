@@ -33,9 +33,9 @@
 - [x] task-028 — Build provenance/filter/result-set/top-k paired corpus and fixtures
 - [x] task-029 — Build trust/protected-document/fallback paired corpus and fixtures
 - [x] task-030 — Add benign controls and no-promotion positive-coverage regressions
-- [ ] task-031 — Add hostile parser/provider/credential/verdict/executable fixtures
-- [ ] task-032 — Implement independent multi-violation capture and redaction-before-persistence
-- [ ] task-033 — Implement RAGSecurityResult and Cycle 001 evidence bridge
+- [x] task-031 — Add hostile parser/provider/credential/verdict/executable fixtures
+- [x] task-032 — Implement independent multi-violation capture and redaction-before-persistence
+- [x] task-033 — Implement RAGSecurityResult and Cycle 001 evidence bridge
 - [ ] task-034 — Add rag-security-baseline-2026 and coverage/registry integration
 - [ ] task-035 — Add validate rag-security CLI and bounded product/report artifacts
 - [ ] task-036 — Add dedicated CI job and actual local workflow execution

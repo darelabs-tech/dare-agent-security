@@ -430,7 +430,10 @@ pub enum RagObservationEvent {
         document_id: String,
         provenance_id: String,
         source_kind: DocumentSourceKind,
-        source_id: String,
+        /// Absent when the document's origin was never recorded, which is
+        /// exactly the condition `machine_readable` reports on.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        source_id: Option<String>,
         machine_readable: bool,
     },
     /// How far a retrieved document was actually trusted.

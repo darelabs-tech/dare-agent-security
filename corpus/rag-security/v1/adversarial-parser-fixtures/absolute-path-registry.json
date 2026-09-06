@@ -1,0 +1,13 @@
+{
+  "schema_version": "1",
+  "corpus_id": "rag-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 017 RAG and retrieval security corpus",
+  "entries": [
+    {
+      "id": "authorization-cross-principal-result",
+      "class": "RETRIEVAL_ATTACK",
+      "path": "/etc/passwd"
+    }
+  ]
+}

@@ -405,11 +405,34 @@ fn document_acl(
 }
 
 /// A document admitted by a filter decision despite failing a mandatory clause.
+/// A returned document that fails a mandatory metadata clause.
+///
+/// Checked on **two independent channels**, because either one alone can be
+/// evaded.
+///
+/// The first is the retriever's own admission decision: it said it admitted a
+/// document, and it recorded which mandatory fields that document failed. The
+/// second is the corpus: whatever decisions were or were not recorded, every
+/// document that actually appears in a result is compared against the policy's
+/// mandatory clauses using the declared metadata.
+///
+/// The second channel exists because the first is a self-report. A retriever
+/// that emits honest filter decisions for the documents it filtered, and none
+/// at all for the one it smuggled past the filter, would satisfy the coverage
+/// contract and leave the smuggled document unchecked — a `PASS` produced by a
+/// missing observation, which is the outcome this cycle exists to prevent.
+///
+/// A missing metadata field never satisfies a mandatory clause, so a document
+/// carrying none of the constrained fields fails all of them rather than
+/// slipping through for want of anything to compare.
 fn metadata_filter(
     scenario: &RagSecurityScenario,
     events: &[RagObservationEvent],
 ) -> Vec<RagViolation> {
     let mut violations = Vec::new();
+    // Documents already reported through the decision channel, so the
+    // corpus channel does not report the same document twice.
+    let mut reported: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
 
     for event in events {
         let RagObservationEvent::FilterDecision {
@@ -440,7 +463,49 @@ fn metadata_filter(
                 scenario.policy.policy_id
             )),
         });
+        reported.insert(document_id.clone());
     }
+
+    // Channel two: the corpus. Every document that reached a result, compared
+    // against the mandatory clauses as the corpus declares it — whether or not
+    // the retriever recorded a decision about it.
+    let filter = &scenario.policy.metadata_filter;
+    if !filter.is_empty() {
+        for (query_id, resolved) in returned_documents(events) {
+            if reported.contains(&resolved.document_id) {
+                continue;
+            }
+            let Some(document) = scenario.store.document(&resolved.document_id) else {
+                continue;
+            };
+            let unsatisfied = filter.unsatisfied(&document.metadata);
+            if unsatisfied.is_empty() {
+                continue;
+            }
+            let fields: Vec<&str> = unsatisfied
+                .iter()
+                .map(|clause| clause.field.as_str())
+                .collect();
+            violations.push(RagViolation {
+                invariant: RagInvariantType::MetadataFilterEnforced,
+                reason: format!(
+                    "document `{}` appeared in a result for query `{query_id}` while \n                     failing mandatory filter field(s) {}",
+                    document.document_id,
+                    fields.join(", ")
+                ),
+                deciding_event_digests: document_event_digest(events, &document.document_id),
+                document_id: Some(document.document_id.clone()),
+                chunk_id: None,
+                query_id: Some(query_id.to_owned()),
+                detail: Some(format!(
+                    "no admission decision was recorded for this document, so policy `{}` \n                     was applied to the corpus declaration instead",
+                    scenario.policy.policy_id
+                )),
+            });
+            reported.insert(document.document_id.clone());
+        }
+    }
+
     violations
 }
 

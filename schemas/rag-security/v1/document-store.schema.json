@@ -106,8 +106,7 @@
             "additionalProperties": false,
             "required": [
               "provenance_id",
-              "source_kind",
-              "source_id"
+              "source_kind"
             ],
             "properties": {
               "provenance_id": {

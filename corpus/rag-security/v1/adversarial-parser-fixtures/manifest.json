@@ -1,0 +1,487 @@
+{
+  "schema_version": "1",
+  "title": "DARE Cycle 017 adversarial parser fixtures",
+  "note": "Every document listed here is invalid by design and must be refused before evaluation or persistence. They are deliberately absent from registry.json. No fixture contains real credential material; credential-shaped values are synthetic placeholders.",
+  "cases": [
+    {
+      "id": "executable-field-command",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-command.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-script",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-script.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-eval",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-eval.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-shell",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-shell.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-callback",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-callback.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-callback-url",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-callback-url.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-exec",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-exec.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "executable-field-hook",
+      "kind": "CORPUS_ENTRY",
+      "path": "executable-field-hook.json",
+      "reason": "a field that could name something to run must not be ignored"
+    },
+    {
+      "id": "credential-field-api-key",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-api-key.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-token",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-token.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-access-token",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-access-token.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-password",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-password.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-client-secret",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-client-secret.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-private-key",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-private-key.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-secret",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-secret.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "credential-field-cookie",
+      "kind": "CORPUS_ENTRY",
+      "path": "credential-field-cookie.json",
+      "reason": "a credential field has no place in a declarative retrieval fixture"
+    },
+    {
+      "id": "api-key-shaped-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "api-key-shaped-value.json",
+      "reason": "the field name is not what makes a value dangerous"
+    },
+    {
+      "id": "jwt-shaped-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "jwt-shaped-value.json",
+      "reason": "a JWT-shaped value must be refused wherever it appears"
+    },
+    {
+      "id": "private-key-shaped-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "private-key-shaped-value.json",
+      "reason": "PEM material must never reach an artifact"
+    },
+    {
+      "id": "bearer-credential-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "bearer-credential-value.json",
+      "reason": "a bearer credential must be refused inside prose too"
+    },
+    {
+      "id": "remote-target-index-url",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-index-url.json",
+      "reason": "Cycle 017 reads local synthetic documents and reaches nothing"
+    },
+    {
+      "id": "remote-target-endpoint",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-endpoint.json",
+      "reason": "Cycle 017 reads local synthetic documents and reaches nothing"
+    },
+    {
+      "id": "remote-target-vector-db",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-vector-db.json",
+      "reason": "Cycle 017 reads local synthetic documents and reaches nothing"
+    },
+    {
+      "id": "remote-target-connection-string",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-connection-string.json",
+      "reason": "Cycle 017 reads local synthetic documents and reaches nothing"
+    },
+    {
+      "id": "remote-target-mcp-server",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-mcp-server.json",
+      "reason": "Cycle 017 reads local synthetic documents and reaches nothing"
+    },
+    {
+      "id": "remote-target-provider",
+      "kind": "CORPUS_ENTRY",
+      "path": "remote-target-provider.json",
+      "reason": "Cycle 017 reads local synthetic documents and reaches nothing"
+    },
+    {
+      "id": "verdict-smuggling-verdict",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-verdict.json",
+      "reason": "a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "id": "verdict-smuggling-expected-verdict",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-expected-verdict.json",
+      "reason": "a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "id": "verdict-smuggling-expected-outcome",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-expected-outcome.json",
+      "reason": "a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "id": "verdict-smuggling-expected-result",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-expected-result.json",
+      "reason": "a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "id": "verdict-smuggling-should-pass",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-should-pass.json",
+      "reason": "a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "id": "verdict-smuggling-should-fail",
+      "kind": "CORPUS_ENTRY",
+      "path": "verdict-smuggling-should-fail.json",
+      "reason": "a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "id": "nested-verdict-smuggling",
+      "kind": "CORPUS_ENTRY",
+      "path": "nested-verdict-smuggling.json",
+      "reason": "a verdict nested inside provenance must be found at any depth"
+    },
+    {
+      "id": "unknown-top-level-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-top-level-field.json",
+      "reason": "an unknown top-level field must not be ignored"
+    },
+    {
+      "id": "unknown-nested-field",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-nested-field.json",
+      "reason": "an unknown field nested inside provenance must not be ignored"
+    },
+    {
+      "id": "unknown-enum-value",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-enum-value.json",
+      "reason": "an unknown surface must fail closed rather than degrade to a default"
+    },
+    {
+      "id": "unknown-reference-behavior",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-reference-behavior.json",
+      "reason": "an unknown reference behavior must fail closed"
+    },
+    {
+      "id": "unknown-invariant",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-invariant.json",
+      "reason": "an invariant nobody implements cannot be evaluated"
+    },
+    {
+      "id": "unknown-poisoning-family",
+      "kind": "CORPUS_ENTRY",
+      "path": "unknown-poisoning-family.json",
+      "reason": "an unknown family would be counted under a surface it never exercises"
+    },
+    {
+      "id": "unsupported-schema-version",
+      "kind": "CORPUS_ENTRY",
+      "path": "unsupported-schema-version.json",
+      "reason": "a version this engine does not implement must be refused, not guessed at"
+    },
+    {
+      "id": "downgraded-schema-version",
+      "kind": "CORPUS_ENTRY",
+      "path": "downgraded-schema-version.json",
+      "reason": "an older version must not be silently upgraded"
+    },
+    {
+      "id": "surface-does-not-own-invariant",
+      "kind": "CORPUS_ENTRY",
+      "path": "surface-does-not-own-invariant.json",
+      "reason": "a mismatched surface would overstate per-surface coverage"
+    },
+    {
+      "id": "family-does-not-match-surface",
+      "kind": "CORPUS_ENTRY",
+      "path": "family-does-not-match-surface.json",
+      "reason": "a family from another surface would be counted in the wrong place"
+    },
+    {
+      "id": "missing-retrieval-policy-precondition",
+      "kind": "CORPUS_ENTRY",
+      "path": "missing-retrieval-policy-precondition.json",
+      "reason": "without a declared retrieval policy there is no Cycle 017 question to ask"
+    },
+    {
+      "id": "attack-declared-compliant",
+      "kind": "CORPUS_ENTRY",
+      "path": "attack-declared-compliant.json",
+      "reason": "an attack whose reference agent complied is a control, not an attack"
+    },
+    {
+      "id": "benign-control-crossing-a-boundary",
+      "kind": "CORPUS_ENTRY",
+      "path": "benign-control-crossing-a-boundary.json",
+      "reason": "a control that crosses a boundary is not a control"
+    },
+    {
+      "id": "oversized-surface-note",
+      "kind": "CORPUS_ENTRY",
+      "path": "oversized-surface-note.json",
+      "reason": "an unbounded note is an unbounded artifact"
+    },
+    {
+      "id": "safety-class-downgraded",
+      "kind": "CORPUS_ENTRY",
+      "path": "safety-class-downgraded.json",
+      "reason": "every Cycle 017 vector is a synthetic no-op and may not say otherwise"
+    },
+    {
+      "id": "log-injection-title",
+      "kind": "CORPUS_ENTRY",
+      "path": "log-injection-title.json",
+      "reason": "a newline in a reported value can forge a log line"
+    },
+    {
+      "id": "carriage-return-note",
+      "kind": "CORPUS_ENTRY",
+      "path": "carriage-return-note.json",
+      "reason": "a carriage return can overwrite a rendered line"
+    },
+    {
+      "id": "hostile-unicode-identifier",
+      "kind": "CORPUS_ENTRY",
+      "path": "hostile-unicode-identifier.json",
+      "reason": "a bidi override can make two distinct document ids render identically"
+    },
+    {
+      "id": "zero-width-identifier",
+      "kind": "CORPUS_ENTRY",
+      "path": "zero-width-identifier.json",
+      "reason": "a zero-width space makes two ids look identical and compare unequal"
+    },
+    {
+      "id": "control-character-note",
+      "kind": "CORPUS_ENTRY",
+      "path": "control-character-note.json",
+      "reason": "a control character in a persisted value is never legitimate"
+    },
+    {
+      "id": "path-traversal-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "path-traversal-registry.json",
+      "reason": "a corpus path must never reach outside the corpus root"
+    },
+    {
+      "id": "absolute-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "absolute-path-registry.json",
+      "reason": "an absolute path ignores the corpus root entirely"
+    },
+    {
+      "id": "drive-prefix-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "drive-prefix-registry.json",
+      "reason": "a drive prefix is an absolute path in another spelling"
+    },
+    {
+      "id": "url-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "url-path-registry.json",
+      "reason": "a corpus path is a local file, never something to fetch"
+    },
+    {
+      "id": "backslash-path-registry",
+      "kind": "CORPUS_REGISTRY",
+      "path": "backslash-path-registry.json",
+      "reason": "a non-portable separator hides traversal from a naive check"
+    },
+    {
+      "id": "duplicate-registry-id",
+      "kind": "CORPUS_REGISTRY",
+      "path": "duplicate-registry-id.json",
+      "reason": "two entries under one id make a report ambiguous about which ran"
+    },
+    {
+      "id": "duplicate-registry-path",
+      "kind": "CORPUS_REGISTRY",
+      "path": "duplicate-registry-path.json",
+      "reason": "one file listed twice would be counted as two vectors"
+    },
+    {
+      "id": "scenario-remote-index",
+      "kind": "SCENARIO",
+      "path": "scenario-remote-index.json",
+      "reason": "a scenario may not name a store to connect to"
+    },
+    {
+      "id": "scenario-non-local-execution",
+      "kind": "SCENARIO",
+      "path": "scenario-non-local-execution.json",
+      "reason": "Cycle 017 is local only and a scenario may not ask otherwise"
+    },
+    {
+      "id": "scenario-over-limit-trials",
+      "kind": "SCENARIO",
+      "path": "scenario-over-limit-trials.json",
+      "reason": "a trial count past the hard bound is refused, never clamped down"
+    },
+    {
+      "id": "scenario-over-limit-top-k",
+      "kind": "SCENARIO",
+      "path": "scenario-over-limit-top-k.json",
+      "reason": "a query asking past the hard result bound is refused before it runs"
+    },
+    {
+      "id": "scenario-unknown-principal",
+      "kind": "SCENARIO",
+      "path": "scenario-unknown-principal.json",
+      "reason": "an acting principal nobody declared would be evaluated against nothing"
+    },
+    {
+      "id": "scenario-unknown-document-reference",
+      "kind": "SCENARIO",
+      "path": "scenario-unknown-document-reference.json",
+      "reason": "a candidate naming a chunk the corpus never declared cannot be evaluated"
+    },
+    {
+      "id": "scenario-duplicate-principal",
+      "kind": "SCENARIO",
+      "path": "scenario-duplicate-principal.json",
+      "reason": "one principal declared twice makes ownership ambiguous"
+    },
+    {
+      "id": "scenario-duplicate-document-id",
+      "kind": "SCENARIO",
+      "path": "scenario-duplicate-document-id.json",
+      "reason": "one document id used twice makes substitution invisible"
+    },
+    {
+      "id": "scenario-credential-smuggling",
+      "kind": "SCENARIO",
+      "path": "scenario-credential-smuggling.json",
+      "reason": "a credential in a scenario must be refused before persistence"
+    },
+    {
+      "id": "scenario-verdict-smuggling",
+      "kind": "SCENARIO",
+      "path": "scenario-verdict-smuggling.json",
+      "reason": "a scenario may not state the verdict it wants"
+    },
+    {
+      "id": "scenario-path-traversal-collection",
+      "kind": "SCENARIO",
+      "path": "scenario-path-traversal-collection.json",
+      "reason": "a tenant id is a label, not a path"
+    },
+    {
+      "id": "scenario-over-limit-documents",
+      "kind": "SCENARIO",
+      "path": "scenario-over-limit-documents.json",
+      "reason": "a store past the hard item bound is refused rather than truncated"
+    },
+    {
+      "id": "trace-live-mode",
+      "kind": "TRACE",
+      "path": "trace-live-mode.json",
+      "reason": "a replay trace may not claim it was recorded live"
+    },
+    {
+      "id": "trace-remote-source",
+      "kind": "TRACE",
+      "path": "trace-remote-source.json",
+      "reason": "a trace may not name somewhere it came from over a network"
+    },
+    {
+      "id": "trace-claims-production-evidence",
+      "kind": "TRACE",
+      "path": "trace-claims-production-evidence.json",
+      "reason": "a trace claiming to be production evidence is refused"
+    },
+    {
+      "id": "trace-orphan-result-set",
+      "kind": "TRACE",
+      "path": "trace-orphan-result-set.json",
+      "reason": "a result set answering no recorded query cannot be inspected"
+    },
+    {
+      "id": "trace-claims-an-action-was-performed",
+      "kind": "TRACE",
+      "path": "trace-claims-an-action-was-performed.json",
+      "reason": "a trace has no standing to say an action ran"
+    },
+    {
+      "id": "trace-over-limit-trials",
+      "kind": "TRACE",
+      "path": "trace-over-limit-trials.json",
+      "reason": "a trace past the hard trial bound is refused before replay"
+    },
+    {
+      "id": "trace-verdict-smuggling",
+      "kind": "TRACE",
+      "path": "trace-verdict-smuggling.json",
+      "reason": "a trace may not state a verdict for the run it records"
+    },
+    {
+      "id": "trace-credential-smuggling",
+      "kind": "TRACE",
+      "path": "trace-credential-smuggling.json",
+      "reason": "a trace carrying credential material is refused before it is read"
+    }
+  ]
+}

@@ -32,7 +32,13 @@ pub struct Provenance {
     pub source_kind: DocumentSourceKind,
     /// Synthetic identifier of the specific origin: an upload, a crawl, a tool
     /// invocation.
-    pub source_id: String,
+    ///
+    /// Optional, because an index genuinely can hold a document whose origin
+    /// was never recorded. That absence is the thing
+    /// [`Provenance::is_machine_readable`] detects; making the field mandatory
+    /// would leave the check unable to fire.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_id: Option<String>,
     /// The principal whose action produced the content, when one is known.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub author_principal_id: Option<String>,
@@ -48,12 +54,18 @@ impl Provenance {
     /// different documents from the same kind of source are indistinguishable,
     /// and a substitution between them would be invisible.
     pub fn is_machine_readable(&self) -> bool {
-        !self.provenance_id.trim().is_empty() && !self.source_id.trim().is_empty()
+        !self.provenance_id.trim().is_empty()
+            && self
+                .source_id
+                .as_ref()
+                .is_some_and(|source| !source.trim().is_empty())
     }
 
     pub fn validate(&self) -> Result<()> {
         crate::canonical::assert_safe_identifier(&self.provenance_id, "provenance id")?;
-        crate::canonical::assert_safe_identifier(&self.source_id, "source id")?;
+        if let Some(source_id) = &self.source_id {
+            crate::canonical::assert_safe_identifier(source_id, "source id")?;
+        }
         if let Some(author) = &self.author_principal_id {
             crate::canonical::assert_safe_identifier(author, "author principal id")?;
         }
@@ -407,7 +419,7 @@ pub(crate) mod tests {
         Provenance {
             provenance_id: id.to_owned(),
             source_kind: kind,
-            source_id: format!("origin-{id}"),
+            source_id: Some(format!("origin-{id}")),
             author_principal_id: None,
             source_digest: None,
         }
@@ -716,7 +728,12 @@ pub(crate) mod tests {
         let mut provenance = provenance("prov-a", DocumentSourceKind::TenantUpload);
         assert!(provenance.is_machine_readable());
 
-        provenance.source_id = "   ".to_owned();
+        // Absence, not blankness, is how "no origin recorded" is expressed.
+        provenance.source_id = None;
+        assert!(!provenance.is_machine_readable());
+
+        // A blank string is treated the same way rather than as a value.
+        provenance.source_id = Some("   ".to_owned());
         assert!(!provenance.is_machine_readable());
     }
 }

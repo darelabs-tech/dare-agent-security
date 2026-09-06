@@ -46,8 +46,7 @@
       "additionalProperties": false,
       "required": [
         "provenance_id",
-        "source_kind",
-        "source_id"
+        "source_kind"
       ],
       "properties": {
         "provenance_id": {
@@ -71,7 +70,8 @@
           "type": "string",
           "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
           "minLength": 1,
-          "maxLength": 200
+          "maxLength": 200,
+          "description": "Optional. A document whose origin was never recorded has no source_id, which is exactly what the provenance invariant detects."
         },
         "author_principal_id": {
           "type": "string",
