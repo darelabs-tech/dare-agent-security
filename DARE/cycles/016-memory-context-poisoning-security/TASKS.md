@@ -1,7 +1,7 @@
 # Cycle 016 — Tasks
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED
 
 ## task-001 — Freeze post-Cycle-015 baseline and compatibility contracts
 ## task-002 — Record Cycle 015 lessons and ASI06 provenance/status snapshot
