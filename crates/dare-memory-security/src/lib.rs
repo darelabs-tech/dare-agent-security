@@ -52,12 +52,15 @@ pub mod binding;
 pub mod canonical;
 pub mod coverage;
 pub mod error;
+pub mod harness;
+pub mod invariant;
 pub mod lifecycle;
 pub mod memory;
 pub mod model;
 pub mod observation;
 pub mod policy;
 pub mod schema;
+pub mod simulated;
 pub mod source;
 
 pub use binding::{MemoryContext, MemoryPrincipal, PrincipalKind};
@@ -68,6 +71,10 @@ pub use coverage::{
 };
 pub use dare_security_evidence::Verdict;
 pub use error::{MemorySecurityError, Result};
+pub use harness::{
+    normalize, normalize_checked, HarnessAdapter, HarnessMode, RawTrialOutput, TrialRequest,
+};
+pub use invariant::{evaluate, supported_invariants, MemoryInvariantOutcome, MemoryViolation};
 pub use lifecycle::{LogicalTime, ValidityWindow};
 pub use memory::{MemoryItem, MemoryStore, Provenance};
 pub use model::{
@@ -79,6 +86,7 @@ pub use observation::{
     MemoryObservationEvent,
 };
 pub use policy::{MemoryPolicy, PolicyDimension, TrustElevationGrant};
+pub use simulated::{stage, SimulatedAdapter};
 pub use source::{
     CorpusClass, LifecycleState, MemorySourceKind, PoisoningFamily, ScenarioClass, SourceKind,
     TrustClass, TrustLevel,

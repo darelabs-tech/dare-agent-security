@@ -1,1 +1,673 @@
-{}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/memory-security/v1/trace.schema.json",
+  "title": "DARE Memory Security Replay Trace v1",
+  "description": "A sanitized, local, previously recorded memory trace. Replay evaluates what a trace says was observed; it never connects to a memory store, cache, database or vector store, and it performs no operation. The trace carries observations only: it declares no verdict, and any field that would let it dictate one is rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trace_id",
+    "scenario_id",
+    "mode",
+    "synthetic",
+    "trials"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "trace_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "mode": {
+      "description": "Fixed. A trace can only ever be replayed.",
+      "const": "REPLAY"
+    },
+    "synthetic": {
+      "description": "Fixed. Every Cycle 016 trace is synthetic; a trace claiming to be production evidence is refused.",
+      "const": true
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "trials": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/$defs/trial"
+      }
+    }
+  },
+  "$defs": {
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshots": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "store_id",
+              "store_digest",
+              "item_count"
+            ],
+            "properties": {
+              "store_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "store_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "item_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 32
+              },
+              "item_digests": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "memory_id",
+                    "content_digest",
+                    "version"
+                  ],
+                  "properties": {
+                    "memory_id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                      "minLength": 2,
+                      "maxLength": 96
+                    },
+                    "content_digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1024
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "writes": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "memory_id",
+              "writer_principal_id",
+              "namespace_id",
+              "tenant_id",
+              "stored_trust_class",
+              "content_digest",
+              "version"
+            ],
+            "properties": {
+              "memory_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "writer_principal_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "namespace_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "tenant_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "source_kind",
+                  "source_id"
+                ],
+                "properties": {
+                  "source_kind": {
+                    "type": "string",
+                    "enum": [
+                      "USER_INPUT",
+                      "TOOL_OUTPUT",
+                      "EXTERNAL_CONTENT",
+                      "SYSTEM_AUTHORED",
+                      "AGENT_GENERATED",
+                      "IMPORTED_CONTEXT"
+                    ]
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                    "minLength": 2,
+                    "maxLength": 96
+                  },
+                  "author_principal_id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                    "minLength": 2,
+                    "maxLength": 96
+                  },
+                  "recorded_at": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000
+                  }
+                }
+              },
+              "stored_trust_class": {
+                "type": "string",
+                "enum": [
+                  "UNTRUSTED",
+                  "CONSTRAINED",
+                  "TRUSTED_POLICY"
+                ]
+              },
+              "content_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1024
+              }
+            }
+          }
+        },
+        "updates": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "memory_id",
+              "writer_principal_id",
+              "before_content_digest",
+              "after_content_digest",
+              "before_version",
+              "after_version",
+              "authorized"
+            ],
+            "properties": {
+              "memory_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "writer_principal_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "before_content_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "after_content_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "before_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1024
+              },
+              "after_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1024
+              },
+              "authorized": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "invalidations": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "memory_id",
+              "state",
+              "at"
+            ],
+            "properties": {
+              "memory_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "NOT_YET_VALID",
+                  "VALID",
+                  "EXPIRED",
+                  "REVOKED"
+                ]
+              },
+              "at": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              }
+            }
+          }
+        },
+        "recall_requests": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "request_id",
+              "requester_principal_id",
+              "requested_namespace_id",
+              "requested_tenant_id"
+            ],
+            "properties": {
+              "request_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "requester_principal_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "requested_namespace_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "requested_tenant_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "requested_owner_principal_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "requested_memory_ids": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                  "minLength": 2,
+                  "maxLength": 96
+                }
+              }
+            }
+          }
+        },
+        "recall_results": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "request_id",
+              "requester_principal_id",
+              "items",
+              "at"
+            ],
+            "properties": {
+              "request_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "requester_principal_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "memory_id",
+                    "owner_principal_id",
+                    "tenant_id",
+                    "namespace_id",
+                    "trust_class",
+                    "content_digest",
+                    "lifecycle_state"
+                  ],
+                  "properties": {
+                    "memory_id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                      "minLength": 2,
+                      "maxLength": 96
+                    },
+                    "owner_principal_id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                      "minLength": 2,
+                      "maxLength": 96
+                    },
+                    "tenant_id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                      "minLength": 2,
+                      "maxLength": 96
+                    },
+                    "namespace_id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                      "minLength": 2,
+                      "maxLength": 96
+                    },
+                    "trust_class": {
+                      "type": "string",
+                      "enum": [
+                        "UNTRUSTED",
+                        "CONSTRAINED",
+                        "TRUSTED_POLICY"
+                      ]
+                    },
+                    "content_digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "lifecycle_state": {
+                      "type": "string",
+                      "enum": [
+                        "NOT_YET_VALID",
+                        "VALID",
+                        "EXPIRED",
+                        "REVOKED"
+                      ]
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source_kind",
+                        "source_id"
+                      ],
+                      "properties": {
+                        "source_kind": {
+                          "type": "string",
+                          "enum": [
+                            "USER_INPUT",
+                            "TOOL_OUTPUT",
+                            "EXTERNAL_CONTENT",
+                            "SYSTEM_AUTHORED",
+                            "AGENT_GENERATED",
+                            "IMPORTED_CONTEXT"
+                          ]
+                        },
+                        "source_id": {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                          "minLength": 2,
+                          "maxLength": 96
+                        },
+                        "author_principal_id": {
+                          "type": "string",
+                          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                          "minLength": 2,
+                          "maxLength": 96
+                        },
+                        "recorded_at": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 1000000
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "at": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              }
+            }
+          }
+        },
+        "influences": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "memory_id",
+              "target",
+              "changed"
+            ],
+            "properties": {
+              "memory_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "target": {
+                "type": "string",
+                "enum": [
+                  "OBJECTIVE",
+                  "TOOL_SELECTION",
+                  "TOOL_ARGUMENT",
+                  "PROTECTED_FIELD",
+                  "DECISION_CONTEXT"
+                ]
+              },
+              "field": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "baseline_value": {
+                "type": "string",
+                "maxLength": 256
+              },
+              "observed_value": {
+                "type": "string",
+                "maxLength": 256
+              },
+              "changed": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "decision_contexts": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "authorized_objective_id",
+              "observed_objective_id"
+            ],
+            "properties": {
+              "authorized_objective_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "observed_objective_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "baseline_tool_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "observed_tool_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              }
+            }
+          }
+        },
+        "action_intents": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action_id",
+              "performed"
+            ],
+            "properties": {
+              "action_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "tool_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "performed": {
+                "description": "Fixed false. Cycle 016 observes intents and performs none.",
+                "const": false
+              }
+            }
+          }
+        },
+        "policy_decisions": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "policy_id",
+              "operation",
+              "memory_id",
+              "allowed"
+            ],
+            "properties": {
+              "policy_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "operation": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "memory_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                "minLength": 2,
+                "maxLength": 96
+              },
+              "allowed": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "harness_error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "detail"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "ADAPTER_FAILURE",
+                "MALFORMED_TRACE",
+                "BUDGET_EXHAUSTED",
+                "TIMEOUT",
+                "SCHEMA_VIOLATION",
+                "KILL_SWITCH_TRIGGERED"
+              ]
+            },
+            "detail": {
+              "type": "string",
+              "maxLength": 512
+            }
+          }
+        }
+      }
+    }
+  }
+}

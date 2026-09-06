@@ -25,166 +25,206 @@
       "maxLength": 200
     },
     "allowed_writers": {
-      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy.",
+      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy. ANY carries no values and ONLY must carry them, so the two forms cannot be confused.",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "constraint"
       ],
-      "oneOf": [
-        {
-          "properties": {
-            "constraint": {
-              "const": "ANY"
-            }
-          },
-          "required": [
-            "constraint"
-          ],
-          "additionalProperties": false
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
         },
+        "values": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      },
+      "allOf": [
         {
-          "properties": {
-            "constraint": {
-              "const": "ONLY"
-            },
-            "values": {
-              "type": "array",
-              "maxItems": 32,
-              "items": {
-                "type": "string",
-                "maxLength": 96
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ONLY"
               }
-            }
+            },
+            "required": [
+              "constraint"
+            ]
           },
-          "required": [
-            "constraint",
-            "values"
-          ],
-          "additionalProperties": false
+          "then": {
+            "required": [
+              "values"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
         }
       ]
     },
     "allowed_readers": {
-      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy.",
+      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy. ANY carries no values and ONLY must carry them, so the two forms cannot be confused.",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "constraint"
       ],
-      "oneOf": [
-        {
-          "properties": {
-            "constraint": {
-              "const": "ANY"
-            }
-          },
-          "required": [
-            "constraint"
-          ],
-          "additionalProperties": false
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
         },
+        "values": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      },
+      "allOf": [
         {
-          "properties": {
-            "constraint": {
-              "const": "ONLY"
-            },
-            "values": {
-              "type": "array",
-              "maxItems": 32,
-              "items": {
-                "type": "string",
-                "maxLength": 96
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ONLY"
               }
-            }
+            },
+            "required": [
+              "constraint"
+            ]
           },
-          "required": [
-            "constraint",
-            "values"
-          ],
-          "additionalProperties": false
+          "then": {
+            "required": [
+              "values"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
         }
       ]
     },
     "allowed_tenants": {
-      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy.",
+      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy. ANY carries no values and ONLY must carry them, so the two forms cannot be confused.",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "constraint"
       ],
-      "oneOf": [
-        {
-          "properties": {
-            "constraint": {
-              "const": "ANY"
-            }
-          },
-          "required": [
-            "constraint"
-          ],
-          "additionalProperties": false
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
         },
+        "values": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      },
+      "allOf": [
         {
-          "properties": {
-            "constraint": {
-              "const": "ONLY"
-            },
-            "values": {
-              "type": "array",
-              "maxItems": 32,
-              "items": {
-                "type": "string",
-                "maxLength": 96
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ONLY"
               }
-            }
+            },
+            "required": [
+              "constraint"
+            ]
           },
-          "required": [
-            "constraint",
-            "values"
-          ],
-          "additionalProperties": false
+          "then": {
+            "required": [
+              "values"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
         }
       ]
     },
     "allowed_namespaces": {
-      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy.",
+      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy. ANY carries no values and ONLY must carry them, so the two forms cannot be confused.",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "constraint"
       ],
-      "oneOf": [
-        {
-          "properties": {
-            "constraint": {
-              "const": "ANY"
-            }
-          },
-          "required": [
-            "constraint"
-          ],
-          "additionalProperties": false
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
         },
+        "values": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      },
+      "allOf": [
         {
-          "properties": {
-            "constraint": {
-              "const": "ONLY"
-            },
-            "values": {
-              "type": "array",
-              "maxItems": 32,
-              "items": {
-                "type": "string",
-                "maxLength": 96
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ONLY"
               }
-            }
+            },
+            "required": [
+              "constraint"
+            ]
           },
-          "required": [
-            "constraint",
-            "values"
-          ],
-          "additionalProperties": false
+          "then": {
+            "required": [
+              "values"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
         }
       ]
     },
@@ -213,43 +253,53 @@
       ]
     },
     "allowed_objective_ids": {
-      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy.",
+      "description": "A closed policy dimension. ANY must be written explicitly; an omitted dimension permits nothing, so forgetting a field can never widen a policy. ANY carries no values and ONLY must carry them, so the two forms cannot be confused.",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "constraint"
       ],
-      "oneOf": [
-        {
-          "properties": {
-            "constraint": {
-              "const": "ANY"
-            }
-          },
-          "required": [
-            "constraint"
-          ],
-          "additionalProperties": false
+      "properties": {
+        "constraint": {
+          "type": "string",
+          "enum": [
+            "ANY",
+            "ONLY"
+          ]
         },
+        "values": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      },
+      "allOf": [
         {
-          "properties": {
-            "constraint": {
-              "const": "ONLY"
-            },
-            "values": {
-              "type": "array",
-              "maxItems": 32,
-              "items": {
-                "type": "string",
-                "maxLength": 96
+          "if": {
+            "properties": {
+              "constraint": {
+                "const": "ONLY"
               }
-            }
+            },
+            "required": [
+              "constraint"
+            ]
           },
-          "required": [
-            "constraint",
-            "values"
-          ],
-          "additionalProperties": false
+          "then": {
+            "required": [
+              "values"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "values"
+              ]
+            }
+          }
         }
       ]
     },

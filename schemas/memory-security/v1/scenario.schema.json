@@ -1,1 +1,448 @@
-{}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/memory-security/v1/scenario.schema.json",
+  "title": "DARE Memory Security Scenario v1",
+  "description": "A complete bounded memory-security scenario. It names the invariant to evaluate and never the answer: there is no field here by which a fixture could state its own verdict, and the lab block records only how a reference agent behaved.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "class",
+    "property",
+    "source",
+    "objective",
+    "store",
+    "context",
+    "invariant",
+    "trials",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "class": {
+      "type": "string",
+      "enum": [
+        "PROVENANCE",
+        "TRUST_BOUNDARY",
+        "TENANT_PRINCIPAL",
+        "LIFECYCLE",
+        "DECISION_INFLUENCE"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "AGENT.MEMORY.CONTEXT_INTEGRITY",
+        "AGENT.MEMORY.TENANT_BOUNDARY",
+        "AGENT.MEMORY.PROVENANCE_INTEGRITY",
+        "AGENT.MEMORY.WRITE_TRUST_BOUNDARY",
+        "AGENT.MEMORY.RECALL_AUTHORITY_BOUNDARY",
+        "AGENT.MEMORY.LIFECYCLE_VALIDITY"
+      ]
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "PROVENANCE_LOSS",
+        "TRUST_PROMOTION",
+        "MEMORY_OVERWRITE_SUBSTITUTION",
+        "CROSS_PRINCIPAL_RECALL",
+        "CROSS_TENANT_RECALL",
+        "CROSS_NAMESPACE_RECALL",
+        "STALE_MEMORY_USE",
+        "REVOKED_MEMORY_USE",
+        "POISONED_RECALL_TO_OBJECTIVE",
+        "POISONED_RECALL_TO_TOOL_SELECTION",
+        "POISONED_RECALL_TO_ARGUMENT",
+        "POISONED_RECALL_TO_PROTECTED_FIELD"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "trust"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "SYNTHETIC_MEMORY_STORE",
+            "REPLAY_TRACE",
+            "DECLARED_MEMORY_POLICY"
+          ]
+        },
+        "trust": {
+          "type": "string",
+          "enum": [
+            "TRUSTED",
+            "UNTRUSTED",
+            "MIXED"
+          ]
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "authorized_objective_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "authorized_objective_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "protected_canaries": {
+          "description": "Synthetic canary identifiers that must never appear in a protected field.",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "maxLength": 96
+          }
+        }
+      }
+    },
+    "store": {
+      "$ref": "https://darelabs.tech/schemas/memory-security/v1/memory-store.schema.json"
+    },
+    "context": {
+      "$ref": "https://darelabs.tech/schemas/memory-security/v1/memory-context.schema.json"
+    },
+    "policy": {
+      "$ref": "https://darelabs.tech/schemas/memory-security/v1/memory-policy.schema.json"
+    },
+    "recall": {
+      "description": "What the agent asked memory for. What it got is an observation; comparing the two is the matching invariant.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "requested_namespace_id",
+        "requested_tenant_id"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "requested_namespace_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "requested_tenant_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "requested_owner_principal_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "requested_memory_ids": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "minLength": 2,
+            "maxLength": 96
+          }
+        },
+        "max_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        }
+      }
+    },
+    "decision": {
+      "description": "The decision a recall may or may not influence. Structural: every comparison is field equality, never similarity.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorized_objective_id"
+      ],
+      "properties": {
+        "authorized_objective_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "baseline_tool_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "baseline_arguments": {
+          "type": "object",
+          "maxProperties": 16,
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "protected_fields": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "minLength": 2,
+            "maxLength": 96
+          }
+        }
+      }
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_id"
+      ],
+      "properties": {
+        "corpus_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 96
+        },
+        "corpus_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "MEMORY_PROVENANCE_PRESENT",
+            "MEMORY_SOURCE_TRUST_PRESERVED",
+            "UNTRUSTED_MEMORY_NOT_PROMOTED_TO_AUTHORITY",
+            "MEMORY_PRINCIPAL_BOUNDARY_PRESERVED",
+            "MEMORY_TENANT_BOUNDARY_PRESERVED",
+            "MEMORY_NAMESPACE_BOUNDARY_PRESERVED",
+            "MEMORY_INTEGRITY_DIGEST_PRESERVED",
+            "MEMORY_WRITE_WITHIN_POLICY",
+            "EXPIRED_OR_REVOKED_MEMORY_NOT_USED",
+            "RECALLED_MEMORY_MATCHES_REQUESTED_CONTEXT",
+            "MEMORY_INFLUENCE_WITHIN_AUTHORIZED_OBJECTIVE",
+            "PROTECTED_FIELD_NOT_DERIVED_FROM_POISONED_MEMORY"
+          ]
+        }
+      }
+    },
+    "evaluation_time": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "trials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "stop_on_first_fail": {
+          "type": "boolean"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_only"
+      ],
+      "properties": {
+        "local_only": {
+          "const": true
+        },
+        "max_events_per_trial": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "max_total_events": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 96
+        },
+        "max_recall_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "max_total_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "max_duration_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      }
+    },
+    "lab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_behavior"
+      ],
+      "properties": {
+        "reference_behavior": {
+          "description": "What a reference agent did. A behavior, never a verdict: the evaluator decides what it means.",
+          "type": "string",
+          "enum": [
+            "COMPLIANT",
+            "PROVENANCE_DROPPED",
+            "TRUST_PROMOTED",
+            "SOURCE_TRUST_EXCEEDED",
+            "WRITE_OUTSIDE_POLICY",
+            "CONTENT_SUBSTITUTED",
+            "AUTHORIZED_UPDATE_APPLIED",
+            "CROSS_PRINCIPAL_RECALL",
+            "CROSS_TENANT_RECALL",
+            "CROSS_NAMESPACE_RECALL",
+            "RECALL_MISMATCHED_REQUEST",
+            "EXPIRED_MEMORY_USED",
+            "REVOKED_MEMORY_USED",
+            "OBJECTIVE_ALTERED",
+            "TOOL_SELECTION_ALTERED",
+            "TOOL_ARGUMENT_ALTERED",
+            "PROTECTED_FIELD_POPULATED",
+            "RECALLED_WITHOUT_INFLUENCE",
+            "MULTIPLE_INDEPENDENT_VIOLATIONS",
+            "NO_RELEVANT_OBSERVATION",
+            "HARNESS_FAILURE"
+          ]
+        },
+        "per_trial": {
+          "type": "object",
+          "maxProperties": 10,
+          "additionalProperties": {
+            "description": "What a reference agent did. A behavior, never a verdict: the evaluator decides what it means.",
+            "type": "string",
+            "enum": [
+              "COMPLIANT",
+              "PROVENANCE_DROPPED",
+              "TRUST_PROMOTED",
+              "SOURCE_TRUST_EXCEEDED",
+              "WRITE_OUTSIDE_POLICY",
+              "CONTENT_SUBSTITUTED",
+              "AUTHORIZED_UPDATE_APPLIED",
+              "CROSS_PRINCIPAL_RECALL",
+              "CROSS_TENANT_RECALL",
+              "CROSS_NAMESPACE_RECALL",
+              "RECALL_MISMATCHED_REQUEST",
+              "EXPIRED_MEMORY_USED",
+              "REVOKED_MEMORY_USED",
+              "OBJECTIVE_ALTERED",
+              "TOOL_SELECTION_ALTERED",
+              "TOOL_ARGUMENT_ALTERED",
+              "PROTECTED_FIELD_POPULATED",
+              "RECALLED_WITHOUT_INFLUENCE",
+              "MULTIPLE_INDEPENDENT_VIOLATIONS",
+              "NO_RELEVANT_OBSERVATION",
+              "HARNESS_FAILURE"
+            ]
+          }
+        }
+      }
+    },
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]+(_[A-Z0-9]+)*$",
+            "maxLength": 64
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "status": {
+            "description": "The upstream document's own status. A draft stays a draft; it never becomes a conformance claim.",
+            "type": "string",
+            "enum": [
+              "NORMATIVE",
+              "FINAL_SPECIFICATION",
+              "DRAFT",
+              "OPEN_PROPOSAL",
+              "INFORMATIVE"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

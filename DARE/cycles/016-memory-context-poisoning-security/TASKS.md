@@ -15,17 +15,17 @@
 - [x] task-010 — Implement hostile-field, credential-shape, control-char, bidi and path refusal rules
 - [x] task-011 — Define normalized Memory Security observation model
 - [x] task-012 — Define invariant-specific positive PASS coverage contracts
-- [ ] task-013 — Implement deterministic Memory Security invariant registry
-- [ ] task-014 — Implement provenance and source-trust evaluators
-- [ ] task-015 — Implement principal/tenant/namespace boundary evaluators
-- [ ] task-016 — Implement integrity digest and overwrite/substitution evaluators
-- [ ] task-017 — Implement lifecycle expiry/revocation evaluators
-- [ ] task-018 — Implement memory-recall-to-decision/action influence evaluators
+- [x] task-013 — Implement deterministic Memory Security invariant registry
+- [x] task-014 — Implement provenance and source-trust evaluators
+- [x] task-015 — Implement principal/tenant/namespace boundary evaluators
+- [x] task-016 — Implement integrity digest and overwrite/substitution evaluators
+- [x] task-017 — Implement lifecycle expiry/revocation evaluators
+- [x] task-018 — Implement memory-recall-to-decision/action influence evaluators
 - [ ] task-019 — Reuse Cycle 013 trust-boundary semantics without duplicating prompt engine
 - [ ] task-020 — Reuse Cycle 015 principal/tenant conventions and compatibility tests
 - [ ] task-021 — Implement bounded trial ledger, memory/event/item limits and output/time budgets
 - [ ] task-022 — Implement replay adapter
-- [ ] task-023 — Implement simulated adapter
+- [x] task-023 — Implement simulated adapter
 - [ ] task-024 — Implement local-synthetic adapter with Cycle 009 controls
 - [ ] task-025 — Build provenance/trust-boundary paired corpus and fixtures
 - [ ] task-026 — Build principal/tenant/namespace paired corpus and fixtures

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/memory-security/v1/corpus-registry.schema.json",
+  "title": "DARE Memory Security Corpus Registry v1",
+  "description": "Index of the local memory-security corpus. Entry paths are root-confined relative paths; absolute paths, traversal, drive prefixes and URLs are refused.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "corpus_id",
+    "version",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "corpus_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "class",
+          "path"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+            "minLength": 2,
+            "maxLength": 96
+          },
+          "class": {
+            "type": "string",
+            "enum": [
+              "MEMORY_ATTACK",
+              "BENIGN_CONTROL"
+            ]
+          },
+          "path": {
+            "description": "Relative path under the corpus root. The pattern admits only the approved family directories and a single safe filename, so '..', absolute paths, drive prefixes and URLs cannot appear.",
+            "type": "string",
+            "pattern": "^(provenance|trust-boundary|tenant-principal|lifecycle|decision-influence|benign-controls)/[a-z0-9]+(-[a-z0-9]+)*\\.json$",
+            "maxLength": 200
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}
