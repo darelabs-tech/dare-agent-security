@@ -3,9 +3,9 @@
 **Status:** APPROVED FOR EXECUTION  
 **Approval:** APPROVED
 
-- [ ] task-001 — Freeze post-Cycle-017 baseline and compatibility contracts
-- [ ] task-002 — Record MCP 2026 / OAuth / AuthZEN / COAZ standards status snapshot
-- [ ] task-003 — Define additive MCP auth properties and applicability semantics
+- [x] task-001 — Freeze post-Cycle-017 baseline and compatibility contracts
+- [x] task-002 — Record MCP 2026 / OAuth / AuthZEN / COAZ standards status snapshot
+- [x] task-003 — Define additive MCP auth properties and applicability semantics
 - [ ] task-004 — Define protocol/request/header/body evidence schemas
 - [ ] task-005 — Define Protected Resource Metadata evidence schema
 - [ ] task-006 — Define Authorization Server Metadata / issuer evidence schema

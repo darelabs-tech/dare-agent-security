@@ -59,6 +59,17 @@ pub fn evaluate_applicability(
                 ),
             });
         }
+        // Cycle 018: an absent auth control or evidence channel on a target
+        // that *does* have the auth surface is a gap, never an exemption.
+        if predicate.is_auth_control_evidence() {
+            return Ok(ApplicabilityDecision {
+                status: CoverageStatus::NotTested,
+                rationale: format!(
+                    "auth control/evidence {} is absent — a gap, not relabeled NOT_APPLICABLE",
+                    predicate.as_str()
+                ),
+            });
+        }
         if predicate.is_target_shape() {
             return Ok(ApplicabilityDecision {
                 status: CoverageStatus::NotApplicable,
@@ -115,6 +126,19 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::DocumentAclPresent => facts.document_acl_present,
         Predicate::RetrievalProvenancePresent => facts.retrieval_provenance_present,
         Predicate::RetrievalTenantContextPresent => facts.retrieval_tenant_context_present,
+        Predicate::McpCurrentProtocolPresent => facts.mcp_current_protocol_present,
+        Predicate::McpHttpTransportPresent => facts.mcp_http_transport_present,
+        Predicate::McpAuthFlowPresent => facts.mcp_auth_flow_present,
+        Predicate::McpIdentityMetadataPresent => facts.mcp_identity_metadata_present,
+        Predicate::ProtectedResourceMetadataPresent => facts.protected_resource_metadata_present,
+        Predicate::AuthorizationServerMetadataPresent => {
+            facts.authorization_server_metadata_present
+        }
+        Predicate::TokenClaimsPresent => facts.token_claims_present,
+        Predicate::PkceContextPresent => facts.pkce_context_present,
+        Predicate::ScopeChallengePresent => facts.scope_challenge_present,
+        Predicate::ClientRegistrationPresent => facts.client_registration_present,
+        Predicate::CredentialForwardingPresent => facts.credential_forwarding_present,
     }
 }
 
@@ -162,6 +186,17 @@ mod tests {
             document_acl_present: false,
             retrieval_provenance_present: false,
             retrieval_tenant_context_present: false,
+            mcp_current_protocol_present: false,
+            mcp_http_transport_present: false,
+            mcp_auth_flow_present: false,
+            mcp_identity_metadata_present: false,
+            protected_resource_metadata_present: false,
+            authorization_server_metadata_present: false,
+            token_claims_present: false,
+            pkce_context_present: false,
+            scope_challenge_present: false,
+            client_registration_present: false,
+            credential_forwarding_present: false,
             out_of_scope_property_ids: Vec::new(),
         }
     }

@@ -94,6 +94,40 @@ pub struct AssessmentFacts {
     /// Cycle 017: retrieval runs under a tenant context distinct from others.
     #[serde(default)]
     pub retrieval_tenant_context_present: bool,
+    /// Cycle 018: the target speaks the current MCP protocol revision.
+    #[serde(default)]
+    pub mcp_current_protocol_present: bool,
+    /// Cycle 018: the target is reachable over the HTTP transport, where the
+    /// modern MCP authorization surface lives at all.
+    #[serde(default)]
+    pub mcp_http_transport_present: bool,
+    /// Cycle 018: the target participates in an MCP authorization flow.
+    #[serde(default)]
+    pub mcp_auth_flow_present: bool,
+    /// Cycle 018: the target reports `clientInfo` / `serverInfo` self-description.
+    #[serde(default)]
+    pub mcp_identity_metadata_present: bool,
+    /// Cycle 018: Protected Resource Metadata is observable for the resource.
+    #[serde(default)]
+    pub protected_resource_metadata_present: bool,
+    /// Cycle 018: authorization-server metadata is observable.
+    #[serde(default)]
+    pub authorization_server_metadata_present: bool,
+    /// Cycle 018: token claims are projected into evidence.
+    #[serde(default)]
+    pub token_claims_present: bool,
+    /// Cycle 018: PKCE challenge/verifier binding is observable.
+    #[serde(default)]
+    pub pkce_context_present: bool,
+    /// Cycle 018: an insufficient-scope challenge is observable.
+    #[serde(default)]
+    pub scope_challenge_present: bool,
+    /// Cycle 018: client registration metadata is observable.
+    #[serde(default)]
+    pub client_registration_present: bool,
+    /// Cycle 018: the target forwards or exchanges credentials to an upstream.
+    #[serde(default)]
+    pub credential_forwarding_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

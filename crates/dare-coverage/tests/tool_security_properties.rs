@@ -58,6 +58,17 @@ fn facts(tools: bool, metadata: bool, output: bool, chaining: bool) -> Assessmen
         document_acl_present: false,
         retrieval_provenance_present: false,
         retrieval_tenant_context_present: false,
+        mcp_current_protocol_present: false,
+        mcp_http_transport_present: false,
+        mcp_auth_flow_present: false,
+        mcp_identity_metadata_present: false,
+        protected_resource_metadata_present: false,
+        authorization_server_metadata_present: false,
+        token_claims_present: false,
+        pkce_context_present: false,
+        scope_challenge_present: false,
+        client_registration_present: false,
+        credential_forwarding_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -187,8 +198,10 @@ fn registry_growth_is_purely_additive() {
 #[test]
 fn every_existing_profile_keeps_its_exact_property_set() {
     let mcp = builtin_profile().expect("mcp profile");
+    // The profile's selection is the invariant this test is named for. The v1
+    // registry it draws from grows additively as MCP cycles add properties, and
+    // Cycle 018 took it to twenty without touching this profile.
     assert_eq!(mcp.properties.len(), 10);
-    assert_eq!(builtin_registry().unwrap().properties.len(), 10);
     validate_profile(&mcp, &builtin_registry().unwrap()).expect("mcp valid");
 
     let agentic = agentic_profile().expect("agentic profile");
