@@ -1,0 +1,224 @@
+{
+  "schema_version": "1.0.0",
+  "recorded_at": "2026-09-05",
+  "fetch_policy": "OFFLINE_LOCAL_SNAPSHOT",
+  "fetch_policy_note": "This manifest is a committed local snapshot of upstream references. DARE Agent Security performs no network fetch of standards at validation time, and Cycle 016 contacts no memory store, cache, database, vector store or SaaS memory provider. Canonical references are recorded for attribution and traceability only.",
+  "conformance_disclaimer": "DARE claims no conformance with any memory, storage, retrieval or context-management specification. Cycle 016 models persisted memory declaratively because that shape is useful for deterministic comparison, not because the engine implements or is certified against any specification. Resemblance of a data model is not conformance, and a draft or proposal referenced here stays a draft or proposal.",
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026",
+      "title": "OWASP Top 10 for Agentic Applications for 2026",
+      "version": "2026",
+      "published_at": "2025-12-09",
+      "canonical_reference": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY_CONTEXT",
+      "mapping_notes": "ASI06 Memory and Context Poisoning is the risk-family parent for Cycle 016. DARE properties are narrower, deterministically decidable security invariants and are not one-to-one restatements of ASI06."
+    },
+    {
+      "id": "OWASP_LLM_TOP10_2025",
+      "title": "OWASP Top 10 for Large Language Model Applications 2025",
+      "version": "2025",
+      "published_at": "2024-11-17",
+      "canonical_reference": "https://genai.owasp.org/llm-top-10/",
+      "status": "NORMATIVE",
+      "usage": "ADJACENT_RISK_CONTEXT",
+      "mapping_notes": "LLM01 Prompt Injection and LLM08 Vector and Embedding Weaknesses are adjacent. Cycle 016 is distinguished from LLM01 by persistence and recall, and deliberately does not implement the vector/embedding surface, which belongs to Cycle 017."
+    },
+    {
+      "id": "DARE_CYCLE_013",
+      "title": "DARE Cycle 013 — Prompt Injection Security",
+      "version": "1",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/013-prompt-injection-security-validation",
+      "status": "INFORMATIVE",
+      "usage": "TRUST_BOUNDARY_SEMANTICS",
+      "mapping_notes": "Cycle 016 reuses the rule that untrusted data does not become an authoritative instruction. It does not reuse or duplicate the prompt-injection evaluator; the distinguishing feature here is that the untrusted data was persisted and later recalled."
+    },
+    {
+      "id": "DARE_CYCLE_015",
+      "title": "DARE Cycle 015 — Identity, Privilege and Delegation Security",
+      "version": "1",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/015-identity-privilege-delegation-security",
+      "status": "INFORMATIVE",
+      "usage": "PRINCIPAL_TENANT_CONVENTIONS",
+      "mapping_notes": "Cycle 016 reuses principal and tenant conventions and sanitized-identifier rules so a memory boundary aligns with identity semantics rather than redefining them. It does not reuse the identity evaluator."
+    },
+    {
+      "id": "MEMORY_PROVENANCE_BINDING",
+      "title": "Memory provenance and recall-authority binding",
+      "version": "draft",
+      "published_at": "2026",
+      "canonical_reference": "DARE/cycles/016-memory-context-poisoning-security/DESIGN.md",
+      "status": "OPEN_PROPOSAL",
+      "usage": "INTERNAL_MODEL",
+      "mapping_notes": "The rule that recalled memory carries no more authority than its source trust class and authorized objective is a DARE modelling position, recorded as an open proposal rather than as an established standard."
+    },
+    {
+      "id": "DARE_CYCLE_016",
+      "title": "DARE Cycle 016 — Memory and Context Poisoning Security",
+      "version": "1",
+      "published_at": "2026-09-05",
+      "canonical_reference": "DARE/cycles/016-memory-context-poisoning-security",
+      "status": "INFORMATIVE",
+      "usage": "CYCLE_SELF_REFERENCE",
+      "mapping_notes": "This cycle's own design, blueprint and acceptance criteria."
+    }
+  ],
+  "memory_trust_statement": {
+    "core_relation": "stored_data != trusted_instruction",
+    "availability_rule": "memory availability is not authorization",
+    "recall_rule": "recall is not permission to influence",
+    "storage_rule": "Persisting data does not convert that data into authority. Untrusted memory may exist as data without producing a violation; a violation requires deterministic evidence that it exceeded its authorized boundary.",
+    "promotion_rule": "Trust elevation must be machine-readable and policy-derived. Content cannot promote itself by carrying words such as system, admin or verified."
+  },
+  "surface_classes": [
+    {
+      "id": "PROVENANCE",
+      "title": "Memory provenance",
+      "description": "Whether persisted memory retains machine-readable source and provenance before it influences behavior."
+    },
+    {
+      "id": "TRUST_BOUNDARY",
+      "title": "Memory write trust boundary",
+      "description": "Whether untrusted content silently became trusted or policy-authoritative persisted memory."
+    },
+    {
+      "id": "TENANT_PRINCIPAL",
+      "title": "Principal, tenant and namespace isolation",
+      "description": "Whether memory crossed a principal, tenant or namespace boundary on write, recall or influence."
+    },
+    {
+      "id": "LIFECYCLE",
+      "title": "Memory lifecycle validity",
+      "description": "Whether expired or revoked memory influenced a later decision, evaluated on deterministic logical time."
+    },
+    {
+      "id": "DECISION_INFLUENCE",
+      "title": "Recall-to-decision influence",
+      "description": "Whether recalled memory altered the authorized objective, tool selection, tool arguments or a protected field beyond policy."
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "AGENT.MEMORY.CONTEXT_INTEGRITY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI06 Memory and Context Poisoning",
+      "relation": "PARENT_INVARIANT",
+      "status": "INFORMATIVE",
+      "notes": "Pre-existing since Cycle 012. Cycle 016 adds specialized properties beside it and leaves its identifier, wording and applicability unchanged."
+    },
+    {
+      "property_id": "AGENT.MEMORY.TENANT_BOUNDARY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI06 Memory and Context Poisoning",
+      "relation": "PARENT_INVARIANT",
+      "status": "INFORMATIVE",
+      "notes": "Pre-existing since Cycle 012. Cycle 016 aligns its memory tenant checks with Cycle 015 tenant conventions rather than redefining this property."
+    },
+    {
+      "property_id": "AGENT.MEMORY.PROVENANCE_INTEGRITY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI06 Memory and Context Poisoning",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Narrower than ASI06: memory must retain machine-readable source and provenance before it influences behavior."
+    },
+    {
+      "property_id": "AGENT.MEMORY.WRITE_TRUST_BOUNDARY",
+      "standard": "DARE_CYCLE_013",
+      "reference": "untrusted data is not an authoritative instruction",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Applies the Cycle 013 untrusted-data rule to persistence: untrusted content may be stored as data but must not silently become policy-authoritative memory."
+    },
+    {
+      "property_id": "AGENT.MEMORY.RECALL_AUTHORITY_BOUNDARY",
+      "standard": "MEMORY_PROVENANCE_BINDING",
+      "reference": "recalled memory carries no more authority than its source trust class",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "A DARE modelling position recorded as an open proposal: recalled memory carries no more authority than its source trust class and authorized objective."
+    },
+    {
+      "property_id": "AGENT.MEMORY.LIFECYCLE_VALIDITY",
+      "standard": "OWASP_AGENTIC_TOP10_2026",
+      "reference": "ASI06 Memory and Context Poisoning",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Narrower than ASI06: expired or revoked memory must not influence a later decision, evaluated on deterministic logical time."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    {
+      "topic": "Vector retrieval, embedding similarity, document chunk authorization and RAG corpus isolation",
+      "deferred_to": "Cycle 017",
+      "note": "Cycle 016 validates persisted memory and context state. It implements no embedding retrieval, similarity search, vector-store authorization or cross-document retrieval testing."
+    },
+    {
+      "topic": "OAuth, OIDC, JWT verification, JWKS, live identity providers, policy decision points and token exchange",
+      "deferred_to": "Cycle 018",
+      "note": "Cycle 016 parses and verifies no token and contacts no identity or authorization service."
+    },
+    {
+      "topic": "AI bill of materials and supply chain",
+      "deferred_to": "Cycle 019"
+    },
+    {
+      "topic": "Agent-to-agent protocol security",
+      "deferred_to": "Cycle 020"
+    },
+    {
+      "topic": "Remote dynamic validation against live systems",
+      "deferred_to": "Cycle 022"
+    },
+    {
+      "topic": "Live memory stores of any kind — Redis, PostgreSQL, vector databases, SaaS memory providers, production agents and customer memory",
+      "deferred_to": "NOT_PLANNED_IN_THIS_TRACK",
+      "note": "No mode, flag or code path in Cycle 016 can reach one."
+    }
+  ],
+  "inherited_lessons": [
+    {
+      "id": "SECRET_SHAPE_NOT_VOCABULARY",
+      "from_cycle": "Cycle 015",
+      "lesson": "Credential detection must match token shape, not the words used to discuss credentials, so that an honest description of the boundary stays writable."
+    },
+    {
+      "id": "MASK_WHOLE_ARMOURED_BLOCK",
+      "from_cycle": "Cycle 015",
+      "lesson": "Key material spans multiple whitespace-separated lines; masking that stops at the first whitespace leaves the key body in retained text."
+    },
+    {
+      "id": "SWEEP_VALUES_NOT_ONLY_FIELD_NAMES",
+      "from_cycle": "Cycle 015",
+      "lesson": "Control characters and bidi overrides in identifiers reach reports and logs, so values are swept as well as field names."
+    },
+    {
+      "id": "NO_EXPECTED_VERDICT_IN_A_FIXTURE",
+      "from_cycle": "Cycle 015",
+      "lesson": "A fixture that can state its own outcome makes the evaluator ceremonial; the expected outcome lives in the test, never in the fixture."
+    },
+    {
+      "id": "PROVE_BOTH_DIRECTIONS_ARE_REACHABLE",
+      "from_cycle": "Cycle 015",
+      "lesson": "A corpus test must prove every invariant is reachable in both the passing and the failing direction rather than assuming it."
+    },
+    {
+      "id": "A_CONTROL_TEST_MUST_BE_ABLE_TO_FIRE",
+      "from_cycle": "Cycle 015",
+      "lesson": "A safety-control test whose condition is impossible by construction asserts nothing; the control must be observably able to trip."
+    },
+    {
+      "id": "ABSENCE_OF_EVIDENCE_IS_NOT_ABSENCE_OF_VIOLATION",
+      "from_cycle": "Cycles 013, 014 and 015",
+      "lesson": "Every invariant declares the observation channels it needs, and a missing channel yields INCONCLUSIVE rather than PASS."
+    },
+    {
+      "id": "INDEPENDENT_VIOLATIONS_STAY_INDEPENDENT",
+      "from_cycle": "Cycles 013, 014 and 015",
+      "lesson": "Violations are collected as a list; one classification never masks another."
+    }
+  ]
+}

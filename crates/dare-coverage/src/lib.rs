@@ -10,6 +10,7 @@ mod error;
 mod facts;
 mod identity_security_standards;
 mod math;
+mod memory_security_standards;
 mod plan;
 mod profile;
 mod prompt_injection_standards;
@@ -43,6 +44,10 @@ pub use identity_security_standards::{
 pub use math::{
     coverage_ratio, eligible_count, finalize_row, required_eligible_count, required_tested_count,
     tested_count, validate_pair, CoverageCounts, CoveragePolicy, CoverageTotals, DENOMINATOR_DOC,
+};
+pub use memory_security_standards::{
+    load_memory_security_provenance, memory_security_provenance,
+    validate_memory_security_provenance, MemorySecurityProvenance, MemoryTrustStatement,
 };
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
@@ -128,6 +133,6 @@ mod tests {
         let mcp = builtin_profile().unwrap();
         assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
         let agentic = agentic_profile().unwrap();
-        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 30);
+        assert_eq!(registry_for_profile(&agentic).unwrap().properties.len(), 34);
     }
 }

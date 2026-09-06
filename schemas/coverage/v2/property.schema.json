@@ -110,7 +110,11 @@
               "principal_context_present",
               "authorization_decision_present",
               "tenant_context_present",
-              "resource_owner_context_present"
+              "resource_owner_context_present",
+              "memory_provenance_present",
+              "memory_recall_present",
+              "memory_lifecycle_present",
+              "memory_namespace_present"
             ]
           }
         }

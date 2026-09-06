@@ -74,6 +74,10 @@ pub enum Predicate {
     AuthorizationDecisionPresent,
     TenantContextPresent,
     ResourceOwnerContextPresent,
+    MemoryProvenancePresent,
+    MemoryRecallPresent,
+    MemoryLifecyclePresent,
+    MemoryNamespacePresent,
 }
 
 impl Predicate {
@@ -107,6 +111,10 @@ impl Predicate {
             Self::AuthorizationDecisionPresent => "authorization_decision_present",
             Self::TenantContextPresent => "tenant_context_present",
             Self::ResourceOwnerContextPresent => "resource_owner_context_present",
+            Self::MemoryProvenancePresent => "memory_provenance_present",
+            Self::MemoryRecallPresent => "memory_recall_present",
+            Self::MemoryLifecyclePresent => "memory_lifecycle_present",
+            Self::MemoryNamespacePresent => "memory_namespace_present",
         }
     }
 
@@ -138,6 +146,10 @@ impl Predicate {
                 | Self::AuthorizationDecisionPresent
                 | Self::TenantContextPresent
                 | Self::ResourceOwnerContextPresent
+                | Self::MemoryProvenancePresent
+                | Self::MemoryRecallPresent
+                | Self::MemoryLifecyclePresent
+                | Self::MemoryNamespacePresent
         )
     }
 }
@@ -392,8 +404,9 @@ mod tests {
     #[test]
     fn agentic_registry_loads_and_all_families_are_represented() {
         let registry = agentic_registry().expect("agentic registry");
-        // 26 after Cycle 014; Cycle 015 appended four AGENT.IDENTITY.* properties.
-        assert_eq!(registry.properties.len(), 30);
+        // 26 after Cycle 014; Cycle 015 appended four AGENT.IDENTITY.*
+        // properties and Cycle 016 four AGENT.MEMORY.* ones.
+        assert_eq!(registry.properties.len(), 34);
         let families: HashSet<_> = registry
             .properties
             .iter()

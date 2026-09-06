@@ -51,6 +51,10 @@ fn facts(
         authorization_decision_present: decision,
         tenant_context_present: tenant,
         resource_owner_context_present: owner,
+        memory_provenance_present: owner,
+        memory_recall_present: owner,
+        memory_lifecycle_present: owner,
+        memory_namespace_present: owner,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -65,10 +69,21 @@ const PRIVILEGE_AMPLIFICATION: &str = "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION";
 #[test]
 fn the_registry_grew_by_exactly_four_properties() {
     let registry = agentic_registry().expect("agentic registry");
+    // Cycle 015 appended exactly four AGENT.IDENTITY.* properties to the six
+    // that family now holds. Asserted on the family rather than on the global
+    // total, so a later cycle appending its own properties does not have to
+    // edit this test to keep it passing — and cannot quietly remove one of
+    // these six either.
+    let identity_family: Vec<&str> = registry
+        .properties
+        .iter()
+        .map(|property| property.id.as_str())
+        .filter(|id| id.starts_with("AGENT.IDENTITY."))
+        .collect();
     assert_eq!(
-        registry.properties.len(),
-        30,
-        "26 before Cycle 015; four appended, none removed"
+        identity_family.len(),
+        6,
+        "two properties predate Cycle 015 and four were appended: {identity_family:?}"
     );
 
     let identity: Vec<&str> = registry
@@ -366,7 +381,10 @@ fn every_registry_property_id_is_unique() {
             property.id
         );
     }
-    assert_eq!(seen.len(), 30);
+    // Uniqueness is the property under test; the exact total moves whenever a
+    // later cycle appends, so it is asserted as a floor rather than an equality.
+    assert_eq!(seen.len(), registry.properties.len());
+    assert!(seen.len() >= 30, "the registry must never shrink");
 }
 
 #[test]
