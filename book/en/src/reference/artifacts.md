@@ -37,6 +37,7 @@ the product run layout above:
 | `validate adversarial` | `validation-result.json`, `evidence.json` |
 | `validate continuous` | `security-changeset.json`, `revalidation-plan.json`, `continuous-report.json` |
 | `validate identity-security` | `identity-security-result.json`, `identity-security-trials.json`, `identity-security-evidence.json`, `summary.md` |
+| `validate memory-security` | `memory-security-result.json`, `memory-security-trials.json`, `memory-security-evidence.json`, `summary.md` |
 | `ci write-result` | `ci-result.json` — schema is closed (Cycle 004); product artifacts above are always siblings, never additions to it. |
 
 ## Release artifacts

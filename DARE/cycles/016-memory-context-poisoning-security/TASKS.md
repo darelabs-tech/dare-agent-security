@@ -38,5 +38,5 @@
 - [x] task-033 — Add `memory-security-baseline-2026` and coverage/registry integration
 - [x] task-034 — Add `validate memory-security` CLI and bounded product/report artifacts
 - [x] task-035 — Add dedicated CI job, offline/confidential/no-live-store regressions and execute actual workflow job locally
-- [ ] task-036 — Document operator safe-use, memory provenance/trust model and Cycle 017 RAG separation
+- [x] task-036 — Document operator safe-use, memory provenance/trust model and Cycle 017 RAG separation
 - [ ] task-037 — Run full regression suite and produce `REGRESSION.md` + `PROOF.md`
