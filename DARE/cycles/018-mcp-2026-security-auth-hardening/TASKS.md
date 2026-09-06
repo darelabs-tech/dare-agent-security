@@ -1,0 +1,53 @@
+# Cycle 018 — Tasks
+
+**Status:** READY FOR REVIEW  
+**Approval:** PENDING
+
+- [ ] task-001 — Freeze post-Cycle-017 baseline and compatibility contracts
+- [ ] task-002 — Record MCP 2026 / OAuth / AuthZEN / COAZ standards status snapshot
+- [ ] task-003 — Define additive MCP auth properties and applicability semantics
+- [ ] task-004 — Define protocol/request/header/body evidence schemas
+- [ ] task-005 — Define Protected Resource Metadata evidence schema
+- [ ] task-006 — Define Authorization Server Metadata / issuer evidence schema
+- [ ] task-007 — Define authorization request/response correlation schemas
+- [ ] task-008 — Define synthetic token claims/resource/audience schema
+- [ ] task-009 — Define PKCE and redirect/state evidence schemas
+- [ ] task-010 — Define scope-challenge/step-up evidence schema
+- [ ] task-011 — Define client-registration metadata trust schema
+- [ ] task-012 — Define credential-flow separation schema
+- [ ] task-013 — Define self-reported MCP identity metadata schema
+- [ ] task-014 — Define scenario/corpus/registry/replay schemas
+- [ ] task-015 — Implement canonical digests and cross-object semantic bindings
+- [ ] task-016 — Implement hostile secret/endpoint/executable/control/bidi/path refusal
+- [ ] task-017 — Define normalized MCP auth observation model
+- [ ] task-018 — Define invariant-specific positive PASS coverage contracts
+- [ ] task-019 — Implement deterministic 14-invariant registry
+- [ ] task-020 — Implement protocol revision + method/name header/body evaluators
+- [ ] task-021 — Implement PRM/resource binding evaluator
+- [ ] task-022 — Implement AS metadata + issuer boundary evaluators
+- [ ] task-023 — Implement authorization-response issuer evaluator
+- [ ] task-024 — Implement token validity + audience/resource evaluators
+- [ ] task-025 — Implement PKCE evaluator
+- [ ] task-026 — Implement redirect/state evaluator
+- [ ] task-027 — Implement scope step-up + retry-bound evaluator
+- [ ] task-028 — Implement client-registration trust evaluator
+- [ ] task-029 — Implement credential separation evaluator
+- [ ] task-030 — Implement self-reported identity metadata boundary evaluator
+- [ ] task-031 — Reuse Cycle 015 principal/tenant/delegation semantics
+- [ ] task-032 — Reuse Cycle 003 final-operation authorization binding
+- [ ] task-033 — Implement trial ledger and hard/run-wide limits
+- [ ] task-034 — Implement replay adapter with semantic scenario binding
+- [ ] task-035 — Implement simulated adapter
+- [ ] task-036 — Implement local-synthetic adapter under Cycle 009 safety controls
+- [ ] task-037 — Build protocol/header/PRM/issuer paired corpus
+- [ ] task-038 — Build token/audience/PKCE/redirect paired corpus
+- [ ] task-039 — Build scope/registration/credential/identity paired corpus
+- [ ] task-040 — Add benign controls + missing-evidence INCONCLUSIVE regressions
+- [ ] task-041 — Add hostile raw-token/secret/endpoint/executable fixtures
+- [ ] task-042 — Implement independent multi-violation capture and redaction-before-persistence
+- [ ] task-043 — Implement MCPAuthSecurityResult + Cycle 001 evidence bridge
+- [ ] task-044 — Add mcp-auth-hardening-2026 profile and coverage integration
+- [ ] task-045 — Add validate mcp-auth-security CLI + bounded reports
+- [ ] task-046 — Add dedicated mcp-auth-security-2026 CI job and local workflow execution
+- [ ] task-047 — Document safe use, identity/auth boundaries, standards status and future DPoP/workload-identity boundary
+- [ ] task-048 — Run full regression suite and produce REGRESSION.md + PROOF.md (76/76 AC)
