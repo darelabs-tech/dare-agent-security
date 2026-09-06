@@ -357,6 +357,7 @@
           }
         },
         "recall_results": {
+          "description": "A recall result names the memory it returned by id. The binding facts — owner, tenant, namespace, trust and lifecycle — are resolved from the store during normalization, so a trace cannot assert that a cross-tenant item belonged to the acting tenant all along.",
           "type": "array",
           "maxItems": 8,
           "items": {
@@ -365,7 +366,7 @@
             "required": [
               "request_id",
               "requester_principal_id",
-              "items",
+              "memory_ids",
               "at"
             ],
             "properties": {
@@ -381,106 +382,14 @@
                 "minLength": 2,
                 "maxLength": 96
               },
-              "items": {
+              "memory_ids": {
                 "type": "array",
                 "maxItems": 8,
                 "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "memory_id",
-                    "owner_principal_id",
-                    "tenant_id",
-                    "namespace_id",
-                    "trust_class",
-                    "content_digest",
-                    "lifecycle_state"
-                  ],
-                  "properties": {
-                    "memory_id": {
-                      "type": "string",
-                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
-                      "minLength": 2,
-                      "maxLength": 96
-                    },
-                    "owner_principal_id": {
-                      "type": "string",
-                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
-                      "minLength": 2,
-                      "maxLength": 96
-                    },
-                    "tenant_id": {
-                      "type": "string",
-                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
-                      "minLength": 2,
-                      "maxLength": 96
-                    },
-                    "namespace_id": {
-                      "type": "string",
-                      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
-                      "minLength": 2,
-                      "maxLength": 96
-                    },
-                    "trust_class": {
-                      "type": "string",
-                      "enum": [
-                        "UNTRUSTED",
-                        "CONSTRAINED",
-                        "TRUSTED_POLICY"
-                      ]
-                    },
-                    "content_digest": {
-                      "type": "string",
-                      "pattern": "^sha256:[0-9a-f]{64}$"
-                    },
-                    "lifecycle_state": {
-                      "type": "string",
-                      "enum": [
-                        "NOT_YET_VALID",
-                        "VALID",
-                        "EXPIRED",
-                        "REVOKED"
-                      ]
-                    },
-                    "provenance": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": [
-                        "source_kind",
-                        "source_id"
-                      ],
-                      "properties": {
-                        "source_kind": {
-                          "type": "string",
-                          "enum": [
-                            "USER_INPUT",
-                            "TOOL_OUTPUT",
-                            "EXTERNAL_CONTENT",
-                            "SYSTEM_AUTHORED",
-                            "AGENT_GENERATED",
-                            "IMPORTED_CONTEXT"
-                          ]
-                        },
-                        "source_id": {
-                          "type": "string",
-                          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
-                          "minLength": 2,
-                          "maxLength": 96
-                        },
-                        "author_principal_id": {
-                          "type": "string",
-                          "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
-                          "minLength": 2,
-                          "maxLength": 96
-                        },
-                        "recorded_at": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 1000000
-                        }
-                      }
-                    }
-                  }
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+                  "minLength": 2,
+                  "maxLength": 96
                 }
               },
               "at": {
@@ -578,14 +487,14 @@
           }
         },
         "action_intents": {
+          "description": "An intent the agent formed. There is deliberately no `performed` field: Cycle 016 observes intents and performs none, so a trace cannot express performance in either direction and normalization sets it structurally false.",
           "type": "array",
           "maxItems": 8,
           "items": {
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "action_id",
-              "performed"
+              "action_id"
             ],
             "properties": {
               "action_id": {
@@ -599,10 +508,6 @@
                 "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
                 "minLength": 2,
                 "maxLength": 96
-              },
-              "performed": {
-                "description": "Fixed false. Cycle 016 observes intents and performs none.",
-                "const": false
               }
             }
           }

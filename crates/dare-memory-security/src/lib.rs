@@ -55,13 +55,16 @@ pub mod error;
 pub mod harness;
 pub mod invariant;
 pub mod lifecycle;
+pub mod local_synthetic;
 pub mod memory;
 pub mod model;
 pub mod observation;
 pub mod policy;
+pub mod replay;
 pub mod schema;
 pub mod simulated;
 pub mod source;
+pub mod trials;
 
 pub use binding::{MemoryContext, MemoryPrincipal, PrincipalKind};
 pub use canonical::{assert_safe_identifier, digest, verify_digest, MemoryBinding};
@@ -76,6 +79,7 @@ pub use harness::{
 };
 pub use invariant::{evaluate, supported_invariants, MemoryInvariantOutcome, MemoryViolation};
 pub use lifecycle::{LogicalTime, ValidityWindow};
+pub use local_synthetic::{synthetic_budget, LocalSyntheticAdapter, MemoryControlSnapshot};
 pub use memory::{MemoryItem, MemoryStore, Provenance};
 pub use model::{
     MemoryCorpusEntry, MemoryInvariantType, MemoryLabSpec, MemoryObjective, MemoryProperty,
@@ -86,11 +90,13 @@ pub use observation::{
     MemoryObservationEvent,
 };
 pub use policy::{MemoryPolicy, PolicyDimension, TrustElevationGrant};
+pub use replay::{load_trace, parse_trace, LoadedTrace, MemoryTrace, ReplayAdapter};
 pub use simulated::{stage, SimulatedAdapter};
 pub use source::{
     CorpusClass, LifecycleState, MemorySourceKind, PoisoningFamily, ScenarioClass, SourceKind,
     TrustClass, TrustLevel,
 };
+pub use trials::{BudgetSnapshot, StopReason, TrialGuard, TrialLedger, TrialPlan};
 
 /// Published crate name for workspace identity checks.
 pub const CRATE_NAME: &str = "dare-memory-security";

@@ -23,10 +23,10 @@
 - [x] task-018 — Implement memory-recall-to-decision/action influence evaluators
 - [ ] task-019 — Reuse Cycle 013 trust-boundary semantics without duplicating prompt engine
 - [ ] task-020 — Reuse Cycle 015 principal/tenant conventions and compatibility tests
-- [ ] task-021 — Implement bounded trial ledger, memory/event/item limits and output/time budgets
-- [ ] task-022 — Implement replay adapter
+- [x] task-021 — Implement bounded trial ledger, memory/event/item limits and output/time budgets
+- [x] task-022 — Implement replay adapter
 - [x] task-023 — Implement simulated adapter
-- [ ] task-024 — Implement local-synthetic adapter with Cycle 009 controls
+- [x] task-024 — Implement local-synthetic adapter with Cycle 009 controls
 - [ ] task-025 — Build provenance/trust-boundary paired corpus and fixtures
 - [ ] task-026 — Build principal/tenant/namespace paired corpus and fixtures
 - [ ] task-027 — Build integrity/lifecycle paired corpus and fixtures
