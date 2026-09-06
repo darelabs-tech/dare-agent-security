@@ -539,6 +539,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-mcp-auth-security"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-adversarial",
+ "dare-coaz-integrity",
+ "dare-coverage",
+ "dare-identity-security",
+ "dare-mcp-discovery",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "time",
+]
+
+[[package]]
 name = "dare-mcp-discovery"
 version = "1.0.0-rc1"
 dependencies = [
