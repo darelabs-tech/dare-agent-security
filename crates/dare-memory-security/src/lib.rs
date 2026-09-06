@@ -50,6 +50,7 @@
 
 pub mod binding;
 pub mod canonical;
+pub mod compat;
 pub mod coverage;
 pub mod error;
 pub mod harness;
@@ -68,6 +69,10 @@ pub mod trials;
 
 pub use binding::{MemoryContext, MemoryPrincipal, PrincipalKind};
 pub use canonical::{assert_safe_identifier, digest, verify_digest, MemoryBinding};
+pub use compat::{
+    acting_principal_originates_authority, assert_identity_agreement, composed_boundary_properties,
+    injection_source_for, memory_principal_from_identity,
+};
 pub use coverage::{
     all_contracts, assess_coverage, coverage_contract, ChannelRequirement, CoverageContract,
     CoverageDecision,

@@ -21,8 +21,8 @@
 - [x] task-016 — Implement integrity digest and overwrite/substitution evaluators
 - [x] task-017 — Implement lifecycle expiry/revocation evaluators
 - [x] task-018 — Implement memory-recall-to-decision/action influence evaluators
-- [ ] task-019 — Reuse Cycle 013 trust-boundary semantics without duplicating prompt engine
-- [ ] task-020 — Reuse Cycle 015 principal/tenant conventions and compatibility tests
+- [x] task-019 — Reuse Cycle 013 trust-boundary semantics without duplicating prompt engine
+- [x] task-020 — Reuse Cycle 015 principal/tenant conventions and compatibility tests
 - [x] task-021 — Implement bounded trial ledger, memory/event/item limits and output/time budgets
 - [x] task-022 — Implement replay adapter
 - [x] task-023 — Implement simulated adapter
