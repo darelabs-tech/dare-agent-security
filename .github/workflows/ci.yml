@@ -1652,6 +1652,8 @@ jobs:
         run: cargo test -p dare-rag-security --test hostile_fixtures -- --nocapture
       - name: Independent multi-violation capture and redaction hygiene
         run: cargo test -p dare-rag-security --test violations_and_hygiene -- --nocapture
+      - name: Offline, confidential and no-remote-retriever regressions
+        run: cargo test -p dare-rag-security --test offline_confidential -- --nocapture
       - name: RAG-security profile and coverage integration
         run: cargo test -p dare-coverage --test rag_security_profile -- --nocapture
       - name: RAG-security properties and standards provenance
