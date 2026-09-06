@@ -1059,6 +1059,9 @@ mod tests {
     #[test]
     fn every_violation_names_the_events_that_decided_it() {
         let scenario = scenario();
+        // This generic in-crate scenario covers every behavior below. Provenance
+        // detachment deliberately remains covered by RAG-LAB-008, whose store
+        // declares the missing-provenance precondition required to stage it.
         let behaviors = [
             ReferenceBehavior::CrossPrincipalResult,
             ReferenceBehavior::CrossTenantResult,
@@ -1066,7 +1069,6 @@ mod tests {
             ReferenceBehavior::UnauthorizedDocumentResult,
             ReferenceBehavior::MetadataFilterBypassed,
             ReferenceBehavior::ProtectedDocumentReturned,
-            ReferenceBehavior::ProvenanceDetached,
             ReferenceBehavior::ChunkReboundToAnotherDocument,
             ReferenceBehavior::NonCandidateResultInjected,
             ReferenceBehavior::TopKExceeded,
