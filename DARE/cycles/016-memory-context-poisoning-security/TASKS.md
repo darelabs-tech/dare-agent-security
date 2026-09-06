@@ -6,15 +6,15 @@
 - [x] task-001 — Freeze post-Cycle-015 baseline and compatibility contracts
 - [x] task-002 — Record Cycle 015 lessons and ASI06 provenance/status snapshot
 - [x] task-003 — Freeze existing memory properties and approve additive memory-security properties/predicates
-- [ ] task-004 — Define memory-item and memory-store schemas
-- [ ] task-005 — Define memory-policy, source-kind and trust-class models
-- [ ] task-006 — Define principal/tenant/namespace binding model using Cycle 015 conventions
-- [ ] task-007 — Define lifecycle and validity model for memory items
-- [ ] task-008 — Define scenario, corpus-entry, event and replay-trace schemas
-- [ ] task-009 — Implement canonical digests and cross-object bindings
-- [ ] task-010 — Implement hostile-field, credential-shape, control-char, bidi and path refusal rules
-- [ ] task-011 — Define normalized Memory Security observation model
-- [ ] task-012 — Define invariant-specific positive PASS coverage contracts
+- [x] task-004 — Define memory-item and memory-store schemas
+- [x] task-005 — Define memory-policy, source-kind and trust-class models
+- [x] task-006 — Define principal/tenant/namespace binding model using Cycle 015 conventions
+- [x] task-007 — Define lifecycle and validity model for memory items
+- [x] task-008 — Define scenario, corpus-entry, event and replay-trace schemas
+- [x] task-009 — Implement canonical digests and cross-object bindings
+- [x] task-010 — Implement hostile-field, credential-shape, control-char, bidi and path refusal rules
+- [x] task-011 — Define normalized Memory Security observation model
+- [x] task-012 — Define invariant-specific positive PASS coverage contracts
 - [ ] task-013 — Implement deterministic Memory Security invariant registry
 - [ ] task-014 — Implement provenance and source-trust evaluators
 - [ ] task-015 — Implement principal/tenant/namespace boundary evaluators

@@ -1,0 +1,29 @@
+[package]
+name = "dare-memory-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Bounded, evidence-first, offline-first memory and context poisoning security validation (Cycle 016)"
+publish = false
+
+[lib]
+name = "dare_memory_security"
+path = "src/lib.rs"
+
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-identity-security = { path = "../dare-identity-security" }
+dare-prompt-injection = { path = "../dare-prompt-injection" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

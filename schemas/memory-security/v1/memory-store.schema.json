@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/memory-security/v1/memory-store.schema.json",
+  "title": "DARE Memory Security Memory Store v1",
+  "description": "A bounded snapshot of persisted memory. A snapshot is a description of state, never a connection: there is no field here by which a store could be reached.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "store_id",
+    "items"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "store_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 96
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "https://darelabs.tech/schemas/memory-security/v1/memory-item.schema.json"
+      }
+    },
+    "namespaces": {
+      "description": "Namespaces this store declares. When present, an item outside the list is refused rather than treated as opening a new namespace.",
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+([-_.][a-z0-9]+)*$",
+        "minLength": 2,
+        "maxLength": 96
+      }
+    }
+  }
+}
