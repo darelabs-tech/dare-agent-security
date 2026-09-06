@@ -102,3 +102,15 @@ declined to run.
 
 Exit `2` covers both a violation and an undecided run. Neither is a pass, and CI
 must not treat either as one. A refusal writes no artifact.
+
+## `validate rag-security`
+
+| Code | Meaning |
+|---|---|
+| 0 | No RAG/retrieval-security invariant violation was observed for the tested vectors. |
+| 1 | Harness or environment error. |
+| 2 | A deterministic invariant violation was observed, or evidence was inconclusive. |
+| 3 | Usage error or safety refusal. |
+
+Exit `2` covers both a violation and an undecided run. Neither is a pass, and CI
+must not treat either as one. A refusal writes no artifact.

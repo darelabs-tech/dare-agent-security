@@ -136,6 +136,28 @@ agent or customer memory is involved, and lifecycle is evaluated at the logical
 time each scenario declares rather than against the machine's clock. See
 [Memory and Context Poisoning Validation](../concepts/memory-security.md).
 
+## `validate rag-security`
+
+Run bounded local RAG and retrieval security validation (Cycle 017).
+
+```bash
+dare-agent-security validate rag-security   --scenario RAG-LAB-001   --mode simulated   --output-dir .dare-agent-security/rag-security
+```
+
+Modes are `replay`, `simulated` and `local-synthetic`; all three are local and
+offline. There is no `--url`, `--endpoint`, `--pinecone`, `--weaviate`,
+`--qdrant`, `--redis`, `--postgres`, `--opensearch`, `--elasticsearch`,
+`--api-key`, `--token`, `--connection-string`, `--remote` or `--command` flag,
+and no connection string is read from the environment.
+
+Documents are described from local synthetic fixtures and are never indexed,
+embedded or persisted: no Pinecone, Weaviate, Qdrant, Redis, PostgreSQL,
+OpenSearch, Elasticsearch, SaaS retrieval API, remote MCP server, production
+retriever or customer corpus is involved. No embedding is computed or compared,
+and no score, ranking, similarity or reranker decides any verdict — retrieval
+relevance is not authorization. See
+[RAG and Retrieval Security Validation](../concepts/rag-security.md).
+
 ## Exit codes
 
 Each subcommand has its own table — see [Exit Codes](../reference/exit-codes.md).
