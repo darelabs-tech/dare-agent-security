@@ -78,6 +78,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local RAG and retrieval security validation (Cycle 017).
     #[command(name = "rag-security")]
     RagSecurity(crate::rag_security::RagSecurityArgs),
+    /// Run bounded local MCP 2026 authentication and authorization validation (Cycle 018).
+    #[command(name = "mcp-auth-security")]
+    McpAuthSecurity(crate::mcp_auth_security::McpAuthSecurityArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

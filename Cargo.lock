@@ -432,6 +432,7 @@ dependencies = [
  "dare-continuous",
  "dare-coverage",
  "dare-identity-security",
+ "dare-mcp-auth-security",
  "dare-mcp-discovery",
  "dare-memory-security",
  "dare-product",
