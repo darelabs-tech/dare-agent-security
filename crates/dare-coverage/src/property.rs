@@ -84,6 +84,17 @@ pub enum Predicate {
     DocumentAclPresent,
     RetrievalProvenancePresent,
     RetrievalTenantContextPresent,
+    McpCurrentProtocolPresent,
+    McpHttpTransportPresent,
+    McpAuthFlowPresent,
+    McpIdentityMetadataPresent,
+    ProtectedResourceMetadataPresent,
+    AuthorizationServerMetadataPresent,
+    TokenClaimsPresent,
+    PkceContextPresent,
+    ScopeChallengePresent,
+    ClientRegistrationPresent,
+    CredentialForwardingPresent,
 }
 
 impl Predicate {
@@ -126,6 +137,17 @@ impl Predicate {
             Self::DocumentAclPresent => "document_acl_present",
             Self::RetrievalProvenancePresent => "retrieval_provenance_present",
             Self::RetrievalTenantContextPresent => "retrieval_tenant_context_present",
+            Self::McpCurrentProtocolPresent => "mcp_current_protocol_present",
+            Self::McpHttpTransportPresent => "mcp_http_transport_present",
+            Self::McpAuthFlowPresent => "mcp_auth_flow_present",
+            Self::McpIdentityMetadataPresent => "mcp_identity_metadata_present",
+            Self::ProtectedResourceMetadataPresent => "protected_resource_metadata_present",
+            Self::AuthorizationServerMetadataPresent => "authorization_server_metadata_present",
+            Self::TokenClaimsPresent => "token_claims_present",
+            Self::PkceContextPresent => "pkce_context_present",
+            Self::ScopeChallengePresent => "scope_challenge_present",
+            Self::ClientRegistrationPresent => "client_registration_present",
+            Self::CredentialForwardingPresent => "credential_forwarding_present",
         }
     }
 
@@ -161,6 +183,46 @@ impl Predicate {
                 | Self::MemoryRecallPresent
                 | Self::MemoryLifecyclePresent
                 | Self::MemoryNamespacePresent
+                // Cycle 018 target-shape predicates. Each says whether the
+                // target has the surface at all: a stdio-only server has no
+                // HTTP authorization surface, and a server that speaks no
+                // authorization flow has no flow to bind. Absence here is
+                // genuinely "not applicable".
+                | Self::McpCurrentProtocolPresent
+                | Self::McpHttpTransportPresent
+                | Self::McpAuthFlowPresent
+                | Self::McpIdentityMetadataPresent
+        )
+    }
+
+    /// Whether this predicate names an auth **control or evidence channel**
+    /// rather than the shape of the target.
+    ///
+    /// The distinction decides what a false predicate means, and getting it
+    /// wrong is the failure mode Cycle 018 acceptance criterion 8 exists to
+    /// prevent.
+    ///
+    /// A target-shape predicate that is false means the question does not
+    /// apply: `NOT_APPLICABLE` is honest. A control-or-evidence predicate that
+    /// is false means the target *has* the auth surface and the control or the
+    /// evidence for it is missing — which is a gap, not an exemption. Reporting
+    /// that as `NOT_APPLICABLE` would let a server with no Protected Resource
+    /// Metadata score identically to one that has no HTTP transport at all, and
+    /// would quietly shrink the denominator by the very properties most worth
+    /// asking about.
+    ///
+    /// These therefore resolve to `NOT_TESTED`, following the precedent already
+    /// set for `execution_integrity_supported` and `confused_deputy_supported`.
+    pub fn is_auth_control_evidence(self) -> bool {
+        matches!(
+            self,
+            Self::ProtectedResourceMetadataPresent
+                | Self::AuthorizationServerMetadataPresent
+                | Self::TokenClaimsPresent
+                | Self::PkceContextPresent
+                | Self::ScopeChallengePresent
+                | Self::ClientRegistrationPresent
+                | Self::CredentialForwardingPresent
         )
     }
 }
@@ -416,6 +478,26 @@ impl PropertyRegistry {
     }
 }
 
+/// The ten v1 MCP properties that predate Cycle 018.
+///
+/// Pinned by identity rather than by count. A total only ever detected that
+/// *something* moved; these detect the changes that would actually break a
+/// filed assessment — one of the original properties being renamed, re-scoped
+/// or removed — while leaving the registry free to grow additively.
+#[cfg(test)]
+pub(crate) const PRE_CYCLE_018_MCP_PROPERTIES: [&str; 10] = [
+    "MCP.DISCOVERY.PASSIVE_BOUNDARY",
+    "MCP.DISCOVERY.EXPLICIT_TARGET",
+    "MCP.AUTHZ.PER_OPERATION",
+    "MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME",
+    "MCP.AUTHZ.EXECUTION_INTEGRITY.ARGUMENTS",
+    "MCP.AUTHZ.EXECUTION_INTEGRITY.CONTEXT",
+    "MCP.EVIDENCE.REDACTION",
+    "MCP.IDENTITY.CONFUSED_DEPUTY",
+    "MCP.DISCOVERY.STREAMABLE_HTTP",
+    "MCP.AUTHZ.DYNAMIC_VALIDATION",
+];
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -423,11 +505,21 @@ mod tests {
     #[test]
     fn builtin_registry_loads_and_ids_are_unique() {
         let registry = builtin_registry().expect("registry");
-        assert!(registry.get("MCP.DISCOVERY.PASSIVE_BOUNDARY").is_some());
-        assert!(registry
-            .get("MCP.AUTHZ.EXECUTION_INTEGRITY.TOOL_NAME")
-            .is_some());
-        assert_eq!(registry.properties.len(), 10);
+        let mut seen = std::collections::BTreeSet::new();
+        for property in &registry.properties {
+            assert!(
+                seen.insert(property.id.as_str()),
+                "duplicate property {}",
+                property.id
+            );
+        }
+        // Every property that predates Cycle 018 is still here, under its own
+        // identifier. The registry may grow; it may not lose or rename one of
+        // these, because a filed assessment refers to them by id.
+        for id in PRE_CYCLE_018_MCP_PROPERTIES {
+            assert!(registry.get(id).is_some(), "{id} disappeared");
+        }
+        assert!(registry.properties.len() >= PRE_CYCLE_018_MCP_PROPERTIES.len());
     }
 
     #[test]

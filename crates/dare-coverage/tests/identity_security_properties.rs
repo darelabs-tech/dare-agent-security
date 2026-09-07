@@ -60,6 +60,17 @@ fn facts(
         document_acl_present: false,
         retrieval_provenance_present: false,
         retrieval_tenant_context_present: false,
+        mcp_current_protocol_present: false,
+        mcp_http_transport_present: false,
+        mcp_auth_flow_present: false,
+        mcp_identity_metadata_present: false,
+        protected_resource_metadata_present: false,
+        authorization_server_metadata_present: false,
+        token_claims_present: false,
+        pkce_context_present: false,
+        scope_challenge_present: false,
+        client_registration_present: false,
+        credential_forwarding_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -365,14 +376,26 @@ fn earlier_profiles_keep_their_exact_property_counts() {
 #[test]
 fn the_v1_registry_did_not_move() {
     // Cycle 015 touches the v2 registry only. The MCP baseline reads v1.
+    //
+    // The count this used to assert has since moved for a legitimate reason:
+    // Cycle 018 added MCP.AUTH.* properties to v1 additively. The invariant
+    // that actually belongs to Cycle 015 is unchanged and is asserted directly
+    // — nothing from the Agentic identity namespace may appear in v1 — together
+    // with the stronger structural claim that v1 holds MCP properties only.
     let v1 = builtin_registry().expect("v1 registry");
-    assert_eq!(v1.properties.len(), 10);
     assert!(
         !v1.properties
             .iter()
             .any(|property| property.id.starts_with("AGENT.IDENTITY.")),
         "no AGENT.IDENTITY.* property belongs in the v1 registry"
     );
+    for property in &v1.properties {
+        assert!(
+            property.id.starts_with("MCP."),
+            "v1 holds MCP properties only, found {}",
+            property.id
+        );
+    }
 }
 
 #[test]

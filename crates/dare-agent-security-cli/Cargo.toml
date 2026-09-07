@@ -31,6 +31,7 @@ dare-prompt-injection = { path = "../dare-prompt-injection" }
 dare-identity-security = { path = "../dare-identity-security" }
 dare-memory-security = { path = "../dare-memory-security" }
 dare-rag-security = { path = "../dare-rag-security" }
+dare-mcp-auth-security = { path = "../dare-mcp-auth-security" }
 dare-tool-security = { path = "../dare-tool-security" }
 jsonschema = { workspace = true }
 serde = { workspace = true }

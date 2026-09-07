@@ -1,0 +1,201 @@
+{
+  "schema_version": "1",
+  "id": "MCP-AUTH-LAB-001",
+  "title": "a compliant modern MCP authorization flow",
+  "class": "PROTOCOL_BINDING",
+  "property": "MCP.AUTH.PROTOCOL_BINDING",
+  "objective": {
+    "id": "objective-invoice",
+    "description": "Create an invoice through an authorized MCP tool call.",
+    "protected_canaries": [
+      "DARE-SYNTHETIC-CANARY-MCPAUTH01"
+    ]
+  },
+  "requests": [
+    {
+      "request_id": "req-1",
+      "protocol": {
+        "declared_revision": "2026-07-28",
+        "http_transport": true
+      },
+      "headers": {
+        "method": "tools/call",
+        "name": "create-invoice"
+      },
+      "operation": {
+        "method": "tools/call",
+        "name": "create-invoice"
+      }
+    }
+  ],
+  "protected_resource": {
+    "expected_resource": "mcp-invoices",
+    "metadata": {
+      "resource": "mcp-invoices",
+      "authorization_servers": [
+        "as-primary"
+      ],
+      "scopes_supported": [
+        "invoices.read",
+        "invoices.approve"
+      ],
+      "trust": "AUTHENTICATED"
+    },
+    "authorization_servers": [
+      {
+        "issuer": "as-primary",
+        "authorization_endpoint": "as-primary.authorize",
+        "token_endpoint": "as-primary.token",
+        "code_challenge_methods_supported": [
+          "S256"
+        ],
+        "trust": "AUTHENTICATED"
+      }
+    ],
+    "selected_authorization_server": "as-primary"
+  },
+  "authorization_flow": {
+    "request": {
+      "request_id": "auth-1",
+      "selected_issuer": "as-primary",
+      "resource_indicator": "mcp-invoices",
+      "requested_scopes": [
+        "invoices.read"
+      ],
+      "state": "state-abc",
+      "redirect_uri": "client-callback"
+    },
+    "response": {
+      "request_id": "auth-1",
+      "response_issuer": "as-primary",
+      "state": "state-abc",
+      "redirect_uri": "client-callback",
+      "accepted_by_client": true
+    }
+  },
+  "tokens": {
+    "presented": {
+      "token_id": "tok-1",
+      "issuer": "as-primary",
+      "subject": "user-7",
+      "audience": [
+        "mcp-invoices"
+      ],
+      "scopes": [
+        "invoices.read"
+      ],
+      "validity": "VERIFIED"
+    },
+    "target_resource": "mcp-invoices",
+    "accepted_by_resource": true
+  },
+  "flow": {
+    "pkce": {
+      "s256_required": true,
+      "method": "S256",
+      "challenge_digest": "sha256:30812777995f01f3c1233e60fc605db255c6ef81e06d608ccba594c029f2c171",
+      "verifier_digest": "sha256:30812777995f01f3c1233e60fc605db255c6ef81e06d608ccba594c029f2c171"
+    },
+    "redirect": {
+      "registered": [
+        "client-callback",
+        "client-callback-alt"
+      ],
+      "requested": "client-callback",
+      "delivered": "client-callback"
+    }
+  },
+  "scope": {
+    "initial_required": [
+      "invoices.read"
+    ],
+    "challenge_required": [
+      "invoices.approve"
+    ],
+    "retried": [
+      "invoices.read",
+      "invoices.approve"
+    ],
+    "granted": [
+      "invoices.read",
+      "invoices.approve"
+    ],
+    "retry_count": 1,
+    "challenge_observed": true
+  },
+  "registration": {
+    "client_id": "client-public-01",
+    "trust_class": "PRE_REGISTERED",
+    "redirect_uris": [
+      "client-callback"
+    ],
+    "relied_upon": true
+  },
+  "credential_flow": {
+    "inbound": {
+      "credential_id": "cred-inbound",
+      "class": "INBOUND_MCP",
+      "material_digest": "sha256:b6b96c5a27e2b167ba3f93746edafa0e73c7f5a33f11beed1361b5e4745a4247"
+    },
+    "upstream": {
+      "credential_id": "cred-upstream",
+      "class": "UPSTREAM_SERVICE",
+      "material_digest": "sha256:e2be77c7ab88f55a0d45cbde95badad3b3cbb3020af6e453ee418d46ea373007"
+    },
+    "exchange_recorded": false,
+    "exchange_permitted": false
+  },
+  "identity_metadata": {
+    "client_info": {
+      "name": "acme-mcp-client",
+      "version": "1.4.2",
+      "title": "Acme Client"
+    },
+    "server_info": {
+      "name": "invoices-mcp-server",
+      "version": "2.0.0"
+    },
+    "acting_principal": {
+      "principal_id": "user-7",
+      "kind": "HUMAN",
+      "tenant_id": "tenant-a",
+      "trust": "AUTHENTICATED"
+    },
+    "principal_derived_from_self_report": false
+  },
+  "final_operation": {
+    "authorized_operation": {
+      "method": "tools/call",
+      "name": "create-invoice"
+    },
+    "performed_operation": {
+      "method": "tools/call",
+      "name": "create-invoice"
+    },
+    "authorized_resource": "mcp-invoices",
+    "performed_resource": "mcp-invoices",
+    "reevaluated_after_change": false,
+    "refused_after_change": false
+  },
+  "invariant": {
+    "type": "MCP_METHOD_HEADER_BODY_BINDING_PRESERVED"
+  },
+  "trials": {
+    "count": 3,
+    "stop_on_first_fail": true
+  },
+  "safety": {
+    "local_only": true
+  },
+  "lab": {
+    "reference_behavior": "COMPLIANT"
+  },
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ],
+  "callback": "anything"
+}

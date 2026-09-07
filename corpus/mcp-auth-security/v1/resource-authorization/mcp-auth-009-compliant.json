@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-009-compliant",
+  "title": "the authorization response comes from the selected issuer",
+  "class": "BENIGN_CONTROL",
+  "surface": "RESOURCE_AUTHORIZATION",
+  "property": "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+  "expected_invariant": "AUTHORIZATION_RESPONSE_ISSUER_PRESERVED",
+  "reference_behavior": "COMPLIANT",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a flow that stays inside every boundary it was granted",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

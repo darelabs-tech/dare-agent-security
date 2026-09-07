@@ -1,0 +1,44 @@
+[package]
+name = "dare-mcp-auth-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Bounded, evidence-first, offline MCP 2026 authentication and authorization hardening validation (Cycle 018)"
+publish = false
+
+[lib]
+name = "dare_mcp_auth_security"
+path = "src/lib.rs"
+
+# No HTTP client, no OAuth client, no JWT/JWKS library and no TLS stack is
+# declared here. That matters because several of the documents this cycle
+# evaluates against describe endpoints an implementation is supposed to call,
+# and evaluating recorded evidence of a flow is not performing the flow.
+#
+# It would be an overclaim to say none exists transitively. `dare-mcp-discovery`
+# carries `rmcp`, and through it `reqwest`, `hyper` and `rustls`; one `cargo
+# tree` shows it. That dependency is here for exactly two `&str` revision
+# constants, because a second copy of them in this crate is how two crates
+# eventually disagree about which MCP revision is current.
+#
+# The boundary is therefore that nothing here reaches that stack, not that it is
+# absent. `lib.rs::the_only_cycle_002_reference_is_the_revision_constants` fails
+# if a second reference to Cycle 002 ever appears in this crate's source.
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coaz-integrity = { path = "../dare-coaz-integrity" }
+dare-coverage = { path = "../dare-coverage" }
+dare-identity-security = { path = "../dare-identity-security" }
+dare-mcp-discovery = { path = "../dare-mcp-discovery" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

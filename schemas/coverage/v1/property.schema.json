@@ -19,7 +19,10 @@
       "type": "string",
       "pattern": "^MCP\\.[A-Z][A-Z0-9_.]+$"
     },
-    "title": { "type": "string", "minLength": 1 },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
     "category": {
       "type": "string",
       "enum": [
@@ -33,11 +36,16 @@
         "EVIDENCE"
       ]
     },
-    "description": { "type": "string", "minLength": 1 },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
     "applicability": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["predicates"],
+      "required": [
+        "predicates"
+      ],
       "properties": {
         "predicates": {
           "type": "array",
@@ -53,7 +61,18 @@
               "authorization_present",
               "dynamic_authorization_allowed",
               "execution_integrity_supported",
-              "confused_deputy_supported"
+              "confused_deputy_supported",
+              "mcp_current_protocol_present",
+              "mcp_http_transport_present",
+              "mcp_auth_flow_present",
+              "mcp_identity_metadata_present",
+              "protected_resource_metadata_present",
+              "authorization_server_metadata_present",
+              "token_claims_present",
+              "pkce_context_present",
+              "scope_challenge_present",
+              "client_registration_present",
+              "credential_forwarding_present"
             ]
           }
         }
@@ -62,14 +81,25 @@
     "supported_modes": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "enum": ["static", "dynamic", "passive"] }
+      "items": {
+        "type": "string",
+        "enum": [
+          "static",
+          "dynamic",
+          "passive"
+        ]
+      }
     },
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["required_for_confirmed_verdict"],
+      "required": [
+        "required_for_confirmed_verdict"
+      ],
       "properties": {
-        "required_for_confirmed_verdict": { "type": "boolean" }
+        "required_for_confirmed_verdict": {
+          "type": "boolean"
+        }
       }
     },
     "standards": {
@@ -77,13 +107,29 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["source", "reference", "status"],
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ],
         "properties": {
-          "source": { "type": "string", "minLength": 1 },
-          "reference": { "type": "string", "minLength": 1 },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1
+          },
           "status": {
             "type": "string",
-            "enum": ["NORMATIVE", "DRAFT", "INFORMATIVE"]
+            "enum": [
+              "NORMATIVE",
+              "DRAFT",
+              "INFORMATIVE",
+              "OPEN_PROPOSAL",
+              "FUTURE"
+            ]
           }
         }
       }

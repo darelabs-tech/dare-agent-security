@@ -131,6 +131,17 @@ mod tests {
             document_acl_present: false,
             retrieval_provenance_present: false,
             retrieval_tenant_context_present: false,
+            mcp_current_protocol_present: false,
+            mcp_http_transport_present: false,
+            mcp_auth_flow_present: false,
+            mcp_identity_metadata_present: false,
+            protected_resource_metadata_present: false,
+            authorization_server_metadata_present: false,
+            token_claims_present: false,
+            pkce_context_present: false,
+            scope_challenge_present: false,
+            client_registration_present: false,
+            credential_forwarding_present: false,
             out_of_scope_property_ids: vec![],
         };
         let report =

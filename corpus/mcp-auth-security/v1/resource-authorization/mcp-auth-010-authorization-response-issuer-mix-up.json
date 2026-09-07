@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-010-authorization-response-issuer-mix-up",
+  "title": "the authorization response comes from another issuer",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "RESOURCE_AUTHORIZATION",
+  "property": "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+  "expected_invariant": "AUTHORIZATION_RESPONSE_ISSUER_PRESERVED",
+  "reference_behavior": "AUTHORIZATION_RESPONSE_ISSUER_MIX_UP",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a well-formed response arrives from an issuer that was never selected",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

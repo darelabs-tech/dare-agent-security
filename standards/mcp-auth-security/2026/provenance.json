@@ -1,0 +1,322 @@
+{
+  "schema_version": "1",
+  "recorded_at": "2026-09-06",
+  "cycle": "018-mcp-2026-security-auth-hardening",
+  "fetch_policy": "OFFLINE_LOCAL_SNAPSHOT",
+  "fetch_policy_note": "This snapshot is recorded locally and versioned in the repository. Nothing in Cycle 018 fetches a standard at runtime, resolves a canonical reference over the network, or treats an upstream document as a live dependency. A reference is an attribution, not a retrieval target. This matters more here than in most cycles: several of the documents below describe endpoints an implementation is supposed to call, and this engine calls none of them.",
+  "reverification_note": "The statuses below are the statuses the approved Cycle 018 planning declares. No upstream re-verification was performed during execution, and none is claimed. A status is therefore recorded as approved rather than as confirmed-current, and any consumer needing today's upstream status must check upstream directly.",
+  "conformance_disclaimer": "DARE maps its MCP authentication and authorization properties onto these documents for context and traceability. That is attribution and not conformance: DARE is not certified against any of these documents, does not claim to implement them, and no artifact produced by this engine may state or imply otherwise. Passing a Cycle 018 vector does not mean an MCP deployment conforms to the MCP authorization specification, OAuth 2.1 or AuthZEN.",
+  "status_discipline_note": "Four statuses appear below and they are not interchangeable. NORMATIVE means the document defines behaviour this cycle evaluates against. DRAFT means the document is published but unstable and may not be cited as a requirement. OPEN_PROPOSAL means the idea is under discussion upstream and has no normative force at all. FUTURE means the surface is real and forward-looking but is deliberately not a Cycle 018 PASS requirement. Promoting a DRAFT or an OPEN_PROPOSAL into a requirement would manufacture a standard that does not exist.",
+  "sources": [
+    {
+      "id": "MCP_2026_07_28",
+      "title": "Model Context Protocol specification",
+      "version": "2026-07-28",
+      "published_at": "2026-07-28",
+      "canonical_reference": "Model Context Protocol specification revision 2026-07-28",
+      "status": "NORMATIVE",
+      "usage": "PRIMARY_PROTOCOL_BASELINE",
+      "mapping_notes": "The protocol revision this cycle evaluates. Supplies the current wire revision, the request/routing metadata model and the JSON-RPC operation semantics that the protocol-binding invariants compare. The revision constant itself is imported from Cycle 002 rather than restated here."
+    },
+    {
+      "id": "MCP_AUTHORIZATION_2026_07_28",
+      "title": "Model Context Protocol authorization specification",
+      "version": "2026-07-28",
+      "published_at": "2026-07-28",
+      "canonical_reference": "MCP Authorization specification, revision 2026-07-28",
+      "status": "NORMATIVE",
+      "usage": "PRIMARY_AUTHORIZATION_BASELINE",
+      "mapping_notes": "Supplies the authorization surface this cycle evaluates: Protected Resource Metadata, authorization-server discovery, issuer validation, resource indicators, PKCE requirements for public clients, and the treatment of dynamic client registration as a compatibility path. Cycle 018 evaluates recorded evidence of these semantics and performs none of the network operations the specification describes."
+    },
+    {
+      "id": "OAUTH_2_1_METADATA_DEPENDENCIES",
+      "title": "OAuth 2.1 and the bearer-token / metadata standards referenced normatively by MCP authorization",
+      "version": "as referenced by MCP 2026-07-28",
+      "published_at": "2026",
+      "canonical_reference": "OAuth 2.1 and the protected-resource / authorization-server metadata, resource-indicator and PKCE standards the MCP authorization specification depends on",
+      "status": "NORMATIVE",
+      "usage": "REFERENCED_DEPENDENCY",
+      "mapping_notes": "Referenced only where this cycle directly evaluates the semantics MCP inherits: resource indicators, audience binding, PKCE code challenge methods, redirect and state correlation, and issuer identification. Cycle 018 is not an OAuth client and implements no OAuth endpoint, grant or exchange."
+    },
+    {
+      "id": "OPENID_AUTHZEN_1_0",
+      "title": "OpenID AuthZEN Authorization API",
+      "version": "1.0",
+      "published_at": "2026",
+      "canonical_reference": "OpenID AuthZEN Authorization API 1.0",
+      "status": "NORMATIVE",
+      "usage": "EXTERNALIZED_AUTHORIZATION_MAPPING",
+      "mapping_notes": "Final specification, applied only where an externalized authorization decision is actually modelled. Cycle 018 does not call an AuthZEN PDP; it reuses the Cycle 003 decision vocabulary where a scenario carries an authorization decision."
+    },
+    {
+      "id": "COAZ_FRAMEWORK",
+      "title": "COAZ Framework",
+      "version": "1.0 Draft 1",
+      "published_at": "2026",
+      "canonical_reference": "COAZ Framework 1.0 Draft 1",
+      "status": "DRAFT",
+      "usage": "CONTEXT_ONLY",
+      "mapping_notes": "Published draft. Cited for context around continuous authorization. Its draft status is preserved: no COAZ requirement is treated as normative by this cycle."
+    },
+    {
+      "id": "COAZ_MCP",
+      "title": "COAZ-MCP profile",
+      "version": "1.0 Draft 1",
+      "published_at": "2026",
+      "canonical_reference": "COAZ-MCP 1.0 Draft 1",
+      "status": "DRAFT",
+      "usage": "CONTEXT_ONLY",
+      "mapping_notes": "Published draft profile of COAZ for MCP. Same treatment as the framework: context, never requirement."
+    },
+    {
+      "id": "AUTHZEN_603",
+      "title": "openid/authzen issue 603 — authorization-to-execution binding",
+      "version": "open-proposal",
+      "published_at": "2026",
+      "canonical_reference": "openid/authzen#603",
+      "status": "OPEN_PROPOSAL",
+      "usage": "CONTEXT_ONLY",
+      "mapping_notes": "An open upstream discussion, not a specification. Cycle 003 already implements a deterministic proof pattern for permit-to-final-operation binding; Cycle 018 composes with that implementation and does not restate the proposal as normative text. Nothing in this cycle depends on the proposal being accepted."
+    },
+    {
+      "id": "MCP_ROADMAP_FORWARD_LOOKING",
+      "title": "MCP roadmap hardening surfaces: DPoP, workload identity federation, ID-JAG, standardized token exchange, Enterprise-Managed Authorization",
+      "version": "roadmap",
+      "published_at": "2026",
+      "canonical_reference": "MCP roadmap discussion of sender-constrained tokens, workload identity federation, identity assertion grants and token exchange",
+      "status": "FUTURE",
+      "usage": "EXTENSION_POINT_ONLY",
+      "mapping_notes": "Real and important future hardening surfaces. They are documented as extension points and are explicitly NOT Cycle 018 PASS requirements. A deployment that does not implement DPoP does not fail any invariant here, and this engine must never report the absence of one of these as a violation."
+    },
+    {
+      "id": "DARE_CYCLE_002",
+      "title": "DARE Cycle 002 — MCP discovery and transport policy",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "DARE Agent Security Cycle 002",
+      "status": "INTERNAL",
+      "usage": "INHERITED_CONTRACT",
+      "mapping_notes": "Owns the MCP wire revision constants, the current and legacy lifecycle, fail-closed unsupported-revision handling and transport policy. Cycle 018 imports the revision constants rather than restating them, so the two cannot drift."
+    },
+    {
+      "id": "DARE_CYCLE_003",
+      "title": "DARE Cycle 003 — COAZ authorization integrity",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "DARE Agent Security Cycle 003",
+      "status": "INTERNAL",
+      "usage": "INHERITED_CONTRACT",
+      "mapping_notes": "Owns authorization-to-execution binding, mutation detection and the reference PEP. Cycle 018 composes with it for final-operation binding and builds no second stale-permit engine."
+    },
+    {
+      "id": "DARE_CYCLE_015",
+      "title": "DARE Cycle 015 — identity, privilege and delegation",
+      "version": "2026",
+      "published_at": "2026",
+      "canonical_reference": "DARE Agent Security Cycle 015",
+      "status": "INTERNAL",
+      "usage": "INHERITED_CONTRACT",
+      "mapping_notes": "Owns principal, tenant, delegation and authority semantics. Cycle 018 re-exports its principal kinds; token claims and MCP self-description may not create a second identity model."
+    }
+  ],
+  "auth_trust_statement": {
+    "core_relation": "protocol_metadata != authenticated_identity",
+    "presence_rule": "token_presence != token_validity. A credential being attached to a request says nothing about whether it is valid.",
+    "audience_rule": "valid_token != correct_audience. A token that is validly issued for resource B does not authorize resource A, however well formed it is.",
+    "operation_rule": "correct_audience != authorization_for_final_operation. Binding a token to the right resource does not authorize a mutated operation; that remains Cycle 003's question.",
+    "credential_rule": "inbound_mcp_token != upstream_service_token. A credential presented to an MCP server is not a credential for whatever that server calls next.",
+    "scope_rule": "scope_challenge != permission_to_drop_prior_scopes. A step-up may add privilege; it may not silently discard what was already required.",
+    "self_description_rule": "clientInfo and serverInfo are self-reported metadata. They may be recorded for inventory and correlation and may never establish a principal, tenant, subject, workload identity or scope.",
+    "replay_rule": "same scenario_id != same authorization semantics. A recorded trace is an observation, never the authority that defines what was approved."
+  },
+  "surface_classes": [
+    {
+      "id": "PROTOCOL_BINDING",
+      "title": "Protocol revision and request routing metadata bound to the JSON-RPC operation",
+      "description": "The routed request metadata and the JSON-RPC body are observed independently and compared on normalized semantics, never raw bytes."
+    },
+    {
+      "id": "RESOURCE_METADATA",
+      "title": "Protected Resource Metadata bound to the protected resource under test",
+      "description": "Protected Resource Metadata is evidence about a resource, not implicit trust in it."
+    },
+    {
+      "id": "AUTHORIZATION_SERVER",
+      "title": "Authorization-server selection, metadata issuer and authorization-response issuer",
+      "description": "Which authorization server was selected, what its metadata claims as issuer, and which issuer the authorization response actually came from."
+    },
+    {
+      "id": "TOKEN_BINDING",
+      "title": "Synthetic token validity evidence and resource/audience binding",
+      "description": "Whether the token evidence is complete, and whether the resource and audience it names are the ones under test."
+    },
+    {
+      "id": "FLOW_INTEGRITY",
+      "title": "PKCE, redirect URI and state correlation",
+      "description": "Whether the authorization response is bound to the request that started it, through PKCE, redirect URI and state."
+    },
+    {
+      "id": "SCOPE_INTEGRITY",
+      "title": "Insufficient-scope challenge and bounded step-up",
+      "description": "Whether a step-up widened privilege without discarding what was already required, within a bounded number of retries."
+    },
+    {
+      "id": "REGISTRATION_TRUST",
+      "title": "Client registration metadata provenance and trust class",
+      "description": "Where the client registration metadata came from, and whether its trust class justifies believing it."
+    },
+    {
+      "id": "CREDENTIAL_SEPARATION",
+      "title": "Inbound MCP credential kept distinct from upstream credentials",
+      "description": "Whether the credential presented to the MCP server stayed distinct from whatever credential the server used upstream."
+    },
+    {
+      "id": "IDENTITY_METADATA",
+      "title": "Self-reported MCP identity metadata boundary",
+      "description": "Whether self-reported protocol metadata was kept as inventory rather than promoted to authenticated identity."
+    },
+    {
+      "id": "FINAL_OPERATION",
+      "title": "Authorization bound to the final normalized operation",
+      "description": "Whether the authorization that was granted still covers the operation that was finally performed."
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "MCP.AUTH.PROTOCOL_BINDING",
+      "standard": "MCP_2026_07_28",
+      "reference": "MCP 2026-07-28 request routing metadata and JSON-RPC operation semantics",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Routing metadata and the JSON-RPC body are two independently observed sides. A mismatch that changes routed semantics is a violation regardless of which side a gateway believed."
+    },
+    {
+      "property_id": "MCP.AUTH.PROTECTED_RESOURCE_METADATA",
+      "standard": "MCP_AUTHORIZATION_2026_07_28",
+      "reference": "Protected Resource Metadata",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Metadata is evidence about a resource, never implicit trust in it. The binding between the advertised resource and the resource actually under test is the question."
+    },
+    {
+      "property_id": "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+      "standard": "MCP_AUTHORIZATION_2026_07_28",
+      "reference": "authorization server discovery and issuer validation",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Covers both authorization-server selection consistency and issuer mix-up on the authorization response."
+    },
+    {
+      "property_id": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+      "standard": "MCP_AUTHORIZATION_2026_07_28",
+      "reference": "resource indicators and access-token audience binding",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The engine compares the expected protected resource, the requested resource indicator and the token's audience/resource claims. It verifies no signature; validity is fixture-declared evidence and binding is what is judged."
+    },
+    {
+      "property_id": "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+      "standard": "OAUTH_2_1_METADATA_DEPENDENCIES",
+      "reference": "PKCE code challenge method, redirect URI and state correlation",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Evaluated as recorded binding evidence. No authorization code is generated, exchanged or transmitted, and no browser is involved."
+    },
+    {
+      "property_id": "MCP.AUTH.SCOPE_STEP_UP_INTEGRITY",
+      "standard": "OAUTH_2_1_METADATA_DEPENDENCIES",
+      "reference": "insufficient_scope challenge and step-up authorization",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "A step-up may only widen. The union of previously required and challenged scopes must survive the retry, and retries are hard bounded."
+    },
+    {
+      "property_id": "MCP.AUTH.CLIENT_REGISTRATION_TRUST",
+      "standard": "MCP_AUTHORIZATION_2026_07_28",
+      "reference": "client registration, client metadata documents and the dynamic registration compatibility path",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Registration metadata carries a trust class. A redirect URI or client identifier is not trusted because an untrusted document asserts it is registered."
+    },
+    {
+      "property_id": "MCP.AUTH.CREDENTIAL_SEPARATION",
+      "standard": "MCP_AUTHORIZATION_2026_07_28",
+      "reference": "token audience restrictions and the prohibition on passing through inbound tokens",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Compared as synthetic identities and digests only. No raw credential is stored, so reuse is detected structurally rather than by comparing secrets."
+    },
+    {
+      "property_id": "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY",
+      "standard": "MCP_2026_07_28",
+      "reference": "clientInfo / serverInfo implementation metadata",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Self-description is inventory data. Promoting it to principal, tenant, subject or scope is the violation this property exists to catch. Authoritative identity remains Cycle 015's."
+    },
+    {
+      "property_id": "MCP.AUTH.FINAL_OPERATION_BINDING",
+      "standard": "AUTHZEN_603",
+      "reference": "openid/authzen#603 authorization-to-execution binding",
+      "relation": "COMPOSES_WITH",
+      "status": "OPEN_PROPOSAL",
+      "notes": "Deliberately recorded as OPEN_PROPOSAL. The deterministic implementation is Cycle 003's and predates the proposal; Cycle 018 composes with that implementation. Nothing here treats the open proposal as a requirement, and the property would hold identically if the proposal were withdrawn."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    {
+      "id": "LIVE_OAUTH",
+      "note": "No authorization request, token request, refresh, introspection or revocation is performed against any server."
+    },
+    {
+      "id": "LIVE_METADATA",
+      "note": "No Protected Resource Metadata, authorization-server metadata, OIDC discovery or JWKS document is fetched. All metadata is closed local fixture evidence."
+    },
+    {
+      "id": "LIVE_REGISTRATION",
+      "note": "No dynamic client registration or client metadata document retrieval is performed."
+    },
+    {
+      "id": "SIGNATURE_VERIFICATION",
+      "note": "No token signature is verified. Validity is a fixture-declared enum and the engine judges the binding around it."
+    },
+    {
+      "id": "REAL_CREDENTIALS",
+      "note": "No real bearer token, refresh token, authorization code, client secret, private key or cookie is accepted, stored or emitted."
+    },
+    {
+      "id": "BROWSER_FLOWS",
+      "note": "No browser, redirect follow or interactive login occurs."
+    },
+    {
+      "id": "DPOP_AND_ROADMAP",
+      "note": "DPoP, workload identity federation, ID-JAG, standardized token exchange and Enterprise-Managed Authorization are extension points, never PASS requirements."
+    },
+    {
+      "id": "REMOTE_DYNAMIC_VALIDATION",
+      "note": "Remote authorized dynamic validation is reserved for Cycle 022 and is not attempted here."
+    }
+  ],
+  "inherited_lessons": [
+    {
+      "id": "REPLAY_IS_NOT_AUTHORITY",
+      "from": "DARE Cycle 017 defect fixed in 940b920",
+      "lesson": "Cycle 017 compared only scenario_id when admitting a replay trace, so a trace could restate its own queries and candidates with widened semantics and have them evaluated as approved. Cycle 018 binds every authorization-relevant field of every observation to the approved scenario before evaluation, and refuses unknown references. Prose is excluded from the comparison because changing a label cannot widen authority."
+    },
+    {
+      "id": "ABSENCE_IS_NOT_A_PASS",
+      "from": "DARE Cycles 013 through 017",
+      "lesson": "Every invariant declares the observation channels it needs. A run that never observed them reports INCONCLUSIVE. No invariant may reach PASS because nothing contradicted it."
+    },
+    {
+      "id": "SELF_REPORT_IS_NOT_A_CHECK",
+      "from": "DARE Cycle 017 metadata-filter evasion",
+      "lesson": "An evaluator that reads only what the subject reported about itself can be evaded by not reporting. Where a second independent channel exists — the approved scenario declaration — it is checked as well."
+    },
+    {
+      "id": "COUNT_THE_WORD_OR_THE_TARGET",
+      "from": "DARE Cycle 017 hygiene tests",
+      "lesson": "Artifacts legitimately name the endpoints and credential kinds a cycle refuses to touch. Hygiene checks must test reachability and credential shape, not the presence of a word, or they ban the sentence that documents the boundary."
+    }
+  ]
+}

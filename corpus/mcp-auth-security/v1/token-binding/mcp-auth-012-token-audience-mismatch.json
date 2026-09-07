@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-012-token-audience-mismatch",
+  "title": "the token was minted for another resource",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "TOKEN_BINDING",
+  "property": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+  "expected_invariant": "TOKEN_RESOURCE_AUDIENCE_BOUNDARY_PRESERVED",
+  "reference_behavior": "TOKEN_AUDIENCE_MISMATCH",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a validly issued token is presented to a resource it was not minted for",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

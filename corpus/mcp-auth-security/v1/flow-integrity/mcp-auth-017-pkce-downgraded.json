@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-017-pkce-downgraded",
+  "title": "PKCE downgraded to plain where S256 was required",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "FLOW_INTEGRITY",
+  "property": "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+  "expected_invariant": "PKCE_BINDING_PRESERVED",
+  "reference_behavior": "PKCE_DOWNGRADED",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a public-client flow drops from S256 to a method that binds nothing",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

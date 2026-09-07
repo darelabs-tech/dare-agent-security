@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/mcp-auth-security/v1/corpus-entry.schema.json",
+  "title": "DARE Cycle 018 MCP auth-security corpus entry",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "class": {
+      "type": "string",
+      "enum": [
+        "MCP_AUTH_ATTACK",
+        "BENIGN_CONTROL"
+      ]
+    },
+    "surface": {
+      "type": "string",
+      "enum": [
+        "PROTOCOL_BINDING",
+        "RESOURCE_AUTHORIZATION",
+        "TOKEN_BINDING",
+        "FLOW_INTEGRITY",
+        "SCOPE_AND_REGISTRATION",
+        "CREDENTIAL_AND_IDENTITY"
+      ]
+    },
+    "property": {
+      "type": "string",
+      "enum": [
+        "MCP.AUTH.PROTOCOL_BINDING",
+        "MCP.AUTH.PROTECTED_RESOURCE_METADATA",
+        "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+        "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+        "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+        "MCP.AUTH.SCOPE_STEP_UP_INTEGRITY",
+        "MCP.AUTH.CLIENT_REGISTRATION_TRUST",
+        "MCP.AUTH.CREDENTIAL_SEPARATION",
+        "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY",
+        "MCP.AUTH.FINAL_OPERATION_BINDING"
+      ]
+    },
+    "expected_invariant": {
+      "type": "string",
+      "enum": [
+        "MCP_PROTOCOL_REVISION_PRESERVED",
+        "MCP_METHOD_HEADER_BODY_BINDING_PRESERVED",
+        "MCP_NAME_HEADER_BODY_BINDING_PRESERVED",
+        "PROTECTED_RESOURCE_METADATA_BOUND_TO_RESOURCE",
+        "AUTHORIZATION_SERVER_ISSUER_BOUNDARY_PRESERVED",
+        "AUTHORIZATION_RESPONSE_ISSUER_PRESERVED",
+        "TOKEN_RESOURCE_AUDIENCE_BOUNDARY_PRESERVED",
+        "TOKEN_VALIDITY_EVIDENCE_PRESENT",
+        "PKCE_BINDING_PRESERVED",
+        "REDIRECT_STATE_BINDING_PRESERVED",
+        "SCOPE_STEP_UP_DOES_NOT_DROP_REQUIRED_SCOPE",
+        "CLIENT_REGISTRATION_METADATA_TRUST_PRESERVED",
+        "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+        "FINAL_OPERATION_AUTHORIZATION_BINDING_PRESERVED"
+      ]
+    },
+    "reference_behavior": {
+      "type": "string",
+      "enum": [
+        "COMPLIANT",
+        "UNSUPPORTED_PROTOCOL_REVISION",
+        "METHOD_HEADER_BODY_MISMATCH",
+        "NAME_HEADER_BODY_MISMATCH",
+        "RESOURCE_METADATA_MISMATCH",
+        "AUTHORIZATION_SERVER_NOT_ADVERTISED",
+        "AUTHORIZATION_RESPONSE_ISSUER_MIX_UP",
+        "TOKEN_AUDIENCE_MISMATCH",
+        "TOKEN_VALIDITY_EVIDENCE_MISSING",
+        "PKCE_DOWNGRADED",
+        "REDIRECT_OR_STATE_SUBSTITUTED",
+        "SCOPE_STEP_UP_DROPPED_SCOPE",
+        "UNTRUSTED_REGISTRATION_RELIED",
+        "INBOUND_CREDENTIAL_FORWARDED",
+        "SELF_REPORTED_METADATA_PROMOTED",
+        "FINAL_OPERATION_MUTATED_AFTER_PERMIT",
+        "MULTIPLE_INDEPENDENT_VIOLATIONS",
+        "NO_RELEVANT_OBSERVATION",
+        "HARNESS_FAILURE"
+      ]
+    },
+    "preconditions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      }
+    },
+    "surface_note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "safety_class": {
+      "const": "SYNTHETIC_NOOP"
+    },
+    "standards": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NORMATIVE",
+              "DRAFT",
+              "OPEN_PROPOSAL",
+              "FUTURE",
+              "INFORMATIVE"
+            ]
+          }
+        },
+        "required": [
+          "source",
+          "reference",
+          "status"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "class",
+    "surface",
+    "property",
+    "expected_invariant",
+    "reference_behavior",
+    "preconditions",
+    "surface_note",
+    "safety_class",
+    "standards"
+  ]
+}

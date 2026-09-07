@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-026-compliant",
+  "title": "the inbound credential stayed distinct from the upstream one",
+  "class": "BENIGN_CONTROL",
+  "surface": "CREDENTIAL_AND_IDENTITY",
+  "property": "MCP.AUTH.CREDENTIAL_SEPARATION",
+  "expected_invariant": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+  "reference_behavior": "COMPLIANT",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a flow that stays inside every boundary it was granted",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

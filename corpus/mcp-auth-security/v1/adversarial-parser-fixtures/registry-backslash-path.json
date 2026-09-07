@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "corpus_id": "mcp-auth-security-v1",
+  "version": "1.0.0",
+  "entries": [
+    {
+      "id": "x",
+      "path": "a\\b.json"
+    }
+  ]
+}

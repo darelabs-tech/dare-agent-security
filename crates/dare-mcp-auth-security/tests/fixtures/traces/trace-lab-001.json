@@ -1,0 +1,67 @@
+{
+  "schema_version": "1",
+  "trace_id": "trace-lab-001",
+  "scenario_id": "MCP-AUTH-LAB-001",
+  "mode": "REPLAY",
+  "synthetic": true,
+  "description": "protocol binding, routing and body in agreement",
+  "trials": [
+    {
+      "observed_requests": [
+        {
+          "request_id": "req-1",
+          "protocol": {
+            "declared_revision": "2026-07-28",
+            "http_transport": true
+          },
+          "headers": {
+            "method": "tools/call",
+            "name": "create-invoice"
+          },
+          "operation": {
+            "method": "tools/call",
+            "name": "create-invoice"
+          }
+        }
+      ]
+    },
+    {
+      "observed_requests": [
+        {
+          "request_id": "req-1",
+          "protocol": {
+            "declared_revision": "2026-07-28",
+            "http_transport": true
+          },
+          "headers": {
+            "method": "tools/call",
+            "name": "create-invoice"
+          },
+          "operation": {
+            "method": "tools/call",
+            "name": "create-invoice"
+          }
+        }
+      ]
+    },
+    {
+      "observed_requests": [
+        {
+          "request_id": "req-1",
+          "protocol": {
+            "declared_revision": "2026-07-28",
+            "http_transport": true
+          },
+          "headers": {
+            "method": "tools/call",
+            "name": "create-invoice"
+          },
+          "operation": {
+            "method": "tools/call",
+            "name": "create-invoice"
+          }
+        }
+      ]
+    }
+  ]
+}

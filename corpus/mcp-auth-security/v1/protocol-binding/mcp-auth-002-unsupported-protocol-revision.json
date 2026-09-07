@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-002-unsupported-protocol-revision",
+  "title": "a request declaring an unsupported protocol revision",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "PROTOCOL_BINDING",
+  "property": "MCP.AUTH.PROTOCOL_BINDING",
+  "expected_invariant": "MCP_PROTOCOL_REVISION_PRESERVED",
+  "reference_behavior": "UNSUPPORTED_PROTOCOL_REVISION",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a server offering a revision the modern authorization surface does not cover",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

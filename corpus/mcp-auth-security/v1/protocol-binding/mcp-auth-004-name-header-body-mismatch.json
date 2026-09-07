@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-004-name-header-body-mismatch",
+  "title": "routing names an operation the body did not request",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "PROTOCOL_BINDING",
+  "property": "MCP.AUTH.PROTOCOL_BINDING",
+  "expected_invariant": "MCP_NAME_HEADER_BODY_BINDING_PRESERVED",
+  "reference_behavior": "NAME_HEADER_BODY_MISMATCH",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "the routed operation name and the executed one diverge",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

@@ -54,6 +54,17 @@ fn facts(user_prompt: bool, external_content: bool) -> AssessmentFacts {
         document_acl_present: false,
         retrieval_provenance_present: false,
         retrieval_tenant_context_present: false,
+        mcp_current_protocol_present: false,
+        mcp_http_transport_present: false,
+        mcp_auth_flow_present: false,
+        mcp_identity_metadata_present: false,
+        protected_resource_metadata_present: false,
+        authorization_server_metadata_present: false,
+        token_claims_present: false,
+        pkce_context_present: false,
+        scope_challenge_present: false,
+        client_registration_present: false,
+        credential_forwarding_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -178,9 +189,20 @@ fn legacy_profiles_keep_their_exact_property_sets() {
     let mcp = builtin_profile().expect("mcp profile");
     let mcp_registry = builtin_registry().expect("mcp registry");
     assert_eq!(mcp.id, "mcp-security-baseline");
-    assert_eq!(mcp_registry.properties.len(), 10);
     validate_profile(&mcp, &mcp_registry).expect("mcp profile valid");
-    assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
+
+    // The test's own title is the invariant: a legacy profile keeps its exact
+    // property *set*. That is the profile's selection, not the size of the
+    // registry it draws from — the v1 registry grew to twenty when Cycle 018
+    // added the MCP.AUTH.* properties, and none of them entered this profile.
+    assert_eq!(mcp.properties.len(), 10);
+    assert!(
+        !mcp.properties
+            .iter()
+            .any(|entry| entry.id.starts_with("MCP.AUTH.")
+                || entry.id == "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY"),
+        "Cycle 018 properties must not be injected into the MCP baseline"
+    );
 }
 
 #[test]

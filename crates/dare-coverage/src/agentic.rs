@@ -255,7 +255,12 @@ mod tests {
     fn crosswalk_does_not_mutate_legacy_registry() {
         validate_mcp_crosswalk(&load_mcp_crosswalk().unwrap()).unwrap();
         let registry = builtin_registry().unwrap();
-        assert_eq!(registry.properties.len(), 10);
+        // The crosswalk must not disturb the legacy registry. Checked by
+        // identity: every pre-Cycle-018 property is still present under its own
+        // id, which is what a crosswalk could actually break.
+        for id in crate::property::PRE_CYCLE_018_MCP_PROPERTIES {
+            assert!(registry.get(id).is_some(), "{id} disappeared");
+        }
         assert!(registry.get("MCP.IDENTITY.CONFUSED_DEPUTY").is_some());
     }
 }

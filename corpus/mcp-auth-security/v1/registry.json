@@ -1,0 +1,178 @@
+{
+  "schema_version": "1",
+  "corpus_id": "mcp-auth-security-v1",
+  "version": "1.0.0",
+  "title": "DARE Cycle 018 MCP 2026 authentication and authorization vectors",
+  "entries": [
+    {
+      "id": "mcp-auth-001-compliant",
+      "path": "protocol-binding/mcp-auth-001-compliant.json",
+      "digest": "sha256:426c5532aa720f6da9b0c8d0c3e2a9a381c43b2239c1b618e6c11fe06d988daa"
+    },
+    {
+      "id": "mcp-auth-002-unsupported-protocol-revision",
+      "path": "protocol-binding/mcp-auth-002-unsupported-protocol-revision.json",
+      "digest": "sha256:da55cc4c6d1db1ed49433d68dc1c9fe7dac9b723f482a192bf95f892e162f626"
+    },
+    {
+      "id": "mcp-auth-003-method-header-body-mismatch",
+      "path": "protocol-binding/mcp-auth-003-method-header-body-mismatch.json",
+      "digest": "sha256:8c8ee04996f10f467381aecfcb26adebac70852c160790a7aecc81c50decc159"
+    },
+    {
+      "id": "mcp-auth-004-name-header-body-mismatch",
+      "path": "protocol-binding/mcp-auth-004-name-header-body-mismatch.json",
+      "digest": "sha256:30d54fed8a6a7b58ff1c4c1c6befb835b0527c758ef0abdc55f5ec969faefcd2"
+    },
+    {
+      "id": "mcp-auth-005-compliant",
+      "path": "resource-authorization/mcp-auth-005-compliant.json",
+      "digest": "sha256:01ab3e456c28080e6eaada3cfe2321fb180d751b204ad83c4b3b2e8916e503d2"
+    },
+    {
+      "id": "mcp-auth-006-resource-metadata-mismatch",
+      "path": "resource-authorization/mcp-auth-006-resource-metadata-mismatch.json",
+      "digest": "sha256:cf76ae786a2a3bda89fa9ba46240339527d4f1e81f4d4f880967b2019c9a8039"
+    },
+    {
+      "id": "mcp-auth-007-compliant",
+      "path": "resource-authorization/mcp-auth-007-compliant.json",
+      "digest": "sha256:6f3c31579fa8f5ef041bafa63ae8eb7f3409d6bddb43088195681ce01bf914dc"
+    },
+    {
+      "id": "mcp-auth-008-authorization-server-not-advertised",
+      "path": "resource-authorization/mcp-auth-008-authorization-server-not-advertised.json",
+      "digest": "sha256:1914ad571897b6c3f9b7ad4aed2f2026d6c9681a4876ce7bf7e7080eab4bd3ff"
+    },
+    {
+      "id": "mcp-auth-009-compliant",
+      "path": "resource-authorization/mcp-auth-009-compliant.json",
+      "digest": "sha256:150120afa74a85796a88cf24e448fda914a2df7ec6b4016d4c45abf67df3f57b"
+    },
+    {
+      "id": "mcp-auth-010-authorization-response-issuer-mix-up",
+      "path": "resource-authorization/mcp-auth-010-authorization-response-issuer-mix-up.json",
+      "digest": "sha256:6f225cbd3dd91543182cb37f8d9c68d403d2d7c5856559448c67b251e4a0f08c"
+    },
+    {
+      "id": "mcp-auth-011-compliant",
+      "path": "token-binding/mcp-auth-011-compliant.json",
+      "digest": "sha256:8efb025d5524b0bd37217da8b98066caba565dfcbde494d55c589c95708ecc48"
+    },
+    {
+      "id": "mcp-auth-012-token-audience-mismatch",
+      "path": "token-binding/mcp-auth-012-token-audience-mismatch.json",
+      "digest": "sha256:c4e5796dfd789fe308ac3958709a4ff56c46edbe5f89444fc9c454ebb168bc8c"
+    },
+    {
+      "id": "mcp-auth-013-compliant",
+      "path": "token-binding/mcp-auth-013-compliant.json",
+      "digest": "sha256:b05f3bc2522f2c2eadccc4506036e59501caedd7cb1fff29058b3490db21e839"
+    },
+    {
+      "id": "mcp-auth-014-no-relevant-observation",
+      "path": "token-binding/mcp-auth-014-no-relevant-observation.json",
+      "digest": "sha256:d550c263b950269487b2536b6e921656ebf03e565cb1d9368b898975556916d8"
+    },
+    {
+      "id": "mcp-auth-015-token-validity-evidence-missing",
+      "path": "token-binding/mcp-auth-015-token-validity-evidence-missing.json",
+      "digest": "sha256:cd00f13a59ff3398ba8cf4e37609ed152d39c19b44ad562bb90bdf8b7ddc0ceb"
+    },
+    {
+      "id": "mcp-auth-016-compliant",
+      "path": "flow-integrity/mcp-auth-016-compliant.json",
+      "digest": "sha256:3a0199682c547da5d32c872c9e4996ef82c80f8a1f4f953da01652d0cdf38ac4"
+    },
+    {
+      "id": "mcp-auth-017-pkce-downgraded",
+      "path": "flow-integrity/mcp-auth-017-pkce-downgraded.json",
+      "digest": "sha256:418e73c1ab1c00e5b2b8efeb4984a78d4c203842527633b11572b9a2e05a2940"
+    },
+    {
+      "id": "mcp-auth-018-compliant",
+      "path": "flow-integrity/mcp-auth-018-compliant.json",
+      "digest": "sha256:749ee0f20069696295fc71bd4589a9bc1936243213f61b0c2e711d37f75aa610"
+    },
+    {
+      "id": "mcp-auth-019-redirect-or-state-substituted",
+      "path": "flow-integrity/mcp-auth-019-redirect-or-state-substituted.json",
+      "digest": "sha256:274e8c9ec8527d786c834a452d884400f440f87d78a0365c54001e348f4ca39d"
+    },
+    {
+      "id": "mcp-auth-020-compliant",
+      "path": "scope-and-registration/mcp-auth-020-compliant.json",
+      "digest": "sha256:62be60bd26734a054125829dec48e8f28a53d88e12114bf190ecb608387f955d"
+    },
+    {
+      "id": "mcp-auth-021-scope-step-up-dropped-scope",
+      "path": "scope-and-registration/mcp-auth-021-scope-step-up-dropped-scope.json",
+      "digest": "sha256:708584860e450bbf8ce98f720f2bc43ce5664a3addc4ee6c7f88ad458299688c"
+    },
+    {
+      "id": "mcp-auth-023-compliant",
+      "path": "scope-and-registration/mcp-auth-023-compliant.json",
+      "digest": "sha256:9064ee7adbedb85c86c6ab32e0eb22171f1fe05f7a075e491b1c4d5808591a75"
+    },
+    {
+      "id": "mcp-auth-024-compliant",
+      "path": "scope-and-registration/mcp-auth-024-compliant.json",
+      "digest": "sha256:ae5ff8ed95f75d49a10cd4e82d8fc5f36ff559c2a0b2ecd90fbcdc11d58cc101"
+    },
+    {
+      "id": "mcp-auth-025-untrusted-registration-relied",
+      "path": "scope-and-registration/mcp-auth-025-untrusted-registration-relied.json",
+      "digest": "sha256:6043655de0c9b54a55ccb416cb123888b5aed07ff30372b3a80f9958433de4d7"
+    },
+    {
+      "id": "mcp-auth-026-compliant",
+      "path": "credential-and-identity/mcp-auth-026-compliant.json",
+      "digest": "sha256:0ef0aa4de27e7ff9421b8fdc2d367f276067efbe13fe343616c1ece7a44597bb"
+    },
+    {
+      "id": "mcp-auth-027-inbound-credential-forwarded",
+      "path": "credential-and-identity/mcp-auth-027-inbound-credential-forwarded.json",
+      "digest": "sha256:bdac5fd8aceb401fc14ffb567fd8b9c3e3500e42d3ea48dbf885aadf7b6b81f9"
+    },
+    {
+      "id": "mcp-auth-028-compliant",
+      "path": "credential-and-identity/mcp-auth-028-compliant.json",
+      "digest": "sha256:f6b1a351589e6df94bd5dfb3a05e3f70e10fe335e4fee7e24e8cfef63b658ad3"
+    },
+    {
+      "id": "mcp-auth-029-compliant",
+      "path": "credential-and-identity/mcp-auth-029-compliant.json",
+      "digest": "sha256:7cc6cf692f94c35d4261949623a23ed51a4d305a914337b05c8f50576bf9bd0a"
+    },
+    {
+      "id": "mcp-auth-030-self-reported-metadata-promoted",
+      "path": "credential-and-identity/mcp-auth-030-self-reported-metadata-promoted.json",
+      "digest": "sha256:a0d4c76218a8b0e5e588faa801f04bcf881dcc946cd5bfb9d1e9a2e631f47ed7"
+    },
+    {
+      "id": "mcp-auth-031-compliant",
+      "path": "credential-and-identity/mcp-auth-031-compliant.json",
+      "digest": "sha256:9c727a7b46c89938fc6f30380405c4e9e1f5cddaa61c290801e0a0c62358f108"
+    },
+    {
+      "id": "mcp-auth-032-compliant",
+      "path": "credential-and-identity/mcp-auth-032-compliant.json",
+      "digest": "sha256:e9d0095eb7da81ea58eb83d6cb7dbe2b92f5a13c7a2325e2bd85b4f194808d31"
+    },
+    {
+      "id": "mcp-auth-033-final-operation-mutated-after-permit",
+      "path": "credential-and-identity/mcp-auth-033-final-operation-mutated-after-permit.json",
+      "digest": "sha256:996a4cef11cf1431fa2926092839bdc4452dd7758977b289feece130abe410db"
+    },
+    {
+      "id": "mcp-auth-034-multiple-independent-violations",
+      "path": "resource-authorization/mcp-auth-034-multiple-independent-violations.json",
+      "digest": "sha256:486f77fa8e6ffa4ed0e41fe2e1d3d61a70681146fada31dc28d1fef716b83c4b"
+    },
+    {
+      "id": "mcp-auth-035-no-relevant-observation",
+      "path": "flow-integrity/mcp-auth-035-no-relevant-observation.json",
+      "digest": "sha256:15231a13c58c5b9f679d384fa5a3e12c06ce89b9c49c966ee6a7561c806ff30d"
+    }
+  ]
+}

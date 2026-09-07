@@ -10,6 +10,7 @@ mod error;
 mod facts;
 mod identity_security_standards;
 mod math;
+mod mcp_auth_security_standards;
 mod memory_security_standards;
 mod plan;
 mod profile;
@@ -46,6 +47,12 @@ pub use math::{
     coverage_ratio, eligible_count, finalize_row, required_eligible_count, required_tested_count,
     tested_count, validate_pair, CoverageCounts, CoveragePolicy, CoverageTotals, DENOMINATOR_DOC,
 };
+pub use mcp_auth_security_standards::{
+    assert_no_conformance_claim as assert_no_mcp_auth_conformance_claim,
+    assert_no_status_promotion, load_mcp_auth_security_provenance, mcp_auth_security_provenance,
+    validate_mcp_auth_security_provenance, AuthTrustStatement, McpAuthSecurityProvenance,
+    MCP_AUTH_SECURITY_PROVENANCE_JSON,
+};
 pub use memory_security_standards::{
     load_memory_security_provenance, memory_security_provenance,
     validate_memory_security_provenance, MemorySecurityProvenance, MemoryTrustStatement,
@@ -53,11 +60,12 @@ pub use memory_security_standards::{
 pub use plan::{build_assessment_plan, AssessmentPlan, PlannedProperty};
 pub use profile::{
     agentic_profile, builtin_profile, identity_security_profile, load_profile, load_profile_file,
-    memory_security_profile, profile_digest_sha256, prompt_injection_profile, rag_security_profile,
-    resolve_profile, tool_security_profile, validate_profile, AssessmentProfile, ProfileProperty,
-    RequirementLevel, AGENTIC_PROFILE_JSON, IDENTITY_SECURITY_PROFILE_JSON,
-    MEMORY_SECURITY_PROFILE_JSON, PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON,
-    PROMPT_INJECTION_PROFILE_JSON, RAG_SECURITY_PROFILE_JSON, TOOL_SECURITY_PROFILE_JSON,
+    mcp_auth_hardening_profile, memory_security_profile, profile_digest_sha256,
+    prompt_injection_profile, rag_security_profile, resolve_profile, tool_security_profile,
+    validate_profile, AssessmentProfile, ProfileProperty, RequirementLevel, AGENTIC_PROFILE_JSON,
+    IDENTITY_SECURITY_PROFILE_JSON, MCP_AUTH_HARDENING_PROFILE_JSON, MEMORY_SECURITY_PROFILE_JSON,
+    PROFILE_SCHEMA_V1_ID, PROFILE_SCHEMA_V1_JSON, PROMPT_INJECTION_PROFILE_JSON,
+    RAG_SECURITY_PROFILE_JSON, TOOL_SECURITY_PROFILE_JSON,
 };
 pub use prompt_injection_standards::{
     load_prompt_injection_provenance, validate_prompt_injection_provenance,
@@ -137,7 +145,13 @@ mod tests {
     #[test]
     fn registry_selection_is_profile_aware() {
         let mcp = builtin_profile().unwrap();
-        assert_eq!(registry_for_profile(&mcp).unwrap().properties.len(), 10);
+        // The MCP profile resolves the v1 registry, which grows additively as
+        // MCP cycles add properties. The profile's own denominator — the number
+        // that a coverage percentage divides by — is asserted where that
+        // profile is tested, not here.
+        let v1 = registry_for_profile(&mcp).unwrap();
+        assert!(v1.get("MCP.DISCOVERY.PASSIVE_BOUNDARY").is_some());
+        assert!(v1.properties.len() >= 10);
         let agentic = agentic_profile().unwrap();
         // Selecting the agentic profile resolves the whole v2 registry, which
         // grows additively; the profile's own denominator is asserted where

@@ -49,6 +49,17 @@ fn facts(user_prompt: bool, external_content: bool) -> AssessmentFacts {
         document_acl_present: false,
         retrieval_provenance_present: false,
         retrieval_tenant_context_present: false,
+        mcp_current_protocol_present: false,
+        mcp_http_transport_present: false,
+        mcp_auth_flow_present: false,
+        mcp_identity_metadata_present: false,
+        protected_resource_metadata_present: false,
+        authorization_server_metadata_present: false,
+        token_claims_present: false,
+        pkce_context_present: false,
+        scope_challenge_present: false,
+        client_registration_present: false,
+        credential_forwarding_present: false,
         out_of_scope_property_ids: Vec::new(),
     }
 }
@@ -223,9 +234,22 @@ fn the_mcp_baseline_is_unchanged() {
     let profile = builtin_profile().expect("mcp profile");
     let registry = builtin_registry().expect("mcp registry");
     assert_eq!(profile.id, "mcp-security-baseline");
-    assert_eq!(registry.properties.len(), 10);
     validate_profile(&profile, &registry).expect("still valid");
-    assert_eq!(registry_for_profile(&profile).unwrap().properties.len(), 10);
+
+    // The registry behind this profile grows as MCP cycles add properties —
+    // Cycle 018 took it from ten to twenty. What must not move is the
+    // *profile's* selection, because that is the denominator every coverage
+    // percentage already filed against `mcp-security-baseline` divides by. That
+    // is asserted below on the report, which is where the denominator actually
+    // lives; the registry size never was the invariant.
+    assert_eq!(profile.properties.len(), 10);
+    for id in [
+        "MCP.DISCOVERY.PASSIVE_BOUNDARY",
+        "MCP.AUTHZ.PER_OPERATION",
+        "MCP.EVIDENCE.REDACTION",
+    ] {
+        assert!(registry.get(id).is_some(), "{id} disappeared");
+    }
 
     let report = run_assessment(
         &profile,

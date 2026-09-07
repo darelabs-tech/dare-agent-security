@@ -9,11 +9,24 @@
       "title": "Passive discovery boundary",
       "category": "DISCOVERY",
       "description": "Passive discovery never dispatches active or state-changing operations.",
-      "applicability": { "predicates": ["tools_present"] },
-      "supported_modes": ["passive", "static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present"
+        ]
+      },
+      "supported_modes": [
+        "passive",
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "MCP", "reference": "tools/list vs tools/call", "status": "NORMATIVE" }
+        {
+          "source": "MCP",
+          "reference": "tools/list vs tools/call",
+          "status": "NORMATIVE"
+        }
       ]
     },
     {
@@ -21,11 +34,24 @@
       "title": "Explicit target discovery",
       "category": "DISCOVERY",
       "description": "Discovery requires an explicit operator-named target.",
-      "applicability": { "predicates": ["tools_present"] },
-      "supported_modes": ["passive", "static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present"
+        ]
+      },
+      "supported_modes": [
+        "passive",
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "DARE", "reference": "Cycle 002 explicit target", "status": "INFORMATIVE" }
+        {
+          "source": "DARE",
+          "reference": "Cycle 002 explicit target",
+          "status": "INFORMATIVE"
+        }
       ]
     },
     {
@@ -33,11 +59,25 @@
       "title": "Per-operation authorization presence",
       "category": "AUTHORIZATION",
       "description": "Each tool/operation advertises or requires authorization presence.",
-      "applicability": { "predicates": ["tools_present", "authorization_present"] },
-      "supported_modes": ["static", "dynamic"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present",
+          "authorization_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "dynamic"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "MCP", "reference": "authorization presence", "status": "DRAFT" }
+        {
+          "source": "MCP",
+          "reference": "authorization presence",
+          "status": "DRAFT"
+        }
       ]
     },
     {
@@ -45,11 +85,24 @@
       "title": "Authorization-to-execution integrity (tool name)",
       "category": "AUTHZ_EXECUTION_INTEGRITY",
       "description": "Authorized tool name must match executed tool name.",
-      "applicability": { "predicates": ["tools_present", "execution_integrity_supported"] },
-      "supported_modes": ["static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present",
+          "execution_integrity_supported"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "COAZ-MCP", "reference": "tool-name binding", "status": "NORMATIVE" }
+        {
+          "source": "COAZ-MCP",
+          "reference": "tool-name binding",
+          "status": "NORMATIVE"
+        }
       ]
     },
     {
@@ -57,11 +110,24 @@
       "title": "Authorization-to-execution integrity (arguments)",
       "category": "AUTHZ_EXECUTION_INTEGRITY",
       "description": "Authorized arguments must match executed arguments.",
-      "applicability": { "predicates": ["tools_present", "execution_integrity_supported"] },
-      "supported_modes": ["static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present",
+          "execution_integrity_supported"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "COAZ-MCP", "reference": "argument binding", "status": "NORMATIVE" }
+        {
+          "source": "COAZ-MCP",
+          "reference": "argument binding",
+          "status": "NORMATIVE"
+        }
       ]
     },
     {
@@ -69,11 +135,24 @@
       "title": "Authorization-to-execution integrity (trusted context)",
       "category": "AUTHZ_EXECUTION_INTEGRITY",
       "description": "Trusted authorization context must bind to execution.",
-      "applicability": { "predicates": ["tools_present", "execution_integrity_supported"] },
-      "supported_modes": ["static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present",
+          "execution_integrity_supported"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "COAZ-MCP", "reference": "trusted context", "status": "NORMATIVE" }
+        {
+          "source": "COAZ-MCP",
+          "reference": "trusted context",
+          "status": "NORMATIVE"
+        }
       ]
     },
     {
@@ -81,11 +160,24 @@
       "title": "Evidence redaction",
       "category": "EVIDENCE",
       "description": "Security evidence must not echo raw secrets.",
-      "applicability": { "predicates": ["tools_present"] },
-      "supported_modes": ["static", "passive"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "DARE", "reference": "Cycle 001 redaction", "status": "INFORMATIVE" }
+        {
+          "source": "DARE",
+          "reference": "Cycle 001 redaction",
+          "status": "INFORMATIVE"
+        }
       ]
     },
     {
@@ -93,11 +185,24 @@
       "title": "Confused-deputy authority binding",
       "category": "IDENTITY",
       "description": "Privileged identity must not be reused across unauthorized principals.",
-      "applicability": { "predicates": ["tools_present", "confused_deputy_supported"] },
-      "supported_modes": ["static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present",
+          "confused_deputy_supported"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "OWASP", "reference": "confused deputy", "status": "INFORMATIVE" }
+        {
+          "source": "OWASP",
+          "reference": "confused deputy",
+          "status": "INFORMATIVE"
+        }
       ]
     },
     {
@@ -105,11 +210,24 @@
       "title": "Streamable HTTP discovery surface",
       "category": "DISCOVERY",
       "description": "HTTP-transport-specific discovery properties apply only to Streamable HTTP targets.",
-      "applicability": { "predicates": ["transport_http"] },
-      "supported_modes": ["passive", "static"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "transport_http"
+        ]
+      },
+      "supported_modes": [
+        "passive",
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "MCP", "reference": "streamable HTTP", "status": "DRAFT" }
+        {
+          "source": "MCP",
+          "reference": "streamable HTTP",
+          "status": "DRAFT"
+        }
       ]
     },
     {
@@ -117,11 +235,289 @@
       "title": "Dynamic authorization validation",
       "category": "AUTHORIZATION",
       "description": "Runtime authorization re-evaluation. Static-only ROE must BLOCK, never NOT_APPLICABLE.",
-      "applicability": { "predicates": ["tools_present", "dynamic_authorization_allowed"] },
-      "supported_modes": ["dynamic"],
-      "evidence": { "required_for_confirmed_verdict": true },
+      "applicability": {
+        "predicates": [
+          "tools_present",
+          "dynamic_authorization_allowed"
+        ]
+      },
+      "supported_modes": [
+        "dynamic"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
       "standards": [
-        { "source": "COAZ-MCP", "reference": "dynamic re-evaluation", "status": "DRAFT" }
+        {
+          "source": "COAZ-MCP",
+          "reference": "dynamic re-evaluation",
+          "status": "DRAFT"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.PROTOCOL_BINDING",
+      "title": "Protocol revision and request routing binding",
+      "category": "AUTHENTICATION",
+      "description": "Routed request metadata and the JSON-RPC body must agree on the operation being performed, under a supported protocol revision.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 request routing metadata and JSON-RPC operation semantics",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.PROTECTED_RESOURCE_METADATA",
+      "title": "Protected Resource Metadata binding",
+      "category": "AUTHORIZATION",
+      "description": "Protected Resource Metadata must be bound to the protected resource under test; metadata presence alone is not authorization.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "protected_resource_metadata_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 authorization: Protected Resource Metadata",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+      "title": "Authorization server and issuer boundary",
+      "category": "AUTHORIZATION",
+      "description": "The selected authorization server, its metadata issuer and the issuer of the authorization response must remain the same authorization context.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "authorization_server_metadata_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 authorization: authorization server discovery and issuer validation",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+      "title": "Token audience and resource binding",
+      "category": "AUTHORIZATION",
+      "description": "A token must name the resource and audience actually under test; a token validly issued for another resource does not authorize this one.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "token_claims_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 authorization: resource indicators and access token audience",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+      "title": "PKCE, redirect and state integrity",
+      "category": "AUTHENTICATION",
+      "description": "The authorization response must be bound to the request that started it through PKCE, the registered redirect URI and the state value.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "pkce_context_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "OAuth",
+          "reference": "PKCE code challenge, redirect URI and state correlation as referenced by MCP authorization",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.SCOPE_STEP_UP_INTEGRITY",
+      "title": "Scope challenge and step-up integrity",
+      "category": "AUTHORIZATION",
+      "description": "An insufficient-scope challenge may widen privilege; it must not silently discard previously required scope, and retries are bounded.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "scope_challenge_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "OAuth",
+          "reference": "insufficient_scope challenge and step-up authorization as referenced by MCP authorization",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.CLIENT_REGISTRATION_TRUST",
+      "title": "Client registration metadata trust",
+      "category": "AUTHENTICATION",
+      "description": "Client registration metadata carries a trust class; a redirect URI or client identifier is not trusted because an untrusted document asserts it is registered.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "client_registration_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 authorization: client registration and client metadata documents",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.CREDENTIAL_SEPARATION",
+      "title": "Inbound and upstream credential separation",
+      "category": "CREDENTIAL_BOUNDARIES",
+      "description": "A credential presented to an MCP server must not be reused or forwarded as the credential for an upstream service.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "credential_forwarding_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 authorization: token audience restriction and token passthrough prohibition",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY",
+      "title": "Self-reported identity metadata boundary",
+      "category": "IDENTITY",
+      "description": "clientInfo and serverInfo are self-reported inventory metadata and must not establish principal, tenant, subject or scope.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_identity_metadata_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "MCP",
+          "reference": "2026-07-28 implementation metadata (clientInfo / serverInfo)",
+          "status": "NORMATIVE"
+        }
+      ]
+    },
+    {
+      "id": "MCP.AUTH.FINAL_OPERATION_BINDING",
+      "title": "Authorization bound to the final operation",
+      "category": "AUTHZ_EXECUTION_INTEGRITY",
+      "description": "Authorization granted for one operation must not survive an authorization-relevant mutation of the operation finally performed.",
+      "applicability": {
+        "predicates": [
+          "mcp_current_protocol_present",
+          "mcp_http_transport_present",
+          "mcp_auth_flow_present",
+          "authorization_present"
+        ]
+      },
+      "supported_modes": [
+        "static"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true
+      },
+      "standards": [
+        {
+          "source": "AuthZEN",
+          "reference": "openid/authzen#603 authorization-to-execution binding",
+          "status": "OPEN_PROPOSAL"
+        }
       ]
     }
   ]

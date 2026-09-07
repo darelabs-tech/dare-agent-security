@@ -1,0 +1,18 @@
+cycle: "018-mcp-2026-security-auth-hardening"
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+approved_at: 2026-09-06
+planning_head: f65dc30cb1493777c4720625f130752374f3da0c
+base_branch: main
+baseline_commit: f5906e8b24679b7affffcdc9db5d6116ba9b045d
+branch: agent/cycle-018-mcp-2026-security-auth-hardening
+approval_file: DARE/cycles/018-mcp-2026-security-auth-hardening/APPROVAL.md
+execution_order: [task-001, task-002, task-003, task-004, task-005, task-006, task-007, task-008, task-009, task-010, task-011, task-012, task-013, task-014, task-015, task-016, task-017, task-018, task-019, task-020, task-021, task-022, task-023, task-024, task-025, task-026, task-027, task-028, task-029, task-030, task-031, task-032, task-033, task-034, task-035, task-036, task-037, task-038, task-039, task-040, task-041, task-042, task-043, task-044, task-045, task-046, task-047, task-048]
+execution_gate:
+  approval_file_present: true
+  execution_authorized: true
+  required_pre_pr_local_workflow_job: mcp-auth-security-2026
+  pr_open_only_after_local_gates_green: true
+  no_runtime_target_expansion: true
+  no_real_credentials: true
+  no_external_egress: true
