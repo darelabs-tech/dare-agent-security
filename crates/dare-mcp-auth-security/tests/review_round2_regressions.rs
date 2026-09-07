@@ -9,7 +9,9 @@ use std::path::PathBuf;
 
 use serde_json::{json, Value};
 
-use dare_mcp_auth_security::harness::{normalize_checked, HarnessAdapter, TrialRequest};
+use dare_mcp_auth_security::harness::{
+    normalize_checked, HarnessAdapter, HarnessMode, RawTrialOutput, TrialRequest,
+};
 use dare_mcp_auth_security::invariant::evaluate;
 use dare_mcp_auth_security::model::{McpAuthInvariantType, McpAuthScenario};
 use dare_mcp_auth_security::observation::McpAuthObservation;
@@ -17,7 +19,7 @@ use dare_mcp_auth_security::result::{run_scenario, McpAuthSecurityResult};
 use dare_mcp_auth_security::schema::validate_scenario_document;
 use dare_mcp_auth_security::simulated::SimulatedAdapter;
 use dare_mcp_auth_security::trials::TrialPlan;
-use dare_mcp_auth_security::Verdict;
+use dare_mcp_auth_security::{Result, Verdict};
 
 fn load_value(lab: &str) -> Value {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -116,17 +118,35 @@ fn r2_an_advertised_but_unselected_sibling_issuer_does_not_bind_the_token() {
     }));
 }
 
+struct OverproducingAdapter;
+
+impl HarnessAdapter for OverproducingAdapter {
+    fn mode(&self) -> HarnessMode {
+        HarnessMode::Simulated
+    }
+
+    fn observe(&self, request: &TrialRequest<'_>) -> Result<RawTrialOutput> {
+        let mut observed_requests = request.scenario.requests.clone();
+        let mut over_budget = observed_requests[0].clone();
+        over_budget.request_id = "req-over-budget".to_owned();
+        observed_requests.push(over_budget);
+        Ok(RawTrialOutput {
+            observed_requests,
+            harness_error: None,
+        })
+    }
+}
+
 #[test]
 fn r2_request_budget_is_an_admission_boundary_before_normalization() {
     let mut scenario = load("mcp-auth-lab-001");
-    let mut second = scenario.requests[0].clone();
-    second.request_id = "req-2".to_owned();
-    scenario.requests.push(second);
     scenario.safety.max_requests_per_trial = Some(1);
     scenario.trials.count = 1;
     scenario.trials.stop_on_first_fail = false;
 
-    let result = run(&scenario);
+    let plan = TrialPlan::from_scenario(&scenario).expect("plan");
+    let result = run_scenario(&scenario, None, &OverproducingAdapter, plan).expect("runs");
+
     assert!(
         result.budget.exhausted,
         "the fixture must exhaust the request budget"
@@ -149,7 +169,7 @@ fn r2_request_budget_is_an_admission_boundary_before_normalization() {
         };
         assert_ne!(
             request_id,
-            Some("req-2"),
+            Some("req-over-budget"),
             "a request rejected by the budget still produced retained evidence"
         );
     }
