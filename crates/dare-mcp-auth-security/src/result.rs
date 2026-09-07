@@ -17,8 +17,8 @@ use serde::{Deserialize, Serialize};
 use dare_security_evidence::Verdict;
 
 use crate::error::Result;
-use crate::harness::{normalize_checked, HarnessAdapter, TrialRequest};
-use crate::invariant::{evaluate, McpAuthViolation};
+use crate::harness::{normalize_checked, HarnessAdapter, RawTrialOutput, TrialRequest};
+use crate::invariant::{collect_observed_violations, evaluate, McpAuthViolation};
 use crate::model::{McpAuthCorpusEntry, McpAuthInvariantType, McpAuthProperty, McpAuthScenario};
 use crate::observation::McpAuthObservation;
 use crate::source::ScenarioClass;
@@ -117,24 +117,25 @@ impl McpAuthSecurityResult {
             Verdict::Pass => format!(
                 "No MCP 2026 authentication/authorization hardening invariant violation was \
                  observed for the tested vectors under the recorded conditions ({} of {} bounded \
-                 trials, invariant {}).",
+                 trials, primary invariant {}).",
                 self.trials_executed,
                 self.trials_planned,
                 self.invariant.as_str()
             ),
             Verdict::Fail => format!(
-                "Invariant {} was violated under the recorded conditions ({} independently \
-                 observed violation(s)).",
-                self.invariant.as_str(),
-                self.violations().len()
+                "One or more MCP 2026 authentication/authorization hardening invariants were \
+                 violated under the recorded conditions ({} independently observed \
+                 violation(s); primary invariant {}).",
+                self.violations().len(),
+                self.invariant.as_str()
             ),
             Verdict::Inconclusive => format!(
-                "Evidence was insufficient to decide invariant {}. An inconclusive result is not \
-                 a pass.",
+                "Evidence was insufficient to decide primary invariant {}. An inconclusive result \
+                 is not a pass.",
                 self.invariant.as_str()
             ),
             Verdict::Error => format!(
-                "The harness could not evaluate invariant {}; no security conclusion is \
+                "The harness could not evaluate primary invariant {}; no security conclusion is \
                  available in either direction.",
                 self.invariant.as_str()
             ),
@@ -179,20 +180,37 @@ pub fn run_scenario(
             trial_index: index,
             scenario,
         })?;
-        let events = normalize_checked(&raw, scenario)?;
 
-        // The budget governs what is *kept*, not merely what is counted.
-        //
-        // This loop used to charge each event, stop counting at the ceiling,
-        // and then store the whole `events` vector anyway. The ledger reported
-        // a number under the bound while the artifact carried everything above
-        // it — an accounted figure that described nothing real.
-        //
-        // Now admission and retention are the same act: an event that was not
-        // charged is not kept, is not evaluated, and is not written. Accounted
-        // bytes, evaluated bytes and persisted bytes are the same bytes.
-        let mut retained = 0usize;
+        // Request accounting is an admission boundary, not a post-hoc metric.
+        // A request that could not be charged must not be normalized, evaluated
+        // or persisted. Otherwise the artifact could contain evidence derived
+        // from more requests than its own budget says were admitted.
         let mut exhausted: Option<String> = None;
+        let mut requests = 0u32;
+        let mut admitted_requests = Vec::with_capacity(raw.observed_requests.len());
+        for request in &raw.observed_requests {
+            match ledger.charge_request(&mut guard) {
+                Ok(()) => {
+                    requests += 1;
+                    admitted_requests.push(request.clone());
+                }
+                Err(error) => {
+                    exhausted = Some(error.to_string());
+                    break;
+                }
+            }
+        }
+
+        let bounded_raw = RawTrialOutput {
+            observed_requests: admitted_requests,
+            harness_error: raw.harness_error.clone(),
+        };
+        let events = normalize_checked(&bounded_raw, scenario)?;
+
+        // The output budget governs what is kept, not merely what is counted.
+        // Admission and retention are the same act: an event that was not
+        // charged is not kept, is not evaluated, and is not written.
+        let mut retained = 0usize;
         let mut admitted: Vec<McpAuthObservation> = Vec::with_capacity(events.len());
         for event in events {
             let bytes = event.retained_bytes();
@@ -202,38 +220,27 @@ pub fn run_scenario(
                     admitted.push(event);
                 }
                 Err(error) => {
-                    exhausted = Some(error.to_string());
+                    if exhausted.is_none() {
+                        exhausted = Some(error.to_string());
+                    }
                     break;
                 }
             }
         }
         let events = admitted;
-        let mut requests = 0u32;
-        for _ in &raw.observed_requests {
-            if ledger.charge_request(&mut guard).is_err() {
-                exhausted.get_or_insert_with(|| "request budget exhausted".to_owned());
-                break;
-            }
-            requests += 1;
-        }
 
-        // A trial that hit *any* bound partway through did not observe
-        // everything it set out to. That is true whether the ceiling was bytes
-        // or requests: in the first case events were not kept, in the second
-        // requests were seen but not accounted, and in both the trial's record
-        // is a partial view being asked to stand for a complete one.
+        // A trial that hit any bound partway through did not observe everything
+        // it set out to. PASS must not be manufactured from a partial view.
         let incomplete = exhausted.is_some();
 
+        // The scenario-selected invariant remains the primary decision surface
+        // for backward compatibility and coverage semantics. Independently,
+        // every evaluator is allowed to report a concrete FAIL over evidence
+        // that is already present in this same trial. This is deliberately not
+        // "all invariants must PASS": an inapplicable secondary invariant will
+        // generally be INCONCLUSIVE and does not poison the primary result.
         let mut outcome = evaluate(invariant, scenario, &events);
 
-        // Evidence that could not be retained is evidence the run does not
-        // have. A PASS reached over a truncated observation set would be
-        // reporting "no violation was observed" about observations that were
-        // discarded, which is the difference between "nothing was there" and
-        // "we stopped looking".
-        //
-        // A FAIL stands: every violation was decided by an event that *was*
-        // admitted, so the finding rests on evidence the artifact still holds.
         if incomplete && outcome.verdict == Verdict::Pass {
             outcome = crate::invariant::McpAuthInvariantOutcome {
                 invariant,
@@ -247,40 +254,35 @@ pub fn run_scenario(
                 coverage_satisfied: false,
             };
         }
+
         let event_digests: Vec<String> = events
             .iter()
             .filter_map(|event| event.digest().ok())
             .collect();
 
-        // The identity boundary is checked on every run, not only where a
-        // scenario selects it. Promotion of self-description to authority is a
-        // property of the identity evidence, so it is wrong in any scenario
-        // carrying it — and if it were selectable, every scenario that did not
-        // select it would report PASS on a target that had already turned a
-        // self-reported name into a principal.
-        //
-        // It is added to the violations rather than replacing them: a run can
-        // breach a request-level boundary and this one at the same time, and
-        // reporting only one of them would understate what was found.
-        let identity = crate::invariant::identity_boundary_violation(scenario, &events);
-        let mut violations = outcome.violations.clone();
-        let verdict = match identity {
-            Some(violation) => {
-                violations.push(violation);
-                Verdict::Fail
-            }
-            None => outcome.verdict,
-        };
-        let reason = if violations.len() > outcome.violations.len() && violations.len() == 1 {
-            violations[0].reason.clone()
-        } else if violations.len() > outcome.violations.len() {
-            format!(
-                "{} independent violations were observed, including the self-reported identity \
-                 boundary",
-                violations.len()
-            )
+        let violations = collect_observed_violations(scenario, &events);
+        let verdict = if violations.is_empty() {
+            outcome.verdict
         } else {
+            Verdict::Fail
+        };
+        let reason = if violations.is_empty() {
             outcome.reason.clone()
+        } else if violations.len() == 1 {
+            violations[0].reason.clone()
+        } else {
+            let mut names: Vec<&str> = violations
+                .iter()
+                .map(|violation| violation.invariant.as_str())
+                .collect();
+            names.sort_unstable();
+            names.dedup();
+            format!(
+                "{} independent violations were observed across {} invariant(s): {}",
+                violations.len(),
+                names.len(),
+                names.join(", ")
+            )
         };
 
         trials.push(McpAuthTrialRecord {
@@ -288,7 +290,7 @@ pub fn run_scenario(
             verdict,
             reason,
             // A boundary that was demonstrably crossed was demonstrably
-            // exercised, whatever else the run did or did not observe.
+            // exercised, whatever else the primary run did or did not observe.
             coverage_satisfied: outcome.coverage_satisfied || verdict == Verdict::Fail,
             requests,
             retained_bytes: retained,
@@ -352,14 +354,12 @@ pub fn run_scenario(
     })
 }
 
-/// `ERROR` > `FAIL` > `INCONCLUSIVE` > `PASS`.
+/// `FAIL` outranks a later harness error because an observed violation is
+/// retained evidence; then `ERROR` > `INCONCLUSIVE` > `PASS`.
 fn aggregate(trials: &[McpAuthTrialRecord]) -> Verdict {
     if trials.is_empty() {
         return Verdict::Inconclusive;
     }
-    // A violation outranks a later harness failure: the finding was real, and
-    // losing it because a subsequent trial crashed would be worse than the
-    // crash.
     if trials.iter().any(|trial| trial.verdict == Verdict::Fail) {
         return Verdict::Fail;
     }
@@ -406,15 +406,11 @@ mod tests {
 
     #[test]
     fn the_same_run_twice_produces_the_same_artifact() {
-        // Determinism is what makes a recorded digest worth anything: two runs
-        // that differed would mean the digest identified the run rather than
-        // the thing under test.
         assert_eq!(run(&scenario()), run(&scenario()));
     }
 
     #[test]
     fn stopping_on_first_fail_keeps_the_failing_trials_evidence() {
-        // The stop must never discard the evidence that caused it.
         let mut broken = scenario();
         broken.lab = Some(crate::model::McpAuthLabSpec {
             reference_behavior: crate::model::ReferenceBehavior::MethodHeaderBodyMismatch,
@@ -483,8 +479,6 @@ mod tests {
         for marker in ["sk-live-", "-----BEGIN", "Bearer ey", "eyJhbGci"] {
             assert!(!rendered.contains(marker), "artifact carried {marker}");
         }
-        // A schema `$id` names a contract and is never resolved; every other
-        // scheme-shaped occurrence would be something a reader could follow.
         for (index, _) in rendered.match_indices("://") {
             let from = rendered[..index].rfind('"').map_or(0, |at| at + 1);
             assert!(
@@ -498,9 +492,6 @@ mod tests {
     fn a_substituted_scenario_identity_is_refused_before_anything_is_observed() {
         let mut substituted = scenario();
         substituted.requests[0].operation.name = Some("delete-invoice".to_owned());
-        // The binding is computed from the scenario itself, so the run proceeds;
-        // what must not happen is the *adapter* substituting one. That is
-        // covered in harness and replay. Here we assert the digest moved.
         let original = crate::canonical::bind(&scenario()).expect("binds");
         let moved = crate::canonical::bind(&substituted).expect("binds");
         assert_ne!(original.scenario_digest, moved.scenario_digest);
