@@ -208,14 +208,47 @@ pub fn run_scenario(
             .filter_map(|event| event.digest().ok())
             .collect();
 
+        // The identity boundary is checked on every run, not only where a
+        // scenario selects it. Promotion of self-description to authority is a
+        // property of the identity evidence, so it is wrong in any scenario
+        // carrying it — and if it were selectable, every scenario that did not
+        // select it would report PASS on a target that had already turned a
+        // self-reported name into a principal.
+        //
+        // It is added to the violations rather than replacing them: a run can
+        // breach a request-level boundary and this one at the same time, and
+        // reporting only one of them would understate what was found.
+        let identity = crate::invariant::identity_boundary_violation(scenario);
+        let mut violations = outcome.violations.clone();
+        let verdict = match identity {
+            Some(violation) => {
+                violations.push(violation);
+                Verdict::Fail
+            }
+            None => outcome.verdict,
+        };
+        let reason = if violations.len() > outcome.violations.len() && violations.len() == 1 {
+            violations[0].reason.clone()
+        } else if violations.len() > outcome.violations.len() {
+            format!(
+                "{} independent violations were observed, including the self-reported identity \
+                 boundary",
+                violations.len()
+            )
+        } else {
+            outcome.reason.clone()
+        };
+
         trials.push(McpAuthTrialRecord {
             index,
-            verdict: outcome.verdict,
-            reason: outcome.reason.clone(),
-            coverage_satisfied: outcome.coverage_satisfied,
+            verdict,
+            reason,
+            // A boundary that was demonstrably crossed was demonstrably
+            // exercised, whatever else the run did or did not observe.
+            coverage_satisfied: outcome.coverage_satisfied || verdict == Verdict::Fail,
             requests,
             retained_bytes: retained,
-            violations: outcome.violations.clone(),
+            violations,
             event_digests,
             events,
         });
@@ -226,7 +259,7 @@ pub fn run_scenario(
             ledger.stop(StopReason::BudgetExhausted { detail });
             break;
         }
-        if plan.stop_on_first_fail && outcome.verdict == Verdict::Fail {
+        if plan.stop_on_first_fail && verdict == Verdict::Fail {
             ledger.stop(StopReason::FirstFail { trial_index: index });
             break;
         }

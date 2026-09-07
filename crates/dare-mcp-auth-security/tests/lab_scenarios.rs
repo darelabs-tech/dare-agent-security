@@ -22,9 +22,11 @@ use dare_mcp_auth_security::harness::{normalize_checked, HarnessAdapter, TrialRe
 use dare_mcp_auth_security::invariant::evaluate;
 use dare_mcp_auth_security::model::{McpAuthInvariantType, McpAuthScenario};
 use dare_mcp_auth_security::observation::McpAuthObservation;
+use dare_mcp_auth_security::result::run_scenario;
 use dare_mcp_auth_security::schema::validate_scenario_document;
 use dare_mcp_auth_security::simulated::SimulatedAdapter;
 use dare_mcp_auth_security::source::ScenarioClass;
+use dare_mcp_auth_security::trials::TrialPlan;
 use dare_mcp_auth_security::{McpAuthSecurityError, Verdict};
 
 /// What a lab is expected to produce for the invariant it names.
@@ -327,6 +329,71 @@ fn the_self_reported_identity_boundary_is_judged_on_its_own_evidence() {
         holds.identity_metadata.client_info,
         broken.identity_metadata.client_info
     );
+}
+
+#[test]
+fn a_promoted_self_report_fails_the_run_and_not_only_a_field_assertion() {
+    // Reading `boundary_holds()` off the scenario proves the model is right. It
+    // does not prove the *engine* acts on it, and for a while it did not: lab
+    // 030 declared a request-level invariant that genuinely held, so a run
+    // reported PASS on a target that had already turned a self-reported name
+    // into a principal.
+    let broken = load("mcp-auth-lab-030").expect("loads");
+    let plan = TrialPlan::from_scenario(&broken).expect("plan");
+    let result = run_scenario(&broken, None, &SimulatedAdapter::new(), plan).expect("runs");
+
+    assert_eq!(result.verdict, Verdict::Fail);
+    let violation = result
+        .violations()
+        .into_iter()
+        .find(|violation| violation.reason.contains("self-reported"))
+        .expect("the finding names the promotion");
+    assert_eq!(violation.subject.as_deref(), Some("user-7"));
+
+    // The control still passes, so the gate is judging the promotion rather
+    // than the presence of self-description.
+    let holds = load("mcp-auth-lab-029").expect("loads");
+    let plan = TrialPlan::from_scenario(&holds).expect("plan");
+    let clean = run_scenario(&holds, None, &SimulatedAdapter::new(), plan).expect("runs");
+    assert_eq!(clean.verdict, Verdict::Pass);
+}
+
+#[test]
+fn the_identity_boundary_is_checked_even_when_a_scenario_selects_another_invariant() {
+    // The reason it is not a fifteenth selectable invariant. A deployment that
+    // derived its principal from `clientInfo` is broken whatever else the run
+    // was looking at, so a scenario examining protocol binding must still
+    // report it rather than passing on the question it did select.
+    let mut scenario = load("mcp-auth-lab-001").expect("loads");
+    assert_eq!(
+        scenario.invariant.type_,
+        McpAuthInvariantType::McpMethodHeaderBodyBindingPreserved
+    );
+    scenario
+        .identity_metadata
+        .principal_derived_from_self_report = true;
+
+    let plan = TrialPlan::from_scenario(&scenario).expect("plan");
+    let result = run_scenario(&scenario, None, &SimulatedAdapter::new(), plan).expect("runs");
+    assert_eq!(
+        result.verdict,
+        Verdict::Fail,
+        "a promoted self-report passed because the scenario was asking about something else"
+    );
+}
+
+#[test]
+fn a_scenario_with_no_self_description_is_not_judged_on_a_boundary_it_never_crossed() {
+    // `None` is a third answer. A target that reports no `clientInfo` at all
+    // has nothing to have promoted, and must not be failed for it.
+    let mut scenario = load("mcp-auth-lab-001").expect("loads");
+    scenario.identity_metadata.client_info = None;
+    scenario.identity_metadata.server_info = None;
+    assert_eq!(scenario.identity_metadata.boundary_holds(), None);
+
+    let plan = TrialPlan::from_scenario(&scenario).expect("plan");
+    let result = run_scenario(&scenario, None, &SimulatedAdapter::new(), plan).expect("runs");
+    assert_eq!(result.verdict, Verdict::Pass);
 }
 
 #[test]

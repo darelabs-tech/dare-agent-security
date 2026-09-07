@@ -827,6 +827,52 @@ fn final_operation(
     violations
 }
 
+/// The self-reported identity boundary, checked on every run rather than only
+/// where a scenario declares it.
+///
+/// This is not a fifteenth invariant. The other fourteen judge a *request* —
+/// what was routed, what was presented, what was performed — and are selected
+/// one per scenario. Promotion of self-description to authority is a property
+/// of the identity evidence itself, and it is wrong in any scenario that
+/// carries it, not only in the one that happened to name it.
+///
+/// The distinction matters because of how it would fail otherwise. A deployment
+/// that derives its acting principal from `clientInfo` is broken whatever else
+/// the run was looking at; if this were selectable, every scenario that did not
+/// select it would report PASS on a target that had already promoted a name
+/// into a principal. That is the self-report evasion this cycle exists to
+/// refuse, and "protocol metadata != authenticated identity" is one of the
+/// distinctions the cycle must hold.
+///
+/// Returns `None` when there is no self-description to have crossed a boundary,
+/// which is a different answer from the boundary holding.
+pub fn identity_boundary_violation(scenario: &McpAuthScenario) -> Option<McpAuthViolation> {
+    if scenario.identity_metadata.boundary_holds()? {
+        return None;
+    }
+
+    let subject = scenario
+        .identity_metadata
+        .acting_principal
+        .as_ref()
+        .map(|principal| principal.principal_id.clone());
+
+    Some(McpAuthViolation {
+        invariant: McpAuthInvariantType::InboundCredentialNotReusedAsUpstreamAuthority,
+        reason: "self-reported protocol metadata was promoted to authoritative identity".to_owned(),
+        // Scenario-level evidence rather than an observation, so there is no
+        // event digest to name. The scenario digest in the result binds it.
+        deciding_event_digests: Vec::new(),
+        request_id: None,
+        subject,
+        detail: Some(
+            "clientInfo and serverInfo are what a peer calls itself; anything can claim any \
+             name, and a principal established from one is not authenticated"
+                .to_owned(),
+        ),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,0 +1,22 @@
+{
+  "tools_count": 3,
+  "resources_count": 1,
+  "prompts_count": 0,
+  "transport": "http",
+  "authorization_present": true,
+  "dynamic_authorization_allowed": false,
+  "execution_integrity_supported": true,
+  "confused_deputy_supported": true,
+  "mcp_current_protocol_present": true,
+  "mcp_http_transport_present": true,
+  "mcp_auth_flow_present": true,
+  "mcp_identity_metadata_present": true,
+  "protected_resource_metadata_present": false,
+  "authorization_server_metadata_present": false,
+  "token_claims_present": false,
+  "pkce_context_present": false,
+  "scope_challenge_present": false,
+  "client_registration_present": false,
+  "credential_forwarding_present": false,
+  "out_of_scope_property_ids": []
+}

@@ -2211,6 +2211,307 @@ jobs:
           test -f .dare-agent-security/regression-mcp-017/coverage-report.json
           test ! -f .dare-agent-security/regression-mcp-017/risk-family-coverage.json
 
+  mcp-auth-security-2026:
+    name: Cycle 018 MCP 2026 auth and authorization gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (schemas, enums, invariants, bounds, adapters)
+        run: cargo test -p dare-mcp-auth-security --lib -- --nocapture
+      - name: The 35 MCP-AUTH-LAB fixtures end to end
+        run: cargo test -p dare-mcp-auth-security --test lab_scenarios -- --nocapture
+      - name: Hostile parser fixtures fail closed
+        run: cargo test -p dare-mcp-auth-security --test hostile_fixtures -- --nocapture
+      - name: Independent multi-violation capture and redaction hygiene
+        run: cargo test -p dare-mcp-auth-security --test violations_and_hygiene -- --nocapture
+      - name: A trace is evidence, never authority
+        run: cargo test -p dare-mcp-auth-security --test replay_traces -- --nocapture
+      - name: MCP-auth profile and coverage integration
+        run: cargo test -p dare-coverage --test mcp_auth_profile -- --nocapture
+      - name: MCP-auth properties and standards provenance
+        run: |
+          cargo test -p dare-coverage --test mcp_auth_properties -- --nocapture
+          cargo test -p dare-coverage --lib mcp_auth_security_standards -- --nocapture
+      - name: CLI flag surface (no endpoint, issuer, token, JWKS or registration flag)
+        run: cargo test -p dare-agent-security --lib mcp_auth_security -- --nocapture
+
+      - name: Schemas, scenarios, corpus, traces and hostile fixtures are generated
+        run: |
+          python scripts/k18/gen_mcp_auth_schemas.py --check
+          python scripts/k18/gen_mcp_auth_scenarios.py --check
+          python scripts/k18/gen_mcp_auth_corpus.py --check
+          python scripts/k18/gen_mcp_auth_traces.py --check
+          python scripts/k18/gen_mcp_auth_hostile.py --check
+
+      - name: Offline CLI - a request that means the same thing to router and server
+        run: |
+          rm -rf .dare-agent-security/cycle018-benign
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle018-benign
+          test -f .dare-agent-security/cycle018-benign/mcp-auth-security-result.json
+          test -f .dare-agent-security/cycle018-benign/mcp-auth-security-trials.json
+          test -f .dare-agent-security/cycle018-benign/mcp-auth-security-evidence.json
+          test -f .dare-agent-security/cycle018-benign/summary.md
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-benign/mcp-auth-security-result.json \
+            verdict=PASS class=PROTOCOL_BINDING mode=SIMULATED synthetic=true \
+            invariant=MCP_METHOD_HEADER_BODY_BINDING_PRESERVED \
+            property_id=MCP.AUTH.PROTOCOL_BINDING \
+            protocol_revision=2026-07-28 expected_resource=mcp-invoices \
+            objective_id=objective-invoice \
+            trials_planned=3 trials_executed=3 \
+            stop_reason.reason=PLAN_COMPLETED redaction_state=REDACTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --present scenario_digest evidence_ids
+
+      - name: Routing that names one operation while the body requests another
+        run: |
+          for pair in "MCP-AUTH-LAB-003:cycle018-method:MCP_METHOD_HEADER_BODY_BINDING_PRESERVED" \
+                      "MCP-AUTH-LAB-004:cycle018-name:MCP_NAME_HEADER_BODY_BINDING_PRESERVED"; do
+            lab="${pair%%:*}"
+            rest="${pair#*:}"
+            dir="${rest%%:*}"
+            invariant="${rest##*:}"
+            rm -rf ".dare-agent-security/$dir"
+            set +e
+            cargo run -p dare-agent-security -- validate mcp-auth-security \
+              --scenario "$lab" \
+              --mode simulated \
+              --output-dir ".dare-agent-security/$dir"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $lab, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py \
+              ".dare-agent-security/$dir/mcp-auth-security-result.json" \
+              verdict=FAIL class=PROTOCOL_BINDING "invariant=$invariant" \
+              stop_reason.reason=FIRST_FAIL trials_executed=1 \
+              budget.state_changes=0 budget.external_egress_bytes=0
+          done
+
+      - name: A valid token is not a correctly audienced one
+        run: |
+          rm -rf .dare-agent-security/cycle018-audience
+          set +e
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-012 \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/cycle018-audience
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a mismatched audience, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-audience/mcp-auth-security-result.json \
+            verdict=FAIL class=TOKEN_BINDING mode=LOCAL_SYNTHETIC \
+            invariant=TOKEN_RESOURCE_AUDIENCE_BOUNDARY_PRESERVED \
+            stop_reason.reason=FIRST_FAIL trials_executed=1 \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: An inbound credential is not upstream authority, and metadata is not identity
+        run: |
+          for pair in "MCP-AUTH-LAB-027:cycle018-credential" \
+                      "MCP-AUTH-LAB-030:cycle018-identity"; do
+            lab="${pair%%:*}"
+            dir="${pair##*:}"
+            rm -rf ".dare-agent-security/$dir"
+            set +e
+            cargo run -p dare-agent-security -- validate mcp-auth-security \
+              --scenario "$lab" \
+              --mode simulated \
+              --output-dir ".dare-agent-security/$dir"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $lab, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py \
+              ".dare-agent-security/$dir/mcp-auth-security-result.json" \
+              verdict=FAIL class=CREDENTIAL_AND_IDENTITY \
+              invariant=INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY
+          done
+
+      - name: A permit does not survive the operation changing under it
+        run: |
+          rm -rf .dare-agent-security/cycle018-final
+          set +e
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-033 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle018-final
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a mutated operation, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-final/mcp-auth-security-result.json \
+            verdict=FAIL invariant=FINAL_OPERATION_AUTHORIZATION_BINDING_PRESERVED
+
+      - name: Silence is inconclusive and never a pass
+        run: |
+          for pair in "MCP-AUTH-LAB-014:cycle018-silent-token" \
+                      "MCP-AUTH-LAB-035:cycle018-silent-pkce"; do
+            lab="${pair%%:*}"
+            dir="${pair##*:}"
+            rm -rf ".dare-agent-security/$dir"
+            set +e
+            cargo run -p dare-agent-security -- validate mcp-auth-security \
+              --scenario "$lab" \
+              --mode simulated \
+              --output-dir ".dare-agent-security/$dir"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $lab, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py \
+              ".dare-agent-security/$dir/mcp-auth-security-result.json" \
+              verdict=INCONCLUSIVE
+          done
+
+      - name: A bound trace replays; one that widens the operation is refused
+        run: |
+          traces=crates/dare-mcp-auth-security/tests/fixtures/traces
+          rm -rf .dare-agent-security/cycle018-replay
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-001 \
+            --mode replay \
+            --trace "$traces/trace-lab-001.json" \
+            --output-dir .dare-agent-security/cycle018-replay
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-replay/mcp-auth-security-result.json \
+            verdict=PASS mode=REPLAY synthetic=true \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+          # Same scenario_id, wider operation. This is the Cycle 017 defect, and
+          # it must be refused before anything is observed or written.
+          rm -rf .dare-agent-security/cycle018-unbound
+          set +e
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-001 \
+            --mode replay \
+            --trace "$traces/trace-unbound-operation.json" \
+            --output-dir .dare-agent-security/cycle018-unbound
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for an unbound trace, got $code"
+            exit 1
+          fi
+          if [ -f .dare-agent-security/cycle018-unbound/mcp-auth-security-result.json ]; then
+            echo "a refused trace still produced a result artifact"
+            exit 1
+          fi
+
+      - name: MCP-auth coverage profile plans every surface it selects
+        run: |
+          rm -rf .dare-agent-security/cycle018-coverage
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-auth-hardening-2026 \
+            --facts fixtures/coverage/mcp-auth-all-surfaces.json \
+            --output-dir .dare-agent-security/cycle018-coverage
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-coverage/coverage-report.json \
+            profile.id=mcp-auth-hardening-2026 \
+            eligible=10 required_eligible=10 \
+            counts.NOT_APPLICABLE=0 counts.OUT_OF_SCOPE=0 counts.BLOCKED=0
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-coverage/coverage-report.json \
+            --count properties=10
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-coverage/coverage-report.json \
+            --all "properties.*.requirement=REQUIRED" --min-matches 10
+
+      - name: A missing auth control is a gap, never relabelled NOT_APPLICABLE
+        run: |
+          rm -rf .dare-agent-security/cycle018-controls-absent
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-auth-hardening-2026 \
+            --facts fixtures/coverage/mcp-auth-controls-absent.json \
+            --output-dir .dare-agent-security/cycle018-controls-absent
+          # AC-08. Seven controls are absent while the target shape is present,
+          # so every property is a gap. Not one may report NOT_APPLICABLE.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-controls-absent/coverage-report.json \
+            counts.NOT_APPLICABLE=0 counts.NOT_TESTED=10 \
+            eligible=10 required_eligible=10
+
+      - name: A target the modern authorization surface does not cover is not a gap
+        run: |
+          rm -rf .dare-agent-security/cycle018-legacy
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-auth-hardening-2026 \
+            --facts fixtures/coverage/mcp-auth-legacy-revision.json \
+            --output-dir .dare-agent-security/cycle018-legacy
+          # The mirror of the check above. A legacy-revision stdio target fails a
+          # target-shape predicate, so these properties leave the denominator
+          # entirely rather than being reported as missing controls.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-legacy/coverage-report.json \
+            counts.NOT_APPLICABLE=10 counts.NOT_TESTED=0 \
+            eligible=0 required_eligible=0
+
+      - name: Cycle 001 evidence, Cycle 002 revision and Cycle 003 integrity regressions
+        run: |
+          cargo test -p dare-security-evidence -- --nocapture
+          cargo test -p dare-mcp-discovery -- --nocapture
+          cargo test -p dare-coaz-integrity -- --nocapture
+
+      - name: Agentic baseline regression (Cycle 012)
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          rm -rf .dare-agent-security/regression-agentic-018
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile agentic-security-baseline-2026 \
+            --facts fixtures/coverage/agentic-all-capabilities.json \
+            --output-dir .dare-agent-security/regression-agentic-018
+          test -f .dare-agent-security/regression-agentic-018/coverage-report.json
+          # Ten MCP.AUTH.* / MCP.IDENTITY.* properties were added to the v1
+          # registry and none of them created an eleventh Agentic risk family.
+          # Authentication is not an Agentic risk family.
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-agentic-018/risk-family-coverage.json \
+            --count "=10" \
+            --all "*.properties=1" --min-matches 10
+
+      - name: No untested risk family renders as SECURE
+        run: |
+          python scripts/assert-risk-family-state.py \
+            .dare-agent-security/regression-agentic-018/risk-family-coverage.json
+
+      - name: MCP baseline regression - the earlier denominator did not move
+        run: |
+          rm -rf .dare-agent-security/regression-mcp-018
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile mcp-security-baseline \
+            --facts fixtures/coverage/fixture-a-tools-static-roe.json \
+            --output-dir .dare-agent-security/regression-mcp-018
+          test -f .dare-agent-security/regression-mcp-018/coverage-report.json
+          test ! -f .dare-agent-security/regression-mcp-018/risk-family-coverage.json
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-mcp-018/coverage-report.json \
+            profile.id=mcp-security-baseline
+          python scripts/assert-json.py \
+            .dare-agent-security/regression-mcp-018/coverage-report.json \
+            --count properties=10
+
+      - name: Cycle 017 retrieval semantics stayed independent
+        run: |
+          cargo test -p dare-rag-security --lib -- --nocapture
+          cargo test -p dare-coverage --test rag_security_profile -- --nocapture
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest
