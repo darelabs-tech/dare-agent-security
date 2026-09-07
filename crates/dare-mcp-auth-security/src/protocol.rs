@@ -170,16 +170,43 @@ impl JsonRpcOperation {
 
 /// Normalize a routing value for semantic comparison.
 ///
-/// Case and surrounding whitespace do not change which operation runs, so they
-/// are removed before comparison. Nothing else is: an engine that normalized
-/// away punctuation or separators would start treating `tools/call` and
-/// `tools.call` as the same routed operation, and a mismatch that changes
-/// routing is exactly what this module exists to catch.
+/// **Only surrounding whitespace is removed, and only because the transport
+/// says it is not part of the value.** RFC 9110 §5.5 defines a field value as
+/// excluding leading and trailing optional whitespace, so `"  tools/call  "`
+/// and `"tools/call"` are the same field value by the wire format's own
+/// definition. That is a proof, not a preference.
+///
+/// **Case is not folded.** An earlier version of this function lowercased both
+/// sides, on the reasoning that casing "does not change which tool runs". That
+/// reasoning confused two different things:
+///
+/// - the *name* of an HTTP header is case-insensitive (RFC 9110 §5.1);
+/// - the *value* a header carries is an opaque octet sequence, and its meaning
+///   belongs to whoever defined the field.
+///
+/// Here the values are a JSON-RPC method and an MCP tool name. Both are exact
+/// identifiers: a server's tool registry is keyed by the literal string it
+/// published, and `deleteInvoice` and `deleteinvoice` are two different keys or
+/// one missing one. Nothing in MCP `2026-07-28` declares them equivalent.
+///
+/// Folding case therefore did not remove noise — it removed a difference
+/// capable of changing which operation executes. A gateway routing on
+/// `Mcp-Name: DeleteInvoice` while the body asked for `deleteinvoice` is either
+/// a routing bug or an attempt to route on one operation and execute another,
+/// and both are exactly what this module exists to report.
+///
+/// Nothing else is normalized either. An engine that normalized away
+/// punctuation or separators would start treating `tools/call` and `tools.call`
+/// as the same routed operation.
 pub fn normalize_routing_value(value: &str) -> String {
-    value.trim().to_ascii_lowercase()
+    value.trim().to_owned()
 }
 
 /// Whether two routing values name the same operation.
+///
+/// Exact after whitespace trimming. When the two disagree in any other way —
+/// case included — they do not name the same operation, and the caller reports
+/// a mismatch rather than deciding the difference was cosmetic.
 pub fn routing_values_agree(left: &str, right: &str) -> bool {
     normalize_routing_value(left) == normalize_routing_value(right)
 }
@@ -300,14 +327,79 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn comparison_is_semantic_rather_than_byte_exact() {
-        // Casing and padding do not change which tool runs. An engine that
-        // reported these would train its readers to ignore it.
+    fn only_transport_padding_is_normalized_away() {
+        // RFC 9110 §5.5 says leading and trailing whitespace is not part of a
+        // field value, so trimming it compares the same value to itself. That
+        // is the only normalization with a proof behind it.
         let mut envelope = envelope();
-        envelope.headers.method = Some("  Tools/Call  ".to_owned());
-        envelope.headers.name = Some("Create-Invoice".to_owned());
+        envelope.headers.method = Some("  tools/call  ".to_owned());
+        envelope.headers.name = Some("  create-invoice  ".to_owned());
         assert_eq!(envelope.method_binding_holds(), Some(true));
         assert_eq!(envelope.name_binding_holds(), Some(true));
+    }
+
+    #[test]
+    fn a_case_changed_operation_name_never_escapes_the_binding() {
+        // The false PASS this replaced. `normalize_routing_value` used to
+        // lowercase both sides, so a gateway routing on `DeleteInvoice` while
+        // the body executed `deleteinvoice` compared equal and the binding
+        // invariant reported PASS.
+        //
+        // A server's tool registry is keyed by the literal string it published.
+        // `deleteInvoice` and `deleteinvoice` are two different keys, or one
+        // key and one miss — never the same operation. Nothing in MCP
+        // 2026-07-28 declares them equivalent, and an engine that folds the
+        // case has decided on the target's behalf that a difference capable of
+        // changing execution is cosmetic.
+        let mut envelope = envelope();
+        envelope.headers.name = Some("DeleteInvoice".to_owned());
+        envelope.operation.name = Some("deleteinvoice".to_owned());
+        assert_eq!(
+            envelope.name_binding_holds(),
+            Some(false),
+            "a case-changed operation name was treated as the same operation"
+        );
+
+        let mut routed = super::tests::envelope();
+        routed.headers.method = Some("Tools/Call".to_owned());
+        routed.operation.method = "tools/call".to_owned();
+        assert_eq!(
+            routed.method_binding_holds(),
+            Some(false),
+            "a case-changed method was treated as the same method"
+        );
+    }
+
+    #[test]
+    fn identical_values_still_agree() {
+        // The other half. Tightening the comparison must not turn every
+        // well-formed request into a finding.
+        assert!(routing_values_agree("tools/call", "tools/call"));
+        assert!(routing_values_agree("delete-invoice", "delete-invoice"));
+        assert!(routing_values_agree("  tools/call", "tools/call  "));
+
+        let envelope = envelope();
+        assert_eq!(envelope.method_binding_holds(), Some(true));
+        assert_eq!(envelope.name_binding_holds(), Some(true));
+    }
+
+    #[test]
+    fn no_case_variant_of_a_routing_value_compares_equal() {
+        // Swept rather than sampled, so the rule cannot hold for the one pair
+        // someone happened to write a test for.
+        for (left, right) in [
+            ("tools/call", "Tools/Call"),
+            ("tools/call", "TOOLS/CALL"),
+            ("delete-invoice", "Delete-Invoice"),
+            ("delete-invoice", "delete-Invoice"),
+            ("deleteInvoice", "deleteinvoice"),
+            ("resources/read", "Resources/Read"),
+        ] {
+            assert!(
+                !routing_values_agree(left, right),
+                "`{left}` and `{right}` were treated as the same operation"
+            );
+        }
     }
 
     #[test]

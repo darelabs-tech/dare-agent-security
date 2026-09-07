@@ -248,7 +248,7 @@ def build():
     add(
         "unknown-invariant",
         "scenario",
-        "names an invariant outside the closed fourteen",
+        "names an invariant outside the closed set",
         scenario(invariant={"type": "SOMETHING_NEW"}),
     )
     add(

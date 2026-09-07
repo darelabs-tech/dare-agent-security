@@ -69,7 +69,7 @@ pub fn requires_exercise_channel(invariant: McpAuthInvariantType) -> bool {
     )
 }
 
-/// The contract for one invariant. Total over all fourteen.
+/// The contract for one invariant. Total over all fifteen.
 pub fn coverage_contract(invariant: McpAuthInvariantType) -> CoverageContract {
     use CoverageChannel as C;
     use McpAuthInvariantType as I;
@@ -139,6 +139,12 @@ pub fn coverage_contract(invariant: McpAuthInvariantType) -> CoverageContract {
             "deciding whether an inbound credential was forwarded needs both sides of the \
              credential flow; a run that never observed an upstream call has nothing to say",
         ),
+        I::SelfReportedMetadataNotAuthority => (
+            vec![C::IdentityMetadata],
+            "deciding whether self-description was promoted to authority needs the identity \
+             evidence that would show the promotion; without it the run has nothing to say in \
+             either direction",
+        ),
         I::FinalOperationAuthorizationBindingPreserved => (
             vec![C::FinalOperationBinding, C::OperationContext],
             "deciding whether authorization still covers what was performed needs the binding and \
@@ -171,6 +177,28 @@ pub fn assess_coverage(
         .collect();
 
     if missing.is_empty() {
+        // One channel needs more than presence to satisfy its contract.
+        //
+        // `TOKEN_CLAIMS_CONTEXT` is the projection that *would* carry a
+        // verification result. Observing it proves the projection exists, not
+        // that anybody verified anything — and for
+        // `TOKEN_VALIDITY_EVIDENCE_PRESENT` the projection is the container,
+        // not the answer.
+        //
+        // Without this, a run that observed a token whose validity was UNKNOWN
+        // and was never accepted had its required channel present, no violation
+        // to report, and therefore PASSed — reporting "validity evidence is
+        // present" about a token nobody had checked. That is the exact shape of
+        // absence-as-satisfaction this cycle exists to refuse.
+        if invariant == McpAuthInvariantType::TokenValidityEvidencePresent {
+            if let Some(reason) = unverified_token_reason(observations) {
+                return CoverageDecision {
+                    satisfied: false,
+                    missing: vec![CoverageChannel::TokenClaims],
+                    reason,
+                };
+            }
+        }
         return CoverageDecision {
             satisfied: true,
             missing,
@@ -184,6 +212,32 @@ pub fn assess_coverage(
         missing,
         reason: format!("{}: missing {}", contract.reason, names.join(", ")),
     }
+}
+
+/// Why an observed token projection does not itself answer the validity
+/// question.
+///
+/// `None` when every observed token carries a recorded verification result,
+/// whatever that result was. A REJECTED or EXPIRED token *has* been verified;
+/// the answer was unfavourable, which is a verdict rather than a gap.
+fn unverified_token_reason(observations: &[McpAuthObservation]) -> Option<String> {
+    for observation in observations {
+        let McpAuthObservation::TokenClaims { token } = observation else {
+            continue;
+        };
+        let Some(claims) = &token.presented else {
+            continue;
+        };
+        if !claims.validity.is_positive_evidence() {
+            return Some(format!(
+                "the token projection was observed but token `{}` carries validity {}: a \
+                 projection that could hold a verification result is not a verification result",
+                claims.token_id,
+                claims.validity.as_str()
+            ));
+        }
+    }
+    None
 }
 
 #[cfg(test)]
@@ -209,7 +263,7 @@ mod tests {
     }
 
     #[test]
-    fn the_contract_is_total_over_the_fourteen_invariants() {
+    fn the_contract_is_total_over_the_fifteen_invariants() {
         // A missing contract would mean an invariant with no stated evidence
         // requirement, which is an invariant that can pass on nothing.
         for invariant in McpAuthInvariantType::all() {

@@ -178,7 +178,7 @@
     "refused_after_change": false
   },
   "invariant": {
-    "type": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY"
+    "type": "SELF_REPORTED_METADATA_NOT_AUTHORITY"
   },
   "trials": {
     "count": 3,

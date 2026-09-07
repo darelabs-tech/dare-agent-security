@@ -385,7 +385,7 @@
     {
       "file": "unknown-invariant.json",
       "document_kind": "scenario",
-      "reason": "names an invariant outside the closed fourteen"
+      "reason": "names an invariant outside the closed set"
     },
     {
       "file": "unknown-reference-behavior.json",

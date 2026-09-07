@@ -1,21 +1,31 @@
 # Cycle 018 — Tasks
 
-**Status:** IN PROGRESS — 37/48 tasks closed; the release gate is NOT met and no PR is open
+**Status:** COMPLETE — 48/48 tasks closed, merged as PR #28
 **Approval:** APPROVED
+**Post-merge:** SECURITY REVIEW APPLIED — see `POST-MERGE-REVIEW.md`
 
-Tasks 001-036 and 043 are closed with recorded evidence. The engine, its schemas, the
-fourteen invariants, the three offline adapters and the Cycle 001 evidence bridge are
-implemented and green: `cargo test --workspace` reports 2721 passing and 0 failing against
-a 2442 baseline, with `cargo fmt --all --check` and
+All 48 tasks are closed with recorded evidence. The cycle merged to `main` as
+`4e2da94e6738cbecfa7a5243f4928e75c01c2e5b` with 21/21 CI checks green,
+`cargo test --workspace` reporting 2799 passing and 0 failing against a 2442
+baseline, and `cargo fmt --all --check` and
 `cargo clippy --workspace --all-targets -- -D warnings` both clean.
 
-Still open: 037-042 (the MCP-AUTH-LAB corpus, benign controls, hostile fixtures and the
-multi-violation/redaction suite), 044 (profile), 045 (CLI), 046 (CI job and its real local
-execution), 047 (EN/PT documentation) and 048 (REGRESSION.md, PROOF.md and the PR).
+## Post-merge security review
 
-Per the approval's release gate, no pull request may be opened until all 48 tasks close and
-all 76 acceptance criteria map to executed evidence. Neither condition is met, so no PR has
-been opened.
+A review after the merge found eleven defects that the 2799 green tests did not
+catch, because the tests asserted the behaviour the engine had rather than the
+behaviour the cycle claimed. Nine were paths that could produce a **false PASS**
+on an authentication or authorization control; two were hygiene.
+
+The corrections are recorded in `POST-MERGE-REVIEW.md`, with the executed
+evidence in `REGRESSION.md` §7 and the corrected mappings in `PROOF.md`. The
+engine now implements **fifteen** invariants rather than fourteen: the
+self-reported metadata boundary was being filed under an invariant about
+credential forwarding, and a finding that does not name what it is about sends
+an operator to the wrong place.
+
+The history below is kept as it was executed. Nothing in it is deleted, because
+a record that is edited to look better afterwards is not a record.
 
 - [x] task-001 — Freeze post-Cycle-017 baseline and compatibility contracts
 - [x] task-002 — Record MCP 2026 / OAuth / AuthZEN / COAZ standards status snapshot

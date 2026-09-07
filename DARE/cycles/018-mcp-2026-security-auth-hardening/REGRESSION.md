@@ -174,3 +174,108 @@ than execution:
   says so in its own `reverification_note`. The statuses are pinned as of the
   cycle and should be re-checked before being relied on. Cycle 018 did not
   convert any draft or open proposal into a requirement.
+
+---
+
+## 7. Post-merge security review
+
+Everything above records the cycle as it was executed before PR #28. This
+section records the corrective review that followed the merge, and is additive:
+nothing above is edited, because a regression record rewritten to look better
+afterwards is not a record.
+
+- **Baseline:** `main @ 4e2da94e6738cbecfa7a5243f4928e75c01c2e5b` (the merge of
+  PR #28), verified against `origin/main` before branching
+- **Branch:** `fix/cycle-018-post-merge-security-review`
+- **Findings:** 11 — nine false-PASS paths, two hygiene. Full account in
+  `POST-MERGE-REVIEW.md`
+
+### 7.1 Executed gates
+
+| Gate | Command | Result |
+|---|---|---|
+| Format | `cargo fmt --all --check` | clean |
+| Lint | `cargo clippy --workspace --all-targets -- -D warnings` | 0 warnings, 0 errors |
+| Tests | `cargo test --workspace` | **2849 passing, 0 failing** |
+| Audit | `cargo audit` | exit 0 — 0 vulnerabilities, the same 1 pre-existing allowed warning as §5 |
+| Cycle 018 gate | `python scripts/run-ci-job-locally.py .github/workflows/ci.yml mcp-auth-security-2026` | **all 31 steps PASSED** |
+| Cycle 017 gate | `… rag-security-2026` | all 41 steps PASSED |
+| Cycle 016 gate | `… memory-security-2026` | all 39 steps PASSED |
+| Cycle 015 gate | `… identity-security-2026` | all 36 steps PASSED |
+| Cycle 014 gate | `… tool-security-2026` | all 28 steps PASSED |
+| Cycle 013 gate | `… prompt-injection-2026` | all 22 steps PASSED |
+| Cycle 012 gate | `… agentic-registry-2026` | all 5 steps PASSED |
+| Generators | all five `--check` | current (4 schemas, 35 labs, 34 vectors, 6 traces, 90 hostile cases) |
+| Credential sweep | `python scripts/k18/assert_no_real_credentials.py` | 176 files, 13 hostile values, none live |
+| Docs EN | `mdbook build book/en` | built |
+| Docs PT | `mdbook build book/pt` | built |
+
+The Cycle 018 job grew from 27 to 31 `run:` steps: the post-merge regression
+suite, a CLI check that a promoted self-report is reported under its own
+invariant, a CLI check that `--trials` cannot widen approved authority, and a
+gate asserting that every test `PROOF.md` cites actually exists — the check that
+found two citations gone stale when their tests were renamed.
+
+### 7.2 Test counts after the review
+
+| Suite | At merge | After |
+|---|---|---|
+| `dare-mcp-auth-security` unit (`--lib`) | 252 | 266 |
+| `lab_scenarios` | 16 | 16 |
+| `hostile_fixtures` | 9 | 9 |
+| `violations_and_hygiene` | 11 | 11 |
+| `replay_traces` | 7 | 7 |
+| `post_merge_regressions` | — | **36** |
+| **crate total** | 295 | **345** |
+| **workspace total** | 2799 | **2849** |
+
+The workspace gained 50: 36 new integration regressions and 14 net in the unit
+suites, from tests added alongside the fixes and from two that were split
+because one name had covered two claims.
+
+### 7.3 A CI step that had to change with the taxonomy
+
+The first local run of the corrected job failed one step — *An inbound
+credential is not upstream authority, and metadata is not identity* — which
+asserted that lab 030 reports
+`invariant=INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY`.
+
+That was the F06 defect present in the gate itself. The step bundled a
+credential-forwarding lab and an identity-promotion lab and asserted a single
+invariant name for both. It is now two steps, each asserting the invariant and
+property that describe what it tests.
+
+Worth recording rather than quietly fixing: the gate agreed with the wrong
+taxonomy, so it could never have caught it.
+
+### 7.4 A second finding the F08 test produced
+
+Writing `f08_a_budget_that_stopped_the_evidence_never_yields_pass` showed the
+fixture exhausting the **request** budget (`HARD_MAX_TOTAL_REQUESTS = 24`)
+before the byte budget, and that path had the same defect: the trial was
+incomplete and still reported PASS. The guard was widened from output-byte
+exhaustion to any hard bound reached mid-trial.
+
+The test asserts `result.budget.exhausted` before asserting the verdict, so it
+cannot pass vacuously if a later change stops the fixture exhausting anything.
+
+### 7.5 Tests that were rewritten, and why
+
+None were deleted. Three asserted the defect and two claimed more than they
+checked:
+
+| Test | Was | Now |
+|---|---|---|
+| `comparison_is_semantic_rather_than_byte_exact` | asserted `Tools/Call` == `tools/call` | `only_transport_padding_is_normalized_away` plus three case tests |
+| `casing_alone_is_not_an_authorization_relevant_change` | asserted a case change was not a change | `a_case_changed_operation_name_is_authorization_relevant` |
+| `every_surface_and_property_is_reachable_from_some_invariant` | asserted 9 of 10 properties reachable, the tenth deliberately not | asserts all 10, and that the tenth maps to its own invariant |
+| `an_override_may_narrow_but_never_widen_past_the_hard_bound` | checked only `HARD_MAX_TRIALS` | renamed `an_override_is_refused_above_the_crate_hard_maximum`; the guarantee it named is now `an_override_can_never_widen_what_a_scenario_approved` |
+| `the_labs_between_them_exercise_every_invariant` | asserted `>= 10` with a comment claiming 12 | asserts all 15 exactly, naming any that are missing |
+
+### 7.6 Residual risks
+
+Recorded in `POST-MERGE-REVIEW.md` under *Residual risks*: the invariant count
+and the property count do not map one-to-one; `DECLARED` metadata is treated as
+unable to establish authority per the existing contract; argument mutation is
+detected over declared values, since Cycle 018 observes no real request bodies;
+and the standards statuses remain pinned with no upstream re-verification.

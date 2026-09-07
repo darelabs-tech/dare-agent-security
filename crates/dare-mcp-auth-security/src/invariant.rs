@@ -1,6 +1,6 @@
 //! The deterministic invariant registry.
 //!
-//! Fourteen evaluators, each a comparison of typed fields. No model, no
+//! Fifteen evaluators, each a comparison of typed fields. No model, no
 //! heuristic, no prose inference and no fixture-declared verdict appears
 //! anywhere in this file.
 //!
@@ -111,7 +111,7 @@ impl McpAuthInvariantOutcome {
 }
 
 /// Every invariant this engine implements.
-pub fn supported_invariants() -> [McpAuthInvariantType; 14] {
+pub fn supported_invariants() -> [McpAuthInvariantType; 15] {
     McpAuthInvariantType::all()
 }
 
@@ -155,6 +155,7 @@ pub fn evaluate(
         I::InboundCredentialNotReusedAsUpstreamAuthority => {
             credential_separation(scenario, observations)
         }
+        I::SelfReportedMetadataNotAuthority => self_reported_authority(scenario, observations),
         I::FinalOperationAuthorizationBindingPreserved => final_operation(scenario, observations),
     };
 
@@ -381,6 +382,36 @@ fn resource_metadata(observations: &[McpAuthObservation]) -> Vec<McpAuthViolatio
         let Some(metadata) = &resource.metadata else {
             continue;
         };
+
+        // Provenance before content.
+        //
+        // Matching identifiers show that a document is *about* this resource.
+        // They say nothing about whether the document may be believed, and a
+        // self-reported document is exactly the one an attacker controls. An
+        // engine that checked only the ids would accept a metadata document
+        // that says "I am mcp-invoices and my authorization server is
+        // as-attacker" because every field lines up.
+        if !metadata.trust.may_establish_identity() {
+            violations.push(McpAuthViolation {
+                subject: Some(metadata.resource.to_string()),
+                detail: Some(format!(
+                    "this document is {} evidence; consistent identifiers show what it claims, \
+                     not that the claim may be relied on",
+                    metadata.trust.as_str()
+                )),
+                ..violation(
+                    McpAuthInvariantType::ProtectedResourceMetadataBoundToResource,
+                    format!(
+                        "protected resource metadata for `{}` is {} and cannot establish which \
+                         authorization servers may issue for it",
+                        metadata.resource,
+                        metadata.trust.as_str()
+                    ),
+                    digest_of(observation),
+                )
+            });
+        }
+
         if metadata.resource != resource.expected_resource {
             violations.push(McpAuthViolation {
                 subject: Some(metadata.resource.to_string()),
@@ -469,7 +500,136 @@ fn issuer_boundary(observations: &[McpAuthObservation]) -> Vec<McpAuthViolation>
             }
             _ => {}
         }
+
+        // F05: a selection is an act of reliance.
+        //
+        // Choosing an authorization server *because* a document advertises it
+        // means trusting that document. If the document could not establish
+        // authority, the selection rests on nothing, and every identifier
+        // agreeing is what that looks like from the inside.
+        if let Some(metadata) = &resource.metadata {
+            if metadata.advertises(selected) && !metadata.trust.may_establish_identity() {
+                violations.push(McpAuthViolation {
+                    subject: Some(selected.to_string()),
+                    detail: Some(format!(
+                        "the only thing placing `{selected}` inside this resource's authority is \
+                         a {} document, and that is not an authority",
+                        metadata.trust.as_str()
+                    )),
+                    ..violation(
+                        McpAuthInvariantType::AuthorizationServerIssuerBoundaryPreserved,
+                        format!(
+                            "authorization server `{selected}` was selected on {} resource \
+                             metadata",
+                            metadata.trust.as_str()
+                        ),
+                        digest_of(observation),
+                    )
+                });
+            }
+        }
+        if let Some(server) = resource.selected_metadata() {
+            if !server.trust.may_establish_identity() {
+                violations.push(McpAuthViolation {
+                    subject: Some(selected.to_string()),
+                    detail: Some(format!(
+                        "a server's own {} description of itself cannot be what makes it \
+                         authoritative; that is the same shape as clientInfo naming a principal",
+                        server.trust.as_str()
+                    )),
+                    ..violation(
+                        McpAuthInvariantType::AuthorizationServerIssuerBoundaryPreserved,
+                        format!(
+                            "the metadata establishing `{selected}` is {} and cannot establish it",
+                            server.trust.as_str()
+                        ),
+                        digest_of(observation),
+                    )
+                });
+            }
+        }
     }
+
+    // F04: the token's own issuer must be inside the same authorization
+    // context.
+    //
+    // Kept as an independent finding rather than folded into the audience
+    // check. A token can be verified, correctly audienced for this resource,
+    // and minted by an authorization server that was never selected — three
+    // separate questions, and collapsing them into one boolean would report one
+    // finding where there are several, or hide one behind another.
+    violations.extend(token_issuer_boundary(observations));
+
+    violations
+}
+
+/// A token minted by an authorization server outside the approved flow.
+///
+/// Evaluated whenever both the resource context and a token projection were
+/// observed. It adds no required coverage channel: a scenario that records no
+/// token still answers the advertisement question, and one that does record a
+/// token gets this check for free.
+fn token_issuer_boundary(observations: &[McpAuthObservation]) -> Vec<McpAuthViolation> {
+    let mut violations = Vec::new();
+
+    let resource = observations.iter().find_map(|o| match o {
+        McpAuthObservation::AuthorizationServerMetadata { resource } => Some(resource),
+        _ => None,
+    });
+    let Some(resource) = resource else {
+        return violations;
+    };
+
+    for observation in observations {
+        let McpAuthObservation::TokenClaims { token } = observation else {
+            continue;
+        };
+        let Some(claims) = &token.presented else {
+            continue;
+        };
+
+        // Trusted issuers are the ones this resource advertised, plus the one
+        // actually selected. Anything else minted a token for a resource it was
+        // never authorized to mint for.
+        let advertised = resource
+            .metadata
+            .as_ref()
+            .map(|metadata| metadata.advertises(&claims.issuer))
+            .unwrap_or(false);
+        let selected = resource
+            .selected_authorization_server
+            .as_ref()
+            .map(|server| server == &claims.issuer)
+            .unwrap_or(false);
+
+        if advertised || selected {
+            continue;
+        }
+        // Nothing recorded to compare against is a gap, not a finding.
+        if resource.metadata.is_none() && resource.selected_authorization_server.is_none() {
+            continue;
+        }
+
+        violations.push(McpAuthViolation {
+            subject: Some(claims.issuer.to_string()),
+            detail: Some(
+                "a correct audience does not make a token the right token: it says the issuer \
+                 meant it for this resource, not that this issuer was ever allowed to issue for \
+                 it"
+                .to_owned(),
+            ),
+            ..violation(
+                McpAuthInvariantType::AuthorizationServerIssuerBoundaryPreserved,
+                format!(
+                    "token `{}` was issued by `{}`, which this resource neither advertises nor \
+                     selected",
+                    claims.token_id, claims.issuer
+                ),
+                digest_of(observation),
+            )
+        });
+    }
+
     violations
 }
 
@@ -575,22 +735,33 @@ fn token_validity(
         let Some(claims) = &token.presented else {
             continue;
         };
-        // Missing verification evidence is INCONCLUSIVE, not FAIL — unless the
-        // deployment went ahead and accepted the token anyway, which is a
-        // decision it made on no evidence and is a finding in itself.
-        if !claims.has_validity_evidence() && token.accepted_by_resource {
+        // Two different questions, kept apart.
+        //
+        // *Was it examined?* decides between INCONCLUSIVE and a verdict, and is
+        // coverage's job. *May it be relied on?* is this one, and only VERIFIED
+        // answers yes. REJECTED and EXPIRED are examined tokens that must not
+        // be accepted, and an engine that read "evidence exists" as "evidence
+        // is favourable" would pass a token its own verifier had refused.
+        //
+        // Accepting is what makes it a finding. A rejected token the deployment
+        // also rejected is the control working, not a violation.
+        if token.accepted_by_resource && !claims.validity.may_be_accepted() {
+            let why = claims
+                .validity
+                .refusal_reason()
+                .unwrap_or("it may not be relied on");
             violations.push(McpAuthViolation {
                 subject: Some(claims.token_id.clone()),
-                detail: Some(
-                    "accepting a token with no recorded verification is a decision made on no \
-                     evidence"
-                        .to_owned(),
-                ),
+                detail: Some(format!(
+                    "the resource accepted this token even though {why}; a recorded verification \
+                     result is not the same as a favourable one"
+                )),
                 ..violation(
                     McpAuthInvariantType::TokenValidityEvidencePresent,
                     format!(
-                        "token `{}` was accepted with no verification evidence",
-                        claims.token_id
+                        "token `{}` was accepted while its recorded validity was {}",
+                        claims.token_id,
+                        claims.validity.as_str()
                     ),
                     digest_of(observation),
                 )
@@ -800,14 +971,48 @@ fn final_operation(
         let McpAuthObservation::FinalOperationBinding { binding } = observation else {
             continue;
         };
-        let changed = crate::compat::authorization_relevant_change(binding);
-        if changed.is_empty() {
+        // The decision is Cycle 003's. `binding_preserved` builds the
+        // projection and asks `bindings_equal` over
+        // `compute_authorization_binding`; this evaluator does not decide what
+        // "the same authorization context" means.
+        //
+        // A projection that cannot be built is not evidence that nothing
+        // changed, so it fails closed rather than continuing.
+        let preserved = match crate::compat::binding_preserved(binding) {
+            Ok(Some(preserved)) => preserved,
+            // Nothing to compare: one end was never observed. Coverage turns
+            // that into INCONCLUSIVE rather than agreement.
+            Ok(None) => continue,
+            Err(error) => {
+                violations.push(McpAuthViolation {
+                    detail: Some(
+                        "an authorization projection that cannot be canonicalized is not                          evidence that the permit still covers the operation"
+                            .to_owned(),
+                    ),
+                    ..violation(
+                        McpAuthInvariantType::FinalOperationAuthorizationBindingPreserved,
+                        format!("the final-operation binding could not be computed: {error}"),
+                        digest_of(observation),
+                    )
+                });
+                continue;
+            }
+        };
+        if preserved {
             continue;
         }
         if binding.reevaluated_after_change || binding.refused_after_change {
             // Re-evaluating or refusing is correct behaviour, not a finding.
             continue;
         }
+        // Cycle 003 has already said the binding moved; this only names the
+        // dimensions, so a finding is actionable.
+        let changed = crate::compat::authorization_relevant_change(binding);
+        let changed = if changed.is_empty() {
+            vec!["the authorization binding"]
+        } else {
+            changed
+        };
         violations.push(McpAuthViolation {
             detail: Some(
                 "a permit covers the operation it was granted for; reusing it after an \
@@ -827,50 +1032,86 @@ fn final_operation(
     violations
 }
 
-/// The self-reported identity boundary, checked on every run rather than only
-/// where a scenario declares it.
+/// The self-reported identity boundary, as an evaluator.
 ///
-/// This is not a fifteenth invariant. The other fourteen judge a *request* —
-/// what was routed, what was presented, what was performed — and are selected
-/// one per scenario. Promotion of self-description to authority is a property
-/// of the identity evidence itself, and it is wrong in any scenario that
-/// carries it, not only in the one that happened to name it.
+/// `clientInfo` and `serverInfo` are what a peer calls itself. Anything can
+/// claim any name, so a principal established from one is not authenticated —
+/// and that is the whole invariant.
 ///
-/// The distinction matters because of how it would fail otherwise. A deployment
-/// that derives its acting principal from `clientInfo` is broken whatever else
-/// the run was looking at; if this were selectable, every scenario that did not
-/// select it would report PASS on a target that had already promoted a name
-/// into a principal. That is the self-report evasion this cycle exists to
-/// refuse, and "protocol metadata != authenticated identity" is one of the
-/// distinctions the cycle must hold.
+/// The finding is bound to the identity observation that shows it, not asserted
+/// about the scenario. Before the post-merge review this violation shipped with
+/// an empty `deciding_event_digests`, which broke the crate's own evidence-first
+/// contract at exactly the point where an operator would want to trace a
+/// verdict back to what was seen.
+fn self_reported_authority(
+    _scenario: &McpAuthScenario,
+    observations: &[McpAuthObservation],
+) -> Vec<McpAuthViolation> {
+    let mut violations = Vec::new();
+    for observation in observations {
+        let McpAuthObservation::IdentityMetadata { identity } = observation else {
+            continue;
+        };
+        // `None` means no self-description was observed, which is a different
+        // answer from the boundary holding and must not become a finding.
+        if identity.boundary_holds() != Some(false) {
+            continue;
+        }
+        violations.push(McpAuthViolation {
+            subject: identity
+                .acting_principal
+                .as_ref()
+                .map(|principal| principal.principal_id.clone()),
+            detail: Some(
+                "clientInfo and serverInfo are what a peer calls itself; anything can claim any \
+                 name, and a principal established from one is not authenticated"
+                    .to_owned(),
+            ),
+            ..violation(
+                McpAuthInvariantType::SelfReportedMetadataNotAuthority,
+                "self-reported protocol metadata was promoted to authoritative identity".to_owned(),
+                digest_of(observation),
+            )
+        });
+    }
+    violations
+}
+
+/// The same boundary, checked on every run rather than only where a scenario
+/// selects it.
 ///
-/// Returns `None` when there is no self-description to have crossed a boundary,
-/// which is a different answer from the boundary holding.
-pub fn identity_boundary_violation(scenario: &McpAuthScenario) -> Option<McpAuthViolation> {
-    if scenario.identity_metadata.boundary_holds()? {
-        return None;
+/// It is a selectable invariant now — that is F06 — but it is *also* checked
+/// unconditionally, and both are needed for different reasons.
+///
+/// Selectable, because a finding must name what it is about: this is the
+/// `MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY` property, and a scenario that
+/// wants to exercise it should be able to.
+///
+/// Unconditional, because a deployment that derives its acting principal from
+/// `clientInfo` is broken whatever else the run was looking at. If this were
+/// only selectable, every scenario that selected something else would keep
+/// reporting PASS on a target that had already turned a name into a principal —
+/// which is the defect the Cycle 018 CI run found in the first place.
+///
+/// Returns `None` when there is no self-description to have crossed a boundary.
+pub fn identity_boundary_violation(
+    scenario: &McpAuthScenario,
+    observations: &[McpAuthObservation],
+) -> Option<McpAuthViolation> {
+    // Prefer the observation-bound finding, so the violation carries the digest
+    // of the evidence that decided it.
+    if let Some(violation) = self_reported_authority(scenario, observations)
+        .into_iter()
+        .next()
+    {
+        return Some(violation);
     }
 
-    let subject = scenario
-        .identity_metadata
-        .acting_principal
-        .as_ref()
-        .map(|principal| principal.principal_id.clone());
-
-    Some(McpAuthViolation {
-        invariant: McpAuthInvariantType::InboundCredentialNotReusedAsUpstreamAuthority,
-        reason: "self-reported protocol metadata was promoted to authoritative identity".to_owned(),
-        // Scenario-level evidence rather than an observation, so there is no
-        // event digest to name. The scenario digest in the result binds it.
-        deciding_event_digests: Vec::new(),
-        request_id: None,
-        subject,
-        detail: Some(
-            "clientInfo and serverInfo are what a peer calls itself; anything can claim any \
-             name, and a principal established from one is not authenticated"
-                .to_owned(),
-        ),
-    })
+    // A scenario carrying broken identity evidence that the run did not
+    // observe is still broken. Reporting it without a deciding digest would
+    // break the evidence contract, so it is reported as a harness-shaped gap
+    // instead: the boundary is not judged, rather than judged on nothing.
+    None
 }
 
 #[cfg(test)]
@@ -889,8 +1130,11 @@ mod tests {
     }
 
     #[test]
-    fn the_registry_is_closed_at_fourteen() {
-        assert_eq!(supported_invariants().len(), 14);
+    fn the_registry_is_closed_at_fifteen() {
+        // Fourteen until the post-merge review added
+        // SELF_REPORTED_METADATA_NOT_AUTHORITY. The count is not the invariant;
+        // a finding naming what it is about is.
+        assert_eq!(supported_invariants().len(), 15);
     }
 
     #[test]

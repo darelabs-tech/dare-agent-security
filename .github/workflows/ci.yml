@@ -2228,6 +2228,8 @@ jobs:
         run: cargo test -p dare-mcp-auth-security --test violations_and_hygiene -- --nocapture
       - name: A trace is evidence, never authority
         run: cargo test -p dare-mcp-auth-security --test replay_traces -- --nocapture
+      - name: Post-merge false-PASS regressions
+        run: cargo test -p dare-mcp-auth-security --test post_merge_regressions -- --nocapture
       - name: MCP-auth profile and coverage integration
         run: cargo test -p dare-coverage --test mcp_auth_profile -- --nocapture
       - name: MCP-auth properties and standards provenance
@@ -2246,6 +2248,8 @@ jobs:
           python scripts/k18/gen_mcp_auth_hostile.py --check
       - name: No real credential or reachable target in any fixture or artifact
         run: python scripts/k18/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k18/verify_proof_citations.py
 
       - name: Offline CLI - a request that means the same thing to router and server
         run: |
@@ -2318,29 +2322,29 @@ jobs:
             stop_reason.reason=FIRST_FAIL trials_executed=1 \
             budget.state_changes=0 budget.external_egress_bytes=0
 
-      - name: An inbound credential is not upstream authority, and metadata is not identity
+      - name: An inbound credential is not upstream authority
         run: |
-          for pair in "MCP-AUTH-LAB-027:cycle018-credential" \
-                      "MCP-AUTH-LAB-030:cycle018-identity"; do
-            lab="${pair%%:*}"
-            dir="${pair##*:}"
-            rm -rf ".dare-agent-security/$dir"
-            set +e
-            cargo run -p dare-agent-security -- validate mcp-auth-security \
-              --scenario "$lab" \
-              --mode simulated \
-              --output-dir ".dare-agent-security/$dir"
-            code=$?
-            set -e
-            if [ "$code" -ne 2 ]; then
-              echo "expected exit 2 for $lab, got $code"
-              exit 1
-            fi
-            python scripts/assert-json.py \
-              ".dare-agent-security/$dir/mcp-auth-security-result.json" \
-              verdict=FAIL class=CREDENTIAL_AND_IDENTITY \
-              invariant=INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY
-          done
+          # Lab 030 used to be asserted here too, under this same invariant.
+          # That was the F06 defect in the gate itself: promoting clientInfo to
+          # a principal is not credential forwarding, and the step asserting it
+          # was so had to change with the taxonomy. It has its own step below.
+          rm -rf .dare-agent-security/cycle018-credential
+          set +e
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-027 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle018-credential
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a forwarded inbound credential, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-credential/mcp-auth-security-result.json \
+            verdict=FAIL class=CREDENTIAL_AND_IDENTITY \
+            invariant=INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY \
+            property_id=MCP.AUTH.CREDENTIAL_SEPARATION
 
       - name: A permit does not survive the operation changing under it
         run: |
@@ -2414,6 +2418,68 @@ jobs:
           fi
           if [ -f .dare-agent-security/cycle018-unbound/mcp-auth-security-result.json ]; then
             echo "a refused trace still produced a result artifact"
+            exit 1
+          fi
+
+      - name: A promoted self-report is reported under its own invariant
+        run: |
+          rm -rf .dare-agent-security/cycle018-selfreport
+          set +e
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-030 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle018-selfreport
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a promoted self-report, got $code"
+            exit 1
+          fi
+          # Post-merge review: this finding used to be filed under the
+          # credential-forwarding invariant, with no deciding evidence at all.
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-selfreport/mcp-auth-security-result.json \
+            verdict=FAIL \
+            invariant=SELF_REPORTED_METADATA_NOT_AUTHORITY \
+            property_id=MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY \
+            class=CREDENTIAL_AND_IDENTITY
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-selfreport/mcp-auth-security-result.json \
+            --all "trials.*.violations.*.invariant=SELF_REPORTED_METADATA_NOT_AUTHORITY" \
+            --min-matches 1
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-selfreport/mcp-auth-security-result.json \
+            --present trials.0.violations.0.deciding_event_digests
+
+      - name: A trial override may narrow what a scenario approved, never widen it
+        run: |
+          rm -rf .dare-agent-security/cycle018-trials
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-001 \
+            --mode simulated \
+            --trials 2 \
+            --output-dir .dare-agent-security/cycle018-trials
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle018-trials/mcp-auth-security-result.json \
+            trials_planned=2 trials_executed=2
+
+          # The scenario approves three. Ten is under HARD_MAX_TRIALS and was
+          # accepted before the post-merge review; it is not approved authority.
+          rm -rf .dare-agent-security/cycle018-trials-wide
+          set +e
+          cargo run -p dare-agent-security -- validate mcp-auth-security \
+            --scenario MCP-AUTH-LAB-001 \
+            --mode simulated \
+            --trials 10 \
+            --output-dir .dare-agent-security/cycle018-trials-wide
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "--trials 10 widened a scenario approved for 3"
+            exit 1
+          fi
+          if [ -f .dare-agent-security/cycle018-trials-wide/mcp-auth-security-result.json ]; then
+            echo "a refused override still produced a result artifact"
             exit 1
           fi
 

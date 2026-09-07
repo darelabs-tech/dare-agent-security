@@ -142,12 +142,12 @@
     {
       "id": "mcp-auth-029-compliant",
       "path": "credential-and-identity/mcp-auth-029-compliant.json",
-      "digest": "sha256:7cc6cf692f94c35d4261949623a23ed51a4d305a914337b05c8f50576bf9bd0a"
+      "digest": "sha256:27550a321286f0fbe32f69ce6fcf7a34ee624dbcf04aed462ac4c27adb6ed40f"
     },
     {
       "id": "mcp-auth-030-self-reported-metadata-promoted",
       "path": "credential-and-identity/mcp-auth-030-self-reported-metadata-promoted.json",
-      "digest": "sha256:a0d4c76218a8b0e5e588faa801f04bcf881dcc946cd5bfb9d1e9a2e631f47ed7"
+      "digest": "sha256:1146518cfee2667cee453ec616fb4a801c6383d85b0940b2c9276b4bd35a1c7f"
     },
     {
       "id": "mcp-auth-031-compliant",

@@ -26,7 +26,17 @@ use crate::scope::ScopeContext;
 use crate::source::{CorpusClass, ScenarioClass};
 use crate::token::TokenContext;
 
-/// The fourteen deterministic invariants.
+/// The fifteen deterministic invariants.
+///
+/// It was fourteen until the post-merge review. The self-reported metadata
+/// boundary was being *evaluated* — correctly — but reported under
+/// `INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY`, an invariant about
+/// forwarding a caller's credential upstream. Promoting `clientInfo` to a
+/// principal is not that. It is not adjacent to it.
+///
+/// Keeping the count at fourteen would have meant keeping a finding filed under
+/// a name that does not describe it, in a registry whose whole purpose is that
+/// a verdict names what it is about. The count moved instead.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum McpAuthInvariantType {
@@ -43,6 +53,11 @@ pub enum McpAuthInvariantType {
     ScopeStepUpDoesNotDropRequiredScope,
     ClientRegistrationMetadataTrustPreserved,
     InboundCredentialNotReusedAsUpstreamAuthority,
+    /// Self-reported protocol metadata must stay metadata.
+    ///
+    /// `clientInfo` and `serverInfo` are what a peer calls itself. A principal
+    /// established from one is not authenticated, whatever the name says.
+    SelfReportedMetadataNotAuthority,
     FinalOperationAuthorizationBindingPreserved,
 }
 
@@ -74,13 +89,14 @@ impl McpAuthInvariantType {
             Self::InboundCredentialNotReusedAsUpstreamAuthority => {
                 "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY"
             }
+            Self::SelfReportedMetadataNotAuthority => "SELF_REPORTED_METADATA_NOT_AUTHORITY",
             Self::FinalOperationAuthorizationBindingPreserved => {
                 "FINAL_OPERATION_AUTHORIZATION_BINDING_PRESERVED"
             }
         }
     }
 
-    pub fn all() -> [Self; 14] {
+    pub fn all() -> [Self; 15] {
         [
             Self::McpProtocolRevisionPreserved,
             Self::McpMethodHeaderBodyBindingPreserved,
@@ -95,6 +111,7 @@ impl McpAuthInvariantType {
             Self::ScopeStepUpDoesNotDropRequiredScope,
             Self::ClientRegistrationMetadataTrustPreserved,
             Self::InboundCredentialNotReusedAsUpstreamAuthority,
+            Self::SelfReportedMetadataNotAuthority,
             Self::FinalOperationAuthorizationBindingPreserved,
         ]
     }
@@ -117,6 +134,7 @@ impl McpAuthInvariantType {
             Self::ScopeStepUpDoesNotDropRequiredScope
             | Self::ClientRegistrationMetadataTrustPreserved => ScenarioClass::ScopeAndRegistration,
             Self::InboundCredentialNotReusedAsUpstreamAuthority
+            | Self::SelfReportedMetadataNotAuthority
             | Self::FinalOperationAuthorizationBindingPreserved => {
                 ScenarioClass::CredentialAndIdentity
             }
@@ -149,6 +167,7 @@ impl McpAuthInvariantType {
             Self::InboundCredentialNotReusedAsUpstreamAuthority => {
                 McpAuthProperty::CredentialSeparation
             }
+            Self::SelfReportedMetadataNotAuthority => McpAuthProperty::SelfReportedMetadataBoundary,
             Self::FinalOperationAuthorizationBindingPreserved => {
                 McpAuthProperty::FinalOperationBinding
             }
@@ -271,6 +290,40 @@ pub struct FinalOperationContext {
     /// The resource the performed operation touched.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub performed_resource: Option<SyntheticUri>,
+
+    /// The mapped arguments the authorization decision covered.
+    ///
+    /// Recorded as a structured value rather than a string so Cycle 003's
+    /// canonicalizer decides what "the same arguments" means. A permit for
+    /// `amount=100` does not stretch to cover `amount=10000`, and nothing about
+    /// the method, the name or the resource would show that.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authorized_arguments: Option<serde_json::Value>,
+    /// The mapped arguments the performed operation actually carried.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub performed_arguments: Option<serde_json::Value>,
+
+    /// The principal the authorization was granted to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authorized_principal: Option<String>,
+    /// The principal the operation ran under.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub performed_principal: Option<String>,
+
+    /// The tenant the authorization was scoped to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authorized_tenant: Option<String>,
+    /// The tenant the operation ran under.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub performed_tenant: Option<String>,
+
+    /// The scopes the authorization decision was made with.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub authorized_scopes: Vec<String>,
+    /// The scopes in force when the operation ran.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub performed_scopes: Vec<String>,
+
     /// Whether the deployment re-evaluated authorization after the change.
     ///
     /// A mutation followed by re-evaluation is correct behaviour. A mutation
@@ -289,6 +342,28 @@ impl FinalOperationContext {
             .flatten()
         {
             operation.validate()?;
+        }
+        for principal in [&self.authorized_principal, &self.performed_principal]
+            .into_iter()
+            .flatten()
+        {
+            crate::canonical::assert_safe_identifier(principal, "final-operation principal")?;
+        }
+        for tenant in [&self.authorized_tenant, &self.performed_tenant]
+            .into_iter()
+            .flatten()
+        {
+            crate::canonical::assert_safe_identifier(tenant, "final-operation tenant")?;
+        }
+        for scope in self.authorized_scopes.iter().chain(&self.performed_scopes) {
+            crate::canonical::assert_safe_identifier(scope, "final-operation scope")?;
+        }
+        if self.authorized_scopes.len() as u32 > crate::limits::HARD_MAX_SCOPES_PER_CONTEXT
+            || self.performed_scopes.len() as u32 > crate::limits::HARD_MAX_SCOPES_PER_CONTEXT
+        {
+            return Err(McpAuthSecurityError::BudgetExhausted(
+                "final-operation context carries too many scopes".to_owned(),
+            ));
         }
         Ok(())
     }
@@ -477,9 +552,12 @@ impl McpAuthScenario {
         self.identity_metadata.validate()?;
         self.final_operation.validate()?;
 
-        if self.invariant.type_.property() != self.property
-            && self.property != McpAuthProperty::SelfReportedMetadataBoundary
-        {
+        // No exemption here any more. The scenario declaring
+        // `MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY` used to be waved past
+        // this check, because the invariant it named reported under a different
+        // property and the two could not agree. Now they can, so the check is
+        // total again.
+        if self.invariant.type_.property() != self.property {
             return Err(McpAuthSecurityError::invalid(format!(
                 "scenario `{}` declares property `{}` but an invariant that reports under `{}`",
                 self.id,
@@ -487,9 +565,7 @@ impl McpAuthScenario {
                 self.invariant.type_.property().as_str()
             )));
         }
-        if self.invariant.type_.surface() != self.class
-            && self.property != McpAuthProperty::SelfReportedMetadataBoundary
-        {
+        if self.invariant.type_.surface() != self.class {
             return Err(McpAuthSecurityError::invalid(format!(
                 "scenario `{}` declares surface `{}` but an invariant on `{}`",
                 self.id,
@@ -532,12 +608,12 @@ mod tests {
     use std::collections::BTreeSet;
 
     #[test]
-    fn the_fourteen_invariants_are_closed_and_uniquely_named() {
+    fn the_fifteen_invariants_are_closed_and_uniquely_named() {
         let names: BTreeSet<&str> = McpAuthInvariantType::all()
             .iter()
             .map(|invariant| invariant.as_str())
             .collect();
-        assert_eq!(names.len(), 14);
+        assert_eq!(names.len(), 15);
     }
 
     #[test]
@@ -562,6 +638,7 @@ mod tests {
                 "SCOPE_STEP_UP_DOES_NOT_DROP_REQUIRED_SCOPE",
                 "CLIENT_REGISTRATION_METADATA_TRUST_PRESERVED",
                 "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+                "SELF_REPORTED_METADATA_NOT_AUTHORITY",
                 "FINAL_OPERATION_AUTHORIZATION_BINDING_PRESERVED",
             ]
         );
@@ -595,11 +672,45 @@ mod tests {
             .iter()
             .map(|invariant| invariant.property())
             .collect();
-        // Nine of the ten are reachable from an invariant. The self-reported
-        // metadata boundary is a property of the identity evidence rather than
-        // of a request, so it is asserted through its own scenarios.
-        assert_eq!(properties.len(), 9);
-        assert!(!properties.contains(&McpAuthProperty::SelfReportedMetadataBoundary));
+        // All ten are now reachable from an invariant.
+        //
+        // This assertion used to read "nine of the ten", with the tenth —
+        // MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY — excluded on the
+        // grounds that it was "a property of the identity evidence rather than
+        // of a request". That was a description of the defect: the property was
+        // in the registry, was marked REQUIRED in the profile, and no invariant
+        // filed anything under it, so its findings arrived labelled
+        // INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY instead.
+        //
+        // A property no invariant can report under is a property that will read
+        // as covered and never be answered.
+        assert_eq!(properties.len(), 10);
+        assert!(properties.contains(&McpAuthProperty::SelfReportedMetadataBoundary));
+        assert_eq!(
+            McpAuthInvariantType::SelfReportedMetadataNotAuthority.property(),
+            McpAuthProperty::SelfReportedMetadataBoundary
+        );
+    }
+
+    #[test]
+    fn the_self_reported_boundary_no_longer_borrows_the_credential_invariants_name() {
+        // The taxonomy fix, stated as the thing it prevents. Promoting
+        // `clientInfo` to a principal is not "reusing an inbound credential as
+        // upstream authority"; the two are different findings with different
+        // fixes, and filing one under the other sends an operator to the wrong
+        // place.
+        assert_ne!(
+            McpAuthInvariantType::SelfReportedMetadataNotAuthority,
+            McpAuthInvariantType::InboundCredentialNotReusedAsUpstreamAuthority
+        );
+        assert_ne!(
+            McpAuthInvariantType::SelfReportedMetadataNotAuthority.property(),
+            McpAuthInvariantType::InboundCredentialNotReusedAsUpstreamAuthority.property()
+        );
+        assert_eq!(
+            McpAuthInvariantType::SelfReportedMetadataNotAuthority.as_str(),
+            "SELF_REPORTED_METADATA_NOT_AUTHORITY"
+        );
     }
 
     #[test]

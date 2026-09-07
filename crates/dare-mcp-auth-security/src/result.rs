@@ -181,18 +181,33 @@ pub fn run_scenario(
         })?;
         let events = normalize_checked(&raw, scenario)?;
 
+        // The budget governs what is *kept*, not merely what is counted.
+        //
+        // This loop used to charge each event, stop counting at the ceiling,
+        // and then store the whole `events` vector anyway. The ledger reported
+        // a number under the bound while the artifact carried everything above
+        // it — an accounted figure that described nothing real.
+        //
+        // Now admission and retention are the same act: an event that was not
+        // charged is not kept, is not evaluated, and is not written. Accounted
+        // bytes, evaluated bytes and persisted bytes are the same bytes.
         let mut retained = 0usize;
         let mut exhausted: Option<String> = None;
-        for event in &events {
+        let mut admitted: Vec<McpAuthObservation> = Vec::with_capacity(events.len());
+        for event in events {
             let bytes = event.retained_bytes();
             match ledger.charge_output(&mut guard, bytes) {
-                Ok(()) => retained += bytes,
+                Ok(()) => {
+                    retained += bytes;
+                    admitted.push(event);
+                }
                 Err(error) => {
                     exhausted = Some(error.to_string());
                     break;
                 }
             }
         }
+        let events = admitted;
         let mut requests = 0u32;
         for _ in &raw.observed_requests {
             if ledger.charge_request(&mut guard).is_err() {
@@ -202,7 +217,36 @@ pub fn run_scenario(
             requests += 1;
         }
 
-        let outcome = evaluate(invariant, scenario, &events);
+        // A trial that hit *any* bound partway through did not observe
+        // everything it set out to. That is true whether the ceiling was bytes
+        // or requests: in the first case events were not kept, in the second
+        // requests were seen but not accounted, and in both the trial's record
+        // is a partial view being asked to stand for a complete one.
+        let incomplete = exhausted.is_some();
+
+        let mut outcome = evaluate(invariant, scenario, &events);
+
+        // Evidence that could not be retained is evidence the run does not
+        // have. A PASS reached over a truncated observation set would be
+        // reporting "no violation was observed" about observations that were
+        // discarded, which is the difference between "nothing was there" and
+        // "we stopped looking".
+        //
+        // A FAIL stands: every violation was decided by an event that *was*
+        // admitted, so the finding rests on evidence the artifact still holds.
+        if incomplete && outcome.verdict == Verdict::Pass {
+            outcome = crate::invariant::McpAuthInvariantOutcome {
+                invariant,
+                verdict: Verdict::Inconclusive,
+                reason: format!(
+                    "a hard bound stopped this trial before its evidence was complete, so {} was \
+                     not decided",
+                    invariant.as_str()
+                ),
+                violations: Vec::new(),
+                coverage_satisfied: false,
+            };
+        }
         let event_digests: Vec<String> = events
             .iter()
             .filter_map(|event| event.digest().ok())
@@ -218,7 +262,7 @@ pub fn run_scenario(
         // It is added to the violations rather than replacing them: a run can
         // breach a request-level boundary and this one at the same time, and
         // reporting only one of them would understate what was found.
-        let identity = crate::invariant::identity_boundary_violation(scenario);
+        let identity = crate::invariant::identity_boundary_violation(scenario, &events);
         let mut violations = outcome.violations.clone();
         let verdict = match identity {
             Some(violation) => {

@@ -413,10 +413,14 @@ LABS = [
      m_credential_forwarded),
     (28, "an authorized, recorded exchange produced the upstream credential", CRED,
      "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY", "COMPLIANT", m_credential_exchanged),
+    # These two name SELF_REPORTED_METADATA_NOT_AUTHORITY, added by the
+    # post-merge review. They used to declare the credential invariant, which
+    # filed a self-report promotion under a name about forwarding a caller's
+    # credential upstream - a different finding with a different fix.
     (29, "self-reported metadata recorded without being promoted to identity", IDENT,
-     "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY", "COMPLIANT", m_noop),
+     "SELF_REPORTED_METADATA_NOT_AUTHORITY", "COMPLIANT", m_noop),
     (30, "self-reported metadata used as the authoritative principal", IDENT,
-     "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY", "SELF_REPORTED_METADATA_PROMOTED",
+     "SELF_REPORTED_METADATA_NOT_AUTHORITY", "SELF_REPORTED_METADATA_PROMOTED",
      m_identity_promoted),
     (31, "the operation performed is the one authorization covered", FINAL,
      "FINAL_OPERATION_AUTHORIZATION_BINDING_PRESERVED", "COMPLIANT", m_noop),

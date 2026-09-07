@@ -196,8 +196,46 @@ impl TokenValidityState {
     /// `Unknown` is not. A token whose verification nobody recorded is not a
     /// valid token and is not an invalid one either — it is a token about which
     /// the run has nothing to say.
+    ///
+    /// Note what this answers and what it does not. "Evidence exists" is a
+    /// question about the *run*; whether the token may be relied on is a
+    /// question about the *token*, and it is [`may_be_accepted`] that answers
+    /// it. Conflating the two is how a REJECTED token becomes acceptable for
+    /// having been examined.
+    ///
+    /// [`may_be_accepted`]: Self::may_be_accepted
     pub fn is_positive_evidence(self) -> bool {
         matches!(self, Self::Verified | Self::Rejected | Self::Expired)
+    }
+
+    /// Whether a token in this state may be relied on for authorization.
+    ///
+    /// **Only `Verified`.** The other three are each a different reason not to
+    /// rely on it, and none of them becomes weaker for being recorded:
+    ///
+    /// - `Rejected` — the deployment's own verifier said no;
+    /// - `Expired` — it is outside the window it was issued for;
+    /// - `Unknown` — nobody checked, so accepting it is a decision made on no
+    ///   evidence.
+    ///
+    /// An engine that treated `is_positive_evidence` as sufficient would answer
+    /// "was this examined?" while appearing to answer "may this be used?", and
+    /// a rejected token that was examined and then accepted would pass.
+    pub fn may_be_accepted(self) -> bool {
+        matches!(self, Self::Verified)
+    }
+
+    /// Why a token in this state may not be relied on.
+    ///
+    /// `None` for `Verified`. Phrased as the reason rather than the state so a
+    /// finding reads as a sentence about what happened.
+    pub fn refusal_reason(self) -> Option<&'static str> {
+        match self {
+            Self::Verified => None,
+            Self::Rejected => Some("the deployment's own verification rejected it"),
+            Self::Expired => Some("it is past the validity window it was issued for"),
+            Self::Unknown => Some("no verification of it was ever recorded"),
+        }
     }
 }
 
