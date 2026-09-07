@@ -1,0 +1,51 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "mcp-auth-hardening-2026",
+  "version": "1.0.0",
+  "title": "DARE MCP 2026 Authentication and Authorization Hardening",
+  "properties": [
+    {
+      "id": "MCP.AUTH.PROTOCOL_BINDING",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.PROTECTED_RESOURCE_METADATA",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.SCOPE_STEP_UP_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.CLIENT_REGISTRATION_TRUST",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.CREDENTIAL_SEPARATION",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "MCP.AUTH.FINAL_OPERATION_BINDING",
+      "requirement": "REQUIRED"
+    }
+  ]
+}

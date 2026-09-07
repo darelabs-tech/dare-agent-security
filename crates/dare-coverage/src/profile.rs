@@ -27,6 +27,8 @@ pub const MEMORY_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/memory-security-baseline-2026.json");
 pub const RAG_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/rag-security-baseline-2026.json");
+pub const MCP_AUTH_HARDENING_PROFILE_JSON: &str =
+    include_str!("../../../profiles/mcp-auth-hardening-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -195,6 +197,53 @@ pub fn rag_security_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(RAG_SECURITY_PROFILE_JSON)
 }
 
+/// Cycle 018 MCP 2026 authentication and authorization hardening baseline.
+///
+/// This one selects from the **v1** MCP registry rather than the v2 Agentic
+/// one, which is where the ten properties it names live. That placement is
+/// deliberate: the surfaces are MCP protocol and OAuth semantics, not agent
+/// behaviours, and putting them in v2 would have created an eleventh Agentic
+/// risk family or forced an exclusion rule to keep the count at ten. Neither is
+/// honest — the properties simply are not an Agentic risk family.
+///
+/// Additive in the same way as every profile before it. `mcp-security-baseline`
+/// keeps its ten properties and their requirement levels, so its denominator
+/// does not move and no assessment already filed against it means something
+/// different than it did when it was produced. The two profiles select disjoint
+/// sets of the same registry.
+///
+/// **All ten are REQUIRED**, and unlike the profiles before it this one has no
+/// CONDITIONAL entry at all. That is not an oversight; it is the requirement
+/// level AC-08 leaves available.
+///
+/// The earlier profiles use CONDITIONAL for a property a target may honestly
+/// have nothing to answer for. Here that case is already handled, one layer
+/// down and more precisely. Seven of these properties are gated on an
+/// *auth control/evidence* predicate — Protected Resource Metadata, AS
+/// metadata, token claims, PKCE context, a scope challenge, client
+/// registration, credential forwarding — and when one of those is absent,
+/// applicability reports NOT_TESTED, a gap, rather than NOT_APPLICABLE. The
+/// remaining gating predicates describe the target's shape (the protocol
+/// revision, the HTTP transport, whether an authorization flow exists at all),
+/// and when one of *those* is false the property is genuinely NOT_APPLICABLE
+/// and drops out of the denominator entirely.
+///
+/// Marking a control-gated property CONDITIONAL would undo that. Only REQUIRED
+/// properties feed the required-coverage ratio, so a CONDITIONAL property whose
+/// evidence is missing reports NOT_TESTED and then counts toward nothing. The
+/// gap would still be printed and would still not lower any number — which is
+/// the same evasion AC-08 forbids, reached through a different door.
+///
+/// So the seven stay REQUIRED, and the three shape-gated ones are REQUIRED too,
+/// because where they apply at all there is no honest way to decline them. A
+/// request must mean the same operation to the router and to the server that
+/// executes it. Self-reported protocol metadata must stay metadata rather than
+/// becoming a principal. And the operation actually performed must be the one
+/// authorization covered.
+pub fn mcp_auth_hardening_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(MCP_AUTH_HARDENING_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -213,6 +262,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "identity-security-baseline-2026" => identity_security_profile(),
         "memory-security-baseline-2026" => memory_security_profile(),
         "rag-security-baseline-2026" => rag_security_profile(),
+        "mcp-auth-hardening-2026" => mcp_auth_hardening_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {
