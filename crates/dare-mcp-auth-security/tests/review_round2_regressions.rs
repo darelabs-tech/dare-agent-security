@@ -127,7 +127,10 @@ fn r2_request_budget_is_an_admission_boundary_before_normalization() {
     scenario.trials.stop_on_first_fail = false;
 
     let result = run(&scenario);
-    assert!(result.budget.exhausted, "the fixture must exhaust the request budget");
+    assert!(
+        result.budget.exhausted,
+        "the fixture must exhaust the request budget"
+    );
     assert_eq!(result.budget.requests_observed, 1);
     assert_eq!(result.trials.len(), 1);
     assert_eq!(result.trials[0].requests, 1);
