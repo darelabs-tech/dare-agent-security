@@ -63,5 +63,5 @@ been opened.
 - [x] task-044 — Add mcp-auth-hardening-2026 profile and coverage integration
 - [x] task-045 — Add validate mcp-auth-security CLI + bounded reports
 - [x] task-046 — Add dedicated mcp-auth-security-2026 CI job and local workflow execution
-- [ ] task-047 — Document safe use, identity/auth boundaries, standards status and future DPoP/workload-identity boundary
-- [ ] task-048 — Run full regression suite and produce REGRESSION.md + PROOF.md (76/76 AC)
+- [x] task-047 — Document safe use, identity/auth boundaries, standards status and future DPoP/workload-identity boundary
+- [x] task-048 — Run full regression suite and produce REGRESSION.md + PROOF.md (76/76 AC)

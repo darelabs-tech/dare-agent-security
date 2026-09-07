@@ -11,9 +11,15 @@
 //! `--authorization-server`, `--token-endpoint`, `--jwks-url`, `--issuer-url`,
 //! `--client-secret`, `--access-token`, `--refresh-token`,
 //! `--authorization-code`, `--private-key`, `--cookie`, `--remote` or
-//! `--command` option, because Cycle 018 has no HTTP client, OAuth client, JWT
-//! verifier or execution path for such a flag to reach. No environment variable
-//! can supply one either: this command reads none.
+//! `--command` option, because there is no code path such a flag could reach:
+//! the engine declares no HTTP client, OAuth client, JWT verifier or TLS stack
+//! of its own, and nothing here opens a connection. No environment variable can
+//! supply one either — this command reads none.
+//!
+//! (A transport stack does exist transitively, through the Cycle 002 crate this
+//! one imports two protocol-revision constants from. Saying otherwise would be
+//! an overclaim. What holds is that nothing reaches it, and a test in
+//! `dare-mcp-auth-security` fails if a second reference to that crate appears.)
 //!
 //! Modes are the three approved local ones. Nothing here performs a login,
 //! exchanges an authorization code, fetches metadata or a key set, introspects

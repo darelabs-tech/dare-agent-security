@@ -12,11 +12,20 @@ publish = false
 name = "dare_mcp_auth_security"
 path = "src/lib.rs"
 
-# No HTTP client, no OAuth client, no JWT/JWKS library and no TLS stack appears
-# here or transitively. That absence is the security boundary: several of the
-# documents this cycle evaluates against describe endpoints an implementation is
-# supposed to call, and there is no dependency through which this crate could
-# reach one.
+# No HTTP client, no OAuth client, no JWT/JWKS library and no TLS stack is
+# declared here. That matters because several of the documents this cycle
+# evaluates against describe endpoints an implementation is supposed to call,
+# and evaluating recorded evidence of a flow is not performing the flow.
+#
+# It would be an overclaim to say none exists transitively. `dare-mcp-discovery`
+# carries `rmcp`, and through it `reqwest`, `hyper` and `rustls`; one `cargo
+# tree` shows it. That dependency is here for exactly two `&str` revision
+# constants, because a second copy of them in this crate is how two crates
+# eventually disagree about which MCP revision is current.
+#
+# The boundary is therefore that nothing here reaches that stack, not that it is
+# absent. `lib.rs::the_only_cycle_002_reference_is_the_revision_constants` fails
+# if a second reference to Cycle 002 ever appears in this crate's source.
 [dependencies]
 dare-adversarial = { path = "../dare-adversarial" }
 dare-coaz-integrity = { path = "../dare-coaz-integrity" }

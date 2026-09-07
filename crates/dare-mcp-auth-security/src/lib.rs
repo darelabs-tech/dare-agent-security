@@ -27,10 +27,26 @@
 //! No authorization server, token endpoint, introspection endpoint, JWKS
 //! endpoint, Protected Resource Metadata URL, authorization-server metadata
 //! URL, registration endpoint, identity provider, browser, MCP server or
-//! upstream API. That is a property of the dependency graph rather than a
-//! promise in a comment: this crate declares no HTTP client, no OAuth client,
-//! no JWT or JWKS library and no TLS stack, and [`harness::HarnessMode`] has no
-//! variant that could name a remote target.
+//! upstream API.
+//!
+//! This crate declares no HTTP client, no OAuth client, no JWT or JWKS library
+//! and no TLS stack of its own, and [`harness::HarnessMode`] has no variant
+//! that could name a remote target.
+//!
+//! **It is not true that no transport stack exists transitively, and saying so
+//! would be an overclaim.** One dependency reaches one: `dare-mcp-discovery`
+//! (Cycle 002) carries `rmcp` and, through it, `reqwest`, `hyper` and `rustls`.
+//! That dependency exists here for exactly two `&str` constants —
+//! [`CURRENT_WIRE_REVISION`] and [`LEGACY_WIRE_REVISION`] — re-exported below,
+//! because redefining the protocol revisions in a second crate is how two
+//! copies eventually disagree about which revision is current.
+//!
+//! So the boundary is not "the transport is absent from the graph". It is that
+//! **nothing in this crate reaches it**: the single `dare_mcp_discovery`
+//! reference in the whole crate is the constants re-export, and
+//! `tests::the_only_cycle_002_reference_is_the_revision_constants` fails if a
+//! second one ever appears. An accurate boundary that a test enforces is worth
+//! more than a stronger one that is not true.
 //!
 //! The distinction matters more here than in most cycles. The specifications
 //! this engine evaluates against are largely *about* calling those endpoints.
@@ -233,6 +249,102 @@ pub mod limits {
             assert_eq!(crate::CURRENT_WIRE_REVISION, "2026-07-28");
             assert_eq!(crate::LEGACY_WIRE_REVISION, "2024-11-05");
             assert_ne!(crate::CURRENT_WIRE_REVISION, crate::LEGACY_WIRE_REVISION);
+        }
+
+        #[test]
+        fn the_only_cycle_002_reference_is_the_revision_constants() {
+            // The honest form of the offline boundary.
+            //
+            // `dare-mcp-discovery` carries `rmcp`, and through it `reqwest`,
+            // `hyper` and `rustls`. Claiming no transport stack exists
+            // transitively would be an overclaim, and the dependency graph
+            // disproves it in one `cargo tree`. What is true, and what this
+            // test holds, is that nothing here reaches it: the crate's single
+            // reference to Cycle 002 is the two-constant re-export.
+            //
+            // If someone later reaches through that dependency for a client, a
+            // session or a transport, this fails — which is the point. A
+            // boundary a test enforces is worth more than a stronger claim
+            // nobody checks.
+            // Split so this test's own source line is not a match. Writing the
+            // name whole here would make the scan find itself and report a
+            // reference that is a string comparison rather than a code path.
+            let needle = concat!("dare_mcp", "_discovery");
+
+            let mut references = Vec::new();
+            let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+            let mut pending = vec![root];
+            while let Some(dir) = pending.pop() {
+                for entry in std::fs::read_dir(&dir).expect("source directory") {
+                    let path = entry.expect("entry").path();
+                    if path.is_dir() {
+                        pending.push(path);
+                        continue;
+                    }
+                    if path.extension().is_none_or(|ext| ext != "rs") {
+                        continue;
+                    }
+                    let text = std::fs::read_to_string(&path).expect("readable");
+                    for line in text.lines() {
+                        // The doc comment above explains the dependency; it is
+                        // prose, not a code path.
+                        if line.trim_start().starts_with("//") {
+                            continue;
+                        }
+                        if line.contains(needle) {
+                            references.push(format!(
+                                "{}: {}",
+                                path.file_name().expect("named").to_string_lossy(),
+                                line.trim()
+                            ));
+                        }
+                    }
+                }
+            }
+
+            assert_eq!(
+                references.len(),
+                1,
+                "Cycle 002 is reached from more than the revision constants: {references:#?}"
+            );
+            assert!(
+                references[0].contains("CURRENT_WIRE_REVISION")
+                    && references[0].contains("LEGACY_WIRE_REVISION"),
+                "the one Cycle 002 reference is not the constants re-export: {}",
+                references[0]
+            );
+        }
+
+        #[test]
+        fn this_crate_declares_no_transport_dependency_of_its_own() {
+            // The direct half of the same claim, checked against the manifest
+            // rather than asserted in prose.
+            let manifest = include_str!("../Cargo.toml");
+            let dependencies = manifest
+                .split("[dependencies]")
+                .nth(1)
+                .expect("a dependencies section");
+            for forbidden in [
+                "reqwest",
+                "hyper",
+                "rustls",
+                "openssl",
+                "native-tls",
+                "ureq",
+                "curl",
+                "oauth",
+                "jsonwebtoken",
+                "jwt",
+                "jwks",
+                "tokio",
+                "axum",
+                "rmcp",
+            ] {
+                assert!(
+                    !dependencies.contains(forbidden),
+                    "this crate declares `{forbidden}` directly"
+                );
+            }
         }
     }
 }

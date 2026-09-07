@@ -2244,6 +2244,8 @@ jobs:
           python scripts/k18/gen_mcp_auth_corpus.py --check
           python scripts/k18/gen_mcp_auth_traces.py --check
           python scripts/k18/gen_mcp_auth_hostile.py --check
+      - name: No real credential or reachable target in any fixture or artifact
+        run: python scripts/k18/assert_no_real_credentials.py
 
       - name: Offline CLI - a request that means the same thing to router and server
         run: |
@@ -2507,10 +2509,22 @@ jobs:
             .dare-agent-security/regression-mcp-018/coverage-report.json \
             --count properties=10
 
-      - name: Cycle 017 retrieval semantics stayed independent
+      - name: Cycles 013-017 stayed independent
         run: |
+          cargo test -p dare-prompt-injection --lib -- --nocapture
+          cargo test -p dare-tool-security --lib -- --nocapture
+          cargo test -p dare-identity-security --lib -- --nocapture
+          cargo test -p dare-memory-security --lib -- --nocapture
           cargo test -p dare-rag-security --lib -- --nocapture
+      - name: Every earlier profile still resolves to what it resolved to
+        run: |
+          cargo test -p dare-coverage --test prompt_injection_profile -- --nocapture
+          cargo test -p dare-coverage --test tool_security_profile -- --nocapture
+          cargo test -p dare-coverage --test identity_security_profile -- --nocapture
+          cargo test -p dare-coverage --test memory_security_profile -- --nocapture
           cargo test -p dare-coverage --test rag_security_profile -- --nocapture
+      - name: Full workspace
+        run: cargo test --workspace
 
   docs-build:
     name: mdBook documentation gate
