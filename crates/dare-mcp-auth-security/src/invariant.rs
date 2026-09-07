@@ -616,7 +616,7 @@ fn token_issuer_boundary(observations: &[McpAuthObservation]) -> Vec<McpAuthViol
                 "a correct audience does not make a token the right token: it says the issuer \
                  meant it for this resource, not that this issuer was ever allowed to issue for \
                  it"
-                    .to_owned(),
+                .to_owned(),
             ),
             ..violation(
                 McpAuthInvariantType::AuthorizationServerIssuerBoundaryPreserved,
