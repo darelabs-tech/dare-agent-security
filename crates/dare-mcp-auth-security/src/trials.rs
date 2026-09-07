@@ -71,6 +71,19 @@ impl TrialPlan {
                 crate::limits::HARD_MAX_TRIALS
             )));
         }
+        // The override may narrow what the scenario approved. It may not widen
+        // it.
+        //
+        // This check used to be only against HARD_MAX_TRIALS, which meant a
+        // scenario approved for 3 trials could be run 10 times from the command
+        // line: still under the crate ceiling, and still more authority than
+        // the scenario granted. The flag is a reduction, not a second approval.
+        if requested > self.trials {
+            return Err(McpAuthSecurityError::BudgetExhausted(format!(
+                "requested {requested} trials but the scenario approved {}; an override may                  narrow what a scenario approved and never widen it",
+                self.trials
+            )));
+        }
         self.trials = requested;
         Ok(self)
     }
@@ -282,12 +295,55 @@ mod tests {
     }
 
     #[test]
-    fn an_override_may_narrow_but_never_widen_past_the_hard_bound() {
+    fn an_override_is_refused_above_the_crate_hard_maximum() {
+        // Renamed. It used to be called
+        // `an_override_may_narrow_but_never_widen_past_the_hard_bound`, which
+        // claimed the narrowing guarantee while only ever checking the crate
+        // ceiling. The guarantee it named is the test below.
         let plan = TrialPlan::from_scenario(&scenario()).expect("plan");
-        assert_eq!(plan.clone().with_trial_override(Some(1)).unwrap().trials, 1);
         assert!(plan
             .with_trial_override(Some(crate::limits::HARD_MAX_TRIALS + 1))
             .is_err());
+    }
+
+    #[test]
+    fn an_override_may_narrow_what_a_scenario_approved() {
+        let plan = TrialPlan::from_scenario(&scenario()).expect("plan");
+        assert_eq!(plan.trials, 3, "the fixture scenario approves three trials");
+        for requested in [1, 2, 3] {
+            assert_eq!(
+                plan.clone()
+                    .with_trial_override(Some(requested))
+                    .expect("narrowing is allowed")
+                    .trials,
+                requested
+            );
+        }
+    }
+
+    #[test]
+    fn an_override_can_never_widen_what_a_scenario_approved() {
+        // The false PASS this closes: `--trials 10` against a scenario approved
+        // for 3 used to run ten times. Every one of those is under
+        // HARD_MAX_TRIALS, and none of them was approved.
+        let plan = TrialPlan::from_scenario(&scenario()).expect("plan");
+        assert_eq!(plan.trials, 3);
+        for requested in [4, 5, crate::limits::HARD_MAX_TRIALS] {
+            let err = plan
+                .clone()
+                .with_trial_override(Some(requested))
+                .expect_err("widening past the scenario must be refused");
+            assert!(
+                err.to_string().contains("approved"),
+                "the refusal does not say what was exceeded: {err}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_zero_override_is_still_refused_alongside_the_new_bound() {
+        let plan = TrialPlan::from_scenario(&scenario()).expect("plan");
+        assert!(plan.with_trial_override(Some(0)).is_err());
     }
 
     #[test]

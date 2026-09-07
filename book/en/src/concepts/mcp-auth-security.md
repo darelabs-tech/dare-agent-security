@@ -216,6 +216,40 @@ memory remains memory-security's; retrieval authorization remains RAG-security's
 and authorization-to-execution integrity is Cycle 003's engine, composed with
 rather than reimplemented here.
 
+## What the post-merge review changed
+
+The cycle merged with all its tests green, and a review afterwards found nine
+paths that could still report `PASS` on a broken control. Green meant the tests
+described the engine, not that the engine matched what the cycle claimed. The
+corrections are worth knowing about because each is a boundary a reader might
+otherwise assume was already held:
+
+- **Case is no longer folded** when comparing a routed operation to the executed
+  one. `Mcp-Name: DeleteInvoice` against a body asking for `deleteinvoice` is a
+  mismatch, because a tool registry is keyed by the literal string it published.
+- **The permit binding is Cycle 003's**, computed over method, name, resource,
+  mapped arguments, principal, tenant and scopes. It used to compare three
+  fields locally, so a permit for `payments.send(amount=100)` covered
+  `amount=10000`.
+- **A recorded verification result is not a favourable one.** `REJECTED` and
+  `EXPIRED` tokens that a resource accepted anyway are findings; `UNKNOWN`
+  validity no longer satisfies the coverage contract for the invariant that
+  exists to ask whether anything verified it.
+- **A token's issuer is checked**, independently of its audience. A token minted
+  by an authorization server this resource never advertised is not made
+  acceptable by naming the right audience.
+- **Metadata provenance participates in the decision.** A `SELF_REPORTED`
+  Protected Resource Metadata document cannot establish which authorization
+  servers may issue for a resource, however consistent its identifiers are.
+- **The self-reported identity boundary has its own invariant**,
+  `SELF_REPORTED_METADATA_NOT_AUTHORITY`, and its findings carry the digest of
+  the observation that decided them. They used to be filed under the credential
+  invariant with no deciding evidence at all.
+- **Budgets bound what is kept**, not only what is counted, and a trial stopped
+  by a bound before its evidence was complete reports `INCONCLUSIVE` rather than
+  `PASS`.
+- **`--trials` may narrow what a scenario approved and never widen it.**
+
 ## Related
 
 - [Extending MCP Auth Security Validation](../reference/extending-mcp-auth-security.md)

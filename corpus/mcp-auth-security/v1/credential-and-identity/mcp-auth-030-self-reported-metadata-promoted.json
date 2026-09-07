@@ -5,7 +5,7 @@
   "class": "MCP_AUTH_ATTACK",
   "surface": "CREDENTIAL_AND_IDENTITY",
   "property": "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY",
-  "expected_invariant": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+  "expected_invariant": "SELF_REPORTED_METADATA_NOT_AUTHORITY",
   "reference_behavior": "SELF_REPORTED_METADATA_PROMOTED",
   "preconditions": [
     "mcp_current_protocol_present",

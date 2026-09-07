@@ -8,3 +8,9 @@ book/pt/book/
 book/en/theme/
 book/pt/theme/
 _site/
+
+# Python bytecode caches. These arrived in the repository through the Cycle 018
+# generators, which import each other and so leave a __pycache__ behind on every
+# run. Compiled artifacts of committed sources are never sources themselves.
+__pycache__/
+*.py[cod]

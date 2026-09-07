@@ -143,12 +143,20 @@ disagreement is what the binding invariants judge. Do not bind it.
 
 ## Adding an invariant evaluator
 
-The registry is **fourteen** invariants, fixed by the cycle design. Adding a
-fifteenth is a design change requiring approval before execution, not a code
-change.
+The registry is **fifteen** invariants. It was fourteen at merge; the
+post-merge review added `SELF_REPORTED_METADATA_NOT_AUTHORITY`, because the
+self-reported metadata boundary was being *evaluated* correctly and *filed*
+under `INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY` — an invariant about
+forwarding a caller's credential upstream, which is a different problem with a
+different fix.
+
+Adding a sixteenth is a design change requiring approval, not a code change. But
+the count is not the thing being protected: a finding that does not name what it
+is about sends an operator to the wrong place, and preserving a number at that
+cost is not a saving.
 
 If what you want to check is a property of a *request* — what was routed, what
-was presented, what was performed — it belongs to one of the fourteen. If it is
+was presented, what was performed — it belongs to one of the fifteen. If it is
 a property of the evidence itself, it may belong where the self-reported
 identity boundary lives: checked by `run_scenario` on every trial rather than
 selected by a scenario.

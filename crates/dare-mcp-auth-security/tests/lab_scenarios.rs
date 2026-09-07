@@ -38,11 +38,6 @@ enum Expectation {
     Inconclusive,
     /// The document never reaches evaluation: a gate refuses it first.
     Refused,
-    /// Judged through the identity boundary rather than through one of the
-    /// fourteen invariants. The self-reported metadata boundary is a property
-    /// of the identity evidence, not of a request, so it is asserted directly.
-    IdentityBoundaryHolds,
-    IdentityBoundaryBroken,
 }
 
 /// The approved lab register: id, and what the engine should conclude.
@@ -75,8 +70,12 @@ const LABS: [(&str, Expectation); 35] = [
     ("mcp-auth-lab-026", Expectation::Pass),
     ("mcp-auth-lab-027", Expectation::Fail),
     ("mcp-auth-lab-028", Expectation::Pass),
-    ("mcp-auth-lab-029", Expectation::IdentityBoundaryHolds),
-    ("mcp-auth-lab-030", Expectation::IdentityBoundaryBroken),
+    // Ordinary PASS/FAIL now. These two used to carry their own expectation
+    // variants, which routed them past the evaluator entirely: the register
+    // loaded the fixture and asserted nothing about what a run concluded. That
+    // is how a lab describing a broken target sat in the suite reporting green.
+    ("mcp-auth-lab-029", Expectation::Pass),
+    ("mcp-auth-lab-030", Expectation::Fail),
     ("mcp-auth-lab-031", Expectation::Pass),
     ("mcp-auth-lab-032", Expectation::Pass),
     ("mcp-auth-lab-033", Expectation::Fail),
@@ -129,11 +128,6 @@ fn every_lab_reaches_the_outcome_the_register_approves() {
                     err.is_refusal() || matches!(err, McpAuthSecurityError::Schema(_)),
                     "{lab} was rejected for the wrong reason: {err}"
                 );
-            }
-            Expectation::IdentityBoundaryHolds | Expectation::IdentityBoundaryBroken => {
-                // Asserted in its own test below, against the identity evidence
-                // rather than against one of the fourteen invariants.
-                load(lab).unwrap_or_else(|err| panic!("{lab} loads: {err}"));
             }
             _ => {
                 let scenario = load(lab).unwrap_or_else(|err| panic!("{lab} loads: {err}"));
@@ -294,21 +288,27 @@ fn the_labs_between_them_exercise_every_invariant() {
         }
         named.insert(load(lab).expect("loads").invariant.type_);
     }
-    // Twelve of the fourteen are reachable from a lab. The two name-binding and
-    // protocol-revision partners are covered above; the remaining gap is
-    // asserted explicitly rather than hidden.
+    // Every one of the fifteen, exactly. This used to assert `>= 10` with a
+    // comment claiming twelve — a bound loose enough that three invariants
+    // could stop being exercised end to end without the test noticing.
+    let all: BTreeSet<McpAuthInvariantType> = McpAuthInvariantType::all().into_iter().collect();
+    let missing: Vec<&str> = all
+        .difference(&named)
+        .map(|invariant| invariant.as_str())
+        .collect();
     assert!(
-        named.len() >= 10,
-        "only {} invariants are exercised by a lab",
-        named.len()
+        missing.is_empty(),
+        "no lab exercises {missing:?}; a unit test is not an end-to-end run"
     );
+    assert_eq!(named.len(), 15);
 }
 
 #[test]
 fn the_self_reported_identity_boundary_is_judged_on_its_own_evidence() {
-    // The boundary is a property of the identity evidence rather than of a
-    // request, so it is not one of the fourteen invariants. It is still
-    // deterministic, and both directions are asserted here.
+    // The boundary now has an invariant of its own,
+    // SELF_REPORTED_METADATA_NOT_AUTHORITY, so this checks the model directly
+    // and `a_promoted_self_report_fails_the_run_and_not_only_a_field_assertion`
+    // checks that a run acts on it. Both directions are asserted.
     let holds = load("mcp-auth-lab-029").expect("loads");
     assert_eq!(
         holds.identity_metadata.boundary_holds(),
@@ -349,6 +349,38 @@ fn a_promoted_self_report_fails_the_run_and_not_only_a_field_assertion() {
         .find(|violation| violation.reason.contains("self-reported"))
         .expect("the finding names the promotion");
     assert_eq!(violation.subject.as_deref(), Some("user-7"));
+
+    // F06: the finding is filed under the invariant that describes it. It used
+    // to arrive labelled INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY,
+    // which is about forwarding a caller's credential to an upstream service —
+    // a different problem with a different fix.
+    assert_eq!(
+        violation.invariant,
+        McpAuthInvariantType::SelfReportedMetadataNotAuthority
+    );
+    assert_eq!(
+        result.property_id.as_str(),
+        "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY"
+    );
+
+    // F07: the finding names the evidence that decided it. It used to ship with
+    // an empty digest list, which broke the crate's own evidence-first contract
+    // at exactly the point an operator would trace the verdict back.
+    assert!(
+        !violation.deciding_event_digests.is_empty(),
+        "the self-report finding carries no deciding evidence"
+    );
+    let retained: Vec<&String> = result
+        .trials
+        .iter()
+        .flat_map(|trial| trial.event_digests.iter())
+        .collect();
+    for digest in &violation.deciding_event_digests {
+        assert!(
+            retained.contains(&digest),
+            "the deciding digest names an event the run did not retain"
+        );
+    }
 
     // The control still passes, so the gate is judging the promotion rather
     // than the presence of self-description.
