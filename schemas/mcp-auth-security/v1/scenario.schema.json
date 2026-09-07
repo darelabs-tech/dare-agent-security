@@ -259,7 +259,7 @@
         "expected_resource"
       ]
     },
-    "authorization": {
+    "authorization_flow": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -575,7 +575,7 @@
         "trust_class"
       ]
     },
-    "credentials": {
+    "credential_flow": {
       "type": "object",
       "additionalProperties": false,
       "properties": {

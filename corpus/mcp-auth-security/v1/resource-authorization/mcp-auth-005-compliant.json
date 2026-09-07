@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-005-compliant",
+  "title": "protected resource metadata describes the resource under test",
+  "class": "BENIGN_CONTROL",
+  "surface": "RESOURCE_AUTHORIZATION",
+  "property": "MCP.AUTH.PROTECTED_RESOURCE_METADATA",
+  "expected_invariant": "PROTECTED_RESOURCE_METADATA_BOUND_TO_RESOURCE",
+  "reference_behavior": "COMPLIANT",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a flow that stays inside every boundary it was granted",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

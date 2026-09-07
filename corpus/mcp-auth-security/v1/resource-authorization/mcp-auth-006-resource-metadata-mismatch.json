@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-006-resource-metadata-mismatch",
+  "title": "protected resource metadata describes a different resource",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "RESOURCE_AUTHORIZATION",
+  "property": "MCP.AUTH.PROTECTED_RESOURCE_METADATA",
+  "expected_invariant": "PROTECTED_RESOURCE_METADATA_BOUND_TO_RESOURCE",
+  "reference_behavior": "RESOURCE_METADATA_MISMATCH",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "metadata describing one resource is used to authorize another",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

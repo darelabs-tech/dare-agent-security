@@ -1,0 +1,61 @@
+{
+  "schema_version": "1",
+  "id": "MCP-AUTH-LAB-035",
+  "title": "a run that observed nothing the invariant needs",
+  "class": "FLOW_INTEGRITY",
+  "property": "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+  "objective": {
+    "id": "objective-invoice",
+    "description": "Create an invoice through an authorized MCP tool call.",
+    "protected_canaries": [
+      "DARE-SYNTHETIC-CANARY-MCPAUTH01"
+    ]
+  },
+  "requests": [
+    {
+      "request_id": "req-1",
+      "protocol": {
+        "declared_revision": "2026-07-28",
+        "http_transport": true
+      },
+      "headers": {
+        "method": "tools/call",
+        "name": "create-invoice"
+      },
+      "operation": {
+        "method": "tools/call",
+        "name": "create-invoice"
+      }
+    }
+  ],
+  "protected_resource": {
+    "expected_resource": "mcp-invoices"
+  },
+  "authorization_flow": {},
+  "tokens": {},
+  "flow": {},
+  "scope": {},
+  "credential_flow": {},
+  "identity_metadata": {},
+  "final_operation": {},
+  "invariant": {
+    "type": "PKCE_BINDING_PRESERVED"
+  },
+  "trials": {
+    "count": 3,
+    "stop_on_first_fail": true
+  },
+  "safety": {
+    "local_only": true
+  },
+  "lab": {
+    "reference_behavior": "NO_RELEVANT_OBSERVATION"
+  },
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

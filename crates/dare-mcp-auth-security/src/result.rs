@@ -371,11 +371,11 @@ mod tests {
             reference_behavior: crate::model::ReferenceBehavior::NoRelevantObservation,
         });
         quiet.tokens = Default::default();
-        quiet.authorization = Default::default();
+        quiet.authorization_flow = Default::default();
         quiet.flow = Default::default();
         quiet.scope = Default::default();
         quiet.registration = None;
-        quiet.credentials = Default::default();
+        quiet.credential_flow = Default::default();
         quiet.identity_metadata = Default::default();
         quiet.final_operation = Default::default();
         quiet.protected_resource.metadata = None;

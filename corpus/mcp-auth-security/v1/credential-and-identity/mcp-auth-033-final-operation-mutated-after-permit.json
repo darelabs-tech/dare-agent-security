@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-033-final-operation-mutated-after-permit",
+  "title": "the operation changed after the permit and the permit was reused",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "CREDENTIAL_AND_IDENTITY",
+  "property": "MCP.AUTH.FINAL_OPERATION_BINDING",
+  "expected_invariant": "FINAL_OPERATION_AUTHORIZATION_BINDING_PRESERVED",
+  "reference_behavior": "FINAL_OPERATION_MUTATED_AFTER_PERMIT",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "the operation changes after the permit and the permit is reused anyway",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

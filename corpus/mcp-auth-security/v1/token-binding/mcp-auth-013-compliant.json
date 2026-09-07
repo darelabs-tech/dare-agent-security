@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-013-compliant",
+  "title": "the token carries recorded verification evidence",
+  "class": "BENIGN_CONTROL",
+  "surface": "TOKEN_BINDING",
+  "property": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+  "expected_invariant": "TOKEN_VALIDITY_EVIDENCE_PRESENT",
+  "reference_behavior": "COMPLIANT",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a flow that stays inside every boundary it was granted",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

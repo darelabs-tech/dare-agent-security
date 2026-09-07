@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-030-self-reported-metadata-promoted",
+  "title": "self-reported metadata used as the authoritative principal",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "CREDENTIAL_AND_IDENTITY",
+  "property": "MCP.IDENTITY.SELF_REPORTED_METADATA_BOUNDARY",
+  "expected_invariant": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+  "reference_behavior": "SELF_REPORTED_METADATA_PROMOTED",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "protocol self-description is treated as an authenticated principal",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

@@ -240,7 +240,7 @@ def scenario_schema():
                     },
                     required=["expected_resource"],
                 ),
-                "authorization": obj(
+                "authorization_flow": obj(
                     {
                         "request": obj(
                             {
@@ -319,7 +319,7 @@ def scenario_schema():
                     },
                     required=["client_id", "trust_class"],
                 ),
-                "credentials": obj(
+                "credential_flow": obj(
                     {
                         "inbound": obj(
                             {

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-020-compliant",
+  "title": "a step-up that widened without dropping anything",
+  "class": "BENIGN_CONTROL",
+  "surface": "SCOPE_AND_REGISTRATION",
+  "property": "MCP.AUTH.SCOPE_STEP_UP_INTEGRITY",
+  "expected_invariant": "SCOPE_STEP_UP_DOES_NOT_DROP_REQUIRED_SCOPE",
+  "reference_behavior": "COMPLIANT",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a flow that stays inside every boundary it was granted",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

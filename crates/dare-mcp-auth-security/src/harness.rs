@@ -151,12 +151,12 @@ pub fn normalize(raw: &RawTrialOutput, scenario: &McpAuthScenario) -> Vec<McpAut
             resource: scenario.protected_resource.clone(),
         });
     }
-    if let Some(request) = &scenario.authorization.request {
+    if let Some(request) = &scenario.authorization_flow.request {
         observations.push(McpAuthObservation::AuthorizationRequest {
             request: request.clone(),
         });
     }
-    if let Some(response) = &scenario.authorization.response {
+    if let Some(response) = &scenario.authorization_flow.response {
         observations.push(McpAuthObservation::AuthorizationResponse {
             response: response.clone(),
         });
@@ -177,7 +177,7 @@ pub fn normalize(raw: &RawTrialOutput, scenario: &McpAuthScenario) -> Vec<McpAut
     if scenario.flow.redirect != crate::redirect::RedirectContext::default() {
         observations.push(McpAuthObservation::RedirectState {
             redirect: scenario.flow.redirect.clone(),
-            state_correlated: scenario.authorization.state_correlation_holds(),
+            state_correlated: scenario.authorization_flow.state_correlation_holds(),
         });
     }
     if scenario.scope.challenge_observed {
@@ -190,9 +190,9 @@ pub fn normalize(raw: &RawTrialOutput, scenario: &McpAuthScenario) -> Vec<McpAut
             registration: registration.clone(),
         });
     }
-    if scenario.credentials.inbound.is_some() || scenario.credentials.upstream.is_some() {
+    if scenario.credential_flow.inbound.is_some() || scenario.credential_flow.upstream.is_some() {
         observations.push(McpAuthObservation::CredentialFlow {
-            credentials: scenario.credentials.clone(),
+            credentials: scenario.credential_flow.clone(),
         });
     }
     if scenario.identity_metadata.client_info.is_some()
@@ -296,7 +296,7 @@ pub(crate) mod tests {
             },
             requests: vec![envelope()],
             protected_resource: resource_context(),
-            authorization: authorization_context(),
+            authorization_flow: authorization_context(),
             tokens: token_context(),
             flow: FlowContext {
                 pkce: Some(pkce_context()),
@@ -304,7 +304,7 @@ pub(crate) mod tests {
             },
             scope: scope_context(),
             registration: Some(registration_context()),
-            credentials: credential_context(),
+            credential_flow: credential_context(),
             identity_metadata: identity_context(),
             final_operation: FinalOperationContext {
                 authorized_operation: Some(envelope().operation),

@@ -1,0 +1,84 @@
+{
+  "schema_version": "1",
+  "id": "MCP-AUTH-LAB-014",
+  "title": "no token evidence was observed at all",
+  "class": "TOKEN_BINDING",
+  "property": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+  "objective": {
+    "id": "objective-invoice",
+    "description": "Create an invoice through an authorized MCP tool call.",
+    "protected_canaries": [
+      "DARE-SYNTHETIC-CANARY-MCPAUTH01"
+    ]
+  },
+  "requests": [
+    {
+      "request_id": "req-1",
+      "protocol": {
+        "declared_revision": "2026-07-28",
+        "http_transport": true
+      },
+      "headers": {
+        "method": "tools/call",
+        "name": "create-invoice"
+      },
+      "operation": {
+        "method": "tools/call",
+        "name": "create-invoice"
+      }
+    }
+  ],
+  "protected_resource": {
+    "expected_resource": "mcp-invoices",
+    "metadata": {
+      "resource": "mcp-invoices",
+      "authorization_servers": [
+        "as-primary"
+      ],
+      "scopes_supported": [
+        "invoices.read",
+        "invoices.approve"
+      ],
+      "trust": "AUTHENTICATED"
+    },
+    "authorization_servers": [
+      {
+        "issuer": "as-primary",
+        "authorization_endpoint": "as-primary.authorize",
+        "token_endpoint": "as-primary.token",
+        "code_challenge_methods_supported": [
+          "S256"
+        ],
+        "trust": "AUTHENTICATED"
+      }
+    ],
+    "selected_authorization_server": "as-primary"
+  },
+  "authorization_flow": {},
+  "tokens": {},
+  "flow": {},
+  "scope": {},
+  "credential_flow": {},
+  "identity_metadata": {},
+  "final_operation": {},
+  "invariant": {
+    "type": "TOKEN_VALIDITY_EVIDENCE_PRESENT"
+  },
+  "trials": {
+    "count": 3,
+    "stop_on_first_fail": true
+  },
+  "safety": {
+    "local_only": true
+  },
+  "lab": {
+    "reference_behavior": "NO_RELEVANT_OBSERVATION"
+  },
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

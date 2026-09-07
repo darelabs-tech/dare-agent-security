@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-019-redirect-or-state-substituted",
+  "title": "the response was delivered to a substituted redirect",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "FLOW_INTEGRITY",
+  "property": "MCP.AUTH.PKCE_REDIRECT_STATE_INTEGRITY",
+  "expected_invariant": "REDIRECT_STATE_BINDING_PRESERVED",
+  "reference_behavior": "REDIRECT_OR_STATE_SUBSTITUTED",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "an authorization response is delivered somewhere the request did not name",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

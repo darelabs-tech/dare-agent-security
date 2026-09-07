@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-014-no-relevant-observation",
+  "title": "no token evidence was observed at all",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "TOKEN_BINDING",
+  "property": "MCP.AUTH.TOKEN_AUDIENCE_RESOURCE_BINDING",
+  "expected_invariant": "TOKEN_VALIDITY_EVIDENCE_PRESENT",
+  "reference_behavior": "NO_RELEVANT_OBSERVATION",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a run that never produced the evidence the invariant needs",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

@@ -393,7 +393,7 @@ pub struct McpAuthScenario {
     pub requests: Vec<RequestEnvelope>,
     pub protected_resource: ResourceContext,
     #[serde(default)]
-    pub authorization: AuthorizationContext,
+    pub authorization_flow: AuthorizationContext,
     #[serde(default)]
     pub tokens: TokenContext,
     #[serde(default)]
@@ -403,7 +403,7 @@ pub struct McpAuthScenario {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub registration: Option<RegistrationContext>,
     #[serde(default)]
-    pub credentials: CredentialContext,
+    pub credential_flow: CredentialContext,
     #[serde(default)]
     pub identity_metadata: IdentityContext,
     #[serde(default)]
@@ -466,14 +466,14 @@ impl McpAuthScenario {
         }
 
         self.protected_resource.validate()?;
-        self.authorization.validate()?;
+        self.authorization_flow.validate()?;
         self.tokens.validate()?;
         self.flow.validate()?;
         self.scope.validate()?;
         if let Some(registration) = &self.registration {
             registration.validate()?;
         }
-        self.credentials.validate()?;
+        self.credential_flow.validate()?;
         self.identity_metadata.validate()?;
         self.final_operation.validate()?;
 

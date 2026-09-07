@@ -53,12 +53,12 @@ been opened.
 - [x] task-034 — Implement replay adapter with semantic scenario binding
 - [x] task-035 — Implement simulated adapter
 - [x] task-036 — Implement local-synthetic adapter under Cycle 009 safety controls
-- [ ] task-037 — Build protocol/header/PRM/issuer paired corpus
-- [ ] task-038 — Build token/audience/PKCE/redirect paired corpus
-- [ ] task-039 — Build scope/registration/credential/identity paired corpus
-- [ ] task-040 — Add benign controls + missing-evidence INCONCLUSIVE regressions
-- [ ] task-041 — Add hostile raw-token/secret/endpoint/executable fixtures
-- [ ] task-042 — Implement independent multi-violation capture and redaction-before-persistence
+- [x] task-037 — Build protocol/header/PRM/issuer paired corpus
+- [x] task-038 — Build token/audience/PKCE/redirect paired corpus
+- [x] task-039 — Build scope/registration/credential/identity paired corpus
+- [x] task-040 — Add benign controls + missing-evidence INCONCLUSIVE regressions
+- [x] task-041 — Add hostile raw-token/secret/endpoint/executable fixtures
+- [x] task-042 — Implement independent multi-violation capture and redaction-before-persistence
 - [x] task-043 — Implement MCPAuthSecurityResult + Cycle 001 evidence bridge
 - [ ] task-044 — Add mcp-auth-hardening-2026 profile and coverage integration
 - [ ] task-045 — Add validate mcp-auth-security CLI + bounded reports

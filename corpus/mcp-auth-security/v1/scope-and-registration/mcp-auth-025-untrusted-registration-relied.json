@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-025-untrusted-registration-relied",
+  "title": "a client accepted on untrusted registration metadata",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "SCOPE_AND_REGISTRATION",
+  "property": "MCP.AUTH.CLIENT_REGISTRATION_TRUST",
+  "expected_invariant": "CLIENT_REGISTRATION_METADATA_TRUST_PRESERVED",
+  "reference_behavior": "UNTRUSTED_REGISTRATION_RELIED",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a client identifier is accepted because an untrusted document asserts it",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}

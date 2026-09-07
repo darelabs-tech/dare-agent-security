@@ -1,0 +1,456 @@
+{
+  "schema_version": "1",
+  "note": "Adversarial parser fixtures. Each isolates one hostile mutation and records why it must be refused. None records an expected error: a fixture that stated its own outcome would let the parser agree with it instead of judging it. These are not corpus vectors and are absent from registry.json.",
+  "cases": [
+    {
+      "file": "armoured-key-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "aws-key-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "bearer-credential-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "bidi-spoofed-issuer.json",
+      "document_kind": "scenario",
+      "reason": "an issuer carrying a bidi override, so a reader sees a different value than was compared"
+    },
+    {
+      "file": "control-character-scenario-id.json",
+      "document_kind": "scenario",
+      "reason": "a scenario id carrying a control character"
+    },
+    {
+      "file": "corpus-attack-declared-compliant.json",
+      "document_kind": "corpus-entry",
+      "reason": "an attack vector declaring compliant behaviour, which would be a control mislabelled"
+    },
+    {
+      "file": "corpus-missing-protocol-precondition.json",
+      "document_kind": "corpus-entry",
+      "reason": "a vector that does not require the current MCP protocol"
+    },
+    {
+      "file": "corpus-non-synthetic-safety-class.json",
+      "document_kind": "corpus-entry",
+      "reason": "a vector declaring a safety class other than SYNTHETIC_NOOP"
+    },
+    {
+      "file": "corpus-surface-does-not-own-invariant.json",
+      "document_kind": "corpus-entry",
+      "reason": "a vector filed under a surface its invariant does not report under"
+    },
+    {
+      "file": "credential-field-access-token.json",
+      "document_kind": "scenario",
+      "reason": "declares a `access_token` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-api-key.json",
+      "document_kind": "scenario",
+      "reason": "declares a `api_key` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-authorization-code.json",
+      "document_kind": "scenario",
+      "reason": "declares a `authorization_code` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-authorization-header.json",
+      "document_kind": "scenario",
+      "reason": "declares a `authorization_header` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-bearer-token.json",
+      "document_kind": "scenario",
+      "reason": "declares a `bearer_token` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-client-secret.json",
+      "document_kind": "scenario",
+      "reason": "declares a `client_secret` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-code-verifier.json",
+      "document_kind": "scenario",
+      "reason": "declares a `code_verifier` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-cookie.json",
+      "document_kind": "scenario",
+      "reason": "declares a `cookie` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-empty-value.json",
+      "document_kind": "scenario",
+      "reason": "declares a credential field with an empty value; the field is what is wrong"
+    },
+    {
+      "file": "credential-field-id-token.json",
+      "document_kind": "scenario",
+      "reason": "declares a `id_token` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-jwk.json",
+      "document_kind": "scenario",
+      "reason": "declares a `jwk` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-nested-deeply.json",
+      "document_kind": "scenario",
+      "reason": "hides a credential field three levels down, to prove depth does not help"
+    },
+    {
+      "file": "credential-field-password.json",
+      "document_kind": "scenario",
+      "reason": "declares a `password` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-private-key.json",
+      "document_kind": "scenario",
+      "reason": "declares a `private_key` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-refresh-token.json",
+      "document_kind": "scenario",
+      "reason": "declares a `refresh_token` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-secret.json",
+      "document_kind": "scenario",
+      "reason": "declares a `secret` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "credential-field-session-token.json",
+      "document_kind": "scenario",
+      "reason": "declares a `session_token` field; Cycle 018 stores no credential material"
+    },
+    {
+      "file": "executable-field-callback.json",
+      "document_kind": "scenario",
+      "reason": "declares a `callback` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-callback-url.json",
+      "document_kind": "scenario",
+      "reason": "declares a `callback_url` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-command.json",
+      "document_kind": "scenario",
+      "reason": "declares a `command` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-entrypoint.json",
+      "document_kind": "scenario",
+      "reason": "declares a `entrypoint` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-eval.json",
+      "document_kind": "scenario",
+      "reason": "declares a `eval` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-exec.json",
+      "document_kind": "scenario",
+      "reason": "declares a `exec` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-hook.json",
+      "document_kind": "scenario",
+      "reason": "declares a `hook` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-run.json",
+      "document_kind": "scenario",
+      "reason": "declares a `run` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-script.json",
+      "document_kind": "scenario",
+      "reason": "declares a `script` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-shell.json",
+      "document_kind": "scenario",
+      "reason": "declares a `shell` field; there is no code path that would run one"
+    },
+    {
+      "file": "executable-field-webhook.json",
+      "document_kind": "scenario",
+      "reason": "declares a `webhook` field; there is no code path that would run one"
+    },
+    {
+      "file": "github-token-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "google-token-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "jwt-shaped-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "log-injection-issuer.json",
+      "document_kind": "scenario",
+      "reason": "an issuer carrying a newline, which could forge a log line"
+    },
+    {
+      "file": "malformed-digest.json",
+      "document_kind": "scenario",
+      "reason": "carries a value in a digest field that is not a digest"
+    },
+    {
+      "file": "missing-schema-version.json",
+      "document_kind": "scenario",
+      "reason": "declares no schema version at all"
+    },
+    {
+      "file": "non-local-execution.json",
+      "document_kind": "scenario",
+      "reason": "declares itself non-local; there is no non-local execution path"
+    },
+    {
+      "file": "over-limit-retry-count.json",
+      "document_kind": "scenario",
+      "reason": "asks for more scope step-up retries than the approved ceiling"
+    },
+    {
+      "file": "over-limit-trials.json",
+      "document_kind": "scenario",
+      "reason": "asks for more trials than the approved ceiling"
+    },
+    {
+      "file": "path-traversal-resource.json",
+      "document_kind": "scenario",
+      "reason": "a resource identifier shaped like a path"
+    },
+    {
+      "file": "registry-absolute-path.json",
+      "document_kind": "corpus-registry",
+      "reason": "a registry entry whose path could escape the corpus root"
+    },
+    {
+      "file": "registry-backslash-path.json",
+      "document_kind": "corpus-registry",
+      "reason": "a registry entry whose path could escape the corpus root"
+    },
+    {
+      "file": "registry-path-traversal.json",
+      "document_kind": "corpus-registry",
+      "reason": "a registry entry whose path could escape the corpus root"
+    },
+    {
+      "file": "registry-url-path.json",
+      "document_kind": "corpus-registry",
+      "reason": "a registry entry whose path could escape the corpus root"
+    },
+    {
+      "file": "remote-field-connection-string.json",
+      "document_kind": "scenario",
+      "reason": "declares a `connection_string` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-discovery-url.json",
+      "document_kind": "scenario",
+      "reason": "declares a `discovery_url` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-endpoint.json",
+      "document_kind": "scenario",
+      "reason": "declares a `endpoint` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-introspection-endpoint.json",
+      "document_kind": "scenario",
+      "reason": "declares a `introspection_endpoint` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-issuer-url.json",
+      "document_kind": "scenario",
+      "reason": "declares a `issuer_url` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-jwks-uri.json",
+      "document_kind": "scenario",
+      "reason": "declares a `jwks_uri` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-jwks-url.json",
+      "document_kind": "scenario",
+      "reason": "declares a `jwks_url` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-metadata-url.json",
+      "document_kind": "scenario",
+      "reason": "declares a `metadata_url` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-proxy.json",
+      "document_kind": "scenario",
+      "reason": "declares a `proxy` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-registration-endpoint.json",
+      "document_kind": "scenario",
+      "reason": "declares a `registration_endpoint` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-remote.json",
+      "document_kind": "scenario",
+      "reason": "declares a `remote` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-field-url.json",
+      "document_kind": "scenario",
+      "reason": "declares a `url` field; Cycle 018 identifiers are identities, never addresses"
+    },
+    {
+      "file": "remote-target-data.json",
+      "document_kind": "scenario",
+      "reason": "names a reachable target by value; this cycle contacts nothing"
+    },
+    {
+      "file": "remote-target-file.json",
+      "document_kind": "scenario",
+      "reason": "names a reachable target by value; this cycle contacts nothing"
+    },
+    {
+      "file": "remote-target-http.json",
+      "document_kind": "scenario",
+      "reason": "names a reachable target by value; this cycle contacts nothing"
+    },
+    {
+      "file": "remote-target-https.json",
+      "document_kind": "scenario",
+      "reason": "names a reachable target by value; this cycle contacts nothing"
+    },
+    {
+      "file": "remote-target-ws.json",
+      "document_kind": "scenario",
+      "reason": "names a reachable target by value; this cycle contacts nothing"
+    },
+    {
+      "file": "slack-token-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "stripe-shaped-value.json",
+      "document_kind": "scenario",
+      "reason": "carries a value shaped like real credential material in an allowed field"
+    },
+    {
+      "file": "trace-claims-production-evidence.json",
+      "document_kind": "trace",
+      "reason": "a recording declaring itself non-synthetic, which would let it be read as production evidence"
+    },
+    {
+      "file": "trace-credential-smuggling.json",
+      "document_kind": "trace",
+      "reason": "a recording carrying a credential-bearing field"
+    },
+    {
+      "file": "trace-live-mode.json",
+      "document_kind": "trace",
+      "reason": "a recording asking to be run in a mode other than replay"
+    },
+    {
+      "file": "trace-over-limit-trials.json",
+      "document_kind": "trace",
+      "reason": "a recording carrying more trials than the approved ceiling"
+    },
+    {
+      "file": "trace-remote-target.json",
+      "document_kind": "trace",
+      "reason": "a recording naming a reachable target"
+    },
+    {
+      "file": "unknown-enum-value.json",
+      "document_kind": "scenario",
+      "reason": "names a scenario class outside the closed set"
+    },
+    {
+      "file": "unknown-invariant.json",
+      "document_kind": "scenario",
+      "reason": "names an invariant outside the closed fourteen"
+    },
+    {
+      "file": "unknown-reference-behavior.json",
+      "document_kind": "scenario",
+      "reason": "names a reference behaviour outside the closed set"
+    },
+    {
+      "file": "unknown-top-level-field.json",
+      "document_kind": "scenario",
+      "reason": "carries a top-level field the closed schema does not define"
+    },
+    {
+      "file": "unsupported-schema-version.json",
+      "document_kind": "scenario",
+      "reason": "declares a schema version this engine does not implement"
+    },
+    {
+      "file": "verdict-smuggling-assertion.json",
+      "document_kind": "scenario",
+      "reason": "declares a `assertion` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-expected-outcome.json",
+      "document_kind": "scenario",
+      "reason": "declares a `expected_outcome` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-expected-result.json",
+      "document_kind": "scenario",
+      "reason": "declares a `expected_result` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-expected-verdict.json",
+      "document_kind": "scenario",
+      "reason": "declares a `expected_verdict` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-is-secure.json",
+      "document_kind": "scenario",
+      "reason": "declares a `is_secure` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-is-vulnerable.json",
+      "document_kind": "scenario",
+      "reason": "declares a `is_vulnerable` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-should-fail.json",
+      "document_kind": "scenario",
+      "reason": "declares a `should_fail` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-should-pass.json",
+      "document_kind": "scenario",
+      "reason": "declares a `should_pass` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "verdict-smuggling-verdict.json",
+      "document_kind": "scenario",
+      "reason": "declares a `verdict` field; a fixture that states its own outcome makes the evaluator ceremonial"
+    },
+    {
+      "file": "zero-width-identifier.json",
+      "document_kind": "scenario",
+      "reason": "an identifier carrying a zero-width space, making two distinct values render alike"
+    }
+  ]
+}

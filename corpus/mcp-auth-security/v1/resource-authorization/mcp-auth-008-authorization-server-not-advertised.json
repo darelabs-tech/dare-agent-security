@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "id": "mcp-auth-008-authorization-server-not-advertised",
+  "title": "the selected authorization server is not advertised by the resource",
+  "class": "MCP_AUTH_ATTACK",
+  "surface": "RESOURCE_AUTHORIZATION",
+  "property": "MCP.AUTH.AUTHORIZATION_SERVER_BINDING",
+  "expected_invariant": "AUTHORIZATION_SERVER_ISSUER_BOUNDARY_PRESERVED",
+  "reference_behavior": "AUTHORIZATION_SERVER_NOT_ADVERTISED",
+  "preconditions": [
+    "mcp_current_protocol_present",
+    "mcp_http_transport_present"
+  ],
+  "surface_note": "a client selects an authorization server the resource never advertised",
+  "safety_class": "SYNTHETIC_NOOP",
+  "standards": [
+    {
+      "source": "MCP",
+      "reference": "2026-07-28 authorization",
+      "status": "NORMATIVE"
+    }
+  ]
+}
