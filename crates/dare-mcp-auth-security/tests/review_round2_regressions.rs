@@ -59,6 +59,8 @@ fn run(scenario: &McpAuthScenario) -> McpAuthSecurityResult {
 fn r2_a_secondary_invariant_failure_cannot_hide_behind_a_passing_primary() {
     let mut scenario = load("mcp-auth-lab-007");
     scenario.invariant.type_ = McpAuthInvariantType::TokenResourceAudienceBoundaryPreserved;
+    scenario.property = scenario.invariant.type_.property();
+    scenario.class = scenario.invariant.type_.surface();
     scenario.tokens.presented.as_mut().expect("token").issuer =
         dare_mcp_auth_security::protocol::SyntheticUri::new("as-attacker")
             .expect("synthetic identifier");
