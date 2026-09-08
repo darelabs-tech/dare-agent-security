@@ -116,11 +116,16 @@ pub struct AttestationAssessment {
     /// Kept separately from "no attestation": an attestation for the wrong
     /// artifact is worse than none, because it looks like coverage.
     pub misbound_attestation_ids: Vec<String>,
+    /// Matching statements whose recorded local verification explicitly failed.
+    /// One valid statement cannot erase an independently invalid statement.
+    pub invalid_verification_ids: Vec<String>,
     /// Whether at least one matching statement binds the artifact's digest.
     pub digest_bound: Option<bool>,
     /// Signers named by matching statements.
     pub signer_ids: BTreeSet<String>,
-    /// The strongest verification status among matching statements.
+    /// The strongest verification status among matching statements. This is
+    /// used only to decide whether positive verification evidence exists; the
+    /// explicit invalid set above is retained independently.
     pub verification_status: Option<VerificationStatus>,
 }
 
@@ -138,12 +143,20 @@ impl AttestationAssessment {
         self.verification_status
             .is_some_and(VerificationStatus::is_recorded_evidence)
     }
+
+    /// Whether positive local verification evidence exists for a matching
+    /// attestation. Only `VALID` may support PASS.
+    pub fn has_reliable_verification(&self) -> bool {
+        self.verification_status
+            .is_some_and(VerificationStatus::may_be_relied_on)
+    }
 }
 
 /// Assess the attestations available for one component.
 pub fn assess(component: &Component, records: &[AttestationRecord]) -> AttestationAssessment {
     let mut matching = Vec::new();
     let mut misbound = Vec::new();
+    let mut invalid_verification_ids = Vec::new();
     let mut digest_bound: Option<bool> = None;
     let mut signer_ids = BTreeSet::new();
     let mut verification_status: Option<VerificationStatus> = None;
@@ -171,12 +184,15 @@ pub fn assess(component: &Component, records: &[AttestationRecord]) -> Attestati
         }
 
         matching.push(record.attestation_id.clone());
+        if record.verification_status == VerificationStatus::Invalid {
+            invalid_verification_ids.push(record.attestation_id.clone());
+        }
         if let Some(signer) = &record.signer_id {
             signer_ids.insert(signer.clone());
         }
-        // Keep the most favourable status among matching statements. Several
-        // attestations for one artifact is normal, and one of them verifying is
-        // a verification.
+        // Keep the most favourable status as the positive-evidence summary.
+        // Explicit INVALID records are retained independently above so a valid
+        // neighbour cannot hide them.
         verification_status = Some(match verification_status {
             Some(VerificationStatus::Valid) => VerificationStatus::Valid,
             Some(existing) if record.verification_status == VerificationStatus::Valid => {
@@ -192,6 +208,7 @@ pub fn assess(component: &Component, records: &[AttestationRecord]) -> Attestati
         component_id: component.component_id.clone(),
         matching_attestation_ids: matching,
         misbound_attestation_ids: misbound,
+        invalid_verification_ids,
         digest_bound,
         signer_ids,
         verification_status,
@@ -264,6 +281,7 @@ pub(crate) mod tests {
             assessment.verification_status,
             Some(VerificationStatus::Valid)
         );
+        assert!(assessment.has_reliable_verification());
     }
 
     #[test]
@@ -303,13 +321,22 @@ pub(crate) mod tests {
                 "{status:?} is a recorded verification"
             );
             assert!(
-                !assessment
-                    .verification_status
-                    .expect("present")
-                    .may_be_relied_on(),
+                !assessment.has_reliable_verification(),
                 "{status:?} was treated as favourable"
             );
         }
+    }
+
+    #[test]
+    fn an_invalid_verification_is_retained_even_beside_a_valid_one() {
+        let component = component("react", ComponentType::Package);
+        let good = attestation("att-good", "react");
+        let mut bad = attestation("att-bad", "react");
+        bad.verification_status = VerificationStatus::Invalid;
+
+        let assessment = assess(&component, &[good, bad]);
+        assert!(assessment.has_reliable_verification());
+        assert_eq!(assessment.invalid_verification_ids, vec!["att-bad"]);
     }
 
     #[test]
@@ -319,6 +346,7 @@ pub(crate) mod tests {
         record.verification_status = VerificationStatus::Unrecorded;
         let assessment = assess(&component, &[record]);
         assert!(!assessment.has_recorded_verification());
+        assert!(!assessment.has_reliable_verification());
     }
 
     #[test]
@@ -332,10 +360,10 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn several_attestations_take_the_most_favourable_status() {
+    fn several_attestations_take_the_most_favourable_positive_status() {
         // Several statements for one artifact is normal. One of them verifying
-        // is a verification, and requiring all of them would report a finding
-        // whenever a second, weaker statement existed.
+        // supplies positive verification evidence, while independently invalid
+        // statements are still retained by id.
         let component = component("react", ComponentType::Package);
         let mut weak = attestation("att-weak", "react");
         weak.verification_status = VerificationStatus::Indeterminate;

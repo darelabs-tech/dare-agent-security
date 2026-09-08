@@ -89,11 +89,13 @@ impl TrustPolicy {
         self.approved_signers.contains(signer_id)
     }
 
-    /// Whether any of a component's source-shaped claims is approved.
+    /// Whether every source-shaped claim a component supplied is approved by
+    /// the corresponding local-policy set.
     ///
-    /// Source, supplier and publisher are checked together because a document
-    /// may record the same fact in any of them, and a component whose publisher
-    /// is approved is approved whichever field carried it.
+    /// Source, supplier and publisher are separate concepts. One approved claim
+    /// must not mask a conflicting unapproved claim on another boundary. With
+    /// no claims at all the answer remains `None`: nobody supplied origin
+    /// evidence to decide.
     pub fn approves_origin(
         &self,
         source_id: Option<&str>,
@@ -109,13 +111,11 @@ impl TrustPolicy {
         for (claim, approved) in claims {
             let Some(claim) = claim else { continue };
             saw_claim = true;
-            if approved.contains(claim) {
-                return Some(true);
+            if !approved.contains(claim) {
+                return Some(false);
             }
         }
-        // No claim at all is nothing to check, which is a gap. A claim that
-        // matched nothing is a decision.
-        saw_claim.then_some(false)
+        saw_claim.then_some(true)
     }
 }
 
@@ -396,14 +396,16 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn an_origin_is_approved_whichever_field_carried_it() {
-        // A document may record the same fact as source, supplier or publisher.
-        // A component whose supplier is approved is approved.
+    fn origin_claims_are_independent_and_one_approved_claim_does_not_mask_another() {
         let policy = policy();
         assert_eq!(policy.approves_origin(None, Some("acme"), None), Some(true));
         assert_eq!(
-            policy.approves_origin(Some("registry-unknown"), Some("acme"), None),
+            policy.approves_origin(Some("registry-internal"), Some("acme"), None),
             Some(true)
+        );
+        assert_eq!(
+            policy.approves_origin(Some("registry-unknown"), Some("acme"), None),
+            Some(false)
         );
     }
 
