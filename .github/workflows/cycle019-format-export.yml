@@ -1,0 +1,29 @@
+name: cycle019-format-export
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  format-export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Format corrective Rust files
+        run: cargo fmt --all
+      - name: Export formatted changed files
+        shell: bash
+        run: |
+          git diff --name-only -- '*.rs' | while IFS= read -r file; do
+            echo "BASE64_BEGIN ${file}"
+            base64 -w0 "${file}"
+            echo
+            echo "BASE64_END ${file}"
+          done
