@@ -84,6 +84,17 @@ pub struct SupplyChainInvariantOutcome {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub violations: Vec<SupplyChainViolation>,
     pub coverage_satisfied: bool,
+    /// Whether this invariant has a subject in this evidence at all.
+    ///
+    /// A bundle with no model has no model lineage to preserve. That is not a
+    /// gap in the evidence — it is a question the system does not raise, and
+    /// counting it as undecided would make every deployment that runs no model
+    /// permanently inconclusive about models.
+    ///
+    /// Distinct from `coverage_satisfied`, which asks whether an invariant that
+    /// *does* apply could be decided. A model with no recorded lineage is
+    /// applicable and undecided; a bundle with no model is neither.
+    pub applicable: bool,
 }
 
 impl SupplyChainInvariantOutcome {
@@ -94,6 +105,7 @@ impl SupplyChainInvariantOutcome {
             reason: reason.into(),
             violations: Vec::new(),
             coverage_satisfied: true,
+            applicable: true,
         }
     }
 
@@ -114,16 +126,23 @@ impl SupplyChainInvariantOutcome {
             // gates PASS, never FAIL: a violation seen through partial evidence
             // is still a violation.
             coverage_satisfied: true,
+            // Something was observed to violate it, so it plainly applied.
+            applicable: true,
         }
     }
 
-    fn inconclusive(invariant: SupplyChainInvariant, reason: impl Into<String>) -> Self {
+    fn inconclusive(
+        invariant: SupplyChainInvariant,
+        reason: impl Into<String>,
+        applicable: bool,
+    ) -> Self {
         Self {
             invariant,
             verdict: Verdict::Inconclusive,
             reason: reason.into(),
             violations: Vec::new(),
             coverage_satisfied: false,
+            applicable,
         }
     }
 
@@ -134,6 +153,9 @@ impl SupplyChainInvariantOutcome {
             reason: reason.into(),
             violations: Vec::new(),
             coverage_satisfied: false,
+            // A run that could not observe cannot say whether the question
+            // applied either.
+            applicable: true,
         }
     }
 }
@@ -186,15 +208,62 @@ pub fn evaluate(
 
     let coverage = assess_coverage(invariant, observations);
     if coverage.satisfied {
-        SupplyChainInvariantOutcome::pass(
+        return SupplyChainInvariantOutcome::pass(
             invariant,
             format!(
                 "{} held, and the evidence needed to decide it was present",
                 invariant.as_str()
             ),
-        )
-    } else {
-        SupplyChainInvariantOutcome::inconclusive(invariant, coverage.reason)
+        );
+    }
+
+    if !applies_to(invariant, observations) {
+        return SupplyChainInvariantOutcome::inconclusive(
+            invariant,
+            format!(
+                "{} has no subject in this evidence, so the question does not arise",
+                invariant.as_str()
+            ),
+            false,
+        );
+    }
+
+    SupplyChainInvariantOutcome::inconclusive(invariant, coverage.reason, true)
+}
+
+/// Whether an invariant has a subject in this evidence at all.
+///
+/// The distinction between *undecided* and *does not arise*. A bundle with no
+/// model has no model lineage to preserve; reporting that as undecided would
+/// make every deployment that runs no model permanently inconclusive about
+/// models, and an operator reading a wall of INCONCLUSIVE learns nothing from
+/// the one that matters.
+///
+/// Applicability is read from the observations rather than declared, so it
+/// cannot drift from what was actually seen. Every rule below is "a context of
+/// this kind was produced", and `project` produces one exactly when the
+/// evidence carries its subject.
+fn applies_to(invariant: SupplyChainInvariant, observations: &ObservationSet) -> bool {
+    use crate::observation::ObservationChannel as C;
+    use SupplyChainInvariant as I;
+
+    match invariant {
+        // A component set is the subject. With no components there is nothing
+        // to be ambiguous about and nothing whose class requires evidence.
+        I::ComponentIdentityUnambiguous
+        | I::MutableReferenceNotUsedAsImmutableIdentity
+        | I::ArtifactDigestBoundToComponent
+        | I::BomRequiredEvidencePresent => observations.has_channel(C::ComponentContext),
+
+        I::ComponentSourceTrustPreserved => observations.has_channel(C::SourceTrustContext),
+        I::ComponentProvenanceSufficient | I::ProvenanceSubjectAndBuilderBound => {
+            observations.has_channel(C::ProvenanceContext)
+        }
+        I::AttestationSubjectDigestPreserved => observations.has_channel(C::AttestationContext),
+        I::DependencyEdgeIntegrityPreserved => observations.has_channel(C::RelationshipContext),
+        I::ExternalCapabilityDriftNotObserved => observations.has_channel(C::CapabilityContext),
+        I::ModelLineagePreserved => observations.has_channel(C::ModelLineageContext),
+        I::DatasetProvenancePreserved => observations.has_channel(C::DatasetProvenanceContext),
     }
 }
 
@@ -235,11 +304,23 @@ pub fn collect_observed_violations(observations: &ObservationSet) -> Vec<SupplyC
 /// an invariant that could not be decided never turns a decided failure into
 /// anything else.
 pub fn aggregate(outcomes: &[SupplyChainInvariantOutcome]) -> Verdict {
-    if outcomes.is_empty() {
+    // Invariants with no subject in the evidence are left out. A bundle of
+    // packages that carries no model must not be reported as undecided because
+    // model lineage went unanswered — that question was never raised, and
+    // folding it in would make a clean result unreachable for any system that
+    // does not contain one of everything.
+    let applicable: Vec<&SupplyChainInvariantOutcome> = outcomes
+        .iter()
+        .filter(|outcome| outcome.applicable)
+        .collect();
+
+    if applicable.is_empty() {
+        // Including the empty run. Nothing applied because nothing was seen,
+        // and "nothing to disagree with" is not a clean supply chain.
         return Verdict::Inconclusive;
     }
     for verdict in [Verdict::Fail, Verdict::Error, Verdict::Inconclusive] {
-        if outcomes.iter().any(|outcome| outcome.verdict == verdict) {
+        if applicable.iter().any(|outcome| outcome.verdict == verdict) {
             return verdict;
         }
     }
@@ -837,6 +918,58 @@ mod tests {
                 outcome.reason
             );
         }
+    }
+
+    #[test]
+    fn an_invariant_with_no_subject_is_inapplicable_rather_than_undecided() {
+        // A bundle of packages raises no question about model lineage. Marking
+        // it undecided would make every deployment that runs no model
+        // permanently inconclusive about models, and an operator reading a wall
+        // of INCONCLUSIVE learns nothing from the one that matters.
+        let observations = observe(&compliant());
+        let outcomes = evaluate_all(&observations);
+
+        let inapplicable: BTreeSet<&str> = outcomes
+            .iter()
+            .filter(|outcome| !outcome.applicable)
+            .map(|outcome| outcome.invariant.as_str())
+            .collect();
+        assert!(inapplicable.contains("MODEL_LINEAGE_PRESERVED"));
+        assert!(inapplicable.contains("DATASET_PROVENANCE_PRESERVED"));
+        assert!(inapplicable.contains("EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED"));
+        assert!(inapplicable.contains("DEPENDENCY_EDGE_INTEGRITY_PRESERVED"));
+
+        for outcome in &outcomes {
+            if inapplicable.contains(outcome.invariant.as_str()) {
+                assert!(
+                    outcome.reason.contains("does not arise"),
+                    "{} says nothing about why it was skipped",
+                    outcome.invariant.as_str()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn an_applicable_invariant_with_thin_evidence_stays_undecided() {
+        // The other side of the distinction. A model *is* present and its
+        // lineage was never recorded: the question arose and could not be
+        // answered, which is a gap an operator should close.
+        let mut evidence = compliant();
+        let mut model = component("planner-model", ComponentType::Model);
+        model.digests = BTreeSet::from([artifact_digest("c")]);
+        evidence.components.push(model);
+
+        let outcome = evaluate(
+            SupplyChainInvariant::ModelLineagePreserved,
+            &observe(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Inconclusive);
+        assert!(
+            outcome.applicable,
+            "a model present raised no lineage question"
+        );
+        assert!(!outcome.coverage_satisfied);
     }
 
     #[test]

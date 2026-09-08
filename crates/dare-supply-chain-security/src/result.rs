@@ -72,7 +72,11 @@ pub struct SupplyChainSecurityResult {
 
     pub outcomes: Vec<SupplyChainInvariantOutcome>,
     /// Every concrete violation retained across all twelve invariants.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    ///
+    /// Always serialized, even when empty. An artifact where "no violations"
+    /// is an absent field invites a reader — and a checker — to treat missing
+    /// as unknown, and those are different answers.
+    #[serde(default)]
     pub violations: Vec<SupplyChainViolation>,
 
     pub documents: Vec<DocumentRecord>,

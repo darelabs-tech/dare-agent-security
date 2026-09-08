@@ -523,17 +523,30 @@ mod tests {
     }
 
     #[test]
-    fn a_compliant_run_never_fails_and_a_substituted_one_does() {
-        // The compliant bundle aggregates to INCONCLUSIVE rather than PASS, and
-        // that is correct: it carries no dependency edges, no model and no
-        // dataset, so four invariants have nothing to decide on. Aggregating
-        // those away as PASS would be the engine claiming to have checked
-        // boundaries it never saw evidence for.
+    fn a_compliant_run_passes_on_the_invariants_that_apply_to_it() {
+        // The compliant bundle carries no dependency edges, no model and no
+        // dataset, so four invariants have no subject in it. Those are marked
+        // inapplicable rather than undecided, and the aggregate is PASS.
+        //
+        // Counting them as undecided would make a clean result unreachable for
+        // any system that does not contain one of everything, and an operator
+        // who never sees PASS stops reading the difference between PASS and
+        // INCONCLUSIVE.
         let compliant = evaluate_all(&project(&staged(ReferenceBehavior::Compliant)));
         assert!(compliant
             .iter()
             .all(|outcome| outcome.verdict != Verdict::Fail));
-        assert_eq!(aggregate(&compliant), Verdict::Inconclusive);
+
+        let inapplicable: Vec<&str> = compliant
+            .iter()
+            .filter(|outcome| !outcome.applicable)
+            .map(|outcome| outcome.invariant.as_str())
+            .collect();
+        assert!(
+            inapplicable.contains(&"MODEL_LINEAGE_PRESERVED"),
+            "a bundle with no model was asked about model lineage: {inapplicable:?}"
+        );
+        assert_eq!(aggregate(&compliant), Verdict::Pass);
 
         assert_eq!(
             aggregate(&evaluate_all(&project(&staged(
