@@ -171,10 +171,7 @@ pub fn resolve_identity(component: &Component) -> CanonicalIdentity {
         IdentityStrength::NameOnly
     };
 
-    let mutable_reference = component
-        .version
-        .as_deref()
-        .map(is_mutable_reference);
+    let mutable_reference = component.version.as_deref().map(is_mutable_reference);
 
     // The key: type, name, version and the sorted digest set. Not the evidence
     // source, not the document's own identifiers ordering, not any field a

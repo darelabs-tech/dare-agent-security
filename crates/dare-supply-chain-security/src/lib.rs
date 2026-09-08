@@ -67,14 +67,20 @@
 //! more. Cycle 023 will build attack paths from a dependency graph; this cycle
 //! produces the graph and draws no paths through it.
 
+pub mod attestation;
 pub mod budget;
 pub mod canonical;
 pub mod component;
+pub mod cyclonedx;
 pub mod error;
 pub mod identity;
+pub mod manifest;
+pub mod normalize;
+pub mod provenance;
 pub mod relationship;
 pub mod schema;
 pub mod source;
+pub mod spdx;
 
 pub use error::{Result, SupplyChainError};
 pub use source::{
