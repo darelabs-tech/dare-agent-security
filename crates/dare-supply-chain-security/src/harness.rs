@@ -259,8 +259,8 @@ pub(crate) mod tests {
     #[test]
     fn non_bom_documents_are_charged_to_the_run_wide_input_budget() {
         let dir = TempDir::new().expect("temp dir");
-        let manifest = serde_json::to_vec(&serde_json::json!({ "schema_version": "1" }))
-            .expect("serializes");
+        let manifest =
+            serde_json::to_vec(&serde_json::json!({ "schema_version": "1" })).expect("serializes");
         write(&dir, "manifest.json", &manifest);
         let mut ledger = AdmissionLedger::new();
         StaticAdapter::new(dir.path())
@@ -289,20 +289,25 @@ pub(crate) mod tests {
         let adapter = StaticAdapter::new(dir.path());
         for hostile in ["../secrets.cdx.json", "..\\secrets.cdx.json"] {
             let mut ledger = AdmissionLedger::new();
-            assert!(adapter.collect(&static_scenario(&[hostile]), &mut ledger).is_err());
+            assert!(adapter
+                .collect(&static_scenario(&[hostile]), &mut ledger)
+                .is_err());
         }
     }
 
     #[test]
     fn two_manifests_are_refused_rather_than_merged() {
         let dir = TempDir::new().expect("temp dir");
-        let manifest = serde_json::to_vec(&serde_json::json!({ "schema_version": "1" }))
-            .expect("serializes");
+        let manifest =
+            serde_json::to_vec(&serde_json::json!({ "schema_version": "1" })).expect("serializes");
         write(&dir, "manifest.json", &manifest);
         write(&dir, "second-manifest.json", &manifest);
         let mut ledger = AdmissionLedger::new();
         assert!(StaticAdapter::new(dir.path())
-            .collect(&static_scenario(&["manifest.json", "second-manifest.json"]), &mut ledger)
+            .collect(
+                &static_scenario(&["manifest.json", "second-manifest.json"]),
+                &mut ledger
+            )
             .is_err());
     }
 
@@ -325,12 +330,223 @@ pub(crate) mod tests {
         );
         let mut ledger = AdmissionLedger::new();
         let evidence = StaticAdapter::new(dir.path())
-            .collect(&static_scenario(&["manifest.json", "bom.cdx.json"]), &mut ledger)
+            .collect(
+                &static_scenario(&["manifest.json", "bom.cdx.json"]),
+                &mut ledger,
+            )
             .expect("collects");
         let outcome = crate::invariant::evaluate(
             SupplyChainInvariant::ArtifactDigestBoundToComponent,
             &crate::observation::project(&evidence),
         );
         assert_eq!(outcome.verdict, Verdict::Pass);
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod cycle019_pre_review_tests {
+    use super::*;
+    use crate::model::tests::scenario;
+    use crate::model::SupplyChainInvariant;
+    use dare_security_evidence::Verdict;
+    use std::io::Write;
+    use tempfile::TempDir;
+
+    pub(crate) fn cyclonedx_document() -> Vec<u8> {
+        let sha = "a".repeat(64);
+        serde_json::to_vec(&serde_json::json!({
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.7",
+            "components": [{
+                "type": "library",
+                "name": "react",
+                "version": "1.0.0",
+                "bom-ref": "react",
+                "hashes": [{ "alg": "SHA-256", "content": sha }]
+            }]
+        }))
+        .expect("serializes")
+    }
+
+    fn write(dir: &TempDir, name: &str, bytes: &[u8]) {
+        let mut file = fs::File::create(dir.path().join(name)).expect("creates");
+        file.write_all(bytes).expect("writes");
+    }
+
+    fn static_scenario(files: &[&str]) -> SupplyChainScenario {
+        let mut scenario = scenario(
+            "supply-lab-static",
+            SupplyChainInvariant::ComponentIdentityUnambiguous,
+        );
+        scenario.evidence_files = files.iter().map(|file| (*file).to_owned()).collect();
+        scenario
+    }
+
+    #[test]
+    fn a_local_cyclonedx_document_is_read_and_normalized() {
+        let dir = TempDir::new().expect("temp dir");
+        write(&dir, "bom.cdx.json", &cyclonedx_document());
+
+        let mut ledger = AdmissionLedger::new();
+        let evidence = StaticAdapter::new(dir.path())
+            .collect(&static_scenario(&["bom.cdx.json"]), &mut ledger)
+            .expect("collects");
+
+        assert_eq!(evidence.components.len(), 1);
+        assert_eq!(evidence.documents.len(), 1);
+        assert_eq!(evidence.documents[0].format, BomFormat::CycloneDx);
+    }
+
+    #[test]
+    fn static_evidence_is_not_marked_synthetic_and_every_other_adapter_is() {
+        // A report must never present a constructed bundle as production
+        // evidence, and local documents are the only ones that describe a real
+        // deployment.
+        let adapter = StaticAdapter::new(".");
+        assert_eq!(adapter.mode(), SupplyChainMode::Static);
+        assert!(!adapter.evidence_is_synthetic());
+    }
+
+    #[test]
+    fn an_unclassifiable_file_is_refused_rather_than_sniffed() {
+        // Guessing what a document is from its content gives an attacker a say
+        // in which parser runs, and every parser has a different attack
+        // surface.
+        assert!(LocalDocumentKind::classify("bom.json").is_err());
+        assert!(LocalDocumentKind::classify("evidence.txt").is_err());
+        assert_eq!(
+            LocalDocumentKind::classify("bom.cdx.json").expect("classifies"),
+            LocalDocumentKind::CycloneDx
+        );
+        assert_eq!(
+            LocalDocumentKind::classify("sbom.SPDX.json").expect("classifies"),
+            LocalDocumentKind::Spdx
+        );
+    }
+
+    #[test]
+    fn a_path_shaped_evidence_name_is_refused_before_anything_is_opened() {
+        let dir = TempDir::new().expect("temp dir");
+        let adapter = StaticAdapter::new(dir.path());
+        for hostile in ["../secrets.cdx.json", "..\\secrets.cdx.json"] {
+            let mut ledger = AdmissionLedger::new();
+            assert!(
+                adapter
+                    .collect(&static_scenario(&[hostile]), &mut ledger)
+                    .is_err(),
+                "`{hostile}` was opened"
+            );
+        }
+    }
+
+    #[test]
+    fn a_missing_file_is_refused_without_echoing_the_system_path() {
+        // An error message is a persistence surface. Quoting a resolved path
+        // prints a directory layout the operator did not ask to publish.
+        let dir = TempDir::new().expect("temp dir");
+        let mut ledger = AdmissionLedger::new();
+        let error = StaticAdapter::new(dir.path())
+            .collect(&static_scenario(&["absent.cdx.json"]), &mut ledger)
+            .expect_err("must be refused");
+        let message = error.to_string();
+        assert!(message.contains("absent.cdx.json"));
+        assert!(!message.contains(dir.path().to_string_lossy().as_ref()));
+    }
+
+    #[test]
+    fn two_manifests_are_refused_rather_than_merged() {
+        // A deployment has one approved policy. Merging two would silently
+        // widen it, and nothing decides which one was meant.
+        let dir = TempDir::new().expect("temp dir");
+        let manifest =
+            serde_json::to_vec(&serde_json::json!({ "schema_version": "1" })).expect("serializes");
+        write(&dir, "manifest.json", &manifest);
+        write(&dir, "second-manifest.json", &manifest);
+
+        let mut ledger = AdmissionLedger::new();
+        assert!(StaticAdapter::new(dir.path())
+            .collect(
+                &static_scenario(&["manifest.json", "second-manifest.json"]),
+                &mut ledger
+            )
+            .is_err());
+    }
+
+    #[test]
+    fn the_manifest_is_applied_after_every_document_whatever_order_it_was_listed_in() {
+        // It is the only input that can raise trust. Applying it first would
+        // leave components imported afterwards unapproved for no reason an
+        // operator could see.
+        let dir = TempDir::new().expect("temp dir");
+        let sha = "a".repeat(64);
+        write(&dir, "bom.cdx.json", &cyclonedx_document());
+        write(
+            &dir,
+            "manifest.json",
+            &serde_json::to_vec(&serde_json::json!({
+                "schema_version": "1",
+                "approved_components": [{
+                    "component_id": "react",
+                    "digests": [{ "algorithm": "sha256", "value": sha }]
+                }]
+            }))
+            .expect("serializes"),
+        );
+
+        for order in [
+            vec!["manifest.json", "bom.cdx.json"],
+            vec!["bom.cdx.json", "manifest.json"],
+        ] {
+            let mut ledger = AdmissionLedger::new();
+            let evidence = StaticAdapter::new(dir.path())
+                .collect(&static_scenario(&order), &mut ledger)
+                .expect("collects");
+            let outcome = crate::invariant::evaluate(
+                SupplyChainInvariant::ArtifactDigestBoundToComponent,
+                &crate::observation::project(&evidence),
+            );
+            assert_eq!(
+                outcome.verdict,
+                Verdict::Pass,
+                "{order:?}: {}",
+                outcome.reason
+            );
+        }
+    }
+
+    #[test]
+    fn a_hostile_field_is_refused_before_the_document_reaches_a_model() {
+        let dir = TempDir::new().expect("temp dir");
+        write(
+            &dir,
+            "manifest.json",
+            &serde_json::to_vec(&serde_json::json!({
+                "schema_version": "1",
+                "api_token": "aws-secret"
+            }))
+            .expect("serializes"),
+        );
+        let mut ledger = AdmissionLedger::new();
+        assert!(StaticAdapter::new(dir.path())
+            .collect(&static_scenario(&["manifest.json"]), &mut ledger)
+            .is_err());
+    }
+
+    #[test]
+    fn the_adapter_contract_has_no_way_to_report_a_verdict() {
+        // Structural: the trait's only output is an evidence bundle, and
+        // `SupplyChainEvidence` has no verdict, violation or finding field.
+        let dir = TempDir::new().expect("temp dir");
+        write(&dir, "bom.cdx.json", &cyclonedx_document());
+        let mut ledger = AdmissionLedger::new();
+        let evidence = StaticAdapter::new(dir.path())
+            .collect(&static_scenario(&["bom.cdx.json"]), &mut ledger)
+            .expect("collects");
+        let rendered = serde_json::to_string(&evidence)
+            .expect("serializes")
+            .to_lowercase();
+        for absent in ["verdict", "violation", "expected_finding", "is_secure"] {
+            assert!(!rendered.contains(absent), "the bundle carries `{absent}`");
+        }
     }
 }

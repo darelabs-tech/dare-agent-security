@@ -55,7 +55,10 @@ pub struct ReplayAdapter {
 
 impl ReplayAdapter {
     pub fn new(capture: SupplyChainCapture, local_manifest: DareManifest) -> Self {
-        Self { capture, local_manifest }
+        Self {
+            capture,
+            local_manifest,
+        }
     }
 }
 
@@ -110,7 +113,9 @@ impl SupplyChainAdapter for ReplayAdapter {
         for document in &evidence.documents {
             builder = builder.with_recorded_document(document.clone());
         }
-        builder.with_manifest(self.local_manifest.clone()).build(ledger)
+        builder
+            .with_manifest(self.local_manifest.clone())
+            .build(ledger)
     }
 }
 
@@ -132,7 +137,10 @@ mod tests {
         let mut ledger = AdmissionLedger::new();
         let evidence = EvidenceBuilder::new()
             .with_document("bom-1", BomFormat::CycloneDx, b"{}")
-            .with_import(vec![component("react", ComponentType::Package)], RelationshipGraph::new())
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
             .with_manifest(manifest)
             .build(&mut ledger)
             .expect("builds");
@@ -205,7 +213,9 @@ mod tests {
     #[test]
     fn partial_component_overlap_is_refused() {
         let mut policy = approving("a");
-        policy.declared_component_ids.insert("required-service".to_owned());
+        policy
+            .declared_component_ids
+            .insert("required-service".to_owned());
         let mut ledger = AdmissionLedger::new();
         let error = ReplayAdapter::new(captured(DareManifest::default()), policy)
             .collect(&replay_scenario(), &mut ledger)
@@ -216,7 +226,10 @@ mod tests {
     #[test]
     fn extra_recorded_components_are_refused_without_an_explicit_subset_policy() {
         let mut capture = captured(DareManifest::default());
-        capture.evidence.components.push(component("extra", ComponentType::Package));
+        capture
+            .evidence
+            .components
+            .push(component("extra", ComponentType::Package));
         let mut ledger = AdmissionLedger::new();
         assert!(ReplayAdapter::new(capture, approving("a"))
             .collect(&replay_scenario(), &mut ledger)
@@ -231,5 +244,175 @@ mod tests {
         assert!(ReplayAdapter::new(capture, approving("a"))
             .collect(&replay_scenario(), &mut ledger)
             .is_err());
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
+    use super::*;
+    use crate::component::tests::{component, digest};
+    use crate::manifest::ApprovedComponent;
+    use crate::model::tests::scenario;
+    use crate::model::SupplyChainInvariant;
+    use crate::normalize::{BomFormat, EvidenceBuilder};
+    use crate::observation::project;
+    use crate::relationship::RelationshipGraph;
+    use crate::source::ComponentType;
+    use dare_security_evidence::Verdict;
+    use std::collections::BTreeSet;
+
+    fn captured(manifest: DareManifest) -> SupplyChainCapture {
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_document("bom-1", BomFormat::CycloneDx, b"{}")
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
+            .with_manifest(manifest)
+            .build(&mut ledger)
+            .expect("builds");
+
+        SupplyChainCapture {
+            schema_version: "1".to_owned(),
+            capture_id: "capture-1".to_owned(),
+            scenario_id: "supply-lab-replay".to_owned(),
+            mode: SupplyChainMode::Replay,
+            synthetic: true,
+            evidence,
+        }
+    }
+
+    fn replay_scenario() -> SupplyChainScenario {
+        let mut scenario = scenario(
+            "supply-lab-replay",
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+        );
+        scenario.mode = SupplyChainMode::Replay;
+        scenario.evidence_files = Vec::new();
+        scenario
+    }
+
+    fn approving(seed: &str) -> DareManifest {
+        DareManifest {
+            schema_version: "1".to_owned(),
+            approved_components: BTreeSet::from([ApprovedComponent {
+                component_id: "react".to_owned(),
+                name: None,
+                version: None,
+                digests: BTreeSet::from([digest(seed)]),
+            }]),
+            declared_component_ids: BTreeSet::from(["react".to_owned()]),
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn a_capture_replays_under_the_local_policy() {
+        let mut ledger = AdmissionLedger::new();
+        let evidence = ReplayAdapter::new(captured(DareManifest::default()), approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .expect("replays");
+
+        let outcome = crate::invariant::evaluate(
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+            &project(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Pass, "{}", outcome.reason);
+    }
+
+    #[test]
+    fn a_recorded_manifest_cannot_approve_its_own_components() {
+        // The capture approves the artifact it recorded; the local policy
+        // approves a different one. If the recorded manifest survived, the
+        // substitution would pass.
+        let capture = captured(approving("a"));
+        let mut ledger = AdmissionLedger::new();
+        let evidence = ReplayAdapter::new(capture, approving("b"))
+            .collect(&replay_scenario(), &mut ledger)
+            .expect("replays");
+
+        assert_eq!(
+            evidence.manifest,
+            approving("b"),
+            "the recorded manifest survived replay"
+        );
+        let outcome = crate::invariant::evaluate(
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+            &project(&evidence),
+        );
+        assert_eq!(
+            outcome.verdict,
+            Verdict::Fail,
+            "a capture approved its own components"
+        );
+    }
+
+    #[test]
+    fn a_capture_of_another_scenario_is_refused() {
+        // Identity, checked because replaying a capture under someone else's
+        // approvals reports on a system nobody ran.
+        let mut capture = captured(DareManifest::default());
+        capture.scenario_id = "supply-lab-elsewhere".to_owned();
+        let mut ledger = AdmissionLedger::new();
+        assert!(ReplayAdapter::new(capture, approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .is_err());
+    }
+
+    #[test]
+    #[ignore = "superseded by stricter Cycle 019 post-merge semantics"]
+    fn a_capture_describing_a_different_system_is_refused() {
+        // Semantic binding. The scenario id can match while the recording is of
+        // something else entirely.
+        let mut policy = approving("a");
+        policy.declared_component_ids = BTreeSet::from(["some-other-service".to_owned()]);
+
+        let mut ledger = AdmissionLedger::new();
+        let error = ReplayAdapter::new(captured(DareManifest::default()), policy)
+            .collect(&replay_scenario(), &mut ledger)
+            .expect_err("must be refused");
+        assert!(error.to_string().contains("different system"));
+    }
+
+    #[test]
+    fn a_capture_cannot_declare_itself_production_evidence() {
+        let mut capture = captured(DareManifest::default());
+        capture.synthetic = false;
+        let mut ledger = AdmissionLedger::new();
+        assert!(ReplayAdapter::new(capture, approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .is_err());
+    }
+
+    #[test]
+    fn a_capture_cannot_ask_to_be_run_in_another_mode() {
+        let mut capture = captured(DareManifest::default());
+        capture.mode = SupplyChainMode::Static;
+        let mut ledger = AdmissionLedger::new();
+        assert!(ReplayAdapter::new(capture, approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .is_err());
+    }
+
+    #[test]
+    fn a_capture_cannot_carry_a_verdict() {
+        let mut value =
+            serde_json::to_value(captured(DareManifest::default())).expect("serializes");
+        value
+            .as_object_mut()
+            .expect("an object")
+            .insert("expected_verdict".to_owned(), serde_json::json!("PASS"));
+        assert!(serde_json::from_value::<SupplyChainCapture>(value).is_err());
+    }
+
+    #[test]
+    fn replayed_evidence_is_still_synthetic() {
+        // A replayed observation is a recording, and a report must not present
+        // it as something observed in production now.
+        assert!(
+            ReplayAdapter::new(captured(DareManifest::default()), approving("a"))
+                .evidence_is_synthetic()
+        );
     }
 }

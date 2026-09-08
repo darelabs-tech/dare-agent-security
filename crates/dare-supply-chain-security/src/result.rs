@@ -8,7 +8,9 @@ use crate::budget::{AdmissionLedger, BudgetSnapshot};
 use crate::canonical::digest;
 use crate::error::Result;
 use crate::harness::SupplyChainAdapter;
-use crate::invariant::{aggregate, evaluate_all, SupplyChainInvariantOutcome, SupplyChainViolation};
+use crate::invariant::{
+    aggregate, evaluate_all, SupplyChainInvariantOutcome, SupplyChainViolation,
+};
 use crate::model::{SupplyChainInvariant, SupplyChainScenario};
 use crate::observation::{project, HarnessErrorContext, ObservationSet, SupplyChainObservation};
 use crate::source::{HarnessErrorKind, ScenarioClass, SupplyChainMode};
@@ -137,8 +139,14 @@ pub fn run_scenario(
         reason: reason_for(verdict, &outcomes, &violations),
         outcomes,
         violations,
-        components_evaluated: evidence.as_ref().map(|e| e.components.len()).unwrap_or_default(),
-        relationships_evaluated: evidence.as_ref().map(|e| e.graph.edges.len()).unwrap_or_default(),
+        components_evaluated: evidence
+            .as_ref()
+            .map(|e| e.components.len())
+            .unwrap_or_default(),
+        relationships_evaluated: evidence
+            .as_ref()
+            .map(|e| e.graph.edges.len())
+            .unwrap_or_default(),
         documents,
         observation_digests,
         redaction_state: "REDACTED".to_owned(),
@@ -234,5 +242,164 @@ mod tests {
         let result = simulated(ReferenceBehavior::Compliant);
         assert!(result.reason.contains("evidence"));
         assert!(!result.reason.eq_ignore_ascii_case("supply chain is secure"));
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
+    use super::*;
+    use crate::corpus::corpus;
+    use crate::harness::StaticAdapter;
+    use crate::model::tests::scenario;
+    use crate::simulated::SimulatedAdapter;
+    use crate::source::ReferenceBehavior;
+
+    fn simulated(behavior: ReferenceBehavior) -> SupplyChainSecurityResult {
+        let mut scenario = scenario(
+            "supply-lab-result",
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+        );
+        scenario.mode = SupplyChainMode::Simulated;
+        scenario.evidence_files = Vec::new();
+        scenario.reference_behavior = Some(behavior);
+
+        let mut ledger = AdmissionLedger::new();
+        run_scenario(&scenario, &SimulatedAdapter::new(), &mut ledger).expect("runs")
+    }
+
+    #[test]
+    fn a_substituted_artifact_produces_a_failing_artifact_with_its_evidence() {
+        let result = simulated(ReferenceBehavior::DigestSubstituted);
+        assert!(result.is_violation());
+        assert!(!result.violations.is_empty());
+        assert!(!result.observation_digests.is_empty());
+        assert!(!result.documents.is_empty());
+        assert!(result.documents[0].content_digest.starts_with("sha256:"));
+        assert_eq!(result.outcomes.len(), 12);
+    }
+
+    #[test]
+    fn a_clean_run_never_claims_the_supply_chain_is_secure() {
+        // `complete AI-BOM != secure supply chain`, enforced where it is
+        // easiest to break: the sentence an operator actually reads.
+        let result = simulated(ReferenceBehavior::Compliant);
+        let reason = result.reason.to_lowercase();
+        assert!(
+            !reason.contains("is secure") || reason.contains("not that the supply chain is secure"),
+            "the artifact claimed a secure supply chain: {}",
+            result.reason
+        );
+        assert!(reason.contains("evidence"));
+    }
+
+    #[test]
+    fn an_inconclusive_run_says_it_established_nothing() {
+        let result = simulated(ReferenceBehavior::NoRelevantObservation);
+        assert_eq!(result.verdict, Verdict::Inconclusive);
+        assert!(result
+            .reason
+            .contains("does not establish that the supply chain is intact"));
+    }
+
+    #[test]
+    fn a_harness_failure_becomes_an_error_result_rather_than_a_lost_run() {
+        // A run that could not collect evidence is a result an operator needs
+        // to see. Returning `Err` would leave the scenario looking like it had
+        // never been attempted.
+        let mut scenario = scenario(
+            "supply-lab-broken",
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+        );
+        scenario.mode = SupplyChainMode::Static;
+        scenario.evidence_files = vec!["absent.cdx.json".to_owned()];
+
+        let mut ledger = AdmissionLedger::new();
+        let result = run_scenario(&scenario, &StaticAdapter::new("."), &mut ledger)
+            .expect("a harness failure is still a result");
+        assert_eq!(result.verdict, Verdict::Error);
+        assert!(result.violations.is_empty());
+        assert_eq!(result.components_evaluated, 0);
+    }
+
+    #[test]
+    fn the_artifact_records_the_budget_it_ran_under() {
+        let result = simulated(ReferenceBehavior::Compliant);
+        assert_eq!(result.budget.state_changes, 0);
+        assert_eq!(result.budget.external_egress_bytes, 0);
+        assert_eq!(result.redaction_state, "REDACTED");
+    }
+
+    #[test]
+    fn the_primary_invariant_does_not_filter_what_is_reported() {
+        // The scenario selects integrity, and the bundle also drifts a
+        // capability and comes from an unapproved vendor.
+        let result = simulated(ReferenceBehavior::MultipleIndependentViolations);
+        let invariants: std::collections::BTreeSet<&str> = result
+            .violations
+            .iter()
+            .map(|violation| violation.invariant.as_str())
+            .collect();
+        assert!(invariants.len() >= 3, "{invariants:?}");
+        assert_eq!(
+            result.primary_invariant,
+            SupplyChainInvariant::ArtifactDigestBoundToComponent
+        );
+    }
+
+    #[test]
+    fn the_artifact_carries_no_credential_shaped_content() {
+        // The input gate does not apply here: an artifact carries a `verdict`
+        // because it *is* the evaluator's output, and running the document
+        // sweep over it would refuse the field the artifact exists to publish.
+        // What must still hold is that nothing credential-shaped or
+        // executable-shaped reached the artifact from the evidence.
+        let result = simulated(ReferenceBehavior::DigestSubstituted);
+        let rendered = serde_json::to_string(&result)
+            .expect("serializes")
+            .to_lowercase();
+        for forbidden in [
+            "api_key",
+            "access_token",
+            "client_secret",
+            "private_key",
+            "bearer ",
+            "command",
+            "entrypoint",
+            "download_url",
+        ] {
+            assert!(
+                !rendered.contains(forbidden),
+                "the artifact carries `{forbidden}`"
+            );
+        }
+        assert!(!crate::schema::contains_bearer_credential(&rendered));
+    }
+
+    #[test]
+    fn results_are_deterministic() {
+        assert_eq!(
+            digest(&simulated(ReferenceBehavior::DigestSubstituted)).unwrap(),
+            digest(&simulated(ReferenceBehavior::DigestSubstituted)).unwrap()
+        );
+    }
+
+    #[test]
+    fn every_corpus_entry_produces_an_artifact_or_an_error_result() {
+        // Nothing in the corpus can leave a run without a record.
+        for entry in corpus() {
+            let mut ledger = AdmissionLedger::new();
+            let evidence = (entry.build)(&mut ledger);
+            let observations = match &evidence {
+                Ok(evidence) => project(evidence),
+                Err(_) => continue,
+            };
+            let outcomes = evaluate_all(&observations);
+            assert_eq!(
+                outcomes.len(),
+                12,
+                "{} evaluated fewer than twelve",
+                entry.id
+            );
+        }
     }
 }

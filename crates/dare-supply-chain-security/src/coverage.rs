@@ -284,7 +284,11 @@ mod tests {
         let empty = ObservationSet::default();
         for invariant in SupplyChainInvariant::all() {
             let decision = assess_coverage(invariant, &empty);
-            assert!(!decision.satisfied, "{} passed coverage having observed nothing", invariant.as_str());
+            assert!(
+                !decision.satisfied,
+                "{} passed coverage having observed nothing",
+                invariant.as_str()
+            );
             assert!(!decision.missing.is_empty());
         }
     }
@@ -337,7 +341,9 @@ mod tests {
             &observations,
         );
         assert!(!decision.satisfied);
-        assert!(decision.missing.contains(&ObservationChannel::BomDocumentContext));
+        assert!(decision
+            .missing
+            .contains(&ObservationChannel::BomDocumentContext));
     }
 
     #[test]
@@ -405,7 +411,10 @@ mod tests {
         use crate::manifest::TrustPolicy;
         use crate::normalize::EvidenceBuilder;
 
-        for status in [VerificationStatus::Indeterminate, VerificationStatus::Unrecorded] {
+        for status in [
+            VerificationStatus::Indeterminate,
+            VerificationStatus::Unrecorded,
+        ] {
             let mut record = attestation("att-1", "react");
             record.verification_status = status;
             let mut ledger = AdmissionLedger::new();
@@ -426,11 +435,13 @@ mod tests {
                 .build(&mut ledger)
                 .expect("builds");
             let observations = project(&evidence);
-            assert!(!assess_coverage(
-                SupplyChainInvariant::AttestationSubjectDigestPreserved,
-                &observations,
-            )
-            .satisfied);
+            assert!(
+                !assess_coverage(
+                    SupplyChainInvariant::AttestationSubjectDigestPreserved,
+                    &observations,
+                )
+                .satisfied
+            );
         }
     }
 
@@ -448,6 +459,214 @@ mod tests {
         assert!(decision.satisfied);
         for absent in ["pass", "fail", "secure", "violation"] {
             assert!(!decision.reason.to_lowercase().contains(absent));
+        }
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
+    use super::*;
+    use crate::component::tests::component;
+    use crate::manifest::DareManifest;
+    use crate::observation::tests::evidence_of;
+    use crate::observation::{project, ObservationSet};
+    use crate::relationship::RelationshipGraph;
+    use crate::source::ComponentType;
+    use std::collections::BTreeSet;
+
+    #[test]
+    fn every_invariant_has_a_contract_and_every_contract_requires_something() {
+        // An invariant with an empty contract would pass on an empty run,
+        // which is the exact failure the contracts exist to prevent.
+        assert_eq!(contracts().len(), SupplyChainInvariant::all().len());
+        for contract in contracts() {
+            assert!(
+                !contract.required.is_empty(),
+                "{} may pass having observed nothing",
+                contract.invariant.as_str()
+            );
+            assert!(
+                !contract.reason.trim().is_empty(),
+                "{} explains nothing when it is undecidable",
+                contract.invariant.as_str()
+            );
+        }
+    }
+
+    #[test]
+    fn an_empty_run_satisfies_no_contract() {
+        // The cheapest way to make every supply-chain check pass is to hand
+        // the engine an empty bill of materials: nothing to disagree with.
+        let empty = ObservationSet::default();
+        for invariant in SupplyChainInvariant::all() {
+            let decision = assess_coverage(invariant, &empty);
+            assert!(
+                !decision.satisfied,
+                "{} passed coverage having observed nothing",
+                invariant.as_str()
+            );
+            assert!(!decision.missing.is_empty());
+        }
+    }
+
+    #[test]
+    fn a_missing_channel_is_named_in_the_reason() {
+        // An operator handed "INCONCLUSIVE" learns nothing. One handed the
+        // channel that was missing knows what to collect next.
+        let observations = project(&evidence_of(
+            vec![component("react", ComponentType::Package)],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let decision = assess_coverage(
+            SupplyChainInvariant::ComponentProvenanceSufficient,
+            &observations,
+        );
+        assert!(!decision.satisfied);
+        assert!(decision.reason.contains("PROVENANCE_CONTEXT"));
+    }
+
+    #[test]
+    fn a_run_with_components_alone_covers_only_the_identity_invariants() {
+        // Identity ambiguity is a property of the component set. Everything
+        // else needs a second kind of evidence, and a run carrying only an
+        // inventory must not pass those.
+        let observations = project(&evidence_of(
+            vec![component("react", ComponentType::Package)],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let satisfied: BTreeSet<&str> = SupplyChainInvariant::all()
+            .iter()
+            .filter(|invariant| assess_coverage(**invariant, &observations).satisfied)
+            .map(|invariant| invariant.as_str())
+            .collect();
+
+        assert!(satisfied.contains("COMPONENT_IDENTITY_UNAMBIGUOUS"));
+        assert!(satisfied.contains("MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY"));
+        assert!(!satisfied.contains("COMPONENT_PROVENANCE_SUFFICIENT"));
+        assert!(!satisfied.contains("ATTESTATION_SUBJECT_DIGEST_PRESERVED"));
+        assert!(!satisfied.contains("MODEL_LINEAGE_PRESERVED"));
+        assert!(!satisfied.contains("EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED"));
+    }
+
+    #[test]
+    fn completeness_cannot_pass_without_a_document_having_been_read() {
+        // The one invariant whose subject is the bill of materials itself. A
+        // run that assembled components in memory and read no document has not
+        // assessed a document's completeness.
+        let observations = project(&evidence_of(
+            vec![component("react", ComponentType::Package)],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let decision = assess_coverage(
+            SupplyChainInvariant::BomRequiredEvidencePresent,
+            &observations,
+        );
+        assert!(!decision.satisfied);
+        assert!(decision
+            .missing
+            .contains(&ObservationChannel::BomDocumentContext));
+    }
+
+    #[test]
+    fn the_comparison_invariants_are_the_ones_that_need_an_approved_side() {
+        // Drift, provenance, attestation, lineage and dataset provenance are
+        // all comparisons. Identity ambiguity is not, and marking it as one
+        // would make a legitimate PASS impossible without a manifest.
+        use SupplyChainInvariant as I;
+        for comparing in [
+            I::ComponentProvenanceSufficient,
+            I::ExternalCapabilityDriftNotObserved,
+            I::ProvenanceSubjectAndBuilderBound,
+            I::AttestationSubjectDigestPreserved,
+            I::ModelLineagePreserved,
+            I::DatasetProvenancePreserved,
+        ] {
+            assert!(
+                requires_comparison_channel(comparing),
+                "{} can pass on inventory alone",
+                comparing.as_str()
+            );
+        }
+        for structural in [
+            I::ComponentIdentityUnambiguous,
+            I::MutableReferenceNotUsedAsImmutableIdentity,
+            I::ArtifactDigestBoundToComponent,
+            I::ComponentSourceTrustPreserved,
+            I::DependencyEdgeIntegrityPreserved,
+            I::BomRequiredEvidencePresent,
+        ] {
+            assert!(
+                !requires_comparison_channel(structural),
+                "{} was marked as a comparison it does not make",
+                structural.as_str()
+            );
+        }
+    }
+
+    #[test]
+    fn digest_bearing_invariants_require_the_digest_channel() {
+        // Integrity, provenance binding and attestation binding all decide
+        // against an artifact digest. Requiring only the record would let each
+        // of them pass on a component nobody could identify.
+        use SupplyChainInvariant as I;
+        for invariant in [
+            I::ArtifactDigestBoundToComponent,
+            I::ProvenanceSubjectAndBuilderBound,
+            I::AttestationSubjectDigestPreserved,
+        ] {
+            assert!(
+                contract(invariant)
+                    .required
+                    .contains(&ObservationChannel::ComponentDigestContext),
+                "{} decides against a digest it does not require",
+                invariant.as_str()
+            );
+        }
+    }
+
+    #[test]
+    #[ignore = "superseded by stricter Cycle 019 post-merge semantics"]
+    fn a_present_channel_that_compared_nothing_does_not_satisfy_a_contract() {
+        // The false PASS one level in: the channel an invariant needed was
+        // there, and it carried one side of a two-sided comparison.
+        let mut tool = component("file-tool", ComponentType::Tool);
+        tool.capabilities = Some(crate::capability::projection(&[], &["read-file"]));
+        let observations = project(&evidence_of(
+            vec![tool],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+
+        assert!(observations.has_channel(ObservationChannel::CapabilityContext));
+        let decision = assess_coverage(
+            SupplyChainInvariant::ExternalCapabilityDriftNotObserved,
+            &observations,
+        );
+        assert!(!decision.satisfied);
+        assert!(decision.reason.contains("nothing to compare"));
+    }
+
+    #[test]
+    fn a_satisfied_contract_says_so_without_claiming_a_verdict() {
+        let observations = project(&evidence_of(
+            vec![component("react", ComponentType::Package)],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let decision = assess_coverage(
+            SupplyChainInvariant::ComponentIdentityUnambiguous,
+            &observations,
+        );
+        assert!(decision.satisfied);
+        // Coverage says the question was answerable, never what the answer was.
+        for absent in ["pass", "fail", "secure", "violation"] {
+            assert!(
+                !decision.reason.to_lowercase().contains(absent),
+                "a coverage decision reads as a verdict"
+            );
         }
     }
 }

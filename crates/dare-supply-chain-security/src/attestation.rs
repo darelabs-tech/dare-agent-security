@@ -407,3 +407,185 @@ pub(crate) mod tests {
         }
     }
 }
+
+#[cfg(test)]
+pub(crate) mod cycle019_pre_review_tests {
+    use super::*;
+    use crate::component::tests::{component, digest};
+    use crate::source::ComponentType;
+
+    pub(crate) fn attestation(id: &str, subject: &str) -> AttestationRecord {
+        AttestationRecord {
+            attestation_id: id.to_owned(),
+            subject_component_id: subject.to_owned(),
+            subject_digests: BTreeSet::from([digest("a")]),
+            predicate_type: Some("slsa-provenance".to_owned()),
+            signer_id: Some("signer-release".to_owned()),
+            verification_status: VerificationStatus::Valid,
+            evidence_source: EvidenceSource::LocalAttestation,
+        }
+    }
+
+    #[test]
+    fn the_fixture_attestation_validates() {
+        attestation("att-1", "react").validate().expect("valid");
+    }
+
+    #[test]
+    fn an_attestation_for_another_artifact_does_not_satisfy_this_one() {
+        // The central binding. However valid it is, a statement about artifact
+        // B says nothing about artifact A.
+        let component = component("react", ComponentType::Package);
+        let mut wrong = attestation("att-1", "react");
+        wrong.subject_digests = BTreeSet::from([digest("b")]);
+
+        assert_eq!(wrong.binds_subject_digest(&component), Some(false));
+
+        let assessment = assess(&component, &[wrong]);
+        assert!(!assessment.has_attestation());
+        assert_eq!(assessment.misbound_attestation_ids, vec!["att-1"]);
+    }
+
+    #[test]
+    fn a_misbound_attestation_is_recorded_separately_from_having_none() {
+        // Worse than none, because it looks like coverage. A reader scanning
+        // for "is this attested?" would see a statement and stop.
+        let component = component("react", ComponentType::Package);
+        let mut wrong = attestation("att-1", "react");
+        wrong.subject_digests = BTreeSet::from([digest("b")]);
+
+        let with_wrong = assess(&component, &[wrong]);
+        let with_none = assess(&component, &[]);
+
+        assert!(!with_wrong.has_attestation());
+        assert!(!with_none.has_attestation());
+        assert!(!with_wrong.misbound_attestation_ids.is_empty());
+        assert!(with_none.misbound_attestation_ids.is_empty());
+    }
+
+    #[test]
+    fn a_correctly_bound_attestation_is_recorded_with_its_signer() {
+        let component = component("react", ComponentType::Package);
+        let assessment = assess(&component, &[attestation("att-1", "react")]);
+        assert!(assessment.has_attestation());
+        assert_eq!(assessment.digest_bound, Some(true));
+        assert!(assessment.signer_ids.contains("signer-release"));
+        assert_eq!(
+            assessment.verification_status,
+            Some(VerificationStatus::Valid)
+        );
+    }
+
+    #[test]
+    fn a_valid_status_says_nothing_about_whether_the_signer_was_allowed() {
+        // The distinction the module exists for, stated as a test. The
+        // assessment records both facts and combines neither: a signer set and
+        // a verification status, with no method that turns one into authority.
+        let component = component("react", ComponentType::Package);
+        let mut unapproved = attestation("att-1", "react");
+        unapproved.signer_id = Some("signer-nobody-approved".to_owned());
+        unapproved.verification_status = VerificationStatus::Valid;
+
+        let assessment = assess(&component, &[unapproved]);
+        assert_eq!(
+            assessment.verification_status,
+            Some(VerificationStatus::Valid)
+        );
+        assert!(assessment.signer_ids.contains("signer-nobody-approved"));
+        // Nothing here can answer "was that signer approved?" — that is the
+        // trust policy's question, deliberately in another module.
+        assert!(assessment.has_recorded_verification());
+    }
+
+    #[test]
+    fn a_recorded_verification_is_not_the_same_as_a_favourable_one() {
+        // Cycle 018's false PASS, prevented here by construction.
+        let component = component("react", ComponentType::Package);
+        for status in [
+            VerificationStatus::Invalid,
+            VerificationStatus::Indeterminate,
+        ] {
+            let mut record = attestation("att-1", "react");
+            record.verification_status = status;
+            let assessment = assess(&component, &[record]);
+            assert!(
+                assessment.has_recorded_verification(),
+                "{status:?} is a recorded verification"
+            );
+            assert!(
+                !assessment
+                    .verification_status
+                    .expect("present")
+                    .may_be_relied_on(),
+                "{status:?} was treated as favourable"
+            );
+        }
+    }
+
+    #[test]
+    fn an_unrecorded_verification_is_not_evidence_in_either_direction() {
+        let component = component("react", ComponentType::Package);
+        let mut record = attestation("att-1", "react");
+        record.verification_status = VerificationStatus::Unrecorded;
+        let assessment = assess(&component, &[record]);
+        assert!(!assessment.has_recorded_verification());
+    }
+
+    #[test]
+    fn an_attestation_with_no_subject_digest_is_about_a_name() {
+        // Which is exactly what the binding exists to reject as sufficient.
+        let component = component("react", ComponentType::Package);
+        let mut nameless = attestation("att-1", "react");
+        nameless.subject_digests.clear();
+        assert_eq!(nameless.binds_subject_digest(&component), None);
+        assert_eq!(assess(&component, &[nameless]).digest_bound, None);
+    }
+
+    #[test]
+    fn several_attestations_take_the_most_favourable_status() {
+        // Several statements for one artifact is normal. One of them verifying
+        // is a verification, and requiring all of them would report a finding
+        // whenever a second, weaker statement existed.
+        let component = component("react", ComponentType::Package);
+        let mut weak = attestation("att-weak", "react");
+        weak.verification_status = VerificationStatus::Indeterminate;
+        let strong = attestation("att-strong", "react");
+
+        let assessment = assess(&component, &[weak, strong]);
+        assert_eq!(
+            assessment.verification_status,
+            Some(VerificationStatus::Valid)
+        );
+        assert_eq!(assessment.matching_attestation_ids.len(), 2);
+    }
+
+    #[test]
+    fn a_statement_about_another_component_is_neither_evidence_nor_a_finding() {
+        let component = component("react", ComponentType::Package);
+        let elsewhere = attestation("att-1", "vue");
+        let assessment = assess(&component, &[elsewhere]);
+        assert!(!assessment.has_attestation());
+        assert!(assessment.misbound_attestation_ids.is_empty());
+    }
+
+    #[test]
+    fn the_model_has_nowhere_to_put_a_key_or_a_signature() {
+        // Structural. There is no field for key material, and none for a
+        // signature blob — because verifying one would need a key this cycle is
+        // not allowed to obtain.
+        for hostile in [
+            serde_json::json!({
+                "attestation_id": "att-1", "subject_component_id": "react",
+                "verification_status": "VALID", "evidence_source": "LOCAL_ATTESTATION",
+                "public_key": "..."
+            }),
+            serde_json::json!({
+                "attestation_id": "att-1", "subject_component_id": "react",
+                "verification_status": "VALID", "evidence_source": "LOCAL_ATTESTATION",
+                "signature": "..."
+            }),
+        ] {
+            assert!(serde_json::from_value::<AttestationRecord>(hostile).is_err());
+        }
+    }
+}

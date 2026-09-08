@@ -200,7 +200,11 @@ fn render_summary(result: &SupplyChainSecurityResult) -> String {
             "| {} | {} | {} |\n",
             outcome.invariant.as_str(),
             outcome.verdict.as_str(),
-            if outcome.coverage_satisfied { "decided" } else { "no deciding evidence" }
+            if outcome.coverage_satisfied {
+                "decided"
+            } else {
+                "no deciding evidence"
+            }
         ));
     }
 
@@ -266,7 +270,9 @@ fn run_inner(args: SupplyChainArgs) -> Result<i32, SupplyChainError> {
     // ledger. The result artifact is written last so its budget snapshot can
     // include every retained artifact, including itself.
     write_json_admitted(
-        &args.output_dir.join("supply-chain-security-invariants.json"),
+        &args
+            .output_dir
+            .join("supply-chain-security-invariants.json"),
         &result.outcomes,
         &mut ledger,
     )?;
@@ -414,8 +420,13 @@ mod tests {
     fn output_bytes_are_admitted_before_write_and_recorded() {
         let dir = tempfile::TempDir::new().expect("temp");
         let mut ledger = AdmissionLedger::new();
-        write_bytes_admitted(&dir.path().join("x.json"), b"12345", &mut ledger, "artifact")
-            .expect("writes");
+        write_bytes_admitted(
+            &dir.path().join("x.json"),
+            b"12345",
+            &mut ledger,
+            "artifact",
+        )
+        .expect("writes");
         assert_eq!(ledger.snapshot().output_bytes_used, 5);
     }
 
@@ -424,7 +435,8 @@ mod tests {
         let scenario = load_scenario("SUPPLY-LAB-001").expect("scenario");
         let mut ledger = AdmissionLedger::new();
         let mut result = run_scenario(&scenario, &CorpusAdapter, &mut ledger).expect("runs");
-        let bytes = serialize_result_with_final_budget(&mut result, &mut ledger).expect("serializes");
+        let bytes =
+            serialize_result_with_final_budget(&mut result, &mut ledger).expect("serializes");
         assert!(result.budget.output_bytes_used >= bytes.len());
         assert!(result.budget.output_bytes_used > 0);
     }
