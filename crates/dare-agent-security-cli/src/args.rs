@@ -81,6 +81,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local MCP 2026 authentication and authorization validation (Cycle 018).
     #[command(name = "mcp-auth-security")]
     McpAuthSecurity(crate::mcp_auth_security::McpAuthSecurityArgs),
+    /// Run bounded local agentic supply-chain and AI-BOM validation (Cycle 019).
+    #[command(name = "supply-chain")]
+    SupplyChain(crate::supply_chain_security::SupplyChainArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

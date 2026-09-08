@@ -439,6 +439,7 @@ dependencies = [
  "dare-prompt-injection",
  "dare-rag-security",
  "dare-security-evidence",
+ "dare-supply-chain-security",
  "dare-tool-security",
  "jsonschema",
  "serde",

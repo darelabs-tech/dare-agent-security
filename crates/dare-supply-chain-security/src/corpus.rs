@@ -968,6 +968,61 @@ fn cross_document_identity_conflict(ledger: &mut AdmissionLedger) -> Result<Supp
         .build(ledger)
 }
 
+/// An adapter that stages one corpus entry by id.
+///
+/// The bridge between a scenario naming `SUPPLY-LAB-004` and the builder that
+/// stages it. Lookup is by id and nothing else: a scenario naming an entry the
+/// corpus does not contain is refused rather than running as though it had
+/// named nothing, which would report a clean verdict for a vector nobody
+/// exercised.
+pub struct CorpusAdapter;
+
+impl crate::harness::SupplyChainAdapter for CorpusAdapter {
+    fn mode(&self) -> crate::source::SupplyChainMode {
+        crate::source::SupplyChainMode::Simulated
+    }
+
+    fn collect(
+        &self,
+        scenario: &crate::model::SupplyChainScenario,
+        ledger: &mut AdmissionLedger,
+    ) -> Result<SupplyChainEvidence> {
+        let entries = corpus();
+        let entry = entries
+            .iter()
+            .find(|entry| entry.id == scenario.scenario_id)
+            .ok_or_else(|| {
+                crate::error::SupplyChainError::invalid(format!(
+                    "the corpus contains no entry `{}`",
+                    scenario.scenario_id
+                ))
+            })?;
+        (entry.build)(ledger)
+    }
+}
+
+/// Build the scenario one corpus entry describes.
+///
+/// The scenario carries no outcome, exactly as a hand-written one would not:
+/// `class` and `primary_invariant` say which surface and which question, and
+/// the evaluator decides the rest.
+pub fn scenario_for(entry: &SupplyLabEntry) -> crate::model::SupplyChainScenario {
+    crate::model::SupplyChainScenario {
+        scenario_id: entry.id.to_owned(),
+        class: entry.dimension,
+        mode: crate::source::SupplyChainMode::Simulated,
+        primary_invariant: entry.invariant,
+        evidence_files: Vec::new(),
+        reference_behavior: None,
+        description: entry.description.to_owned(),
+    }
+}
+
+/// Find one entry by id.
+pub fn entry_by_id(id: &str) -> Option<SupplyLabEntry> {
+    corpus().into_iter().find(|entry| entry.id == id)
+}
+
 /// The CycloneDX half of the cross-format equivalence pair.
 ///
 /// Public so the equivalence test can compare the two halves without going

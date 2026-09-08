@@ -1,0 +1,51 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "agentic-supply-chain-security-2026",
+  "version": "1.0.0",
+  "title": "DARE Agentic Supply Chain Security and AI-BOM 2026",
+  "properties": [
+    {
+      "id": "AGENT.SUPPLY_CHAIN.COMPONENT_PROVENANCE",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.ARTIFACT_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.SOURCE_TRUST",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.ATTESTATION_BINDING",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.DEPENDENCY_INTEGRITY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.CAPABILITY_DRIFT",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.MODEL_LINEAGE",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.DATASET_PROVENANCE",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.SUPPLY_CHAIN.BOM_COMPLETENESS",
+      "requirement": "REQUIRED"
+    }
+  ]
+}

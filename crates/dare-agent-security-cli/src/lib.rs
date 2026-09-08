@@ -14,6 +14,7 @@ pub mod memory_security;
 pub mod product;
 pub mod prompt_injection;
 pub mod rag_security;
+pub mod supply_chain_security;
 pub mod tool_security;
 
 pub mod args;
