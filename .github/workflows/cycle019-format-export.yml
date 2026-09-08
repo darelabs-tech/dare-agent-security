@@ -18,83 +18,148 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
-      - name: Restore baseline regression modules beside corrective tests
+      - name: Restore CLI proof regression names with corrective semantics
         shell: python
         run: |
           import pathlib
-          import re
-          import subprocess
 
-          baseline = "3fcf3bb8177dbca3d5cbf49df9d9d8923d5681c1"
-          files = [
-              "crates/dare-supply-chain-security/src/attestation.rs",
-              "crates/dare-supply-chain-security/src/coverage.rs",
-              "crates/dare-supply-chain-security/src/harness.rs",
-              "crates/dare-supply-chain-security/src/invariant.rs",
-              "crates/dare-supply-chain-security/src/local_synthetic.rs",
-              "crates/dare-supply-chain-security/src/manifest.rs",
-              "crates/dare-supply-chain-security/src/normalize.rs",
-              "crates/dare-supply-chain-security/src/observation.rs",
-              "crates/dare-supply-chain-security/src/provenance.rs",
-              "crates/dare-supply-chain-security/src/replay.rs",
-              "crates/dare-supply-chain-security/src/result.rs",
-          ]
-          superseded = [
-              "a_present_channel_that_compared_nothing_does_not_satisfy_a_contract",
-              "an_origin_is_approved_whichever_field_carried_it",
-              "a_capture_describing_a_different_system_is_refused",
-          ]
+          path = pathlib.Path("crates/dare-agent-security-cli/src/supply_chain_security.rs")
+          text = path.read_text(encoding="utf-8")
+          if "mod cycle019_post_merge_proof_tests" not in text:
+              module = r'''
 
-          pattern = re.compile(r"(?m)^#\[cfg\(test\)\]\s*\n(?:pub\(crate\)\s+)?mod tests\s*\{")
-          for name in files:
-              path = pathlib.Path(name)
-              current = path.read_text(encoding="utf-8")
-              if "mod cycle019_pre_review_tests" in current:
-                  continue
-              original = subprocess.check_output(
-                  ["git", "show", f"{baseline}:{name}"], text=True
-              )
-              match = pattern.search(original)
-              if not match:
-                  raise SystemExit(f"no baseline test module found in {name}")
-              suffix = original[match.start():]
-              suffix = re.sub(
-                  r"(?m)^((?:pub\(crate\)\s+)?)mod tests\s*\{",
-                  r"\1mod cycle019_pre_review_tests {",
-                  suffix,
-                  count=1,
-              )
-              for test_name in superseded:
-                  suffix = suffix.replace(
-                      f"    #[test]\n    fn {test_name}",
-                      "    #[test]\n"
-                      "    #[ignore = \"superseded by stricter Cycle 019 post-merge semantics\"]\n"
-                      f"    fn {test_name}",
-                  )
-              path.write_text(current.rstrip() + "\n\n" + suffix.lstrip(), encoding="utf-8")
+          #[cfg(test)]
+          mod cycle019_post_merge_proof_tests {
+              use super::*;
+
+              #[test]
+              fn a_built_in_corpus_id_resolves_to_a_scenario() {
+                  let scenario = load_scenario("SUPPLY-LAB-004").expect("resolves");
+                  assert_eq!(scenario.scenario_id, "SUPPLY-LAB-004");
+                  assert!(!scenario.description.is_empty());
+              }
+
+              #[test]
+              fn a_path_shaped_corpus_id_is_refused() {
+                  for hostile in ["../../etc/passwd", "SUPPLY/../LAB"] {
+                      assert!(load_scenario(hostile).is_err(), "`{hostile}` was accepted");
+                  }
+              }
+
+              #[test]
+              fn a_flag_from_another_mode_is_a_usage_error() {
+                  let scenario = load_scenario("SUPPLY-LAB-004").expect("resolves");
+                  let args = SupplyChainArgs {
+                      scenario: "SUPPLY-LAB-004".to_owned(),
+                      mode: SupplyChainModeArg::Simulated,
+                      evidence_dir: Some(PathBuf::from(".")),
+                      capture: None,
+                      manifest: None,
+                      output_dir: PathBuf::from("out"),
+                      json: false,
+                  };
+                  assert!(build_adapter(&args, &scenario).is_err());
+              }
+
+              #[test]
+              fn replay_requires_a_manifest_the_capture_did_not_supply() {
+                  let scenario = load_scenario("SUPPLY-LAB-004").expect("resolves");
+                  let args = SupplyChainArgs {
+                      scenario: "SUPPLY-LAB-004".to_owned(),
+                      mode: SupplyChainModeArg::Replay,
+                      evidence_dir: None,
+                      capture: Some(PathBuf::from("capture.json")),
+                      manifest: None,
+                      output_dir: PathBuf::from("out"),
+                      json: false,
+                  };
+                  let Err(error) = build_adapter(&args, &scenario) else {
+                      panic!("replay without a manifest was accepted");
+                  };
+                  assert!(error.to_string().contains("--manifest"));
+              }
+
+              #[test]
+              fn the_summary_of_a_clean_run_is_bounded() {
+                  let scenario = load_scenario("SUPPLY-LAB-001").expect("resolves");
+                  let mut ledger = AdmissionLedger::new();
+                  let result = run_scenario(&scenario, &CorpusAdapter, &mut ledger).expect("runs");
+                  let summary = render_summary(&result);
+                  assert_summary_is_bounded(&summary).expect("bounded");
+                  assert!(summary.contains("does not establish that the supply chain is secure"));
+                  assert!(summary.contains("| State changes | 0 |"));
+                  assert!(summary.contains("| External egress bytes | 0 |"));
+              }
+
+              #[test]
+              fn an_overstated_summary_is_refused() {
+                  assert!(assert_summary_is_bounded("the supply chain is secure").is_err());
+                  assert!(assert_summary_is_bounded("all components verified").is_err());
+              }
+
+              #[test]
+              fn an_artifact_carrying_a_credential_is_not_written() {
+                  assert!(assert_bytes_are_secret_safe(b"{\"note\":\"ghp_example\"}").is_err());
+                  assert!(assert_bytes_are_secret_safe(b"{\"note\":\"a purl is inert\"}").is_ok());
+              }
+
+              #[test]
+              fn the_command_exposes_no_fetch_or_credential_flag() {
+                  use clap::CommandFactory;
+                  #[derive(clap::Parser)]
+                  struct Wrapper {
+                      #[command(flatten)]
+                      inner: SupplyChainArgs,
+                  }
+                  let rendered = Wrapper::command()
+                      .render_long_help()
+                      .to_string()
+                      .to_lowercase();
+                  for forbidden in [
+                      "--registry",
+                      "--fetch",
+                      "--download",
+                      "--resolve",
+                      "--model-hub",
+                      "--oci",
+                      "--git",
+                      "--rekor",
+                      "--fulcio",
+                      "--transparency-log",
+                      "--sign",
+                      "--key",
+                      "--private-key",
+                      "--token",
+                      "--remote",
+                      "--command",
+                      "--extract",
+                  ] {
+                      assert!(
+                          !rendered.contains(&format!("{forbidden} ")),
+                          "the command exposes `{forbidden}`"
+                      );
+                  }
+              }
+          }
+          '''
+              path.write_text(text.rstrip() + module, encoding="utf-8")
       - name: Canonical Rust formatting
         run: cargo fmt --all
       - name: Engine regression suite
         run: cargo test -p dare-supply-chain-security --lib
-      - name: Report remaining proof citation gaps
-        if: always()
-        shell: bash
-        run: |
-          set +e
-          python scripts/k19/verify_proof_citations.py
-          status=$?
-          echo "proof_status=${status}"
-          exit 0
-      - name: Commit restored and formatted regression surface
-        if: success()
+      - name: CLI supply-chain regression suite
+        run: cargo test -p dare-agent-security --lib supply_chain_security
+      - name: Verify all Cycle 019 proof citations
+        run: python scripts/k19/verify_proof_citations.py
+      - name: Commit canonical corrective sources
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add crates/dare-supply-chain-security/src crates/dare-agent-security-cli/src/supply_chain_security.rs
           if git diff --cached --quiet; then
-            echo "No formatting or regression restoration changes"
+            echo "No source changes"
             exit 0
           fi
-          git commit -m "test(cycle-019): restore baseline regressions and canonical formatting"
+          git commit -m "test(cycle-019): restore CLI proof regressions"
           git push origin HEAD:fix/cycle-019-post-merge-security-review
