@@ -20,6 +20,7 @@ mod rag_security_standards;
 mod report;
 mod risk_family;
 mod status;
+mod supply_chain_standards;
 mod tool_security_standards;
 
 pub use agentic::{
@@ -91,6 +92,17 @@ pub use report::{
 };
 pub use risk_family::{derive_risk_family_coverage, RiskFamilyCoverage};
 pub use status::CoverageStatus;
+pub use supply_chain_standards::{
+    load_supply_chain_provenance, supply_chain_provenance, validate_supply_chain_provenance,
+    SupplyChainInheritedLesson, SupplyChainPropertyMapping, SupplyChainProvenance,
+    SupplyChainSource, SupplyChainSurfaceClass, SupplyChainTrustStatement,
+    REQUIRED_MAPPED_PROPERTIES as SUPPLY_CHAIN_MAPPED_PROPERTIES,
+    SUPPLY_CHAIN_ARTIFACT_INTEGRITY_PROPERTY, SUPPLY_CHAIN_ATTESTATION_BINDING_PROPERTY,
+    SUPPLY_CHAIN_BOM_COMPLETENESS_PROPERTY, SUPPLY_CHAIN_CAPABILITY_DRIFT_PROPERTY,
+    SUPPLY_CHAIN_COMPONENT_IDENTITY_PROPERTY, SUPPLY_CHAIN_COMPONENT_PROVENANCE_PROPERTY,
+    SUPPLY_CHAIN_DATASET_PROVENANCE_PROPERTY, SUPPLY_CHAIN_DEPENDENCY_INTEGRITY_PROPERTY,
+    SUPPLY_CHAIN_MODEL_LINEAGE_PROPERTY, SUPPLY_CHAIN_SOURCE_TRUST_PROPERTY,
+};
 pub use tool_security_standards::{
     load_tool_security_provenance, validate_tool_security_provenance,
     validate_tool_security_standards, InheritedLesson, ToolDeferredTopic, ToolPropertyMapping,

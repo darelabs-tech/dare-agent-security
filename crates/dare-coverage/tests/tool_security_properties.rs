@@ -70,6 +70,7 @@ fn facts(tools: bool, metadata: bool, output: bool, chaining: bool) -> Assessmen
         client_registration_present: false,
         credential_forwarding_present: false,
         out_of_scope_property_ids: Vec::new(),
+        ..Default::default()
     }
 }
 

@@ -2,14 +2,33 @@
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum TransportKind {
+    /// The default when a caller builds facts field by field.
+    ///
+    /// Stdio rather than Http deliberately: it is the transport with the
+    /// smaller surface, so a forgotten field understates what the target
+    /// exposes rather than overstating it.
+    #[default]
     Stdio,
     Http,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+/// Typed assessment facts.
+///
+/// `Default` is derived so a caller can name the fields a scenario is about and
+/// let the rest be false. That matters beyond convenience: every cycle since
+/// 013 has added predicates, and a test that must list every field is a test
+/// that gets edited — mechanically, without thought — each time the struct
+/// grows. `..Default::default()` keeps those edits from touching tests whose
+/// subject has not changed.
+///
+/// Deriving `Default` does not affect deserialization. Serde uses a field's
+/// default only where `#[serde(default)]` says so, which is already the case
+/// for every additive field and deliberately not the case for the original
+/// required ones.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AssessmentFacts {
     pub tools_count: u32,
     pub resources_count: u32,
@@ -128,6 +147,33 @@ pub struct AssessmentFacts {
     /// Cycle 018: the target forwards or exchanges credentials to an upstream.
     #[serde(default)]
     pub credential_forwarding_present: bool,
+    /// Cycle 019: a bill of materials is available for the assessed system.
+    #[serde(default)]
+    pub supply_chain_bom_present: bool,
+    /// Cycle 019: components carry immutable digest evidence.
+    #[serde(default)]
+    pub component_digest_present: bool,
+    /// Cycle 019: a local approved-source/publisher/builder/signer policy exists.
+    #[serde(default)]
+    pub source_trust_policy_present: bool,
+    /// Cycle 019: local provenance records are available.
+    #[serde(default)]
+    pub provenance_present: bool,
+    /// Cycle 019: local attestation or signature evidence is available.
+    #[serde(default)]
+    pub attestation_present: bool,
+    /// Cycle 019: dependency relationships are observable.
+    #[serde(default)]
+    pub dependency_graph_present: bool,
+    /// Cycle 019: the system includes at least one model component.
+    #[serde(default)]
+    pub model_component_present: bool,
+    /// Cycle 019: the system includes at least one dataset component.
+    #[serde(default)]
+    pub dataset_component_present: bool,
+    /// Cycle 019: both declared and observed component sets are recorded.
+    #[serde(default)]
+    pub declared_observed_components_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

@@ -6,10 +6,10 @@
 
 All tasks below are approved for execution inside the frozen scope/safety boundary. Completion requires executed evidence, not code existence alone.
 
-- [ ] task-001 — Freeze Cycle 019 baseline and compatibility contracts (AC-01, AC-02, AC-03, AC-04, AC-06, AC-14, AC-71, AC-72)
-- [ ] task-002 — Record verified standards/status snapshot and provenance assets (AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13)
-- [ ] task-003 — Extend Agentic registry with exactly eight additive supply-chain properties (AC-02, AC-03, AC-04, AC-05, AC-06, AC-07)
-- [ ] task-004 — Add supply-chain applicability predicates and coverage compatibility tests (AC-14, AC-70, AC-71, AC-72)
+- [x] task-001 — Freeze Cycle 019 baseline and compatibility contracts (AC-01, AC-02, AC-03, AC-04, AC-06, AC-14, AC-71, AC-72)
+- [x] task-002 — Record verified standards/status snapshot and provenance assets (AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13)
+- [x] task-003 — Extend Agentic registry with exactly eight additive supply-chain properties (AC-02, AC-03, AC-04, AC-05, AC-06, AC-07)
+- [x] task-004 — Add supply-chain applicability predicates and coverage compatibility tests (AC-14, AC-70, AC-71, AC-72)
 - [ ] task-005 — Define closed component/type schemas and canonical identifier primitives (AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21)
 - [ ] task-006 — Define closed relationship graph schemas and validation contracts (AC-22, AC-23)
 - [ ] task-007 — Define DARE Agentic Supply Chain Manifest schema without verdict authority (AC-27, AC-28)

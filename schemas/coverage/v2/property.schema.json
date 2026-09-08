@@ -120,7 +120,16 @@
               "retrieval_policy_present",
               "document_acl_present",
               "retrieval_provenance_present",
-              "retrieval_tenant_context_present"
+              "retrieval_tenant_context_present",
+              "supply_chain_bom_present",
+              "component_digest_present",
+              "source_trust_policy_present",
+              "provenance_present",
+              "attestation_present",
+              "dependency_graph_present",
+              "model_component_present",
+              "dataset_component_present",
+              "declared_observed_components_present"
             ]
           }
         }

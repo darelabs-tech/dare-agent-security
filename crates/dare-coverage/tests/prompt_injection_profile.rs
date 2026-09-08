@@ -61,6 +61,7 @@ fn facts(user_prompt: bool, external_content: bool) -> AssessmentFacts {
         client_registration_present: false,
         credential_forwarding_present: false,
         out_of_scope_property_ids: Vec::new(),
+        ..Default::default()
     }
 }
 
