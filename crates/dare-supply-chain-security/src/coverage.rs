@@ -25,7 +25,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::model::SupplyChainInvariant;
-use crate::observation::{ObservationChannel, ObservationSet};
+use crate::observation::{ObservationChannel, ObservationSet, SupplyChainObservation};
 
 /// How the required channels combine.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -200,6 +200,69 @@ pub fn contracts() -> Vec<CoverageContract> {
         .collect()
 }
 
+/// Whether the comparison an invariant makes could actually be made.
+///
+/// A channel can be present and carry nothing to compare. A capability context
+/// exists as soon as either side supplies capabilities, and one side alone is
+/// not a difference; a lineage context exists for every model, and a model with
+/// no observed base has nothing to check against its approval.
+///
+/// Without this second step an invariant would report `PASS` because the
+/// channel it needed was there, having compared nothing — which is the same
+/// false `PASS` the contracts exist to prevent, one level in.
+fn comparison_reason(
+    invariant: SupplyChainInvariant,
+    observations: &ObservationSet,
+) -> Option<&'static str> {
+    use SupplyChainInvariant as I;
+    use SupplyChainObservation as O;
+
+    let any = |predicate: &dyn Fn(&SupplyChainObservation) -> bool| {
+        observations.observations.iter().any(predicate)
+    };
+
+    let decided = match invariant {
+        I::ExternalCapabilityDriftNotObserved => any(
+            &|o| matches!(o, O::CapabilityContext(context) if context.assessment.drifted().is_some()),
+        ),
+        I::ModelLineagePreserved => any(
+            &|o| matches!(o, O::ModelLineageContext(context) if context.assessment.is_decidable()),
+        ),
+        I::DatasetProvenancePreserved => any(
+            &|o| matches!(o, O::DatasetProvenanceContext(context) if context.assessment.is_decidable()),
+        ),
+        I::ArtifactDigestBoundToComponent => any(
+            &|o| matches!(o, O::ComponentDigestContext(context) if context.approved_digest_bound.is_some()),
+        ),
+        I::ProvenanceSubjectAndBuilderBound => any(&|o| {
+            matches!(o, O::ProvenanceContext(context)
+                if context.assessment.has_provenance() && context.assessment.digest_bound.is_some())
+        }),
+        I::AttestationSubjectDigestPreserved => any(&|o| {
+            matches!(o, O::AttestationContext(context)
+                if context.assessment.has_attestation() && context.assessment.digest_bound.is_some())
+        }),
+        I::DependencyEdgeIntegrityPreserved => {
+            any(&|o| matches!(o, O::RelationshipContext(context) if context.comparable))
+        }
+        I::ComponentSourceTrustPreserved => any(
+            &|o| matches!(o, O::SourceTrustContext(context) if context.policy_approves_origin.is_some()),
+        ),
+        // These three decide from the component set alone: uniqueness, whether
+        // a mutable reference stands in for identity, and whether a class's
+        // required evidence is present. There is no approved side to be
+        // missing.
+        I::ComponentIdentityUnambiguous
+        | I::MutableReferenceNotUsedAsImmutableIdentity
+        | I::BomRequiredEvidencePresent
+        | I::ComponentProvenanceSufficient => true,
+    };
+
+    (!decided).then_some(
+        "the channel was observed and carried nothing to compare, so the question stayed open",
+    )
+}
+
 /// Check one invariant's contract against what a run observed.
 pub fn assess_coverage(
     invariant: SupplyChainInvariant,
@@ -215,6 +278,13 @@ pub fn assess_coverage(
         .collect();
 
     if missing.is_empty() {
+        if let Some(undecided) = comparison_reason(invariant, observations) {
+            return CoverageDecision {
+                satisfied: false,
+                missing,
+                reason: format!("{} ({undecided})", contract.reason),
+            };
+        }
         return CoverageDecision {
             satisfied: true,
             missing,
@@ -392,6 +462,27 @@ mod tests {
                 invariant.as_str()
             );
         }
+    }
+
+    #[test]
+    fn a_present_channel_that_compared_nothing_does_not_satisfy_a_contract() {
+        // The false PASS one level in: the channel an invariant needed was
+        // there, and it carried one side of a two-sided comparison.
+        let mut tool = component("file-tool", ComponentType::Tool);
+        tool.capabilities = Some(crate::capability::projection(&[], &["read-file"]));
+        let observations = project(&evidence_of(
+            vec![tool],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+
+        assert!(observations.has_channel(ObservationChannel::CapabilityContext));
+        let decision = assess_coverage(
+            SupplyChainInvariant::ExternalCapabilityDriftNotObserved,
+            &observations,
+        );
+        assert!(!decision.satisfied);
+        assert!(decision.reason.contains("nothing to compare"));
     }
 
     #[test]

@@ -72,6 +72,7 @@ pub mod budget;
 pub mod canonical;
 pub mod capability;
 pub mod component;
+pub mod corpus;
 pub mod coverage;
 pub mod cyclonedx;
 pub mod dataset;
