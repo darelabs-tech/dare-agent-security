@@ -158,6 +158,39 @@ and no score, ranking, similarity or reranker decides any verdict — retrieval
 relevance is not authorization. See
 [RAG and Retrieval Security Validation](../concepts/rag-security.md).
 
+## `validate supply-chain`
+
+Bounded local agentic supply-chain and AI-BOM validation (Cycle 019). Reads
+local bill-of-materials, provenance and attestation documents and evaluates
+twelve invariants over component identity, artifact integrity, source trust,
+provenance and attestation binding, dependency-graph integrity, capability
+drift, model lineage, dataset provenance and BOM completeness.
+
+```bash
+dare-agent-security validate supply-chain   --scenario SUPPLY-LAB-004   --mode simulated   --output-dir .dare-agent-security/supply-chain
+
+dare-agent-security validate supply-chain   --scenario scenarios/production-bom.json   --mode static   --evidence-dir evidence/2026-q3   --output-dir .dare-agent-security/supply-chain
+```
+
+Modes are `static`, `replay`, `simulated` and `local-synthetic`; all four are
+local and offline. There is no `--registry`, `--registry-url`, `--fetch`,
+`--download`, `--resolve`, `--model-hub`, `--oci`, `--git`, `--rekor`,
+`--fulcio`, `--transparency-log`, `--sign`, `--key`, `--private-key`,
+`--token`, `--remote`, `--command` or `--extract` flag, and no credential is
+read from the environment.
+
+Under `--mode replay`, `--manifest` is required alongside `--capture`: a
+recording may not supply the policy it is judged against, or it would approve
+its own components, builders and signers.
+
+No package registry, model hub, container registry, Git host, transparency log,
+signing service, key server or vulnerability database is contacted; no signature
+or attestation is issued; and no artifact, model, archive or code named in an
+imported document is executed, loaded or extracted. A purl, download location or
+repository inside a document is inert metadata — naming a location is not
+authorization to fetch it. See
+[Agentic Supply Chain and AI-BOM Validation](../concepts/supply-chain-security.md).
+
 ## Exit codes
 
 Each subcommand has its own table — see [Exit Codes](../reference/exit-codes.md).

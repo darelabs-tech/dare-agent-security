@@ -21,6 +21,7 @@
 - [Memory and Context Poisoning Validation](concepts/memory-security.md)
 - [RAG and Retrieval Security Validation](concepts/rag-security.md)
 - [MCP 2026 Auth Security Validation](concepts/mcp-auth-security.md)
+- [Agentic Supply Chain and AI-BOM Validation](concepts/supply-chain-security.md)
 
 # Commands
 
@@ -70,5 +71,6 @@
 - [Extending Memory Security Validation](reference/extending-memory-security.md)
 - [Extending RAG and Retrieval Security Validation](reference/extending-rag-security.md)
 - [Extending MCP Auth Security Validation](reference/extending-mcp-auth-security.md)
+- [Extending Agentic Supply Chain Validation](reference/extending-supply-chain-security.md)
 
 [Troubleshooting](troubleshooting.md)
