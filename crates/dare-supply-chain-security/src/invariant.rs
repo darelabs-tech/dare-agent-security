@@ -412,8 +412,35 @@ fn mutable_reference(observations: &ObservationSet) -> Vec<SupplyChainViolation>
 }
 
 /// Invariant 6. The component came from a source local policy approved.
+///
+/// Two shapes of failure. The obvious one is a component whose origin the
+/// policy denies. The quieter one is a component the deployment never declared
+/// at all: nothing approves its presence, and an engine that only checked named
+/// origins would report nothing about a component that arrived from nowhere.
+///
+/// The second only fires where a declared inventory exists to compare against.
+/// Without one, an undeclared component is every component, and the finding
+/// would be noise.
 fn source_trust(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
+    for observation in &observations.observations {
+        let SupplyChainObservation::DeclaredObservedComponentContext(context) = observation else {
+            continue;
+        };
+        if !context.comparable {
+            continue;
+        }
+        for component_id in &context.observed_only_ids {
+            violations.push(SupplyChainViolation::new(
+                SupplyChainInvariant::ComponentSourceTrustPreserved,
+                Some(component_id),
+                format!(
+                    "`{component_id}` was observed in the system and the deployment never                      declared it, so nothing approves its presence"
+                ),
+                &[observation],
+            ));
+        }
+    }
     for observation in &observations.observations {
         let SupplyChainObservation::SourceTrustContext(context) = observation else {
             continue;
@@ -1181,18 +1208,20 @@ mod tests {
     }
 
     #[test]
-    fn a_model_with_no_digest_fails_completeness_and_a_framework_does_not() {
-        // The requirement is per class. A framework describes an arrangement
+    fn a_model_with_no_digest_fails_completeness_and_a_service_api_does_not() {
+        // The requirement is per class. A service API is a running endpoint
         // rather than bytes, and demanding a digest for it would produce a
-        // finding nobody can remediate.
+        // finding nobody can remediate. Both components here lack a digest, so
+        // the test turns on the class and not on the evidence.
         let mut model = component("planner-model", ComponentType::Model);
         model.digests.clear();
-        let framework = component("langchain", ComponentType::Framework);
+        let mut service = component("billing-api", ComponentType::ServiceApi);
+        service.digests.clear();
 
         let mut ledger = AdmissionLedger::new();
         let evidence = EvidenceBuilder::new()
             .with_document("bom-1", BomFormat::CycloneDx, b"{}")
-            .with_import(vec![model, framework], RelationshipGraph::new())
+            .with_import(vec![model, service], RelationshipGraph::new())
             .build(&mut ledger)
             .expect("builds");
 

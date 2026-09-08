@@ -464,6 +464,29 @@ impl ReferenceBehavior {
     pub fn is_legitimate(self) -> bool {
         matches!(self, Self::Compliant)
     }
+
+    pub fn all() -> [Self; 18] {
+        [
+            Self::Compliant,
+            Self::AmbiguousDuplicateIdentity,
+            Self::DigestSubstituted,
+            Self::MutableReferenceUsedAsIdentity,
+            Self::SourceSubstituted,
+            Self::ProvenanceSubjectMismatch,
+            Self::UnauthorizedBuilder,
+            Self::AttestationSubjectMismatch,
+            Self::UnapprovedSigner,
+            Self::UnexpectedDependencyEdge,
+            Self::MissingExpectedDependencyEdge,
+            Self::CapabilityDrifted,
+            Self::BaseModelSubstituted,
+            Self::DatasetSubstituted,
+            Self::UndeclaredExternalComponent,
+            Self::MultipleIndependentViolations,
+            Self::NoRelevantObservation,
+            Self::HarnessFailure,
+        ]
+    }
 }
 
 #[cfg(test)]

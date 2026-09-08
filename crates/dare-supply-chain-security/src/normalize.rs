@@ -203,6 +203,17 @@ impl EvidenceBuilder {
         }
     }
 
+    /// Carry forward a document reference a capture already recorded.
+    ///
+    /// The digest comes from the capture rather than being recomputed, because
+    /// the bytes are gone: what is being replayed is the record of having read
+    /// them. Recomputing over the reconstructed bundle would produce a digest
+    /// of something the run never saw.
+    pub fn with_recorded_document(mut self, document: BomDocumentRef) -> Self {
+        self.evidence.documents.push(document);
+        self
+    }
+
     /// Record that a document was read.
     pub fn with_document(mut self, document_id: &str, format: BomFormat, raw: &[u8]) -> Self {
         self.evidence.documents.push(BomDocumentRef {
