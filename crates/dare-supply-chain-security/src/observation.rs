@@ -155,22 +155,23 @@ pub struct SourceTrustContext {
     /// Whether a local policy exists at all. An absent policy is a gap, not a
     /// denial.
     pub policy_present: bool,
-    /// Whether the policy approves one of the origin claims. `None` when no
-    /// claim was made or no policy exists.
+    /// Whether every present origin claim is approved by its corresponding
+    /// local policy set. `None` when no claim was made or no policy exists.
     pub policy_approves_origin: Option<bool>,
 }
 
-/// The provenance bindings for one component, plus what policy says about the
-/// builder it names.
+/// The provenance bindings for one component, plus what policy says about every
+/// builder the matching provenance records name.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProvenanceContext {
     pub assessment: ProvenanceAssessment,
     pub policy_present: bool,
-    /// Whether the named builder is approved. `None` when no builder was named
-    /// or no policy exists — a builder nobody approved and a builder nobody
-    /// asked about are different situations.
+    /// Compatibility summary for a single representative builder. Security
+    /// decisions use the complete approved/unapproved sets below.
     pub builder_approved: Option<bool>,
+    pub approved_builder_ids: BTreeSet<String>,
+    pub unapproved_builder_ids: BTreeSet<String>,
 }
 
 /// The attestation bindings for one component, plus signer approval.
@@ -407,11 +408,22 @@ pub fn project(evidence: &SupplyChainEvidence) -> ObservationSet {
                 .as_ref()
                 .filter(|_| policy_present)
                 .map(|builder| policy.approves_builder(builder));
+            let (approved_builder_ids, unapproved_builder_ids) = if policy_present {
+                assessment
+                    .builder_ids
+                    .iter()
+                    .cloned()
+                    .partition(|builder| policy.approves_builder(builder))
+            } else {
+                (BTreeSet::new(), BTreeSet::new())
+            };
             observations.push(SupplyChainObservation::ProvenanceContext(
                 ProvenanceContext {
                     assessment,
                     policy_present,
                     builder_approved,
+                    approved_builder_ids,
+                    unapproved_builder_ids,
                 },
             ));
         }
@@ -678,8 +690,6 @@ pub(crate) mod tests {
 
     #[test]
     fn the_twelve_design_channels_are_all_present() {
-        // The list is fixed by DESIGN section 18. A channel quietly dropped
-        // here would silently satisfy every coverage contract that required it.
         let names: BTreeSet<&str> = ObservationChannel::all()
             .iter()
             .map(|channel| channel.as_str())
@@ -704,9 +714,6 @@ pub(crate) mod tests {
 
     #[test]
     fn an_observation_cannot_carry_a_verdict() {
-        // The authority boundary, structural rather than checked. An adapter
-        // that could emit a verdict would decide the outcome and reduce the
-        // evaluator to transcribing it.
         for hostile in [
             serde_json::json!({ "channel": "COMPONENT_CONTEXT", "verdict": "PASS" }),
             serde_json::json!({ "channel": "HARNESS_ERROR", "kind": "ADAPTER_FAILURE",
@@ -723,8 +730,6 @@ pub(crate) mod tests {
 
     #[test]
     fn a_component_with_no_digest_produces_no_digest_context() {
-        // The basis for INCONCLUSIVE. A context saying `has_digest: false`
-        // reads as an answer; an absent channel is honestly the absence of one.
         let mut bare = component("react", ComponentType::Package);
         bare.digests.clear();
         let set = project(&evidence_of(
@@ -778,8 +783,6 @@ pub(crate) mod tests {
 
     #[test]
     fn an_unapproved_signer_is_named_rather_than_counted() {
-        // "An unapproved signer attested this" is only actionable if the
-        // operator learns which one.
         let mut ledger = AdmissionLedger::new();
         let manifest = DareManifest {
             schema_version: "1".to_owned(),
@@ -817,9 +820,43 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn every_provenance_builder_is_classified_independently() {
+        let mut ledger = AdmissionLedger::new();
+        let manifest = DareManifest {
+            schema_version: "1".to_owned(),
+            trust_policy: TrustPolicy {
+                approved_builders: BTreeSet::from(["builder-ci".to_owned()]),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let mut second = record("prov-2", "react");
+        second.builder_id = Some("builder-unknown".to_owned());
+        let evidence = EvidenceBuilder::new()
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
+            .with_provenance(vec![record("prov-1", "react"), second])
+            .with_manifest(manifest)
+            .build(&mut ledger)
+            .expect("builds");
+
+        let set = project(&evidence);
+        let context = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::ProvenanceContext(context) => Some(context),
+                _ => None,
+            })
+            .expect("a provenance context");
+        assert!(context.approved_builder_ids.contains("builder-ci"));
+        assert!(context.unapproved_builder_ids.contains("builder-unknown"));
+    }
+
+    #[test]
     fn an_absent_policy_leaves_signer_and_builder_approval_unanswered() {
-        // Not `false`. With no policy nobody asked the question, and answering
-        // it would make every component a finding.
         let mut ledger = AdmissionLedger::new();
         let evidence = EvidenceBuilder::new()
             .with_import(
@@ -841,6 +878,8 @@ pub(crate) mod tests {
             .expect("a provenance context");
         assert!(!context.policy_present);
         assert_eq!(context.builder_approved, None);
+        assert!(context.approved_builder_ids.is_empty());
+        assert!(context.unapproved_builder_ids.is_empty());
     }
 
     #[test]
@@ -901,8 +940,6 @@ pub(crate) mod tests {
 
     #[test]
     fn capability_context_appears_when_either_side_supplies_capabilities() {
-        // Including when only the manifest does: a component that dropped its
-        // capability projection entirely must not make drift unobservable.
         let manifest = DareManifest {
             schema_version: "1".to_owned(),
             approved_capabilities: BTreeMap::from([(
@@ -942,9 +979,6 @@ pub(crate) mod tests {
         assert!(set.has_channel(ObservationChannel::ModelLineageContext));
         assert!(set.has_channel(ObservationChannel::DatasetProvenanceContext));
 
-        // A package has neither lineage nor dataset provenance, and emitting
-        // an empty context for it would make every package undecidable on two
-        // invariants that do not apply to it.
         let lineage_subjects: Vec<&str> = set
             .observations
             .iter()
@@ -956,8 +990,6 @@ pub(crate) mod tests {
 
     #[test]
     fn projection_is_deterministic() {
-        // Two runs over the same evidence must digest identically, or a report
-        // would differ from itself between runs.
         let build = || {
             evidence_of(
                 vec![
@@ -975,8 +1007,6 @@ pub(crate) mod tests {
 
     #[test]
     fn every_observation_digests_and_the_digests_differ() {
-        // Deciding-evidence citation is only useful if two different
-        // observations cite differently.
         let set = project(&evidence_of(
             vec![
                 component("react", ComponentType::Package),
