@@ -1,0 +1,41 @@
+[package]
+name = "dare-supply-chain-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Bounded, evidence-first, offline agentic supply-chain and AI-BOM validation (Cycle 019)"
+publish = false
+
+[lib]
+name = "dare_supply_chain_security"
+path = "src/lib.rs"
+
+# No HTTP client, no registry client, no OCI client, no Git library, no model
+# runtime and no archive extractor is declared here.
+#
+# That absence is the security boundary, and it is worth being precise about
+# what it does and does not claim. Every document this engine reads is *about*
+# artifacts that live somewhere reachable: a package on a registry, an image in
+# a repository, a model on a hub. The documents are full of coordinates. This
+# crate has no dependency through which one of those coordinates could become a
+# request.
+#
+# It is not true that no transport stack exists transitively - `dare-coverage`
+# reaches one through the workspace - so the boundary asserted in `lib.rs` is
+# that nothing here *reaches* it, checked by a test over this crate's own
+# source rather than claimed in a comment.
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"
