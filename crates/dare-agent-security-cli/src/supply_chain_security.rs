@@ -461,3 +461,117 @@ mod tests {
         assert!(build_adapter(&args, &scenario).is_err());
     }
 }
+
+#[cfg(test)]
+mod cycle019_post_merge_proof_tests {
+    use super::*;
+
+    #[test]
+    fn a_built_in_corpus_id_resolves_to_a_scenario() {
+        let scenario = load_scenario("SUPPLY-LAB-004").expect("resolves");
+        assert_eq!(scenario.scenario_id, "SUPPLY-LAB-004");
+        assert!(!scenario.description.is_empty());
+    }
+
+    #[test]
+    fn a_path_shaped_corpus_id_is_refused() {
+        for hostile in ["../../etc/passwd", "SUPPLY/../LAB"] {
+            assert!(load_scenario(hostile).is_err(), "`{hostile}` was accepted");
+        }
+    }
+
+    #[test]
+    fn a_flag_from_another_mode_is_a_usage_error() {
+        let scenario = load_scenario("SUPPLY-LAB-004").expect("resolves");
+        let args = SupplyChainArgs {
+            scenario: "SUPPLY-LAB-004".to_owned(),
+            mode: SupplyChainModeArg::Simulated,
+            evidence_dir: Some(PathBuf::from(".")),
+            capture: None,
+            manifest: None,
+            output_dir: PathBuf::from("out"),
+            json: false,
+        };
+        assert!(build_adapter(&args, &scenario).is_err());
+    }
+
+    #[test]
+    fn replay_requires_a_manifest_the_capture_did_not_supply() {
+        let scenario = load_scenario("SUPPLY-LAB-004").expect("resolves");
+        let args = SupplyChainArgs {
+            scenario: "SUPPLY-LAB-004".to_owned(),
+            mode: SupplyChainModeArg::Replay,
+            evidence_dir: None,
+            capture: Some(PathBuf::from("capture.json")),
+            manifest: None,
+            output_dir: PathBuf::from("out"),
+            json: false,
+        };
+        let Err(error) = build_adapter(&args, &scenario) else {
+            panic!("replay without a manifest was accepted");
+        };
+        assert!(error.to_string().contains("--manifest"));
+    }
+
+    #[test]
+    fn the_summary_of_a_clean_run_is_bounded() {
+        let scenario = load_scenario("SUPPLY-LAB-001").expect("resolves");
+        let mut ledger = AdmissionLedger::new();
+        let result = run_scenario(&scenario, &CorpusAdapter, &mut ledger).expect("runs");
+        let summary = render_summary(&result);
+        assert_summary_is_bounded(&summary).expect("bounded");
+        assert!(summary.contains("does not establish that the supply chain is secure"));
+        assert!(summary.contains("| State changes | 0 |"));
+        assert!(summary.contains("| External egress bytes | 0 |"));
+    }
+
+    #[test]
+    fn an_overstated_summary_is_refused() {
+        assert!(assert_summary_is_bounded("the supply chain is secure").is_err());
+        assert!(assert_summary_is_bounded("all components verified").is_err());
+    }
+
+    #[test]
+    fn an_artifact_carrying_a_credential_is_not_written() {
+        assert!(assert_bytes_are_secret_safe(b"{\"note\":\"ghp_example\"}").is_err());
+        assert!(assert_bytes_are_secret_safe(b"{\"note\":\"a purl is inert\"}").is_ok());
+    }
+
+    #[test]
+    fn the_command_exposes_no_fetch_or_credential_flag() {
+        use clap::CommandFactory;
+        #[derive(clap::Parser)]
+        struct Wrapper {
+            #[command(flatten)]
+            inner: SupplyChainArgs,
+        }
+        let rendered = Wrapper::command()
+            .render_long_help()
+            .to_string()
+            .to_lowercase();
+        for forbidden in [
+            "--registry",
+            "--fetch",
+            "--download",
+            "--resolve",
+            "--model-hub",
+            "--oci",
+            "--git",
+            "--rekor",
+            "--fulcio",
+            "--transparency-log",
+            "--sign",
+            "--key",
+            "--private-key",
+            "--token",
+            "--remote",
+            "--command",
+            "--extract",
+        ] {
+            assert!(
+                !rendered.contains(&format!("{forbidden} ")),
+                "the command exposes `{forbidden}`"
+            );
+        }
+    }
+}
