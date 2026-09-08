@@ -20,7 +20,7 @@ use crate::attestation::AttestationRecord;
 use crate::budget::AdmissionLedger;
 use crate::component::Component;
 use crate::error::{Result, SupplyChainError};
-use crate::identity::{assert_no_collisions, resolve_identity};
+use crate::identity::{find_collisions, resolve_identity, IdentityCollision};
 use crate::manifest::DareManifest;
 use crate::provenance::ProvenanceRecord;
 use crate::relationship::{Relationship, RelationshipGraph};
@@ -115,9 +115,17 @@ impl SupplyChainEvidence {
 
     /// Validate the assembled evidence as a whole.
     ///
-    /// The checks that only make sense once everything is present: identities
-    /// must be unambiguous across documents, edges must not dangle, and the
-    /// graph must be bounded.
+    /// The checks that only make sense once everything is present: edges must
+    /// not dangle, and the graph must be bounded.
+    ///
+    /// Identity ambiguity is deliberately **not** refused here. It is a
+    /// security finding, not malformed input: one artifact appearing under two
+    /// canonical ids is precisely what
+    /// `COMPONENT_IDENTITY_UNAMBIGUOUS` exists to report, and refusing the
+    /// bundle would turn a finding an operator needs to see into a run that
+    /// could not observe. The ambiguity is retained and reported by
+    /// [`Self::identity_collisions`]; the ids stay distinct and resolvable, so
+    /// every other invariant still reads the row it meant to.
     pub fn validate(&self) -> Result<()> {
         for component in &self.components {
             component.validate()?;
@@ -130,10 +138,16 @@ impl SupplyChainEvidence {
         }
         self.manifest.validate()?;
 
-        assert_no_collisions(&self.components)?;
         self.graph.assert_no_dangling(&self.components)?;
         self.graph.assert_bounded_depth()?;
         Ok(())
+    }
+
+    /// Components whose canonical identities cannot be told apart.
+    ///
+    /// Retained rather than refused — see [`Self::validate`].
+    pub fn identity_collisions(&self) -> Vec<IdentityCollision> {
+        find_collisions(&self.components)
     }
 
     /// Whether both declared and observed component sets exist.
@@ -573,20 +587,29 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn a_collision_between_two_documents_is_caught_at_merge_time() {
-        // It cannot be seen from inside either document, which is why
-        // `validate` runs on the assembled bundle rather than per import.
+    fn a_collision_between_two_documents_is_visible_at_merge_time() {
+        // It cannot be seen from inside either document, which is why the
+        // bundle is assembled before anything looks for it.
+        //
+        // It is reported rather than refused. One artifact under two canonical
+        // ids is the finding `COMPONENT_IDENTITY_UNAMBIGUOUS` exists for, and
+        // refusing the bundle would hand an operator a run that could not
+        // observe instead of the ambiguity it observed perfectly well.
         let first = component("react", ComponentType::Package);
         let mut second = component("react-duplicate", ComponentType::Package);
         second.name = "react".to_owned();
 
         let mut ledger = AdmissionLedger::new();
-        let result = EvidenceBuilder::new()
+        let evidence = EvidenceBuilder::new()
             .with_import(vec![first], RelationshipGraph::new())
             .with_import(vec![second], RelationshipGraph::new())
-            .build(&mut ledger);
+            .build(&mut ledger)
+            .expect("an ambiguous bundle is evaluated, not refused");
 
-        assert!(result.is_err(), "one artifact under two ids was admitted");
+        let collisions = evidence.identity_collisions();
+        assert_eq!(collisions.len(), 1);
+        assert_eq!(collisions[0].component_id, "react-duplicate");
+        assert_eq!(collisions[0].conflicting_component_id, "react");
     }
 
     #[test]

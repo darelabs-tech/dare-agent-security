@@ -364,6 +364,47 @@ impl ScenarioClass {
     }
 }
 
+/// How a run obtained its evidence.
+///
+/// Four modes, and there is no fifth. Every one of them reads local files: a
+/// remote mode would need a transport this crate does not declare, and adding
+/// the variant would be the first half of adding the capability.
+///
+/// `LOCAL_SYNTHETIC` is the only mode that stages anything, and what it stages
+/// is a document, never a process.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum SupplyChainMode {
+    /// Read local bill-of-materials, provenance and attestation documents.
+    Static,
+    /// Re-evaluate a previously captured evidence bundle.
+    Replay,
+    /// Evaluate a locally constructed evidence bundle.
+    Simulated,
+    /// Evaluate against locally generated synthetic documents.
+    LocalSynthetic,
+}
+
+impl SupplyChainMode {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Static => "STATIC",
+            Self::Replay => "REPLAY",
+            Self::Simulated => "SIMULATED",
+            Self::LocalSynthetic => "LOCAL_SYNTHETIC",
+        }
+    }
+
+    pub fn all() -> [Self; 4] {
+        [
+            Self::Static,
+            Self::Replay,
+            Self::Simulated,
+            Self::LocalSynthetic,
+        ]
+    }
+}
+
 /// Why a harness could not observe.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -427,6 +468,25 @@ impl ReferenceBehavior {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn there_are_exactly_four_modes_and_none_of_them_is_remote() {
+        // AC-55. A remote mode would need a transport this crate does not
+        // declare, and adding the variant would be the first half of adding
+        // the capability.
+        assert_eq!(SupplyChainMode::all().len(), 4);
+        let names: Vec<&str> = SupplyChainMode::all()
+            .iter()
+            .map(|mode| mode.as_str())
+            .collect();
+        assert_eq!(names, ["STATIC", "REPLAY", "SIMULATED", "LOCAL_SYNTHETIC"]);
+        for hostile in ["\"REMOTE\"", "\"LIVE\"", "\"REGISTRY\"", "\"NETWORK\""] {
+            assert!(
+                serde_json::from_str::<SupplyChainMode>(hostile).is_err(),
+                "{hostile} decoded as a mode"
+            );
+        }
+    }
+
     use super::*;
     use std::collections::BTreeSet;
 
