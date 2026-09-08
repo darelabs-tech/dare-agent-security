@@ -89,11 +89,13 @@ impl TrustPolicy {
         self.approved_signers.contains(signer_id)
     }
 
-    /// Whether any of a component's source-shaped claims is approved.
+    /// Whether every source-shaped claim a component supplied is approved by
+    /// the corresponding local-policy set.
     ///
-    /// Source, supplier and publisher are checked together because a document
-    /// may record the same fact in any of them, and a component whose publisher
-    /// is approved is approved whichever field carried it.
+    /// Source, supplier and publisher are separate concepts. One approved claim
+    /// must not mask a conflicting unapproved claim on another boundary. With
+    /// no claims at all the answer remains `None`: nobody supplied origin
+    /// evidence to decide.
     pub fn approves_origin(
         &self,
         source_id: Option<&str>,
@@ -109,13 +111,11 @@ impl TrustPolicy {
         for (claim, approved) in claims {
             let Some(claim) = claim else { continue };
             saw_claim = true;
-            if approved.contains(claim) {
-                return Some(true);
+            if !approved.contains(claim) {
+                return Some(false);
             }
         }
-        // No claim at all is nothing to check, which is a gap. A claim that
-        // matched nothing is a decision.
-        saw_claim.then_some(false)
+        saw_claim.then_some(true)
     }
 }
 
@@ -396,6 +396,175 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn origin_claims_are_independent_and_one_approved_claim_does_not_mask_another() {
+        let policy = policy();
+        assert_eq!(policy.approves_origin(None, Some("acme"), None), Some(true));
+        assert_eq!(
+            policy.approves_origin(Some("registry-internal"), Some("acme"), None),
+            Some(true)
+        );
+        assert_eq!(
+            policy.approves_origin(Some("registry-unknown"), Some("acme"), None),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn expected_lineage_is_expressed_as_an_id_and_not_a_name() {
+        // "A model name alone cannot prove lineage" is the property. Expressing
+        // the expectation as a name would build the defect into the
+        // expectation itself.
+        let lineage = ExpectedLineage {
+            component_id: "fine-tuned".to_owned(),
+            base_component_id: "base-model".to_owned(),
+            base_digests: BTreeSet::from([digest("a")]),
+        };
+        lineage.validate().expect("valid");
+        // The field is a component id, and the type has no `base_name`.
+        let hostile = serde_json::json!({
+            "component_id": "fine-tuned",
+            "base_component_id": "base-model",
+            "base_name": "llama-3"
+        });
+        assert!(serde_json::from_value::<ExpectedLineage>(hostile).is_err());
+    }
+
+    #[test]
+    fn a_model_cannot_be_its_own_base() {
+        let lineage = ExpectedLineage {
+            component_id: "model".to_owned(),
+            base_component_id: "model".to_owned(),
+            base_digests: BTreeSet::new(),
+        };
+        assert!(lineage.validate().is_err());
+    }
+
+    #[test]
+    fn a_hostile_identity_in_the_policy_is_refused() {
+        let mut policy = policy();
+        policy
+            .approved_builders
+            .insert("builder\u{202E}evil".to_owned());
+        assert!(policy.validate().is_err());
+    }
+
+    #[test]
+    fn manifest_collections_are_order_independent() {
+        // The manifest is part of the binding, so two equivalent manifests must
+        // digest identically or a reordering would read as a substitution.
+        let mut left = manifest();
+        left.declared_component_ids =
+            BTreeSet::from(["a".to_owned(), "b".to_owned(), "c".to_owned()]);
+        let mut right = manifest();
+        right.declared_component_ids =
+            BTreeSet::from(["c".to_owned(), "a".to_owned(), "b".to_owned()]);
+        assert_eq!(
+            crate::canonical::digest(&left).unwrap(),
+            crate::canonical::digest(&right).unwrap()
+        );
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod cycle019_pre_review_tests {
+    use super::*;
+    use crate::component::tests::digest;
+
+    pub(crate) fn policy() -> TrustPolicy {
+        TrustPolicy {
+            approved_sources: BTreeSet::from(["registry-internal".to_owned()]),
+            approved_suppliers: BTreeSet::from(["acme".to_owned()]),
+            approved_publishers: BTreeSet::new(),
+            approved_builders: BTreeSet::from(["builder-ci".to_owned()]),
+            approved_signers: BTreeSet::from(["signer-release".to_owned()]),
+        }
+    }
+
+    pub(crate) fn manifest() -> DareManifest {
+        DareManifest {
+            schema_version: "1".to_owned(),
+            manifest_id: Some("manifest-1".to_owned()),
+            trust_policy: policy(),
+            approved_components: BTreeSet::from([ApprovedComponent {
+                component_id: "react".to_owned(),
+                name: Some("react".to_owned()),
+                version: Some("1.0.0".to_owned()),
+                digests: BTreeSet::from([digest("a")]),
+            }]),
+            expected_edges: BTreeSet::new(),
+            expected_lineage: BTreeSet::new(),
+            declared_component_ids: BTreeSet::from(["react".to_owned()]),
+            approved_capabilities: BTreeMap::new(),
+        }
+    }
+
+    #[test]
+    fn the_fixture_manifest_validates() {
+        manifest().validate().expect("valid");
+    }
+
+    #[test]
+    fn a_manifest_cannot_declare_a_verdict() {
+        // Structural rather than checked: there is no field, and
+        // `deny_unknown_fields` means adding one fails to decode. A manifest
+        // that could state an outcome would reduce the engine to agreeing with
+        // whoever wrote the manifest.
+        for hostile in [
+            serde_json::json!({ "schema_version": "1", "expected_verdict": "PASS" }),
+            serde_json::json!({ "schema_version": "1", "is_secure": true }),
+            serde_json::json!({ "schema_version": "1", "expected_findings": [] }),
+            serde_json::json!({ "schema_version": "1", "should_fail": false }),
+        ] {
+            assert!(
+                serde_json::from_value::<DareManifest>(hostile).is_err(),
+                "a manifest declared its own outcome"
+            );
+        }
+    }
+
+    #[test]
+    fn an_unsupported_manifest_version_is_refused_rather_than_guessed() {
+        let mut manifest = manifest();
+        manifest.schema_version = "2".to_owned();
+        let err = manifest.validate().expect_err("must be refused");
+        assert!(err.is_refusal());
+    }
+
+    #[test]
+    fn the_five_approved_identity_sets_are_separate_concepts() {
+        // A publisher is not a builder, and approving one approves one.
+        let policy = policy();
+        assert!(policy.approves_builder("builder-ci"));
+        assert!(!policy.approves_signer("builder-ci"));
+        assert!(policy.approves_signer("signer-release"));
+        assert!(!policy.approves_builder("signer-release"));
+    }
+
+    #[test]
+    fn an_absent_policy_is_a_gap_rather_than_universal_denial() {
+        // Denying everything would make every component a finding, which is
+        // indistinguishable from a broken engine. The evaluator needs to be
+        // able to tell "nobody wrote a policy" from "the policy says no".
+        let empty = TrustPolicy::default();
+        assert!(empty.is_empty());
+        assert_eq!(empty.approves_origin(None, None, None), None);
+    }
+
+    #[test]
+    fn a_claim_that_matches_nothing_is_a_decision_not_a_gap() {
+        let policy = policy();
+        assert_eq!(
+            policy.approves_origin(Some("registry-unknown"), None, None),
+            Some(false)
+        );
+        assert_eq!(
+            policy.approves_origin(Some("registry-internal"), None, None),
+            Some(true)
+        );
+    }
+
+    #[test]
+    #[ignore = "superseded by stricter Cycle 019 post-merge semantics"]
     fn an_origin_is_approved_whichever_field_carried_it() {
         // A document may record the same fact as source, supplier or publisher.
         // A component whose supplier is approved is approved.

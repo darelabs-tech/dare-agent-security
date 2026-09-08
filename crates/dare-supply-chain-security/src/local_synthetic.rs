@@ -1,23 +1,6 @@
 //! Local-synthetic collection, gated through the Cycle 009 controls.
-//!
-//! This adapter generates a bill of materials locally and then reads it back
-//! through the **real importer**, so the parser path a hostile document would
-//! take is the path a synthetic document takes. A simulated bundle assembled
-//! directly in memory proves the evaluators work; only this proves the
-//! importers do.
-//!
-//! Nothing here reaches anything. What it "generates" is bytes in a `Vec<u8>`
-//! that never leave the process: no file is written, no directory is created,
-//! no artifact is executed and no coordinate inside the generated document is
-//! resolved. The Cycle 009 budget pins state changes and external egress to
-//! zero and the snapshot records that it did.
-//!
-//! # The kill switch
-//!
-//! A run approved for one scenario that is pointed at another stops rather than
-//! collecting. Without it, an approved allocation could be redirected at
-//! something nobody approved — the allocation would still look correct in every
-//! record, because the record names the scenario the run was *approved* for.
+
+use std::cell::Cell;
 
 use dare_adversarial::model::ExecutionBudget;
 use serde::{Deserialize, Serialize};
@@ -30,7 +13,6 @@ use crate::model::SupplyChainScenario;
 use crate::normalize::{BomFormat, EvidenceBuilder, SupplyChainEvidence};
 use crate::source::{ReferenceBehavior, SupplyChainMode};
 
-/// The Cycle 009 budget a Cycle 019 synthetic run executes under.
 pub fn synthetic_budget(documents: u32) -> ExecutionBudget {
     ExecutionBudget {
         schema_version: "1".to_owned(),
@@ -46,7 +28,6 @@ pub fn synthetic_budget(documents: u32) -> ExecutionBudget {
     }
 }
 
-/// What the controls allowed, recorded so a report can show it.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SupplyChainControlSnapshot {
@@ -58,16 +39,17 @@ pub struct SupplyChainControlSnapshot {
     pub kill_switch_triggered: bool,
 }
 
-/// Generate local documents and read them back through the real importers.
 #[derive(Debug, Clone)]
 pub struct LocalSyntheticAdapter {
     target_scenario_id: String,
+    kill_switch_triggered: Cell<bool>,
 }
 
 impl LocalSyntheticAdapter {
     pub fn new(target_scenario_id: impl Into<String>) -> Self {
         Self {
             target_scenario_id: target_scenario_id.into(),
+            kill_switch_triggered: Cell::new(false),
         }
     }
 
@@ -83,7 +65,7 @@ impl LocalSyntheticAdapter {
             state_changes: budget.max_state_changes,
             external_egress_bytes: budget.max_external_egress_bytes,
             bytes_written: budget.max_bytes_written,
-            kill_switch_triggered: false,
+            kill_switch_triggered: self.kill_switch_triggered.get(),
         }
     }
 }
@@ -93,6 +75,10 @@ impl SupplyChainAdapter for LocalSyntheticAdapter {
         SupplyChainMode::LocalSynthetic
     }
 
+    fn control_snapshot(&self) -> Option<SupplyChainControlSnapshot> {
+        Some(self.snapshot())
+    }
+
     fn collect(
         &self,
         scenario: &SupplyChainScenario,
@@ -100,16 +86,15 @@ impl SupplyChainAdapter for LocalSyntheticAdapter {
     ) -> Result<SupplyChainEvidence> {
         scenario.validate()?;
         if scenario.scenario_id != self.target_scenario_id {
+            self.kill_switch_triggered.set(true);
             return Err(SupplyChainError::refusal(format!(
-                "the local-synthetic run was approved for `{}` and was pointed at another \
-                 scenario",
+                "the local-synthetic run was approved for `{}` and was pointed at another scenario",
                 self.target_scenario_id
             )));
         }
         let behavior = scenario.reference_behavior.ok_or_else(|| {
             SupplyChainError::invalid(format!(
-                "scenario `{}` runs in LOCAL_SYNTHETIC mode without naming a reference \
-                 behaviour, so there is no document to generate",
+                "scenario `{}` runs in LOCAL_SYNTHETIC mode without naming a reference behaviour, so there is no document to generate",
                 scenario.scenario_id
             ))
         })?;
@@ -124,11 +109,6 @@ impl SupplyChainAdapter for LocalSyntheticAdapter {
     }
 }
 
-/// Generate a CycloneDX 1.7 document for one behaviour.
-///
-/// Deterministic: the same behaviour always produces byte-identical output, so
-/// a report's document digest is reproducible and a changed digest means a
-/// changed generator rather than a changed run.
 pub fn generate_cyclonedx(behavior: ReferenceBehavior) -> Vec<u8> {
     let sha_a = "a".repeat(64);
     let sha_b = "b".repeat(64);
@@ -139,7 +119,6 @@ pub fn generate_cyclonedx(behavior: ReferenceBehavior) -> Vec<u8> {
         "name": "react",
         "version": "1.0.0",
         "hashes": [{ "alg": "SHA-256", "content": sha_a }],
-        // A coordinate, and nothing more. Nothing in this crate resolves it.
         "purl": "pkg:npm/react@1.0.0"
     })];
 
@@ -177,6 +156,62 @@ pub fn generate_cyclonedx(behavior: ReferenceBehavior) -> Vec<u8> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::model::tests::scenario;
+    use crate::model::SupplyChainInvariant;
+
+    fn synthetic_scenario(behavior: ReferenceBehavior) -> SupplyChainScenario {
+        let mut scenario = scenario(
+            "supply-lab-synthetic",
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+        );
+        scenario.mode = SupplyChainMode::LocalSynthetic;
+        scenario.evidence_files = Vec::new();
+        scenario.reference_behavior = Some(behavior);
+        scenario
+    }
+
+    #[test]
+    fn the_budget_pins_state_changes_egress_and_writes_to_zero() {
+        let budget = synthetic_budget(3);
+        assert_eq!(budget.max_state_changes, 0);
+        assert_eq!(budget.max_external_egress_bytes, 0);
+        assert_eq!(budget.max_bytes_written, 0);
+    }
+
+    #[test]
+    fn control_snapshot_is_exposed_through_the_adapter_contract() {
+        let scenario = synthetic_scenario(ReferenceBehavior::Compliant);
+        let adapter = LocalSyntheticAdapter::for_scenario(&scenario);
+        let snapshot = adapter.control_snapshot().expect("snapshot");
+        assert_eq!(snapshot.target_scenario_id, scenario.scenario_id);
+        assert_eq!(snapshot.state_changes, 0);
+        assert_eq!(snapshot.external_egress_bytes, 0);
+    }
+
+    #[test]
+    fn pointing_an_approved_run_at_another_scenario_records_the_kill_switch() {
+        let adapter = LocalSyntheticAdapter::new("supply-lab-elsewhere");
+        let mut ledger = AdmissionLedger::new();
+        assert!(adapter
+            .collect(
+                &synthetic_scenario(ReferenceBehavior::Compliant),
+                &mut ledger,
+            )
+            .is_err());
+        assert!(adapter.snapshot().kill_switch_triggered);
+    }
+
+    #[test]
+    fn generation_is_deterministic() {
+        for behavior in ReferenceBehavior::all() {
+            assert_eq!(generate_cyclonedx(behavior), generate_cyclonedx(behavior));
+        }
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
     use super::*;
     use crate::invariant::{collect_observed_violations, evaluate};
     use crate::model::tests::scenario;

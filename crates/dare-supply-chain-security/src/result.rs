@@ -1,20 +1,4 @@
 //! The run artifact.
-//!
-//! One scenario, one evidence bundle, twelve invariant outcomes, one verdict.
-//!
-//! # Bounded wording
-//!
-//! A result never says a supply chain is secure. It says which invariants held
-//! under the evidence that was actually read, and the reason text is written so
-//! that a reader who sees only the artifact cannot mistake it for a broader
-//! claim — `complete AI-BOM != secure supply chain` is a rule of this cycle and
-//! the report is where it is easiest to break.
-//!
-//! # What the artifact carries
-//!
-//! Enough to get from the verdict back to the evidence: the digest of every
-//! document read, the digest of the observation that decided each violation,
-//! the budget the run executed under, and whether the evidence was staged.
 
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +18,6 @@ use crate::source::{HarnessErrorKind, ScenarioClass, SupplyChainMode};
 pub const RESULT_SCHEMA_ID: &str =
     "https://darelabs.tech/schemas/supply-chain-security/v1/result.schema.json";
 
-/// One document the run read.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DocumentRecord {
@@ -44,46 +27,28 @@ pub struct DocumentRecord {
     pub content_digest: String,
 }
 
-/// The bounded run artifact.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SupplyChainSecurityResult {
     pub schema_version: String,
     pub schema_id: String,
-
     pub scenario_id: String,
     pub scenario_digest: String,
     pub evidence_digest: String,
-
     pub class: ScenarioClass,
-    /// The invariant the scenario selected for coverage. Never a verdict.
     pub primary_invariant: SupplyChainInvariant,
     pub property_id: String,
-
     pub mode: SupplyChainMode,
-    /// True when the evidence was staged or replayed rather than collected from
-    /// a real deployment.
     pub synthetic: bool,
-
     pub verdict: Verdict,
-    /// Operator-safe explanation. Bounded to what was evaluated, and never a
-    /// claim that the supply chain is secure.
     pub reason: String,
-
     pub outcomes: Vec<SupplyChainInvariantOutcome>,
-    /// Every concrete violation retained across all twelve invariants.
-    ///
-    /// Always serialized, even when empty. An artifact where "no violations"
-    /// is an absent field invites a reader — and a checker — to treat missing
-    /// as unknown, and those are different answers.
     #[serde(default)]
     pub violations: Vec<SupplyChainViolation>,
-
     pub documents: Vec<DocumentRecord>,
     pub components_evaluated: usize,
     pub relationships_evaluated: usize,
     pub observation_digests: Vec<String>,
-
     pub redaction_state: String,
     pub budget: BudgetSnapshot,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -95,7 +60,6 @@ impl SupplyChainSecurityResult {
         self.verdict == Verdict::Fail
     }
 
-    /// The invariants that reached a definite answer.
     pub fn decided(&self) -> Vec<&SupplyChainInvariantOutcome> {
         self.outcomes
             .iter()
@@ -104,12 +68,6 @@ impl SupplyChainSecurityResult {
     }
 }
 
-/// Run one scenario through one adapter.
-///
-/// A harness failure becomes a `HARNESS_ERROR` observation rather than an
-/// `Err`: a run that could not collect evidence is a result an operator needs
-/// to see, and losing it in an error return would leave the scenario looking
-/// like it had never been attempted.
 pub fn run_scenario(
     scenario: &SupplyChainScenario,
     adapter: &dyn SupplyChainAdapter,
@@ -127,8 +85,6 @@ pub fn run_scenario(
             ObservationSet::new(vec![SupplyChainObservation::HarnessError(
                 HarnessErrorContext {
                     kind: harness_error_kind(&error),
-                    // The engine's own message, which is already written not to
-                    // echo what it refused.
                     reason: error.to_string(),
                 },
             )]),
@@ -185,17 +141,19 @@ pub fn run_scenario(
         violations,
         components_evaluated: evidence
             .as_ref()
-            .map(|evidence| evidence.components.len())
+            .map(|e| e.components.len())
             .unwrap_or_default(),
         relationships_evaluated: evidence
             .as_ref()
-            .map(|evidence| evidence.graph.edges.len())
+            .map(|e| e.graph.edges.len())
             .unwrap_or_default(),
         documents,
         observation_digests,
         redaction_state: "REDACTED".to_owned(),
         budget: ledger.snapshot(),
-        controls: None,
+        // Capture the adapter's real control state after collection. This is
+        // especially important for a kill switch that may have tripped.
+        controls: adapter.control_snapshot(),
     })
 }
 
@@ -206,11 +164,6 @@ fn harness_error_kind(error: &crate::error::SupplyChainError) -> HarnessErrorKin
     }
 }
 
-/// The operator-facing summary.
-///
-/// Deliberately narrow. A run that violated nothing is reported as *these
-/// invariants held under this evidence*, never as a secure supply chain — a
-/// complete bill of materials is an inventory, and an inventory is not trust.
 fn reason_for(
     verdict: Verdict,
     outcomes: &[SupplyChainInvariantOutcome],
@@ -224,29 +177,76 @@ fn reason_for(
 
     match verdict {
         Verdict::Fail => format!(
-            "{} independent supply-chain violation(s) were observed across {decided} decided \
-             invariant(s); {undecided} could not be decided from the evidence read",
+            "{} independent supply-chain violation(s) were observed across {decided} decided invariant(s); {undecided} could not be decided from the evidence read",
             violations.len()
         ),
-        Verdict::Error => {
-            "the run could not read the evidence it was asked to evaluate, so no supply-chain \
-             conclusion is available in either direction"
-                .to_owned()
-        }
+        Verdict::Error => "the run could not read the evidence it was asked to evaluate, so no supply-chain conclusion is available in either direction".to_owned(),
         Verdict::Inconclusive => format!(
-            "no violation was observed, and {undecided} of {} invariant(s) lacked the evidence \
-             needed to decide them; this run does not establish that the supply chain is intact",
+            "no violation was observed, and {undecided} of {} invariant(s) lacked the evidence needed to decide them; this run does not establish that the supply chain is intact",
             outcomes.len()
         ),
         Verdict::Pass => format!(
-            "all {decided} applicable invariant(s) held under the evidence read; this is a \
-             statement about the evidence supplied, not that the supply chain is secure"
+            "all {decided} applicable invariant(s) held under the evidence read; this is a statement about the evidence supplied, not that the supply chain is secure"
         ),
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::local_synthetic::LocalSyntheticAdapter;
+    use crate::model::tests::scenario;
+    use crate::simulated::SimulatedAdapter;
+    use crate::source::ReferenceBehavior;
+
+    fn simulated(behavior: ReferenceBehavior) -> SupplyChainSecurityResult {
+        let mut scenario = scenario(
+            "supply-lab-result",
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+        );
+        scenario.mode = SupplyChainMode::Simulated;
+        scenario.evidence_files = Vec::new();
+        scenario.reference_behavior = Some(behavior);
+        let mut ledger = AdmissionLedger::new();
+        run_scenario(&scenario, &SimulatedAdapter::new(), &mut ledger).expect("runs")
+    }
+
+    #[test]
+    fn a_substituted_artifact_produces_a_failing_artifact() {
+        let result = simulated(ReferenceBehavior::DigestSubstituted);
+        assert!(result.is_violation());
+        assert!(!result.violations.is_empty());
+        assert_eq!(result.outcomes.len(), 12);
+    }
+
+    #[test]
+    fn local_synthetic_result_persists_the_control_snapshot() {
+        let mut scenario = scenario(
+            "supply-lab-controls",
+            SupplyChainInvariant::ComponentIdentityUnambiguous,
+        );
+        scenario.mode = SupplyChainMode::LocalSynthetic;
+        scenario.evidence_files = Vec::new();
+        scenario.reference_behavior = Some(ReferenceBehavior::Compliant);
+        let adapter = LocalSyntheticAdapter::for_scenario(&scenario);
+        let mut ledger = AdmissionLedger::new();
+        let result = run_scenario(&scenario, &adapter, &mut ledger).expect("runs");
+        let controls = result.controls.expect("control snapshot");
+        assert_eq!(controls.state_changes, 0);
+        assert_eq!(controls.external_egress_bytes, 0);
+        assert!(!controls.kill_switch_triggered);
+    }
+
+    #[test]
+    fn a_clean_run_never_claims_the_supply_chain_is_secure() {
+        let result = simulated(ReferenceBehavior::Compliant);
+        assert!(result.reason.contains("evidence"));
+        assert!(!result.reason.eq_ignore_ascii_case("supply chain is secure"));
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
     use super::*;
     use crate::corpus::corpus;
     use crate::harness::StaticAdapter;
