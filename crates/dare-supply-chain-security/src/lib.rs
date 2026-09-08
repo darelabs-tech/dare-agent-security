@@ -70,12 +70,16 @@
 pub mod attestation;
 pub mod budget;
 pub mod canonical;
+pub mod capability;
 pub mod component;
 pub mod cyclonedx;
+pub mod dataset;
 pub mod error;
 pub mod identity;
 pub mod manifest;
+pub mod model_lineage;
 pub mod normalize;
+pub mod projection;
 pub mod provenance;
 pub mod relationship;
 pub mod schema;
