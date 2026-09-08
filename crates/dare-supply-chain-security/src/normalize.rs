@@ -1,16 +1,4 @@
-//! Format-independent normalization, and the evidence bundle everything else
-//! reads.
-//!
-//! Two documents describing the same system in different vocabularies must
-//! reach the same components and the same edges. That is what makes supporting
-//! two formats worth anything: a security question gets one answer regardless
-//! of which tool produced the evidence.
-//!
-//! **Equivalence is semantic, never structural.** Comparing normalized JSON
-//! would compare parsers — field order, optional keys, which importer happened
-//! to populate `metadata`. What is compared is the set of semantic keys, which
-//! `identity.rs` builds from what a component *is* rather than from which
-//! document described it.
+//! Format-independent normalization, and the evidence bundle everything else reads.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -26,7 +14,6 @@ use crate::provenance::ProvenanceRecord;
 use crate::relationship::{Relationship, RelationshipGraph};
 use crate::source::{EvidenceSource, ObservationKind};
 
-/// Which format a document was read from.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum BomFormat {
@@ -45,22 +32,15 @@ impl BomFormat {
     }
 }
 
-/// A record that a document was read, and what it was.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BomDocumentRef {
     pub document_id: String,
     pub format: BomFormat,
     pub bytes: usize,
-    /// A digest of the raw document, so a substituted input is visible in the
-    /// artifact rather than only in whoever ran it.
     pub content_digest: String,
 }
 
-/// Everything the evaluators read.
-///
-/// Assembled once, then treated as immutable. An evaluator that could mutate
-/// the evidence it judges would make findings depend on evaluation order.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SupplyChainEvidence {
@@ -79,16 +59,12 @@ pub struct SupplyChainEvidence {
 }
 
 impl SupplyChainEvidence {
-    /// Find a component by its canonical id.
     pub fn component(&self, component_id: &str) -> Option<&Component> {
         self.components
             .iter()
             .find(|component| component.component_id == component_id)
     }
 
-    /// The set of semantic keys this evidence describes.
-    ///
-    /// The comparison surface for cross-format equivalence.
     pub fn semantic_keys(&self) -> BTreeSet<String> {
         self.components
             .iter()
@@ -96,7 +72,6 @@ impl SupplyChainEvidence {
             .collect()
     }
 
-    /// Edge keys, ignoring which format supplied them.
     pub fn edge_keys(&self) -> BTreeSet<String> {
         self.graph
             .edges
@@ -105,27 +80,10 @@ impl SupplyChainEvidence {
             .collect()
     }
 
-    /// Whether this evidence and another describe the same system.
-    ///
-    /// Semantic, not structural: two documents may differ in every optional
-    /// field and still describe the same components and relationships.
     pub fn describes_same_system_as(&self, other: &Self) -> bool {
         self.semantic_keys() == other.semantic_keys() && self.edge_keys() == other.edge_keys()
     }
 
-    /// Validate the assembled evidence as a whole.
-    ///
-    /// The checks that only make sense once everything is present: edges must
-    /// not dangle, and the graph must be bounded.
-    ///
-    /// Identity ambiguity is deliberately **not** refused here. It is a
-    /// security finding, not malformed input: one artifact appearing under two
-    /// canonical ids is precisely what
-    /// `COMPONENT_IDENTITY_UNAMBIGUOUS` exists to report, and refusing the
-    /// bundle would turn a finding an operator needs to see into a run that
-    /// could not observe. The ambiguity is retained and reported by
-    /// [`Self::identity_collisions`]; the ids stay distinct and resolvable, so
-    /// every other invariant still reads the row it meant to.
     pub fn validate(&self) -> Result<()> {
         for component in &self.components {
             component.validate()?;
@@ -138,22 +96,40 @@ impl SupplyChainEvidence {
         }
         self.manifest.validate()?;
 
+        let mut provenance_counts: BTreeMap<&str, u32> = BTreeMap::new();
+        for record in &self.provenance {
+            let count = provenance_counts
+                .entry(&record.subject_component_id)
+                .or_default();
+            *count += 1;
+            if *count > crate::limits::HARD_MAX_PROVENANCE_RECORDS_PER_COMPONENT {
+                return Err(SupplyChainError::BudgetExhausted(
+                    "a component carries more provenance records than the hard maximum".to_owned(),
+                ));
+            }
+        }
+        let mut attestation_counts: BTreeMap<&str, u32> = BTreeMap::new();
+        for record in &self.attestations {
+            let count = attestation_counts
+                .entry(&record.subject_component_id)
+                .or_default();
+            *count += 1;
+            if *count > crate::limits::HARD_MAX_ATTESTATIONS_PER_COMPONENT {
+                return Err(SupplyChainError::BudgetExhausted(
+                    "a component carries more attestations than the hard maximum".to_owned(),
+                ));
+            }
+        }
+
         self.graph.assert_no_dangling(&self.components)?;
         self.graph.assert_bounded_depth()?;
         Ok(())
     }
 
-    /// Components whose canonical identities cannot be told apart.
-    ///
-    /// Retained rather than refused — see [`Self::validate`].
     pub fn identity_collisions(&self) -> Vec<IdentityCollision> {
         find_collisions(&self.components)
     }
 
-    /// Whether both declared and observed component sets exist.
-    ///
-    /// Without both, the evidence describes what was expected or what was
-    /// found, and the declared/observed comparison has nothing to compare.
     pub fn has_declared_and_observed(&self) -> bool {
         !self.manifest.declared_component_ids.is_empty()
             && self
@@ -162,7 +138,6 @@ impl SupplyChainEvidence {
                 .any(|component| component.observation != ObservationKind::Declared)
     }
 
-    /// Components observed that the manifest never declared.
     pub fn undeclared_components(&self) -> Vec<&Component> {
         if self.manifest.declared_component_ids.is_empty() {
             return Vec::new();
@@ -179,11 +154,6 @@ impl SupplyChainEvidence {
     }
 }
 
-/// Merge imported documents, a manifest and local records into one bundle.
-///
-/// Merging is where duplicate identities become visible, so `validate` runs at
-/// the end rather than per document: a collision between two documents cannot
-/// be seen from inside either one.
 pub struct EvidenceBuilder {
     evidence: SupplyChainEvidence,
     seen_ids: BTreeMap<String, EvidenceSource>,
@@ -203,18 +173,11 @@ impl EvidenceBuilder {
         }
     }
 
-    /// Carry forward a document reference a capture already recorded.
-    ///
-    /// The digest comes from the capture rather than being recomputed, because
-    /// the bytes are gone: what is being replayed is the record of having read
-    /// them. Recomputing over the reconstructed bundle would produce a digest
-    /// of something the run never saw.
     pub fn with_recorded_document(mut self, document: BomDocumentRef) -> Self {
         self.evidence.documents.push(document);
         self
     }
 
-    /// Record that a document was read.
     pub fn with_document(mut self, document_id: &str, format: BomFormat, raw: &[u8]) -> Self {
         self.evidence.documents.push(BomDocumentRef {
             document_id: document_id.to_owned(),
@@ -225,23 +188,29 @@ impl EvidenceBuilder {
         self
     }
 
-    /// Add components and edges from one import.
-    ///
-    /// A component already present under the same id from another document is
-    /// merged rather than duplicated: two documents describing one component is
-    /// the normal case, and a duplicate row would make the identity resolver
-    /// report an ambiguity that does not exist.
+    /// Complementary descriptions of one component may merge; contradictory
+    /// descriptions must survive as separate rows so the evaluator can see the
+    /// conflict. In particular, two different digests for the same algorithm,
+    /// or conflicting origin claims, are never unioned into one apparently
+    /// acceptable component.
     pub fn with_import(mut self, components: Vec<Component>, graph: RelationshipGraph) -> Self {
         for component in components {
             match self.seen_ids.get(&component.component_id) {
                 Some(_) => {
-                    if let Some(existing) = self
+                    if let Some(existing_index) = self
                         .evidence
                         .components
-                        .iter_mut()
-                        .find(|candidate| candidate.component_id == component.component_id)
+                        .iter()
+                        .position(|candidate| candidate.component_id == component.component_id)
                     {
-                        merge_into(existing, component);
+                        if descriptions_conflict(
+                            &self.evidence.components[existing_index],
+                            &component,
+                        ) {
+                            self.evidence.components.push(component);
+                        } else {
+                            merge_into(&mut self.evidence.components[existing_index], component);
+                        }
                     }
                 }
                 None => {
@@ -257,13 +226,7 @@ impl EvidenceBuilder {
         self
     }
 
-    /// Apply a DARE manifest: approvals, expectations and declared components.
-    ///
-    /// This is the only step that can raise a component's trust class, and it
-    /// is the only one that may: approval lives in a local policy.
     pub fn with_manifest(mut self, manifest: DareManifest) -> Self {
-        // Expected edges enter the graph as *declared*, which is what makes the
-        // declared/observed comparison possible at all.
         for expected in &manifest.expected_edges {
             self.evidence.graph.edges.insert(Relationship {
                 source_id: expected.source_id.clone(),
@@ -273,12 +236,7 @@ impl EvidenceBuilder {
                 evidence_source: EvidenceSource::DareManifest,
             });
         }
-
-        // An edge that is both declared and observed collapses into one
-        // `DeclaredAndObserved` entry, so the comparison reports agreement
-        // rather than two half-findings.
         collapse_declared_and_observed(&mut self.evidence.graph);
-
         self.evidence.manifest = manifest;
         self
     }
@@ -293,30 +251,66 @@ impl EvidenceBuilder {
         self
     }
 
-    /// Finish, admitting the assembled objects and validating the whole.
     pub fn build(self, ledger: &mut AdmissionLedger) -> Result<SupplyChainEvidence> {
         let evidence = self.evidence;
-
-        // Admission before persistence, once more: the merged set can exceed a
-        // bound that no single document did.
         for _ in &evidence.components {
             ledger.admit_component()?;
         }
         for _ in &evidence.graph.edges {
             ledger.admit_relationship()?;
         }
-
         evidence.validate()?;
         Ok(evidence)
     }
 }
 
-/// Merge a second description of one component into the first.
-///
-/// Union of evidence, never replacement. A second document that omits a digest
-/// the first supplied must not remove it: the union is what is known about the
-/// component, and dropping evidence because one source was quieter would turn a
-/// complete picture into a partial one.
+fn descriptions_conflict(existing: &Component, incoming: &Component) -> bool {
+    if existing.component_type != incoming.component_type || existing.name != incoming.name {
+        return true;
+    }
+    if matches!((&existing.version, &incoming.version), (Some(a), Some(b)) if a != b) {
+        return true;
+    }
+
+    // Different algorithms can complement one another (sha256 + sha512). For a
+    // shared algorithm, however, two non-empty different value sets describe
+    // different bytes and must not be unioned.
+    for algorithm in crate::source::DigestAlgorithm::all() {
+        let left: BTreeSet<&str> = existing
+            .digests
+            .iter()
+            .filter(|digest| digest.algorithm == algorithm)
+            .map(|digest| digest.value.as_str())
+            .collect();
+        let right: BTreeSet<&str> = incoming
+            .digests
+            .iter()
+            .filter(|digest| digest.algorithm == algorithm)
+            .map(|digest| digest.value.as_str())
+            .collect();
+        if !left.is_empty() && !right.is_empty() && left != right {
+            return true;
+        }
+    }
+
+    let origin_conflicts = [
+        (&existing.supplier.source_id, &incoming.supplier.source_id),
+        (
+            &existing.supplier.supplier_id,
+            &incoming.supplier.supplier_id,
+        ),
+        (
+            &existing.supplier.publisher_id,
+            &incoming.supplier.publisher_id,
+        ),
+        (&existing.supplier.builder_id, &incoming.supplier.builder_id),
+        (&existing.supplier.signer_id, &incoming.supplier.signer_id),
+    ];
+    origin_conflicts
+        .iter()
+        .any(|(left, right)| matches!((left, right), (Some(a), Some(b)) if a != b))
+}
+
 fn merge_into(existing: &mut Component, incoming: Component) {
     existing.digests.extend(incoming.digests);
     existing.identifiers.extend(incoming.identifiers);
@@ -341,7 +335,6 @@ fn merge_into(existing: &mut Component, incoming: Component) {
     existing.metadata.extend(incoming.metadata);
 }
 
-/// Collapse edges present as both declared and observed into one entry.
 fn collapse_declared_and_observed(graph: &mut RelationshipGraph) {
     let declared: BTreeSet<String> = graph
         .edges
@@ -355,12 +348,10 @@ fn collapse_declared_and_observed(graph: &mut RelationshipGraph) {
         .filter(|edge| edge.observation == ObservationKind::Observed)
         .map(Relationship::edge_key)
         .collect();
-
     let both: BTreeSet<&String> = declared.intersection(&observed).collect();
     if both.is_empty() {
         return;
     }
-
     let mut collapsed = BTreeSet::new();
     for edge in std::mem::take(&mut graph.edges) {
         if both.contains(&edge.edge_key()) {
@@ -370,7 +361,6 @@ fn collapse_declared_and_observed(graph: &mut RelationshipGraph) {
                     ..edge
                 });
             }
-            // The observed twin is dropped; the collapsed entry carries both.
             continue;
         }
         collapsed.insert(edge);
@@ -378,7 +368,6 @@ fn collapse_declared_and_observed(graph: &mut RelationshipGraph) {
     graph.edges = collapsed;
 }
 
-/// Assert two evidence bundles describe the same system.
 pub fn assert_equivalent(left: &SupplyChainEvidence, right: &SupplyChainEvidence) -> Result<()> {
     if left.semantic_keys() != right.semantic_keys() {
         return Err(SupplyChainError::BindingMismatch(
@@ -395,6 +384,96 @@ pub fn assert_equivalent(left: &SupplyChainEvidence, right: &SupplyChainEvidence
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use super::*;
+    use crate::component::tests::{component, digest};
+    use crate::source::ComponentType;
+
+    #[test]
+    fn complementary_same_id_descriptions_merge() {
+        let mut first = component("react", ComponentType::Package);
+        first.supplier.supplier_id = Some("acme".to_owned());
+        let mut second = component("react", ComponentType::Package);
+        second.digests.clear();
+        second.supplier = Default::default();
+        second.evidence_source = EvidenceSource::Spdx;
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_import(vec![first], RelationshipGraph::new())
+            .with_import(vec![second], RelationshipGraph::new())
+            .build(&mut ledger)
+            .expect("builds");
+        assert_eq!(evidence.components.len(), 1);
+        assert_eq!(evidence.components[0].digests.len(), 1);
+    }
+
+    #[test]
+    fn conflicting_same_id_digest_descriptions_are_retained() {
+        let first = component("react", ComponentType::Package);
+        let mut second = component("react", ComponentType::Package);
+        second.digests = BTreeSet::from([digest("b")]);
+        second.evidence_source = EvidenceSource::Spdx;
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_import(vec![first], RelationshipGraph::new())
+            .with_import(vec![second], RelationshipGraph::new())
+            .build(&mut ledger)
+            .expect("builds");
+        assert_eq!(evidence.components.len(), 2);
+        assert!(!evidence.identity_collisions().is_empty());
+    }
+
+    #[test]
+    fn conflicting_origin_claims_are_retained() {
+        let mut first = component("react", ComponentType::Package);
+        first.supplier.source_id = Some("registry-approved".to_owned());
+        let mut second = first.clone();
+        second.supplier.source_id = Some("registry-evil".to_owned());
+        second.evidence_source = EvidenceSource::Spdx;
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_import(vec![first], RelationshipGraph::new())
+            .with_import(vec![second], RelationshipGraph::new())
+            .build(&mut ledger)
+            .expect("builds");
+        assert_eq!(evidence.components.len(), 2);
+    }
+
+    #[test]
+    fn provenance_and_attestation_counts_are_bounded_per_component() {
+        use crate::attestation::tests::attestation;
+        use crate::provenance::tests::record;
+        let mut ledger = AdmissionLedger::new();
+        let too_many_provenance: Vec<_> = (0
+            ..=crate::limits::HARD_MAX_PROVENANCE_RECORDS_PER_COMPONENT)
+            .map(|i| record(&format!("prov-{i}"), "react"))
+            .collect();
+        assert!(EvidenceBuilder::new()
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new()
+            )
+            .with_provenance(too_many_provenance)
+            .build(&mut ledger)
+            .is_err());
+
+        let mut ledger = AdmissionLedger::new();
+        let too_many_attestations: Vec<_> = (0
+            ..=crate::limits::HARD_MAX_ATTESTATIONS_PER_COMPONENT)
+            .map(|i| attestation(&format!("att-{i}"), "react"))
+            .collect();
+        assert!(EvidenceBuilder::new()
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new()
+            )
+            .with_attestations(too_many_attestations)
+            .build(&mut ledger)
+            .is_err());
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod cycle019_pre_review_tests {
     use super::*;
     use crate::component::tests::component;
     use crate::manifest::{ExpectedEdge, TrustPolicy};

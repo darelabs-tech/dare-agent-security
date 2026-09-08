@@ -155,22 +155,23 @@ pub struct SourceTrustContext {
     /// Whether a local policy exists at all. An absent policy is a gap, not a
     /// denial.
     pub policy_present: bool,
-    /// Whether the policy approves one of the origin claims. `None` when no
-    /// claim was made or no policy exists.
+    /// Whether every present origin claim is approved by its corresponding
+    /// local policy set. `None` when no claim was made or no policy exists.
     pub policy_approves_origin: Option<bool>,
 }
 
-/// The provenance bindings for one component, plus what policy says about the
-/// builder it names.
+/// The provenance bindings for one component, plus what policy says about every
+/// builder the matching provenance records name.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProvenanceContext {
     pub assessment: ProvenanceAssessment,
     pub policy_present: bool,
-    /// Whether the named builder is approved. `None` when no builder was named
-    /// or no policy exists — a builder nobody approved and a builder nobody
-    /// asked about are different situations.
+    /// Compatibility summary for a single representative builder. Security
+    /// decisions use the complete approved/unapproved sets below.
     pub builder_approved: Option<bool>,
+    pub approved_builder_ids: BTreeSet<String>,
+    pub unapproved_builder_ids: BTreeSet<String>,
 }
 
 /// The attestation bindings for one component, plus signer approval.
@@ -407,11 +408,22 @@ pub fn project(evidence: &SupplyChainEvidence) -> ObservationSet {
                 .as_ref()
                 .filter(|_| policy_present)
                 .map(|builder| policy.approves_builder(builder));
+            let (approved_builder_ids, unapproved_builder_ids) = if policy_present {
+                assessment
+                    .builder_ids
+                    .iter()
+                    .cloned()
+                    .partition(|builder| policy.approves_builder(builder))
+            } else {
+                (BTreeSet::new(), BTreeSet::new())
+            };
             observations.push(SupplyChainObservation::ProvenanceContext(
                 ProvenanceContext {
                     assessment,
                     policy_present,
                     builder_approved,
+                    approved_builder_ids,
+                    unapproved_builder_ids,
                 },
             ));
         }
@@ -632,6 +644,424 @@ pub fn by_component(set: &ObservationSet) -> BTreeMap<&str, Vec<&SupplyChainObse
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use super::*;
+    use crate::budget::AdmissionLedger;
+    use crate::capability::projection;
+    use crate::component::tests::{component, digest as artifact_digest};
+    use crate::manifest::{ApprovedComponent, DareManifest, TrustPolicy};
+    use crate::normalize::EvidenceBuilder;
+    use crate::provenance::tests::record;
+    use crate::relationship::tests::edge;
+    use crate::relationship::{RelationType, RelationshipGraph};
+    use std::collections::BTreeMap;
+
+    pub(crate) fn evidence_of(
+        components: Vec<Component>,
+        graph: RelationshipGraph,
+        manifest: DareManifest,
+    ) -> SupplyChainEvidence {
+        let mut ledger = AdmissionLedger::new();
+        EvidenceBuilder::new()
+            .with_import(components, graph)
+            .with_manifest(manifest)
+            .build(&mut ledger)
+            .expect("builds")
+    }
+
+    #[test]
+    fn the_channel_set_is_closed_and_uniquely_named() {
+        let names: BTreeSet<&str> = ObservationChannel::all()
+            .iter()
+            .map(|channel| channel.as_str())
+            .collect();
+        assert_eq!(names.len(), ObservationChannel::all().len());
+        for channel in ObservationChannel::all() {
+            assert_eq!(
+                channel.as_str(),
+                channel.as_str().to_uppercase(),
+                "a channel token is not screaming snake case"
+            );
+        }
+        assert!(
+            serde_json::from_str::<ObservationChannel>("\"SOME_NEW_CONTEXT\"").is_err(),
+            "an unknown channel decoded"
+        );
+    }
+
+    #[test]
+    fn the_twelve_design_channels_are_all_present() {
+        let names: BTreeSet<&str> = ObservationChannel::all()
+            .iter()
+            .map(|channel| channel.as_str())
+            .collect();
+        for required in [
+            "BOM_DOCUMENT_CONTEXT",
+            "COMPONENT_CONTEXT",
+            "COMPONENT_DIGEST_CONTEXT",
+            "SOURCE_TRUST_CONTEXT",
+            "PROVENANCE_CONTEXT",
+            "ATTESTATION_CONTEXT",
+            "RELATIONSHIP_CONTEXT",
+            "CAPABILITY_CONTEXT",
+            "MODEL_LINEAGE_CONTEXT",
+            "DATASET_PROVENANCE_CONTEXT",
+            "DECLARED_OBSERVED_COMPONENT_CONTEXT",
+            "HARNESS_ERROR",
+        ] {
+            assert!(names.contains(required), "{required} is missing");
+        }
+    }
+
+    #[test]
+    fn an_observation_cannot_carry_a_verdict() {
+        for hostile in [
+            serde_json::json!({ "channel": "COMPONENT_CONTEXT", "verdict": "PASS" }),
+            serde_json::json!({ "channel": "HARNESS_ERROR", "kind": "ADAPTER_FAILURE",
+                                "reason": "x", "is_secure": false }),
+            serde_json::json!({ "channel": "VERDICT", "verdict": "FAIL" }),
+            serde_json::json!({ "channel": "VIOLATION", "invariant": "X" }),
+        ] {
+            assert!(
+                serde_json::from_value::<SupplyChainObservation>(hostile).is_err(),
+                "an observation carrying a verdict decoded"
+            );
+        }
+    }
+
+    #[test]
+    fn a_component_with_no_digest_produces_no_digest_context() {
+        let mut bare = component("react", ComponentType::Package);
+        bare.digests.clear();
+        let set = project(&evidence_of(
+            vec![bare],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        assert!(set.has_channel(ObservationChannel::ComponentContext));
+        assert!(!set.has_channel(ObservationChannel::ComponentDigestContext));
+    }
+
+    #[test]
+    fn a_component_with_a_digest_produces_one() {
+        let set = project(&evidence_of(
+            vec![component("react", ComponentType::Package)],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        assert!(set.has_channel(ObservationChannel::ComponentDigestContext));
+    }
+
+    #[test]
+    fn an_approved_digest_that_matches_is_recorded_as_bound() {
+        let manifest = DareManifest {
+            schema_version: "1".to_owned(),
+            approved_components: BTreeSet::from([ApprovedComponent {
+                component_id: "react".to_owned(),
+                name: None,
+                version: None,
+                digests: BTreeSet::from([artifact_digest("a")]),
+            }]),
+            ..Default::default()
+        };
+        let set = project(&evidence_of(
+            vec![component("react", ComponentType::Package)],
+            RelationshipGraph::new(),
+            manifest,
+        ));
+
+        let bound = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::ComponentDigestContext(context) => {
+                    Some(context.approved_digest_bound)
+                }
+                _ => None,
+            });
+        assert_eq!(bound, Some(Some(true)));
+    }
+
+    #[test]
+    fn an_unapproved_signer_is_named_rather_than_counted() {
+        let mut ledger = AdmissionLedger::new();
+        let manifest = DareManifest {
+            schema_version: "1".to_owned(),
+            trust_policy: TrustPolicy {
+                approved_signers: BTreeSet::from(["signer-release".to_owned()]),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let evidence = EvidenceBuilder::new()
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
+            .with_attestations(vec![{
+                let mut record = crate::attestation::tests::attestation("att-1", "react");
+                record.signer_id = Some("signer-unknown".to_owned());
+                record
+            }])
+            .with_manifest(manifest)
+            .build(&mut ledger)
+            .expect("builds");
+
+        let set = project(&evidence);
+        let context = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::AttestationContext(context) => Some(context),
+                _ => None,
+            })
+            .expect("an attestation context");
+        assert!(context.unapproved_signer_ids.contains("signer-unknown"));
+        assert!(context.approved_signer_ids.is_empty());
+    }
+
+    #[test]
+    fn every_provenance_builder_is_classified_independently() {
+        let mut ledger = AdmissionLedger::new();
+        let manifest = DareManifest {
+            schema_version: "1".to_owned(),
+            trust_policy: TrustPolicy {
+                approved_builders: BTreeSet::from(["builder-ci".to_owned()]),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let mut second = record("prov-2", "react");
+        second.builder_id = Some("builder-unknown".to_owned());
+        let evidence = EvidenceBuilder::new()
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
+            .with_provenance(vec![record("prov-1", "react"), second])
+            .with_manifest(manifest)
+            .build(&mut ledger)
+            .expect("builds");
+
+        let set = project(&evidence);
+        let context = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::ProvenanceContext(context) => Some(context),
+                _ => None,
+            })
+            .expect("a provenance context");
+        assert!(context.approved_builder_ids.contains("builder-ci"));
+        assert!(context.unapproved_builder_ids.contains("builder-unknown"));
+    }
+
+    #[test]
+    fn an_absent_policy_leaves_signer_and_builder_approval_unanswered() {
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
+            .with_provenance(vec![record("prov-1", "react")])
+            .build(&mut ledger)
+            .expect("builds");
+
+        let set = project(&evidence);
+        let context = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::ProvenanceContext(context) => Some(context),
+                _ => None,
+            })
+            .expect("a provenance context");
+        assert!(!context.policy_present);
+        assert_eq!(context.builder_approved, None);
+        assert!(context.approved_builder_ids.is_empty());
+        assert!(context.unapproved_builder_ids.is_empty());
+    }
+
+    #[test]
+    fn a_mutable_version_is_recorded_on_the_component_context() {
+        let mut floating = component("api-image", ComponentType::ContainerImage);
+        floating.version = Some("latest".to_owned());
+        let set = project(&evidence_of(
+            vec![floating],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let context = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::ComponentContext(context) => Some(context),
+                _ => None,
+            })
+            .expect("a component context");
+        assert!(context.uses_mutable_reference);
+        assert!(context.expects_immutable_artifact);
+    }
+
+    #[test]
+    fn declared_and_observed_edges_are_counted_separately_from_where_they_agree() {
+        let mut graph = RelationshipGraph::new();
+        graph
+            .insert(edge(
+                "app",
+                "react",
+                RelationType::DependsOn,
+                ObservationKind::Observed,
+            ))
+            .expect("valid");
+        let evidence = evidence_of(
+            vec![
+                component("app", ComponentType::Package),
+                component("react", ComponentType::Package),
+            ],
+            graph,
+            DareManifest::default(),
+        );
+
+        let set = project(&evidence);
+        let context = set
+            .observations
+            .iter()
+            .find_map(|observation| match observation {
+                SupplyChainObservation::RelationshipContext(context) => Some(context),
+                _ => None,
+            })
+            .expect("a relationship context");
+        assert_eq!(context.observed_edge_count, 1);
+        assert_eq!(context.declared_edge_count, 0);
+        assert_eq!(context.undeclared_edge_keys.len(), 1);
+        assert!(!context.comparable, "one side alone compared as two");
+    }
+
+    #[test]
+    fn capability_context_appears_when_either_side_supplies_capabilities() {
+        let manifest = DareManifest {
+            schema_version: "1".to_owned(),
+            approved_capabilities: BTreeMap::from([(
+                "file-tool".to_owned(),
+                BTreeSet::from(["read-file".to_owned()]),
+            )]),
+            ..Default::default()
+        };
+        let set = project(&evidence_of(
+            vec![component("file-tool", ComponentType::Tool)],
+            RelationshipGraph::new(),
+            manifest,
+        ));
+        assert!(set.has_channel(ObservationChannel::CapabilityContext));
+
+        let mut tool = component("file-tool", ComponentType::Tool);
+        tool.capabilities = Some(projection(&["read-file"], &["read-file"]));
+        let set = project(&evidence_of(
+            vec![tool],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        assert!(set.has_channel(ObservationChannel::CapabilityContext));
+    }
+
+    #[test]
+    fn lineage_and_dataset_contexts_follow_the_component_class() {
+        let set = project(&evidence_of(
+            vec![
+                component("planner-model", ComponentType::Model),
+                component("corpus", ComponentType::Dataset),
+                component("react", ComponentType::Package),
+            ],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        assert!(set.has_channel(ObservationChannel::ModelLineageContext));
+        assert!(set.has_channel(ObservationChannel::DatasetProvenanceContext));
+
+        let lineage_subjects: Vec<&str> = set
+            .observations
+            .iter()
+            .filter(|observation| observation.channel() == ObservationChannel::ModelLineageContext)
+            .filter_map(SupplyChainObservation::component_id)
+            .collect();
+        assert_eq!(lineage_subjects, vec!["planner-model"]);
+    }
+
+    #[test]
+    fn projection_is_deterministic() {
+        let build = || {
+            evidence_of(
+                vec![
+                    component("react", ComponentType::Package),
+                    component("planner-model", ComponentType::Model),
+                ],
+                RelationshipGraph::new(),
+                DareManifest::default(),
+            )
+        };
+        let left = project(&build());
+        let right = project(&build());
+        assert_eq!(digest(&left).unwrap(), digest(&right).unwrap());
+    }
+
+    #[test]
+    fn every_observation_digests_and_the_digests_differ() {
+        let set = project(&evidence_of(
+            vec![
+                component("react", ComponentType::Package),
+                component("vue", ComponentType::Package),
+            ],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let digests: BTreeSet<String> = set
+            .observations
+            .iter()
+            .map(|observation| observation.digest().expect("digests"))
+            .collect();
+        assert_eq!(digests.len(), set.observations.len());
+    }
+
+    #[test]
+    fn a_harness_error_is_a_channel_and_not_a_finding() {
+        let set = ObservationSet::new(vec![SupplyChainObservation::HarnessError(
+            HarnessErrorContext {
+                kind: HarnessErrorKind::AdapterFailure,
+                reason: "the adapter could not read the local evidence directory".to_owned(),
+            },
+        )]);
+        assert!(set.has_harness_error());
+        let rendered = serde_json::to_string(&set)
+            .expect("serializes")
+            .to_lowercase();
+        for absent in ["violation", "verdict", "finding", "insecure"] {
+            assert!(
+                !rendered.contains(absent),
+                "a harness error reads as `{absent}`"
+            );
+        }
+    }
+
+    #[test]
+    fn observations_can_be_grouped_by_component() {
+        let set = project(&evidence_of(
+            vec![
+                component("react", ComponentType::Package),
+                component("vue", ComponentType::Package),
+            ],
+            RelationshipGraph::new(),
+            DareManifest::default(),
+        ));
+        let grouped = by_component(&set);
+        assert_eq!(grouped.len(), 2);
+        assert!(grouped.contains_key("react"));
+        assert_eq!(set.for_component("react").count(), grouped["react"].len());
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod cycle019_pre_review_tests {
     use super::*;
     use crate::budget::AdmissionLedger;
     use crate::capability::projection;

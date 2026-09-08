@@ -1,26 +1,9 @@
 //! The replay adapter: a previously captured bundle, re-evaluated locally.
 //!
-//! # The thing a recording must not bring with it
-//!
-//! A capture records what a system contained. It must not also record what was
-//! approved — and this is the Cycle 017 lesson in this cycle's vocabulary.
-//!
-//! A recorded bundle can carry a manifest. If replay accepted it, whoever
-//! produced the capture would be supplying both the evidence and the policy it
-//! is judged against, and a recording could approve its own components,
-//! builders and signers. Every invariant that compares observation against
-//! approval would then compare a capture against itself.
-//!
-//! [`ReplayAdapter`] therefore **discards** the recorded manifest and applies a
-//! local one supplied beside it. `a_recorded_manifest_cannot_approve_its_own
-//! _components` asserts it.
-//!
-//! # Semantic binding
-//!
-//! Matching a scenario id is identity, not evidence. A capture is bound to the
-//! run by what it *describes*: its semantic keys must match the ones the
-//! scenario's expectation names, so a capture of a different system cannot be
-//! replayed under this scenario's approvals.
+//! A capture supplies evidence, never approval. The recorded manifest is
+//! discarded and a separate local manifest is applied. Replay also binds the
+//! complete declared component scope: partial overlap is not proof that the
+//! recording is of the same system.
 
 use serde::{Deserialize, Serialize};
 
@@ -32,17 +15,13 @@ use crate::model::SupplyChainScenario;
 use crate::normalize::SupplyChainEvidence;
 use crate::source::SupplyChainMode;
 
-/// A captured evidence bundle.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SupplyChainCapture {
     pub schema_version: String,
     pub capture_id: String,
-    /// The scenario the capture was taken under. Identity, never authority.
     pub scenario_id: String,
-    /// Always `REPLAY`. A recording cannot ask to be run any other way.
     pub mode: SupplyChainMode,
-    /// Always `true`. A capture cannot claim to be production evidence.
     pub synthetic: bool,
     pub evidence: SupplyChainEvidence,
 }
@@ -57,31 +36,24 @@ impl SupplyChainCapture {
         }
         if self.mode != SupplyChainMode::Replay {
             return Err(SupplyChainError::refusal(
-                "a capture declared a mode other than REPLAY; a recording cannot ask to be run \
-                 as something else"
-                    .to_owned(),
+                "a capture declared a mode other than REPLAY; a recording cannot ask to be run as something else".to_owned(),
             ));
         }
         if !self.synthetic {
             return Err(SupplyChainError::refusal(
-                "a capture declared itself non-synthetic; a recording is a recording, and a \
-                 report must not present one as production evidence"
-                    .to_owned(),
+                "a capture declared itself non-synthetic; a recording is a recording, and a report must not present one as production evidence".to_owned(),
             ));
         }
         self.evidence.validate()
     }
 }
 
-/// Re-evaluate a captured bundle under a local policy.
 pub struct ReplayAdapter {
     capture: SupplyChainCapture,
     local_manifest: DareManifest,
 }
 
 impl ReplayAdapter {
-    /// The manifest is a separate argument on purpose: it is the one input the
-    /// capture may not supply.
     pub fn new(capture: SupplyChainCapture, local_manifest: DareManifest) -> Self {
         Self {
             capture,
@@ -112,45 +84,28 @@ impl SupplyChainAdapter for ReplayAdapter {
         }
 
         let mut evidence = self.capture.evidence.clone();
-
-        // The recorded manifest is discarded rather than merged. Merging would
-        // let the capture add approvals the local policy never granted, which
-        // is the same thing as the capture approving itself.
         evidence.manifest = DareManifest::default();
 
-        // Semantic binding: the capture must describe the system the local
-        // policy is about. A capture of a different deployment replayed under
-        // these approvals would report on components nobody here runs.
         if !self.local_manifest.declared_component_ids.is_empty() {
-            let recorded: std::collections::BTreeSet<&String> = evidence
+            let recorded: std::collections::BTreeSet<String> = evidence
                 .components
                 .iter()
-                .map(|component| &component.component_id)
+                .map(|component| component.component_id.clone())
                 .collect();
-            let unmatched: Vec<&String> = self
-                .local_manifest
-                .declared_component_ids
-                .iter()
-                .filter(|declared| !recorded.contains(declared))
-                .collect();
-            if unmatched.len() == self.local_manifest.declared_component_ids.len() {
+            let declared = &self.local_manifest.declared_component_ids;
+
+            // Exact declared-scope binding. The prior partial-overlap rule
+            // accepted {A,X,Y} under a policy declaring {A,B,C}; one shared row
+            // is identity coincidence, not semantic equivalence.
+            if &recorded != declared {
                 return Err(SupplyChainError::BindingMismatch(
-                    "the capture describes none of the components the local policy declares, so \
-                     it is a recording of a different system"
-                        .to_owned(),
+                    "the capture component set does not exactly match the component scope declared by the local replay policy".to_owned(),
                 ));
             }
         }
 
-        // Re-admitted rather than trusted. A capture is a file like any other
-        // and can have grown past a bound since it was taken.
-        for _ in &evidence.components {
-            ledger.admit_component()?;
-        }
-        for _ in &evidence.graph.edges {
-            ledger.admit_relationship()?;
-        }
-
+        // Rebuild with the external run-wide ledger. This performs component,
+        // relationship and per-component record admission exactly once.
         let mut builder = crate::normalize::EvidenceBuilder::new()
             .with_import(evidence.components.clone(), evidence.graph.clone())
             .with_provenance(evidence.provenance.clone())
@@ -160,12 +115,140 @@ impl SupplyChainAdapter for ReplayAdapter {
         }
         builder
             .with_manifest(self.local_manifest.clone())
-            .build(&mut AdmissionLedger::new())
+            .build(ledger)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::component::tests::{component, digest};
+    use crate::manifest::ApprovedComponent;
+    use crate::model::tests::scenario;
+    use crate::model::SupplyChainInvariant;
+    use crate::normalize::{BomFormat, EvidenceBuilder};
+    use crate::observation::project;
+    use crate::relationship::RelationshipGraph;
+    use crate::source::ComponentType;
+    use dare_security_evidence::Verdict;
+    use std::collections::BTreeSet;
+
+    fn captured(manifest: DareManifest) -> SupplyChainCapture {
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_document("bom-1", BomFormat::CycloneDx, b"{}")
+            .with_import(
+                vec![component("react", ComponentType::Package)],
+                RelationshipGraph::new(),
+            )
+            .with_manifest(manifest)
+            .build(&mut ledger)
+            .expect("builds");
+        SupplyChainCapture {
+            schema_version: "1".to_owned(),
+            capture_id: "capture-1".to_owned(),
+            scenario_id: "supply-lab-replay".to_owned(),
+            mode: SupplyChainMode::Replay,
+            synthetic: true,
+            evidence,
+        }
+    }
+
+    fn replay_scenario() -> SupplyChainScenario {
+        let mut scenario = scenario(
+            "supply-lab-replay",
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+        );
+        scenario.mode = SupplyChainMode::Replay;
+        scenario.evidence_files = Vec::new();
+        scenario
+    }
+
+    fn approving(seed: &str) -> DareManifest {
+        DareManifest {
+            schema_version: "1".to_owned(),
+            approved_components: BTreeSet::from([ApprovedComponent {
+                component_id: "react".to_owned(),
+                name: None,
+                version: None,
+                digests: BTreeSet::from([digest(seed)]),
+            }]),
+            declared_component_ids: BTreeSet::from(["react".to_owned()]),
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn a_capture_replays_under_the_local_policy() {
+        let mut ledger = AdmissionLedger::new();
+        let evidence = ReplayAdapter::new(captured(DareManifest::default()), approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .expect("replays");
+        let outcome = crate::invariant::evaluate(
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+            &project(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Pass);
+        assert_eq!(ledger.snapshot().components_admitted, 1);
+    }
+
+    #[test]
+    fn a_recorded_manifest_cannot_approve_its_own_components() {
+        let capture = captured(approving("a"));
+        let mut ledger = AdmissionLedger::new();
+        let evidence = ReplayAdapter::new(capture, approving("b"))
+            .collect(&replay_scenario(), &mut ledger)
+            .expect("replays");
+        assert_eq!(evidence.manifest, approving("b"));
+        assert_eq!(
+            crate::invariant::evaluate(
+                SupplyChainInvariant::ArtifactDigestBoundToComponent,
+                &project(&evidence),
+            )
+            .verdict,
+            Verdict::Fail
+        );
+    }
+
+    #[test]
+    fn partial_component_overlap_is_refused() {
+        let mut policy = approving("a");
+        policy
+            .declared_component_ids
+            .insert("required-service".to_owned());
+        let mut ledger = AdmissionLedger::new();
+        let error = ReplayAdapter::new(captured(DareManifest::default()), policy)
+            .collect(&replay_scenario(), &mut ledger)
+            .expect_err("partial overlap must be refused");
+        assert!(error.to_string().contains("does not exactly match"));
+    }
+
+    #[test]
+    fn extra_recorded_components_are_refused_without_an_explicit_subset_policy() {
+        let mut capture = captured(DareManifest::default());
+        capture
+            .evidence
+            .components
+            .push(component("extra", ComponentType::Package));
+        let mut ledger = AdmissionLedger::new();
+        assert!(ReplayAdapter::new(capture, approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .is_err());
+    }
+
+    #[test]
+    fn a_capture_of_another_scenario_is_refused() {
+        let mut capture = captured(DareManifest::default());
+        capture.scenario_id = "supply-lab-elsewhere".to_owned();
+        let mut ledger = AdmissionLedger::new();
+        assert!(ReplayAdapter::new(capture, approving("a"))
+            .collect(&replay_scenario(), &mut ledger)
+            .is_err());
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
     use super::*;
     use crate::component::tests::{component, digest};
     use crate::manifest::ApprovedComponent;
@@ -278,6 +361,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "superseded by stricter Cycle 019 post-merge semantics"]
     fn a_capture_describing_a_different_system_is_refused() {
         // Semantic binding. The scenario id can match while the recording is of
         // something else entirely.

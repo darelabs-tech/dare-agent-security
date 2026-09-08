@@ -1,33 +1,7 @@
 //! The deterministic invariant registry.
 //!
 //! Twelve evaluators, each a comparison of typed fields. No model, no
-//! heuristic, no prose inference and no fixture-declared verdict appears
-//! anywhere in this file.
-//!
-//! # The order inside [`evaluate`]
-//!
-//! 1. a harness failure means the run could not observe, so no security
-//!    conclusion is available in either direction — `ERROR`;
-//! 2. violations are collected next, and **all** of them are collected. One
-//!    evidence bundle can substitute a digest, drift a capability and insert a
-//!    dependency at once, and reporting the first would understate what was
-//!    seen;
-//! 3. only if nothing was violated does coverage decide between `PASS` and
-//!    `INCONCLUSIVE`. Checking coverage first would let a bundle with a real
-//!    substitution report `INCONCLUSIVE` because some unrelated channel was
-//!    missing — hiding a finding behind a gap.
-//!
-//! # Three answers, not two
-//!
-//! Every evaluator distinguishes *compared and differed* from *nothing to
-//! compare*. The first is a finding; the second is a gap. The engine reports
-//! them differently because an operator acts on them differently: a
-//! substitution needs investigating, a gap needs evidence collecting.
-//!
-//! This is why so many assessments in this crate return `Option<bool>`. A
-//! `false` that meant either would make every missing manifest look like an
-//! attack, and an operator who learns to dismiss those has learned to dismiss
-//! the real ones too.
+//! heuristic, no prose inference and no fixture-declared verdict appears here.
 
 use serde::{Deserialize, Serialize};
 
@@ -38,17 +12,11 @@ use crate::model::SupplyChainInvariant;
 use crate::observation::{ObservationSet, SupplyChainObservation};
 use crate::source::ComponentType;
 
-/// One independently observed violation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SupplyChainViolation {
     pub invariant: SupplyChainInvariant,
     pub reason: String,
-    /// Digests of the observations that decided this violation.
-    ///
-    /// A finding with no deciding evidence is an assertion rather than a
-    /// finding: an operator has to be able to get from the verdict back to
-    /// what was observed.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub deciding_observation_digests: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -74,7 +42,6 @@ impl SupplyChainViolation {
     }
 }
 
-/// The outcome of evaluating one invariant.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SupplyChainInvariantOutcome {
@@ -84,16 +51,6 @@ pub struct SupplyChainInvariantOutcome {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub violations: Vec<SupplyChainViolation>,
     pub coverage_satisfied: bool,
-    /// Whether this invariant has a subject in this evidence at all.
-    ///
-    /// A bundle with no model has no model lineage to preserve. That is not a
-    /// gap in the evidence — it is a question the system does not raise, and
-    /// counting it as undecided would make every deployment that runs no model
-    /// permanently inconclusive about models.
-    ///
-    /// Distinct from `coverage_satisfied`, which asks whether an invariant that
-    /// *does* apply could be decided. A model with no recorded lineage is
-    /// applicable and undecided; a bundle with no model is neither.
     pub applicable: bool,
 }
 
@@ -108,7 +65,6 @@ impl SupplyChainInvariantOutcome {
             applicable: true,
         }
     }
-
     fn fail(invariant: SupplyChainInvariant, violations: Vec<SupplyChainViolation>) -> Self {
         let reason = match violations.len() {
             1 => violations[0].reason.clone(),
@@ -122,15 +78,10 @@ impl SupplyChainInvariantOutcome {
             verdict: Verdict::Fail,
             reason,
             violations,
-            // A failing invariant was decided by what was observed. Coverage
-            // gates PASS, never FAIL: a violation seen through partial evidence
-            // is still a violation.
             coverage_satisfied: true,
-            // Something was observed to violate it, so it plainly applied.
             applicable: true,
         }
     }
-
     fn inconclusive(
         invariant: SupplyChainInvariant,
         reason: impl Into<String>,
@@ -145,7 +96,6 @@ impl SupplyChainInvariantOutcome {
             applicable,
         }
     }
-
     fn error(invariant: SupplyChainInvariant, reason: impl Into<String>) -> Self {
         Self {
             invariant,
@@ -153,19 +103,15 @@ impl SupplyChainInvariantOutcome {
             reason: reason.into(),
             violations: Vec::new(),
             coverage_satisfied: false,
-            // A run that could not observe cannot say whether the question
-            // applied either.
             applicable: true,
         }
     }
 }
 
-/// Every invariant this engine implements.
 pub fn supported_invariants() -> [SupplyChainInvariant; 12] {
     SupplyChainInvariant::all()
 }
 
-/// Evaluate one invariant against one run's observations.
 pub fn evaluate(
     invariant: SupplyChainInvariant,
     observations: &ObservationSet,
@@ -231,34 +177,24 @@ pub fn evaluate(
     SupplyChainInvariantOutcome::inconclusive(invariant, coverage.reason, true)
 }
 
-/// Whether an invariant has a subject in this evidence at all.
-///
-/// The distinction between *undecided* and *does not arise*. A bundle with no
-/// model has no model lineage to preserve; reporting that as undecided would
-/// make every deployment that runs no model permanently inconclusive about
-/// models, and an operator reading a wall of INCONCLUSIVE learns nothing from
-/// the one that matters.
-///
-/// Applicability is read from the observations rather than declared, so it
-/// cannot drift from what was actually seen. Every rule below is "a context of
-/// this kind was produced", and `project` produces one exactly when the
-/// evidence carries its subject.
 fn applies_to(invariant: SupplyChainInvariant, observations: &ObservationSet) -> bool {
     use crate::observation::ObservationChannel as C;
     use SupplyChainInvariant as I;
 
     match invariant {
-        // A component set is the subject. With no components there is nothing
-        // to be ambiguous about and nothing whose class requires evidence.
         I::ComponentIdentityUnambiguous
         | I::MutableReferenceNotUsedAsImmutableIdentity
         | I::ArtifactDigestBoundToComponent
-        | I::BomRequiredEvidencePresent => observations.has_channel(C::ComponentContext),
+        | I::BomRequiredEvidencePresent
+        | I::ComponentSourceTrustPreserved => observations.has_channel(C::ComponentContext),
 
-        I::ComponentSourceTrustPreserved => observations.has_channel(C::SourceTrustContext),
-        I::ComponentProvenanceSufficient | I::ProvenanceSubjectAndBuilderBound => {
-            observations.has_channel(C::ProvenanceContext)
-        }
+        // Provenance sufficiency applies to artifact-like components even when
+        // the provenance channel is completely absent. Missing evidence on an
+        // applicable surface is INCONCLUSIVE, never NOT_APPLICABLE.
+        I::ComponentProvenanceSufficient => observations.observations.iter().any(|o| {
+            matches!(o, SupplyChainObservation::ComponentContext(context) if context.expects_immutable_artifact)
+        }),
+        I::ProvenanceSubjectAndBuilderBound => observations.has_channel(C::ProvenanceContext),
         I::AttestationSubjectDigestPreserved => observations.has_channel(C::AttestationContext),
         I::DependencyEdgeIntegrityPreserved => observations.has_channel(C::RelationshipContext),
         I::ExternalCapabilityDriftNotObserved => observations.has_channel(C::CapabilityContext),
@@ -267,12 +203,6 @@ fn applies_to(invariant: SupplyChainInvariant, observations: &ObservationSet) ->
     }
 }
 
-/// Evaluate every invariant against one run's observations.
-///
-/// The scenario-selected invariant is a coverage selector, never a filter. A
-/// real violation on another applicable boundary must not disappear because the
-/// fixture author was looking somewhere else, and a corpus built around one
-/// question would otherwise never notice the answer to a second.
 pub fn evaluate_all(observations: &ObservationSet) -> Vec<SupplyChainInvariantOutcome> {
     supported_invariants()
         .iter()
@@ -280,11 +210,6 @@ pub fn evaluate_all(observations: &ObservationSet) -> Vec<SupplyChainInvariantOu
         .collect()
 }
 
-/// Every concrete violation the retained observations prove, across all twelve.
-///
-/// Secondary `PASS`, `INCONCLUSIVE` and `ERROR` outcomes are deliberately not
-/// promoted here: this collects deterministically observed failures so a false
-/// `PASS` cannot survive, and does nothing else.
 pub fn collect_observed_violations(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     evaluate_all(observations)
         .into_iter()
@@ -293,30 +218,12 @@ pub fn collect_observed_violations(observations: &ObservationSet) -> Vec<SupplyC
         .collect()
 }
 
-/// Combine one run's invariant outcomes into a single verdict.
-///
-/// `FAIL` outranks everything, because an observed violation is retained
-/// evidence and a gap elsewhere does not unsee it. Then `ERROR` (the run broke)
-/// outranks `INCONCLUSIVE` (the run was fine and the evidence was thin), which
-/// outranks `PASS`.
-///
-/// The precedence is what stops a secondary outcome from erasing a primary one:
-/// an invariant that could not be decided never turns a decided failure into
-/// anything else.
 pub fn aggregate(outcomes: &[SupplyChainInvariantOutcome]) -> Verdict {
-    // Invariants with no subject in the evidence are left out. A bundle of
-    // packages that carries no model must not be reported as undecided because
-    // model lineage went unanswered — that question was never raised, and
-    // folding it in would make a clean result unreachable for any system that
-    // does not contain one of everything.
     let applicable: Vec<&SupplyChainInvariantOutcome> = outcomes
         .iter()
         .filter(|outcome| outcome.applicable)
         .collect();
-
     if applicable.is_empty() {
-        // Including the empty run. Nothing applied because nothing was seen,
-        // and "nothing to disagree with" is not a clean supply chain.
         return Verdict::Inconclusive;
     }
     for verdict in [Verdict::Fail, Verdict::Error, Verdict::Inconclusive] {
@@ -327,14 +234,6 @@ pub fn aggregate(outcomes: &[SupplyChainInvariantOutcome]) -> Verdict {
     Verdict::Pass
 }
 
-// --- evaluators ------------------------------------------------------------
-
-/// Invariant 1. A component that needs provenance has some that names it.
-///
-/// Applies to classes that *are* bytes — a package, an image, a model, an
-/// embedding model, a dataset. A framework or a prompt asset describes an
-/// arrangement rather than an artifact, and demanding provenance for it would
-/// produce a finding nobody can remediate.
 fn provenance_sufficient(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -352,9 +251,28 @@ fn provenance_sufficient(observations: &ObservationSet) -> Vec<SupplyChainViolat
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ComponentProvenanceSufficient,
                 Some(component_id),
+                format!("provenance evidence was read and none of it names `{component_id}`, an artifact whose class requires it"),
+                &[observation],
+            ));
+        }
+    }
+    violations
+}
+
+fn capability_drift(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
+    let mut violations = Vec::new();
+    for observation in &observations.observations {
+        let SupplyChainObservation::CapabilityContext(context) = observation else {
+            continue;
+        };
+        if context.assessment.drifted() == Some(true) {
+            violations.push(SupplyChainViolation::new(
+                SupplyChainInvariant::ExternalCapabilityDriftNotObserved,
+                Some(&context.assessment.component_id),
                 format!(
-                    "provenance evidence was read and none of it names `{component_id}`, an \
-                     artifact whose class requires it"
+                    "`{}` was observed with capabilities nobody approved: {}",
+                    context.assessment.component_id,
+                    context.assessment.introduced.join(", ")
                 ),
                 &[observation],
             ));
@@ -363,35 +281,6 @@ fn provenance_sufficient(observations: &ObservationSet) -> Vec<SupplyChainViolat
     violations
 }
 
-/// Invariant 2. No externally supplied component gained a capability.
-fn capability_drift(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
-    let mut violations = Vec::new();
-    for observation in &observations.observations {
-        let SupplyChainObservation::CapabilityContext(context) = observation else {
-            continue;
-        };
-        if context.assessment.drifted() != Some(true) {
-            continue;
-        }
-        violations.push(SupplyChainViolation::new(
-            SupplyChainInvariant::ExternalCapabilityDriftNotObserved,
-            Some(&context.assessment.component_id),
-            format!(
-                "`{}` was observed with capabilities nobody approved: {}",
-                context.assessment.component_id,
-                context.assessment.introduced.join(", ")
-            ),
-            &[observation],
-        ));
-    }
-    violations
-}
-
-/// Invariant 3. No artifact appears under two identities, and no identity
-/// covers two artifacts.
-///
-/// Computed from the observations rather than the evidence bundle, so the
-/// finding cites exactly the two contexts that disagree.
 fn identity_unambiguous(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let contexts: Vec<(
         &SupplyChainObservation,
@@ -404,22 +293,18 @@ fn identity_unambiguous(observations: &ObservationSet) -> Vec<SupplyChainViolati
             _ => None,
         })
         .collect();
-
     let mut violations = Vec::new();
     for (index, (observation, context)) in contexts.iter().enumerate() {
         for (earlier_observation, earlier) in contexts.iter().take(index) {
-            if earlier.semantic_key == context.semantic_key
-                && earlier.component_id != context.component_id
-            {
+            let same_id_different_semantics = earlier.component_id == context.component_id
+                && earlier.semantic_key != context.semantic_key;
+            let same_semantics_different_id = earlier.semantic_key == context.semantic_key
+                && earlier.component_id != context.component_id;
+            if same_id_different_semantics || same_semantics_different_id {
                 violations.push(SupplyChainViolation::new(
                     SupplyChainInvariant::ComponentIdentityUnambiguous,
                     Some(&context.component_id),
-                    format!(
-                        "`{}` and `{}` resolve to one canonical identity, so approving one \
-                         leaves the other unapproved while a reader sees the component as \
-                         covered",
-                        earlier.component_id, context.component_id
-                    ),
+                    format!("`{}` and `{}` cannot be treated as one unambiguous component identity; their id/semantic binding conflicts", earlier.component_id, context.component_id),
                     &[earlier_observation, observation],
                 ));
             }
@@ -428,25 +313,17 @@ fn identity_unambiguous(observations: &ObservationSet) -> Vec<SupplyChainViolati
     violations
 }
 
-/// Invariant 4. The observed artifact is the approved artifact.
 fn artifact_digest_bound(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
         let SupplyChainObservation::ComponentDigestContext(context) = observation else {
             continue;
         };
-        // `None` is "nothing approved to compare against", which is a gap the
-        // coverage contract reports. Only a compared-and-differed answer is a
-        // substitution.
         if context.approved_digest_bound == Some(false) {
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ArtifactDigestBoundToComponent,
                 Some(&context.component_id),
-                format!(
-                    "the artifact observed for `{}` is not the one the manifest approved; the \
-                     digests do not match",
-                    context.component_id
-                ),
+                format!("the artifact observed for `{}` is not the one the manifest approved; the digests do not match", context.component_id),
                 &[observation],
             ));
         }
@@ -454,11 +331,6 @@ fn artifact_digest_bound(observations: &ObservationSet) -> Vec<SupplyChainViolat
     violations
 }
 
-/// Invariant 5. A tag or range is not standing in for an immutable identity.
-///
-/// A mutable reference is only a finding when nothing else pins the artifact. A
-/// container image tagged `latest` *with* a digest beside it is pinned by the
-/// digest, and reporting it would be reporting a naming convention.
 fn mutable_reference(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -480,28 +352,13 @@ fn mutable_reference(observations: &ObservationSet) -> Vec<SupplyChainViolation>
         violations.push(SupplyChainViolation::new(
             SupplyChainInvariant::MutableReferenceNotUsedAsImmutableIdentity,
             Some(&context.component_id),
-            format!(
-                "`{}` is identified only by `{}`, a reference that can move under it, and no \
-                 digest pins which artifact was meant",
-                context.component_id,
-                context.version.as_deref().unwrap_or("a mutable reference")
-            ),
+            format!("`{}` is identified only by `{}`, a reference that can move under it, and no digest pins which artifact was meant", context.component_id, context.version.as_deref().unwrap_or("a mutable reference")),
             &[observation],
         ));
     }
     violations
 }
 
-/// Invariant 6. The component came from a source local policy approved.
-///
-/// Two shapes of failure. The obvious one is a component whose origin the
-/// policy denies. The quieter one is a component the deployment never declared
-/// at all: nothing approves its presence, and an engine that only checked named
-/// origins would report nothing about a component that arrived from nowhere.
-///
-/// The second only fires where a declared inventory exists to compare against.
-/// Without one, an undeclared component is every component, and the finding
-/// would be noise.
 fn source_trust(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -515,9 +372,7 @@ fn source_trust(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ComponentSourceTrustPreserved,
                 Some(component_id),
-                format!(
-                    "`{component_id}` was observed in the system and the deployment never                      declared it, so nothing approves its presence"
-                ),
+                format!("`{component_id}` was observed in the system and the deployment never declared it, so nothing approves its presence"),
                 &[observation],
             ));
         }
@@ -526,8 +381,6 @@ fn source_trust(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
         let SupplyChainObservation::SourceTrustContext(context) = observation else {
             continue;
         };
-        // With no policy nobody asked. Denying everything would make every
-        // component a finding, which is indistinguishable from a broken engine.
         if !context.policy_present {
             continue;
         }
@@ -541,10 +394,7 @@ fn source_trust(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ComponentSourceTrustPreserved,
                 Some(&context.component_id),
-                format!(
-                    "`{}` came from `{origin}`, which the local policy does not approve",
-                    context.component_id
-                ),
+                format!("`{}` carries an origin claim including `{origin}` that local policy does not approve", context.component_id),
                 &[observation],
             ));
         }
@@ -552,12 +402,6 @@ fn source_trust(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     violations
 }
 
-/// Invariant 7. Provenance binds its subject's artifact, and names a builder
-/// policy approved.
-///
-/// Two distinct failures, reported separately: provenance for a different build
-/// is not the same finding as provenance from an unapproved builder, and an
-/// operator remediates them differently.
 fn provenance_bound(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -565,79 +409,25 @@ fn provenance_bound(observations: &ObservationSet) -> Vec<SupplyChainViolation> 
             continue;
         };
         if !context.assessment.has_provenance() {
-            // Absence is invariant 1's finding. Reporting it here too would
-            // double-count one gap as two failures.
             continue;
         }
         let component_id = context.assessment.component_id.as_str();
-
         if context.assessment.digest_bound == Some(false) {
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ProvenanceSubjectAndBuilderBound,
                 Some(component_id),
-                format!(
-                    "the provenance naming `{component_id}` describes a different artifact than \
-                     the one observed, so it is provenance for a different build"
-                ),
+                format!("provenance record(s) {} for `{component_id}` describe a different artifact than the one observed", context.assessment.misbound_provenance_ids.join(", ")),
                 &[observation],
             ));
         }
-
-        if context.builder_approved == Some(false) {
+        if !context.unapproved_builder_ids.is_empty() {
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ProvenanceSubjectAndBuilderBound,
                 Some(component_id),
                 format!(
-                    "the provenance for `{component_id}` names builder `{}`, which the local \
-                     policy does not approve",
+                    "the provenance for `{component_id}` names unapproved builder(s): {}",
                     context
-                        .assessment
-                        .builder_id
-                        .as_deref()
-                        .unwrap_or("an unnamed builder")
-                ),
-                &[observation],
-            ));
-        }
-    }
-    violations
-}
-
-/// Invariant 8. The attestation's subject digest is this artifact's digest.
-fn attestation_bound(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
-    let mut violations = Vec::new();
-    for observation in &observations.observations {
-        let SupplyChainObservation::AttestationContext(context) = observation else {
-            continue;
-        };
-        let component_id = context.assessment.component_id.as_str();
-
-        // A misbound statement is worse than none, because it looks like
-        // coverage. It is reported whether or not a correctly bound one also
-        // exists.
-        if !context.assessment.misbound_attestation_ids.is_empty() {
-            violations.push(SupplyChainViolation::new(
-                SupplyChainInvariant::AttestationSubjectDigestPreserved,
-                Some(component_id),
-                format!(
-                    "attestation(s) {} name `{component_id}` while binding a different \
-                     artifact's digest, so they attest something other than what was observed",
-                    context.assessment.misbound_attestation_ids.join(", ")
-                ),
-                &[observation],
-            ));
-        }
-
-        // A valid signature is not an authorized signer.
-        if !context.unapproved_signer_ids.is_empty() {
-            violations.push(SupplyChainViolation::new(
-                SupplyChainInvariant::AttestationSubjectDigestPreserved,
-                Some(component_id),
-                format!(
-                    "the attestation for `{component_id}` was signed by {}, which the local \
-                     policy does not approve; a valid signature is not an approved signer",
-                    context
-                        .unapproved_signer_ids
+                        .unapproved_builder_ids
                         .iter()
                         .cloned()
                         .collect::<Vec<_>>()
@@ -650,19 +440,47 @@ fn attestation_bound(observations: &ObservationSet) -> Vec<SupplyChainViolation>
     violations
 }
 
-/// Invariant 9. Declared and observed dependency edges agree.
-///
-/// Insertion and omission are reported as separate findings: one is something
-/// arriving that nobody approved, the other is something approved that is not
-/// there, and they have different causes.
+fn attestation_bound(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
+    let mut violations = Vec::new();
+    for observation in &observations.observations {
+        let SupplyChainObservation::AttestationContext(context) = observation else {
+            continue;
+        };
+        let component_id = context.assessment.component_id.as_str();
+        if !context.assessment.misbound_attestation_ids.is_empty() {
+            violations.push(SupplyChainViolation::new(
+                SupplyChainInvariant::AttestationSubjectDigestPreserved,
+                Some(component_id),
+                format!("attestation(s) {} name `{component_id}` while binding a different artifact's digest", context.assessment.misbound_attestation_ids.join(", ")),
+                &[observation],
+            ));
+        }
+        if !context.assessment.invalid_verification_ids.is_empty() {
+            violations.push(SupplyChainViolation::new(
+                SupplyChainInvariant::AttestationSubjectDigestPreserved,
+                Some(component_id),
+                format!("attestation(s) {} for `{component_id}` carry a recorded INVALID verification and cannot support trust", context.assessment.invalid_verification_ids.join(", ")),
+                &[observation],
+            ));
+        }
+        if !context.unapproved_signer_ids.is_empty() {
+            violations.push(SupplyChainViolation::new(
+                SupplyChainInvariant::AttestationSubjectDigestPreserved,
+                Some(component_id),
+                format!("the attestation for `{component_id}` was signed by {}, which local policy does not approve; a valid signature is not an approved signer", context.unapproved_signer_ids.iter().cloned().collect::<Vec<_>>().join(", ")),
+                &[observation],
+            ));
+        }
+    }
+    violations
+}
+
 fn dependency_integrity(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
         let SupplyChainObservation::RelationshipContext(context) = observation else {
             continue;
         };
-        // With only one side there is nothing to compare, and every edge would
-        // read as a difference.
         if !context.comparable {
             continue;
         }
@@ -692,7 +510,6 @@ fn dependency_integrity(observations: &ObservationSet) -> Vec<SupplyChainViolati
     violations
 }
 
-/// Invariant 10. The model derives from the base that was approved.
 fn model_lineage(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -701,28 +518,15 @@ fn model_lineage(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
         };
         let assessment = &context.assessment;
         let component_id = assessment.component_id.as_str();
-
         if assessment.base_matches() == Some(false) {
-            violations.push(SupplyChainViolation::new(
-                SupplyChainInvariant::ModelLineagePreserved,
-                Some(component_id),
-                format!(
-                    "`{component_id}` derives from {} and not from `{}`, the base the manifest \
-                     approved; the model's own name is unchanged",
-                    assessment.observed_base_ids.join(", "),
-                    assessment.expected_base_id.as_deref().unwrap_or("nothing")
-                ),
-                &[observation],
-            ));
+            violations.push(SupplyChainViolation::new(SupplyChainInvariant::ModelLineagePreserved, Some(component_id),
+                format!("`{component_id}` derives from {} and not from `{}`, the base the manifest approved", assessment.observed_base_ids.join(", "), assessment.expected_base_id.as_deref().unwrap_or("nothing")), &[observation]));
         } else if assessment.base_digest_bound == Some(false) {
-            // The right base id and the wrong bytes: the same substitution one
-            // level down, and reporting only the id would pass it.
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::ModelLineagePreserved,
                 Some(component_id),
                 format!(
-                    "`{component_id}` derives from a build of `{}` that is not the one approved; \
-                     the base id agrees and the artifact does not",
+                    "`{component_id}` derives from a build of `{}` that is not the one approved",
                     assessment.expected_base_id.as_deref().unwrap_or("its base")
                 ),
                 &[observation],
@@ -732,7 +536,6 @@ fn model_lineage(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     violations
 }
 
-/// Invariant 11. The dataset is the one that was approved.
 fn dataset_provenance(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -740,37 +543,22 @@ fn dataset_provenance(observations: &ObservationSet) -> Vec<SupplyChainViolation
             continue;
         };
         let assessment = &context.assessment;
-        if assessment.digest_bound != Some(false) {
-            continue;
+        if assessment.digest_bound == Some(false) {
+            let consumers = if assessment.consuming_model_ids.is_empty() {
+                "no model records training on it".to_owned()
+            } else {
+                format!(
+                    "the models trained on it were {}",
+                    assessment.consuming_model_ids.join(", ")
+                )
+            };
+            violations.push(SupplyChainViolation::new(SupplyChainInvariant::DatasetProvenancePreserved, Some(&assessment.component_id),
+                format!("the dataset observed for `{}` is not the one the manifest approved, and {consumers}", assessment.component_id), &[observation]));
         }
-        let consumers = if assessment.consuming_model_ids.is_empty() {
-            "no model records training on it".to_owned()
-        } else {
-            format!(
-                "the models trained on it were {}",
-                assessment.consuming_model_ids.join(", ")
-            )
-        };
-        violations.push(SupplyChainViolation::new(
-            SupplyChainInvariant::DatasetProvenancePreserved,
-            Some(&assessment.component_id),
-            format!(
-                "the dataset observed for `{}` is not the one the manifest approved, and \
-                 {consumers}",
-                assessment.component_id
-            ),
-            &[observation],
-        ));
     }
     violations
 }
 
-/// Invariant 12. The evidence a component's class requires is present.
-///
-/// The requirement is per class rather than global: an artifact needs a digest,
-/// a model additionally needs lineage evidence, a dataset needs provenance
-/// evidence. Demanding all of it from every component would report findings
-/// against components the requirement was never about.
 fn bom_completeness(observations: &ObservationSet) -> Vec<SupplyChainViolation> {
     let mut violations = Vec::new();
     for observation in &observations.observations {
@@ -778,7 +566,6 @@ fn bom_completeness(observations: &ObservationSet) -> Vec<SupplyChainViolation> 
             continue;
         };
         let mut missing = Vec::new();
-
         if context.expects_immutable_artifact
             && !observations
                 .for_component(&context.component_id)
@@ -800,7 +587,6 @@ fn bom_completeness(observations: &ObservationSet) -> Vec<SupplyChainViolation> 
         {
             missing.push("dataset provenance evidence");
         }
-
         if !missing.is_empty() {
             violations.push(SupplyChainViolation::new(
                 SupplyChainInvariant::BomRequiredEvidencePresent,
@@ -837,6 +623,204 @@ fn component_context<'a>(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::attestation::tests::attestation;
+    use crate::budget::AdmissionLedger;
+    use crate::component::tests::{component, digest};
+    use crate::manifest::{ApprovedComponent, DareManifest, TrustPolicy};
+    use crate::normalize::EvidenceBuilder;
+    use crate::observation::project;
+    use crate::provenance::tests::record;
+    use crate::relationship::RelationshipGraph;
+    use crate::source::{ComponentType, VerificationStatus};
+    use std::collections::BTreeSet;
+
+    fn approved_manifest() -> DareManifest {
+        DareManifest {
+            schema_version: "1".to_owned(),
+            trust_policy: TrustPolicy {
+                approved_suppliers: BTreeSet::from(["acme".to_owned()]),
+                approved_builders: BTreeSet::from(["builder-ci".to_owned()]),
+                approved_signers: BTreeSet::from(["signer-release".to_owned()]),
+                ..Default::default()
+            },
+            approved_components: BTreeSet::from([ApprovedComponent {
+                component_id: "react".to_owned(),
+                name: None,
+                version: None,
+                digests: BTreeSet::from([digest("a")]),
+            }]),
+            declared_component_ids: BTreeSet::from(["react".to_owned()]),
+            ..Default::default()
+        }
+    }
+
+    fn compliant() -> crate::normalize::SupplyChainEvidence {
+        let mut package = component("react", ComponentType::Package);
+        package.supplier.supplier_id = Some("acme".to_owned());
+        let mut ledger = AdmissionLedger::new();
+        EvidenceBuilder::new()
+            .with_document("bom", crate::normalize::BomFormat::CycloneDx, b"{}")
+            .with_import(vec![package], RelationshipGraph::new())
+            .with_provenance(vec![record("prov-1", "react")])
+            .with_attestations(vec![attestation("att-1", "react")])
+            .with_manifest(approved_manifest())
+            .build(&mut ledger)
+            .expect("builds")
+    }
+
+    #[test]
+    fn compliant_bundle_passes_its_decidable_security_boundaries() {
+        let observations = project(&compliant());
+        for invariant in [
+            SupplyChainInvariant::ComponentProvenanceSufficient,
+            SupplyChainInvariant::ComponentIdentityUnambiguous,
+            SupplyChainInvariant::ArtifactDigestBoundToComponent,
+            SupplyChainInvariant::ComponentSourceTrustPreserved,
+            SupplyChainInvariant::ProvenanceSubjectAndBuilderBound,
+            SupplyChainInvariant::AttestationSubjectDigestPreserved,
+        ] {
+            assert_eq!(
+                evaluate(invariant, &observations).verdict,
+                Verdict::Pass,
+                "{}",
+                invariant.as_str()
+            );
+        }
+    }
+
+    #[test]
+    fn missing_provenance_on_an_artifact_is_applicable_and_inconclusive() {
+        let mut evidence = compliant();
+        evidence.provenance.clear();
+        let observations = project(&evidence);
+        let outcome = evaluate(
+            SupplyChainInvariant::ComponentProvenanceSufficient,
+            &observations,
+        );
+        assert_eq!(outcome.verdict, Verdict::Inconclusive);
+        assert!(outcome.applicable);
+        assert_eq!(
+            aggregate(&evaluate_all(&observations)),
+            Verdict::Inconclusive
+        );
+    }
+
+    #[test]
+    fn missing_source_claim_on_a_component_is_applicable_and_inconclusive() {
+        let mut evidence = compliant();
+        evidence.components[0].supplier = Default::default();
+        let observations = project(&evidence);
+        let outcome = evaluate(
+            SupplyChainInvariant::ComponentSourceTrustPreserved,
+            &observations,
+        );
+        assert_eq!(outcome.verdict, Verdict::Inconclusive);
+        assert!(outcome.applicable);
+    }
+
+    #[test]
+    fn same_component_id_with_conflicting_digest_fails_identity_and_integrity() {
+        let first = component("react", ComponentType::Package);
+        let mut second = component("react", ComponentType::Package);
+        second.digests = BTreeSet::from([digest("b")]);
+        let mut ledger = AdmissionLedger::new();
+        let evidence = EvidenceBuilder::new()
+            .with_import(vec![first], RelationshipGraph::new())
+            .with_import(vec![second], RelationshipGraph::new())
+            .with_manifest(approved_manifest())
+            .build(&mut ledger)
+            .expect("builds");
+        let observations = project(&evidence);
+        assert_eq!(
+            evaluate(
+                SupplyChainInvariant::ComponentIdentityUnambiguous,
+                &observations
+            )
+            .verdict,
+            Verdict::Fail
+        );
+        assert_eq!(
+            evaluate(
+                SupplyChainInvariant::ArtifactDigestBoundToComponent,
+                &observations
+            )
+            .verdict,
+            Verdict::Fail
+        );
+    }
+
+    #[test]
+    fn conflicting_provenance_cannot_be_hidden_by_good_provenance() {
+        let mut evidence = compliant();
+        let mut bad = record("prov-bad", "react");
+        bad.subject_digests = BTreeSet::from([digest("b")]);
+        bad.builder_id = Some("builder-evil".to_owned());
+        evidence.provenance.push(bad);
+        let outcome = evaluate(
+            SupplyChainInvariant::ProvenanceSubjectAndBuilderBound,
+            &project(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Fail);
+        assert!(outcome.violations.len() >= 2);
+    }
+
+    #[test]
+    fn invalid_attestation_verification_fails_even_beside_a_valid_one() {
+        let mut evidence = compliant();
+        let mut invalid = attestation("att-invalid", "react");
+        invalid.verification_status = VerificationStatus::Invalid;
+        evidence.attestations.push(invalid);
+        let outcome = evaluate(
+            SupplyChainInvariant::AttestationSubjectDigestPreserved,
+            &project(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Fail);
+        assert!(outcome
+            .violations
+            .iter()
+            .any(|v| v.reason.contains("INVALID")));
+    }
+
+    #[test]
+    fn indeterminate_attestation_verification_is_inconclusive_not_pass() {
+        let mut evidence = compliant();
+        evidence.attestations[0].verification_status = VerificationStatus::Indeterminate;
+        let outcome = evaluate(
+            SupplyChainInvariant::AttestationSubjectDigestPreserved,
+            &project(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Inconclusive);
+        assert!(outcome.applicable);
+    }
+
+    #[test]
+    fn an_approved_supplier_does_not_mask_an_unapproved_source() {
+        let mut evidence = compliant();
+        evidence.components[0].supplier.source_id = Some("registry-evil".to_owned());
+        let outcome = evaluate(
+            SupplyChainInvariant::ComponentSourceTrustPreserved,
+            &project(&evidence),
+        );
+        assert_eq!(outcome.verdict, Verdict::Fail);
+    }
+
+    #[test]
+    fn empty_run_is_inconclusive() {
+        assert_eq!(
+            aggregate(&evaluate_all(&ObservationSet::default())),
+            Verdict::Inconclusive
+        );
+    }
+
+    #[test]
+    fn registry_still_contains_exactly_twelve_evaluators() {
+        assert_eq!(supported_invariants().len(), 12);
+    }
+}
+
+#[cfg(test)]
+mod cycle019_pre_review_tests {
     use super::*;
     use crate::attestation::tests::attestation;
     use crate::budget::AdmissionLedger;
