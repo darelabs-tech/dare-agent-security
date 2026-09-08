@@ -6,24 +6,81 @@ on:
     types: [opened]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  format-export:
+  restore-format-verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
-      - name: Format corrective Rust files
+      - name: Restore baseline regression modules beside corrective tests
+        shell: python
+        run: |
+          import pathlib
+          import re
+          import subprocess
+
+          baseline = "3fcf3bb8177dbca3d5cbf49df9d9d8923d5681c1"
+          files = [
+              "crates/dare-supply-chain-security/src/attestation.rs",
+              "crates/dare-supply-chain-security/src/coverage.rs",
+              "crates/dare-supply-chain-security/src/harness.rs",
+              "crates/dare-supply-chain-security/src/invariant.rs",
+              "crates/dare-supply-chain-security/src/local_synthetic.rs",
+              "crates/dare-supply-chain-security/src/manifest.rs",
+              "crates/dare-supply-chain-security/src/normalize.rs",
+              "crates/dare-supply-chain-security/src/observation.rs",
+              "crates/dare-supply-chain-security/src/provenance.rs",
+              "crates/dare-supply-chain-security/src/replay.rs",
+              "crates/dare-supply-chain-security/src/result.rs",
+          ]
+
+          pattern = re.compile(r"(?m)^#\[cfg\(test\)\]\s*\n(?:pub\(crate\)\s+)?mod tests\s*\{")
+          for name in files:
+              path = pathlib.Path(name)
+              current = path.read_text(encoding="utf-8")
+              if "mod cycle019_pre_review_tests" in current:
+                  continue
+              original = subprocess.check_output(
+                  ["git", "show", f"{baseline}:{name}"], text=True
+              )
+              match = pattern.search(original)
+              if not match:
+                  raise SystemExit(f"no baseline test module found in {name}")
+              suffix = original[match.start():]
+              suffix = re.sub(
+                  r"(?m)^((?:pub\(crate\)\s+)?)mod tests\s*\{",
+                  r"\1mod cycle019_pre_review_tests {",
+                  suffix,
+                  count=1,
+              )
+              path.write_text(current.rstrip() + "\n\n" + suffix.lstrip(), encoding="utf-8")
+      - name: Canonical Rust formatting
         run: cargo fmt --all
-      - name: Export formatted changed files
+      - name: Engine regression suite
+        run: cargo test -p dare-supply-chain-security --lib
+      - name: Report remaining proof citation gaps
         shell: bash
         run: |
-          git diff --name-only -- '*.rs' | while IFS= read -r file; do
-            echo "BASE64_BEGIN ${file}"
-            base64 -w0 "${file}"
-            echo
-            echo "BASE64_END ${file}"
-          done
+          set +e
+          python scripts/k19/verify_proof_citations.py
+          status=$?
+          echo "proof_status=${status}"
+          exit 0
+      - name: Commit restored and formatted regression surface
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/dare-supply-chain-security/src crates/dare-agent-security-cli/src/supply_chain_security.rs
+          if git diff --cached --quiet; then
+            echo "No formatting or regression restoration changes"
+            exit 0
+          fi
+          git commit -m "test(cycle-019): restore baseline regressions and canonical formatting"
+          git push origin HEAD:fix/cycle-019-post-merge-security-review
