@@ -1,0 +1,121 @@
+cycle: 019
+slug: agentic-supply-chain-aibom
+title: Agentic Supply Chain Security & AI-BOM
+status: APPROVED_FOR_EXECUTION
+approval: APPROVED
+approved_at: 2026-09-08
+baseline:
+  branch: main
+  commit: 83fee819ef07f29a8d27cedd95db809b34829fd9
+execution_branch: agent/cycle-019-agentic-supply-chain-aibom
+acceptance_criteria: 85
+execution_tasks: 53
+execution_authorized: true
+requires_product_owner_approval: true
+approval_file: DARE/cycles/019-agentic-supply-chain-aibom/APPROVAL.md
+
+safety:
+  modes: [STATIC, REPLAY, SIMULATED, LOCAL_SYNTHETIC]
+  max_state_changes: 0
+  external_egress_bytes: 0
+  real_credentials: false
+  production_targets: false
+  remote_registry_fetch: false
+  remote_package_fetch: false
+  remote_model_fetch: false
+  remote_git_fetch: false
+  remote_oci_fetch: false
+  remote_attestation_fetch: false
+  remote_signature_verification: false
+  artifact_execution: false
+  model_execution: false
+
+standards:
+  - { source: OWASP_AGENTIC_TOP10_2026, reference: 'ASI04 Agentic Supply Chain Vulnerabilities', status: NORMATIVE }
+  - { source: CycloneDX, version: '1.7', status: NORMATIVE }
+  - { source: ECMA-424, version: '2nd Edition', status: NORMATIVE }
+  - { source: SPDX, version: '3.0.1', status: NORMATIVE }
+  - { source: SLSA, version: '1.2', status: NORMATIVE }
+  - { source: in-toto Attestation Framework, version: '1.2', status: NORMATIVE }
+  - { source: Sigstore/Cosign, version: local-evidence-model, status: INFORMATIVE }
+
+future_not_baseline:
+  - CycloneDX v2.0 / Transparency Exchange Language
+  - remote registry verification
+  - remote transparency-log verification
+  - A2A protocol security
+  - automatic attack graph
+  - blast radius analysis
+
+tasks:
+  task-001: { depends_on: [] }
+  task-002: { depends_on: [task-001] }
+  task-003: { depends_on: [task-001, task-002] }
+  task-004: { depends_on: [task-001, task-003] }
+  task-005: { depends_on: [task-001, task-003] }
+  task-006: { depends_on: [task-005] }
+  task-007: { depends_on: [task-005, task-006] }
+  task-008: { depends_on: [task-005, task-006, task-007] }
+  task-009: { depends_on: [task-005, task-007, task-008] }
+  task-010: { depends_on: [task-002, task-005, task-008, task-009] }
+  task-011: { depends_on: [task-002, task-005, task-008, task-009] }
+  task-012: { depends_on: [task-005, task-006, task-010, task-011] }
+  task-013: { depends_on: [task-005, task-012] }
+  task-014: { depends_on: [task-006, task-012, task-013] }
+  task-015: { depends_on: [task-005, task-007, task-012] }
+  task-016: { depends_on: [task-002, task-012, task-013, task-015] }
+  task-017: { depends_on: [task-002, task-012, task-013, task-015, task-016] }
+  task-018: { depends_on: [task-012, task-013, task-014] }
+  task-019: { depends_on: [task-012, task-013, task-014, task-016] }
+  task-020: { depends_on: [task-012, task-013, task-014] }
+  task-021: { depends_on: [task-012, task-013] }
+  task-022: { depends_on: [task-003, task-012, task-013, task-014] }
+  task-023: { depends_on: [task-012, task-013, task-014, task-015, task-016, task-017, task-018, task-019, task-020, task-021, task-022] }
+  task-024: { depends_on: [task-023] }
+  task-025: { depends_on: [task-003, task-023, task-024] }
+  task-026: { depends_on: [task-016, task-022, task-023, task-024, task-025] }
+  task-027: { depends_on: [task-013, task-023, task-024, task-025] }
+  task-028: { depends_on: [task-013, task-015, task-023, task-024, task-025] }
+  task-029: { depends_on: [task-017, task-023, task-024, task-025] }
+  task-030: { depends_on: [task-014, task-023, task-024, task-025] }
+  task-031: { depends_on: [task-018, task-019, task-023, task-024, task-025] }
+  task-032: { depends_on: [task-023, task-024, task-025] }
+  task-033: { depends_on: [task-025, task-026, task-027, task-028, task-029, task-030, task-031, task-032] }
+  task-034: { depends_on: [task-008, task-009, task-012, task-023, task-024, task-025, task-033] }
+  task-035: { depends_on: [task-008, task-009, task-012, task-023, task-024, task-025, task-033] }
+  task-036: { depends_on: [task-008, task-009, task-023, task-024, task-025, task-033] }
+  task-037: { depends_on: [task-008, task-009, task-023, task-024, task-025, task-033] }
+  task-038: { depends_on: [task-009, task-027, task-028] }
+  task-039: { depends_on: [task-009, task-026, task-029, task-030] }
+  task-040: { depends_on: [task-009, task-022, task-031] }
+  task-041: { depends_on: [task-010, task-011, task-012] }
+  task-042: { depends_on: [task-008, task-009, task-034, task-035, task-036, task-037] }
+  task-043: { depends_on: [task-024, task-033, task-038, task-039, task-040, task-041, task-042] }
+  task-044: { depends_on: [task-009, task-023, task-033, task-043] }
+  task-045: { depends_on: [task-003, task-004, task-044] }
+  task-046: { depends_on: [task-034, task-035, task-036, task-037, task-044, task-045] }
+  task-047: { depends_on: [task-038, task-039, task-040, task-041, task-042, task-043] }
+  task-048: { depends_on: [task-038, task-039, task-040, task-041, task-042, task-043, task-044, task-045, task-046, task-047] }
+  task-049: { depends_on: [task-045, task-046, task-048] }
+  task-050: { depends_on: [task-048, task-049] }
+  task-051: { depends_on: [task-002, task-045, task-046, task-048] }
+  task-052: { depends_on: [task-048, task-049, task-050, task-051] }
+  task-053: { depends_on: [task-052] }
+
+pre_pr_gates:
+  - cargo fmt --all --check
+  - cargo clippy --workspace --all-targets -- -D warnings
+  - cargo test --workspace
+  - cargo audit
+  - python scripts/run-ci-job-locally.py .github/workflows/ci.yml supply-chain-security-2026
+  - build English mdBook
+  - build Portuguese mdBook
+  - verify REGRESSION.md complete
+  - verify PROOF.md maps 85/85 acceptance criteria
+
+pr_policy:
+  trigger: pull_request.opened
+  push_trigger_allowed: false
+  final_branch_push_before_pr: true
+  single_pr_after_local_gates: true
+  changed_branch_after_pr_means_ci_stale: true

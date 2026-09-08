@@ -95,6 +95,17 @@ pub enum Predicate {
     ScopeChallengePresent,
     ClientRegistrationPresent,
     CredentialForwardingPresent,
+    // Cycle 019. Two more — `agent_present` and `external_components_present`
+    // — are reused from Cycle 012 rather than restated.
+    SupplyChainBomPresent,
+    ComponentDigestPresent,
+    SourceTrustPolicyPresent,
+    ProvenancePresent,
+    AttestationPresent,
+    DependencyGraphPresent,
+    ModelComponentPresent,
+    DatasetComponentPresent,
+    DeclaredObservedComponentsPresent,
 }
 
 impl Predicate {
@@ -148,6 +159,15 @@ impl Predicate {
             Self::ScopeChallengePresent => "scope_challenge_present",
             Self::ClientRegistrationPresent => "client_registration_present",
             Self::CredentialForwardingPresent => "credential_forwarding_present",
+            Self::SupplyChainBomPresent => "supply_chain_bom_present",
+            Self::ComponentDigestPresent => "component_digest_present",
+            Self::SourceTrustPolicyPresent => "source_trust_policy_present",
+            Self::ProvenancePresent => "provenance_present",
+            Self::AttestationPresent => "attestation_present",
+            Self::DependencyGraphPresent => "dependency_graph_present",
+            Self::ModelComponentPresent => "model_component_present",
+            Self::DatasetComponentPresent => "dataset_component_present",
+            Self::DeclaredObservedComponentsPresent => "declared_observed_components_present",
         }
     }
 
@@ -169,6 +189,8 @@ impl Predicate {
                 | Self::HumanApprovalPresent
                 | Self::DelegatedIdentityPresent
                 | Self::ExternalComponentsPresent
+                | Self::ModelComponentPresent
+                | Self::DatasetComponentPresent
                 | Self::StatefulAgentPresent
                 | Self::UserPromptPresent
                 | Self::UntrustedExternalContentPresent
@@ -213,6 +235,32 @@ impl Predicate {
     ///
     /// These therefore resolve to `NOT_TESTED`, following the precedent already
     /// set for `execution_integrity_supported` and `confused_deputy_supported`.
+    /// Whether this predicate names supply-chain evidence or a control
+    /// rather than the shape of the target.
+    ///
+    /// The Cycle 018 distinction, applied to a second domain. A target that
+    /// ships external components but publishes no bill of materials, records no
+    /// digest, declares no approved-source policy, carries no provenance or
+    /// attestation, or supplies only one side of the declared/observed
+    /// comparison has a **gap**, not an exemption. Reporting NOT_APPLICABLE
+    /// there would let a target score better for supplying less.
+    ///
+    /// `model_component_present` and `dataset_component_present` are
+    /// deliberately absent: those describe what the target *is*, and a system
+    /// with no model genuinely has no model lineage to answer for.
+    pub fn is_supply_chain_evidence(self) -> bool {
+        matches!(
+            self,
+            Self::SupplyChainBomPresent
+                | Self::ComponentDigestPresent
+                | Self::SourceTrustPolicyPresent
+                | Self::ProvenancePresent
+                | Self::AttestationPresent
+                | Self::DependencyGraphPresent
+                | Self::DeclaredObservedComponentsPresent
+        )
+    }
+
     pub fn is_auth_control_evidence(self) -> bool {
         matches!(
             self,

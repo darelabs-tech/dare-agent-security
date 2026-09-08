@@ -2592,6 +2592,214 @@ jobs:
       - name: Full workspace
         run: cargo test --workspace
 
+  supply-chain-security-2026:
+    name: Cycle 019 agentic supply chain and AI-BOM gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (types, bounds, importers, evaluators, adapters)
+        run: cargo test -p dare-supply-chain-security --lib -- --nocapture
+      - name: The 40 SUPPLY-LAB entries against the harness contract
+        run: cargo test -p dare-supply-chain-security --test supply_lab -- --nocapture
+      - name: Generators are reproducible and no fixture carries a credential
+        run: cargo test -p dare-supply-chain-security --test generators -- --nocapture
+      - name: Supply-chain profile and coverage integration
+        run: cargo test -p dare-coverage --test supply_chain_profile -- --nocapture
+      - name: Supply-chain properties and standards provenance
+        run: |
+          cargo test -p dare-coverage --test supply_chain_properties -- --nocapture
+          cargo test -p dare-coverage --lib supply_chain_standards -- --nocapture
+      - name: CLI flag surface (no registry, fetch, signing, key or token flag)
+        run: cargo test -p dare-agent-security --lib supply_chain_security -- --nocapture
+
+      - name: No real credential, key or live registry endpoint anywhere
+        run: python scripts/k19/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k19/verify_proof_citations.py
+
+      - name: Offline CLI - a bill of materials that agrees with its approvals
+        run: |
+          rm -rf .dare-agent-security/cycle019-benign
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-benign
+          test -f .dare-agent-security/cycle019-benign/supply-chain-security-result.json
+          test -f .dare-agent-security/cycle019-benign/supply-chain-security-invariants.json
+          test -f .dare-agent-security/cycle019-benign/supply-chain-security-evidence.json
+          test -f .dare-agent-security/cycle019-benign/summary.md
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-benign/supply-chain-security-result.json \
+            verdict=PASS class=COMPONENT_IDENTITY mode=SIMULATED synthetic=true \
+            primary_invariant=COMPONENT_IDENTITY_UNAMBIGUOUS \
+            property_id=AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY \
+            redaction_state=REDACTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --present scenario_digest evidence_digest observation_digests \
+            --count outcomes=12
+
+      - name: An artifact substituted under an approved identity
+        run: |
+          rm -rf .dare-agent-security/cycle019-substituted
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-004 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-substituted
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a substituted artifact, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-substituted/supply-chain-security-result.json \
+            verdict=FAIL class=ARTIFACT_INTEGRITY \
+            primary_invariant=ARTIFACT_DIGEST_BOUND_TO_COMPONENT \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: A valid signature is not an approved signer
+        run: |
+          rm -rf .dare-agent-security/cycle019-signer
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-015 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-signer
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an unapproved signer, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-signer/supply-chain-security-result.json \
+            verdict=FAIL class=ATTESTATION_BINDING \
+            primary_invariant=ATTESTATION_SUBJECT_DIGEST_PRESERVED
+
+      - name: A model name alone cannot prove base-model lineage
+        run: |
+          rm -rf .dare-agent-security/cycle019-lineage
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-024 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-lineage
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a substituted base model, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-lineage/supply-chain-security-result.json \
+            verdict=FAIL class=MODEL_LINEAGE \
+            primary_invariant=MODEL_LINEAGE_PRESERVED
+
+      - name: Thin evidence is inconclusive and never a pass
+        run: |
+          rm -rf .dare-agent-security/cycle019-gap
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-022 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-gap
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for evidence too thin to decide, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-gap/supply-chain-security-result.json \
+            verdict=INCONCLUSIVE class=CAPABILITY_DRIFT
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-gap/supply-chain-security-result.json \
+            --count violations=0
+
+      - name: One bundle crossing three boundaries reports three
+        run: |
+          rm -rf .dare-agent-security/cycle019-multi
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-036 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-multi
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a multi-violation bundle, got $code"
+            exit 1
+          fi
+          python - <<'PY'
+          import json, pathlib, sys
+
+          result = json.loads(
+              pathlib.Path(
+                  ".dare-agent-security/cycle019-multi/supply-chain-security-result.json"
+              ).read_text(encoding="utf-8")
+          )
+          invariants = {violation["invariant"] for violation in result["violations"]}
+          expected = {
+              "ARTIFACT_DIGEST_BOUND_TO_COMPONENT",
+              "COMPONENT_SOURCE_TRUST_PRESERVED",
+              "EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED",
+          }
+          missing = expected - invariants
+          if missing:
+              print(f"a multi-violation bundle lost {sorted(missing)}", file=sys.stderr)
+              sys.exit(1)
+          print(f"retained {sorted(invariants)}")
+          PY
+
+      - name: A dangling dependency edge is refused rather than dropped
+        run: |
+          rm -rf .dare-agent-security/cycle019-dangling
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-019 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-dangling
+          code=$?
+          set -e
+          if [ "$code" -ne 1 ]; then
+            echo "expected exit 1 for a refused bundle, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle019-dangling/supply-chain-security-result.json \
+            verdict=ERROR components_evaluated=0
+
+      - name: An unknown corpus vector is refused rather than run empty
+        run: |
+          rm -rf .dare-agent-security/cycle019-unknown
+          set +e
+          cargo run -p dare-agent-security -- validate supply-chain \
+            --scenario SUPPLY-LAB-999 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle019-unknown
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for an unknown vector, got $code"
+            exit 1
+          fi
+
+      - name: No artifact this job wrote carries a credential or live endpoint
+        run: python scripts/k19/assert_no_real_credentials.py
+
+      - name: Cycle 012 to 018 regressions still pass
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          cargo test -p dare-prompt-injection -- --nocapture
+          cargo test -p dare-tool-security -- --nocapture
+          cargo test -p dare-identity-security -- --nocapture
+          cargo test -p dare-memory-security -- --nocapture
+          cargo test -p dare-rag-security -- --nocapture
+          cargo test -p dare-mcp-auth-security -- --nocapture
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

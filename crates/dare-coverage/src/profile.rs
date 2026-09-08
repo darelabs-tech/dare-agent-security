@@ -29,6 +29,8 @@ pub const RAG_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/rag-security-baseline-2026.json");
 pub const MCP_AUTH_HARDENING_PROFILE_JSON: &str =
     include_str!("../../../profiles/mcp-auth-hardening-2026.json");
+pub const AGENTIC_SUPPLY_CHAIN_PROFILE_JSON: &str =
+    include_str!("../../../profiles/agentic-supply-chain-security-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -244,6 +246,27 @@ pub fn mcp_auth_hardening_profile() -> Result<AssessmentProfile, CoverageError> 
     load_profile(MCP_AUTH_HARDENING_PROFILE_JSON)
 }
 
+/// The Cycle 019 agentic supply-chain profile.
+///
+/// Additive: it selects the two properties Cycle 012 created and the eight this
+/// cycle added, and touches no earlier profile. A coverage percentage is a
+/// fraction whose denominator is a profile's property count, so changing an
+/// existing profile would silently change what every assessment already filed
+/// against it means.
+///
+/// Four properties are REQUIRED and six are CONDITIONAL, and the split is not
+/// arbitrary. Identity, integrity, source trust and completeness apply to any
+/// system that has a bill of materials at all: a component nobody can identify
+/// or whose bytes nobody pinned is a gap in every deployment.
+///
+/// The six conditional ones apply where their evidence class exists. A system
+/// with no model has no model lineage to preserve, and marking lineage REQUIRED
+/// would report a finding against every deployment that runs no model — which
+/// is how an operator learns to ignore the profile.
+pub fn agentic_supply_chain_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(AGENTIC_SUPPLY_CHAIN_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -263,6 +286,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "memory-security-baseline-2026" => memory_security_profile(),
         "rag-security-baseline-2026" => rag_security_profile(),
         "mcp-auth-hardening-2026" => mcp_auth_hardening_profile(),
+        "agentic-supply-chain-security-2026" => agentic_supply_chain_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

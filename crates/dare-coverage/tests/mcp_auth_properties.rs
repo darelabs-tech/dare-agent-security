@@ -132,6 +132,7 @@ fn full_auth_target() -> AssessmentFacts {
         client_registration_present: true,
         credential_forwarding_present: true,
         out_of_scope_property_ids: Vec::new(),
+        ..Default::default()
     }
 }
 
@@ -219,11 +220,15 @@ fn the_new_properties_did_not_enter_the_mcp_baseline_profile() {
 
 #[test]
 fn the_agentic_registry_and_its_family_count_are_untouched() {
-    // Cycle 018 adds to v1. The v2 registry carries the risk families, so
-    // adding nothing to it is what keeps the count at ten — there is no
-    // exclusion rule doing the work, and there is nothing to exclude.
+    // Cycle 018 adds to v1, and none of its properties may appear in v2.
+    //
+    // This used to assert `properties.len() == 40`, which said "Cycle 018 added
+    // nothing to v2" by freezing a total that later cycles legitimately move —
+    // Cycle 019 added eight supply-chain properties to v2 and this assertion
+    // failed for the right reason and the wrong subject. What Cycle 018 needs
+    // to hold is that *its* properties are absent from v2 and that the family
+    // count is unchanged, and both are asserted directly below.
     let agentic = agentic_registry().expect("v2 registry");
-    assert_eq!(agentic.properties.len(), 40);
     let families: std::collections::HashSet<_> = agentic
         .properties
         .iter()

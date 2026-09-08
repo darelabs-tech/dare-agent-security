@@ -143,6 +143,7 @@ mod tests {
             client_registration_present: false,
             credential_forwarding_present: false,
             out_of_scope_property_ids: vec![],
+            ..Default::default()
         };
         let report =
             run_assessment(&profile, &registry, &facts, &[], CoveragePolicy::default()).unwrap();

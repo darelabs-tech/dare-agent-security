@@ -14,6 +14,7 @@
 - [Cobertura de Avaliação](concepts/assessment-coverage.md)
 - [Grafo de Ataque](concepts/attack-graph.md)
 - [Modos de Validação](concepts/validation.md)
+- [Cadeia de Suprimentos Agêntica e AI-BOM](concepts/supply-chain-security.md)
 
 # Comandos
 

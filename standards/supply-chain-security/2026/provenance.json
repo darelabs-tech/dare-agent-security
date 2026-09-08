@@ -1,0 +1,244 @@
+{
+  "schema_version": "1",
+  "recorded_at": "2026-09-08",
+  "cycle": "019-agentic-supply-chain-aibom",
+
+  "fetch_policy": "NO_NETWORK_ACCESS",
+  "fetch_policy_note": "Nothing in this cycle retrieves a specification, a registry entry, a package, a model, a container image, a Git repository, an attestation, a signature or a transparency-log record. Every source below is recorded as a pinned reference with the status the approval assigned it. A URL or registry coordinate appearing anywhere in imported evidence is inert metadata: it names something, and naming something is not authorization to go and get it.",
+
+  "reverification_note": "No upstream re-verification of any status below was performed during this cycle. These are the statuses the Cycle 019 approval froze on 2026-09-08. They should be re-checked against the publishers before being relied on, and this record says so rather than leaving a reader to assume currency from the presence of a version number.",
+
+  "conformance_disclaimer": "Nothing in this cycle asserts conformance with any specification listed here. The engine evaluates whether the security properties it names hold for the evidence it was given. It does not certify a CycloneDX document, an SPDX document, an SLSA provenance statement or an in-toto attestation as conformant, and a PASS is never a conformance claim.",
+
+  "status_discipline_note": "A source's status governs what may depend on it. NORMATIVE sources may inform a mandatory PASS condition. INFORMATIVE and FUTURE sources may not, in this cycle or in a later one, unless a subsequent approval explicitly freezes the promotion. Property mappings therefore carry a status of their own, and none of them is NORMATIVE: a mapping records which specification a property draws its vocabulary from, never that the specification requires the property.",
+
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026_ASI04",
+      "title": "OWASP Agentic Top 10 2026",
+      "version": "2026",
+      "canonical_reference": "ASI04 Agentic Supply Chain Vulnerabilities",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY",
+      "mapping_notes": "The risk taxonomy this cycle reports under. It supplies the risk family AGENTIC_SUPPLY_CHAIN, which Cycle 012 already created and this cycle reuses. It does not supply invariants: a taxonomy names a class of risk, and an invariant is a comparison of typed fields."
+    },
+    {
+      "id": "CYCLONEDX_1_7",
+      "title": "CycloneDX Bill of Materials specification",
+      "version": "1.7",
+      "canonical_reference": "CycloneDX 1.7 components, dependencies, hashes, supplier/publisher metadata and ML/AI model and dataset evidence",
+      "status": "NORMATIVE",
+      "usage": "INTERCHANGE_BASELINE",
+      "mapping_notes": "The supported CycloneDX interchange baseline. A bounded subset is imported: components, services as component references, dependencies, hashes, supplier and publisher metadata, and the model and dataset evidence the specification represents. External references are read as inert metadata and never as instructions."
+    },
+    {
+      "id": "ECMA_424_2ND",
+      "title": "ECMA-424 CycloneDX Bill of Materials Standard",
+      "version": "2nd Edition",
+      "canonical_reference": "ECMA-424 2nd Edition",
+      "status": "NORMATIVE",
+      "usage": "INTERCHANGE_BASELINE",
+      "mapping_notes": "The standardized form of the CycloneDX baseline above. Recorded separately because a reader checking the interchange contract may hold either document, and the two are the same baseline rather than two."
+    },
+    {
+      "id": "SPDX_3_0_1",
+      "title": "SPDX specification",
+      "version": "3.0.1",
+      "canonical_reference": "SPDX 3.0.1 Core, Software, AI and Dataset profiles",
+      "status": "NORMATIVE",
+      "usage": "INTERCHANGE_BASELINE",
+      "mapping_notes": "The supported SPDX baseline, bounded to the Core, Software, AI and Dataset subset the engine normalizes: elements, packages, AI packages, datasets and relationships, plus whatever integrity and provenance references the local document already carries."
+    },
+    {
+      "id": "SLSA_1_2",
+      "title": "Supply-chain Levels for Software Artifacts",
+      "version": "1.2",
+      "canonical_reference": "SLSA 1.2 provenance semantics",
+      "status": "NORMATIVE",
+      "usage": "PROVENANCE_SEMANTICS",
+      "mapping_notes": "The semantic reference for how local provenance evidence is read: subject, subject digest, builder identity, build invocation and source material. It is a vocabulary, not a level assessment. This cycle assigns no SLSA level to anything, because a level is a statement about a build system that no local document can establish on its own."
+    },
+    {
+      "id": "IN_TOTO_ATTESTATION_1_2",
+      "title": "in-toto Attestation Framework",
+      "version": "1.2",
+      "canonical_reference": "in-toto Attestation Framework v1.2 statement, subject, predicate and envelope semantics",
+      "status": "NORMATIVE",
+      "usage": "ATTESTATION_SEMANTICS",
+      "mapping_notes": "The semantic reference for local attestation evidence: what a statement, a subject, a predicate type and an envelope are. Used to read a document that is already present. No envelope is verified cryptographically here, and no signature is checked against a key this cycle could not have obtained without a network."
+    },
+    {
+      "id": "SIGSTORE_COSIGN",
+      "title": "Sigstore and Cosign verification concepts",
+      "version": "local-evidence-model",
+      "canonical_reference": "Sigstore/Cosign signature and signer-identity concepts",
+      "status": "INFORMATIVE",
+      "usage": "LOCAL_EVIDENCE_MODEL",
+      "mapping_notes": "Informative only, and deliberately so. The concepts shape how a local verification-status field and a signer identity are modelled. Nothing here contacts Fulcio, Rekor, an OCI registry or a transparency log, and a recorded verification status is evidence about a verification somebody else performed rather than a verification performed here."
+    },
+    {
+      "id": "CYCLONEDX_2_0_TEL",
+      "title": "CycloneDX v2.0 and Transparency Exchange Language",
+      "version": "2.0-draft",
+      "canonical_reference": "CycloneDX v2.0 / TEL",
+      "status": "FUTURE",
+      "usage": "NOT_A_REQUIREMENT",
+      "mapping_notes": "Forward-looking and explicitly not a baseline PASS requirement. A deployment producing no TEL evidence is not reported as deficient, and one producing it is not reported as better. Re-verification against a stable released specification is a later cycle's work, not an inference this cycle may make."
+    }
+  ],
+
+  "supply_chain_trust_statement": {
+    "id": "cycle-019-supply-chain-trust",
+    "summary": "Eleven distinctions the engine exists to hold apart. Each is a place where two things that look alike are not the same thing, and where treating them as the same is how a supply-chain boundary quietly stops existing.",
+    "rules": [
+      "inventory != trust. A component being listed in a bill of materials says it was declared, not that it was approved.",
+      "component name != component identity. A name is what something calls itself; identity is what distinguishes it from everything else.",
+      "version string != immutable artifact. Two builds can carry the same version and be different bytes.",
+      "digest presence != provenance. A digest says what an artifact is, never where it came from or who built it.",
+      "valid signature evidence != authorized signer. A correctly verified signature by a signer nobody approved is a correct signature and no authorization at all.",
+      "provenance presence != trusted provenance. A provenance record is a claim until a local policy says whose claims count.",
+      "complete AI-BOM != secure supply chain. Completeness is a property of the document; security is a property of what the document describes.",
+      "declared dependency != observed dependency. What a manifest lists and what a system loads are two observations, and the gap between them is the finding.",
+      "same name and version != same artifact. This is the substitution the digest exists to catch.",
+      "component URL != authorization to fetch. A coordinate inside imported evidence is inert metadata, and this engine has no path that could act on it.",
+      "external agent inventory != A2A authorization. Listing an agent is not deciding what it may say to another agent; that is Cycle 020."
+    ]
+  },
+
+  "surface_classes": [
+    { "id": "COMPONENT_IDENTITY", "summary": "Whether a component can be told apart from everything else it might be confused with." },
+    { "id": "ARTIFACT_INTEGRITY", "summary": "Whether the bytes an identity names are bound to that identity by an immutable digest." },
+    { "id": "SOURCE_TRUST", "summary": "Whether the source, publisher, builder or signer a component rests on is one a local policy approved." },
+    { "id": "PROVENANCE_BINDING", "summary": "Whether a provenance record's subject and builder bind to the component and artifact actually assessed." },
+    { "id": "ATTESTATION_BINDING", "summary": "Whether an attestation's subject digest is the artifact under assessment rather than a different one." },
+    { "id": "DEPENDENCY_INTEGRITY", "summary": "Whether the dependency edges observed are the edges expected, in both directions." },
+    { "id": "CAPABILITY_DRIFT", "summary": "Whether an externally supplied component's capability set changed from the approved one." },
+    { "id": "MODEL_LINEAGE", "summary": "Whether a model's base-model lineage is the approved one rather than a substituted base." },
+    { "id": "DATASET_PROVENANCE", "summary": "Whether a dataset's identity and source are the approved ones, within supply-chain scope only." },
+    { "id": "BOM_COMPLETENESS", "summary": "Whether the evidence a component type requires is present at all, before any question about whether it holds." }
+  ],
+
+  "property_mappings": [
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.COMPONENT_PROVENANCE",
+      "standard": "SLSA_1_2",
+      "reference": "SLSA 1.2 provenance subject, builder and source-material semantics",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Pre-existing property from Cycle 012, reused unchanged. The mapping records where its provenance vocabulary comes from; it does not make SLSA a PASS condition, and no SLSA level is assigned."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.CAPABILITY_DRIFT",
+      "standard": "OWASP_AGENTIC_TOP10_2026_ASI04",
+      "reference": "ASI04 externally supplied capability change",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Pre-existing property from Cycle 012, reused unchanged. Cycle 019 supplies capability projections to it rather than creating a second drift property, because two drift properties would eventually disagree about what drift is."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY",
+      "standard": "CYCLONEDX_1_7",
+      "reference": "CycloneDX 1.7 component identity fields and package coordinates",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Draws its identifier vocabulary from CycloneDX and SPDX alike; the property is about whether an identity is unambiguous, which is a security question neither specification answers."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.ARTIFACT_INTEGRITY",
+      "standard": "CYCLONEDX_1_7",
+      "reference": "CycloneDX 1.7 component hashes",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "A hash field is where the evidence lives. Whether the digest binds to the component actually assessed is the property, and a document carrying a well-formed hash for something else satisfies nothing."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.SOURCE_TRUST",
+      "standard": "SIGSTORE_COSIGN",
+      "reference": "Signer identity and verification-status concepts",
+      "relation": "COMPOSES_WITH",
+      "status": "INFORMATIVE",
+      "notes": "Informative, because the source is informative. Trust here comes from a local approved-identity policy, never from a verification status and never from a document describing itself as trusted."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.ATTESTATION_BINDING",
+      "standard": "IN_TOTO_ATTESTATION_1_2",
+      "reference": "in-toto v1.2 statement subject and predicate semantics",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The framework supplies what a subject and a predicate are. The property is that an attestation for artifact B does not satisfy artifact A, which is a binding question rather than a format one."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.DEPENDENCY_INTEGRITY",
+      "standard": "SPDX_3_0_1",
+      "reference": "SPDX 3.0.1 relationship semantics",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Relationship vocabulary comes from SPDX and CycloneDX. The property compares expected edges against observed ones, in both directions: an inserted edge and a missing edge are different findings."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.MODEL_LINEAGE",
+      "standard": "CYCLONEDX_1_7",
+      "reference": "CycloneDX 1.7 ML/AI model evidence",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Lineage is expressed as typed edges between component identities. A model repository name is not lineage, which is exactly the substitution this property exists to catch."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.DATASET_PROVENANCE",
+      "standard": "SPDX_3_0_1",
+      "reference": "SPDX 3.0.1 Dataset profile",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Bounded to supply-chain concerns: identity, integrity, source and lineage relationship. Privacy, PII, copyright, licence compliance, fairness and bias are outside this cycle and outside this property."
+    },
+    {
+      "property_id": "AGENT.SUPPLY_CHAIN.BOM_COMPLETENESS",
+      "standard": "ECMA_424_2ND",
+      "reference": "ECMA-424 2nd Edition required component evidence",
+      "relation": "COMPOSES_WITH",
+      "status": "INFORMATIVE",
+      "notes": "Completeness is prior to every other property: whether the evidence a component type requires is present at all. A complete document is not a secure supply chain, and this property never claims it is."
+    }
+  ],
+
+  "explicitly_out_of_scope": [
+    "Remote package, registry, model, container-image or Git lookup of any kind.",
+    "Vulnerability database synchronization, CVE matching or exploitability assessment.",
+    "Malware analysis, model execution, artifact execution or unsafe object deserialization.",
+    "Licence-compliance decisions, and any dataset analysis for PII, copyright, fairness or bias.",
+    "Real signing, attestation issuance, private keys or credentials of any kind.",
+    "Remote signature verification, Fulcio, Rekor, OCI or transparency-log requests.",
+    "A2A protocol, authentication and message security, which is Cycle 020.",
+    "Attack-path construction and blast-radius analysis, which are Cycles 023 and 024. This cycle produces a dependency graph that a later cycle may consume; it draws no paths through it.",
+    "Runtime tool authorization and tool misuse, which remain Cycle 014, and MCP authentication, which remains Cycle 018.",
+    "External-system remediation, publication or any product state change."
+  ],
+
+  "inherited_lessons": [
+    {
+      "from": "cycle-017",
+      "lesson": "A replayed trace must not manufacture authority. Matching a scenario id is identity, not approval.",
+      "applied_as": "An imported BOM, provenance record or attestation is evidence about a component, never the authority for which component was approved. A REPLAY trace binds to the approved scenario semantically before any evaluator reads it."
+    },
+    {
+      "from": "cycle-018",
+      "lesson": "Admission must precede normalization. A budget that counts what it does not bound describes a smaller run than the one that happened.",
+      "applied_as": "The order is frozen: byte admission, parse, component and relationship admission, persistence, evaluation. An over-budget object never produces deciding evidence, and a trial stopped by a bound before its evidence was complete cannot report PASS."
+    },
+    {
+      "from": "cycle-018",
+      "lesson": "A primary invariant must not hide another concrete FAIL visible in the same evidence.",
+      "applied_as": "Cross-invariant aggregation is reused rather than reinvented: every applicable invariant is evaluated over the retained evidence and every concrete FAIL is kept, while secondary PASS, INCONCLUSIVE and ERROR outcomes stay out of the aggregate."
+    },
+    {
+      "from": "cycle-018",
+      "lesson": "A finding must be filed under a name that describes it, and must carry the evidence that decided it.",
+      "applied_as": "The twelve invariants map onto the ten properties totally in both directions, and every violation names the observation digests that decided it. A finding with no deciding evidence is an assertion rather than a finding."
+    },
+    {
+      "from": "cycle-018",
+      "lesson": "A suite written after an implementation describes it. Green is not the same as correct.",
+      "applied_as": "Every vulnerable SUPPLY-LAB fixture differs from its control by exactly one mutation, and each expected outcome lives in the test register rather than in the fixture, so a fixture cannot tell the evaluator what to conclude."
+    }
+  ]
+}

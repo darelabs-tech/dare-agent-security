@@ -59,6 +59,19 @@ pub fn evaluate_applicability(
                 ),
             });
         }
+        // Cycle 019: the same rule for supply-chain evidence. A target that
+        // ships external components but publishes no BOM, records no digest or
+        // declares no approved-source policy has a gap. Relabeling that
+        // NOT_APPLICABLE would let a target score better for supplying less.
+        if predicate.is_supply_chain_evidence() {
+            return Ok(ApplicabilityDecision {
+                status: CoverageStatus::NotTested,
+                rationale: format!(
+                    "supply-chain evidence {} is absent — a gap, not relabeled NOT_APPLICABLE",
+                    predicate.as_str()
+                ),
+            });
+        }
         // Cycle 018: an absent auth control or evidence channel on a target
         // that *does* have the auth surface is a gap, never an exemption.
         if predicate.is_auth_control_evidence() {
@@ -139,6 +152,15 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::ScopeChallengePresent => facts.scope_challenge_present,
         Predicate::ClientRegistrationPresent => facts.client_registration_present,
         Predicate::CredentialForwardingPresent => facts.credential_forwarding_present,
+        Predicate::SupplyChainBomPresent => facts.supply_chain_bom_present,
+        Predicate::ComponentDigestPresent => facts.component_digest_present,
+        Predicate::SourceTrustPolicyPresent => facts.source_trust_policy_present,
+        Predicate::ProvenancePresent => facts.provenance_present,
+        Predicate::AttestationPresent => facts.attestation_present,
+        Predicate::DependencyGraphPresent => facts.dependency_graph_present,
+        Predicate::ModelComponentPresent => facts.model_component_present,
+        Predicate::DatasetComponentPresent => facts.dataset_component_present,
+        Predicate::DeclaredObservedComponentsPresent => facts.declared_observed_components_present,
     }
 }
 
@@ -198,6 +220,7 @@ mod tests {
             client_registration_present: false,
             credential_forwarding_present: false,
             out_of_scope_property_ids: Vec::new(),
+            ..Default::default()
         }
     }
 
