@@ -84,6 +84,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local agentic supply-chain and AI-BOM validation (Cycle 019).
     #[command(name = "supply-chain")]
     SupplyChain(crate::supply_chain_security::SupplyChainArgs),
+    /// Run bounded local A2A and inter-agent communication validation (Cycle 020).
+    #[command(name = "a2a")]
+    A2a(crate::a2a_security::A2aArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

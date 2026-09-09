@@ -35,7 +35,7 @@ pub struct BudgetSnapshot {
 }
 
 /// Charges every bound before the thing it bounds exists.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct AdmissionLedger {
     input_bytes: usize,
     peers: u32,
@@ -44,11 +44,55 @@ pub struct AdmissionLedger {
     trial_output_bytes: usize,
     trials_started: u32,
     exhausted: bool,
+    /// The peer ceiling in force, never above `limits::HARD_MAX_PEERS`.
+    max_peers: u32,
+    /// The exchange ceiling in force, never above `limits::HARD_MAX_EXCHANGES`.
+    max_exchanges: u32,
+}
+
+impl Default for AdmissionLedger {
+    fn default() -> Self {
+        Self {
+            input_bytes: 0,
+            peers: 0,
+            exchanges: 0,
+            output_bytes: 0,
+            trial_output_bytes: 0,
+            trials_started: 0,
+            exhausted: false,
+            max_peers: limits::HARD_MAX_PEERS,
+            max_exchanges: limits::HARD_MAX_EXCHANGES,
+        }
+    }
 }
 
 impl AdmissionLedger {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// A ledger with tighter ceilings than the hard maxima.
+    ///
+    /// Ceilings only ever move **down**. A caller asking for more peers than
+    /// `HARD_MAX_PEERS` gets the hard maximum, silently and deliberately: a
+    /// flag that could raise a hard bound is not a limit, it is a bypass, and
+    /// the point of a hard bound is that no invocation can argue with it.
+    ///
+    /// A ceiling of zero is refused rather than clamped. Zero would admit
+    /// nothing and report a clean run over an empty analysis, which is the
+    /// shape of answer this engine exists not to give.
+    pub fn with_ceilings(max_peers: u32, max_exchanges: u32) -> Result<Self> {
+        if max_peers == 0 || max_exchanges == 0 {
+            return Err(A2aSecurityError::invalid(
+                "a ceiling of zero admits nothing, and a run that analysed nothing must not                  report that it found nothing wrong"
+                    .to_owned(),
+            ));
+        }
+        Ok(Self {
+            max_peers: max_peers.min(limits::HARD_MAX_PEERS),
+            max_exchanges: max_exchanges.min(limits::HARD_MAX_EXCHANGES),
+            ..Self::default()
+        })
     }
 
     /// Charge raw input bytes before a parser sees them.
@@ -67,21 +111,18 @@ impl AdmissionLedger {
     }
 
     pub fn admit_peer(&mut self) -> Result<()> {
-        if self.peers + 1 > limits::HARD_MAX_PEERS {
-            return self.exhaust(format!(
-                "more peers than the hard maximum of {}",
-                limits::HARD_MAX_PEERS
-            ));
+        if self.peers + 1 > self.max_peers {
+            return self.exhaust(format!("more peers than the ceiling of {}", self.max_peers));
         }
         self.peers += 1;
         Ok(())
     }
 
     pub fn admit_exchange(&mut self) -> Result<()> {
-        if self.exchanges + 1 > limits::HARD_MAX_EXCHANGES {
+        if self.exchanges + 1 > self.max_exchanges {
             return self.exhaust(format!(
-                "more exchanges than the hard maximum of {}",
-                limits::HARD_MAX_EXCHANGES
+                "more exchanges than the ceiling of {}",
+                self.max_exchanges
             ));
         }
         self.exchanges += 1;
@@ -144,9 +185,9 @@ impl AdmissionLedger {
             input_bytes: self.input_bytes,
             max_input_bytes: limits::HARD_MAX_DOCUMENT_BYTES,
             peers_admitted: self.peers,
-            max_peers: limits::HARD_MAX_PEERS,
+            max_peers: self.max_peers,
             exchanges_admitted: self.exchanges,
-            max_exchanges: limits::HARD_MAX_EXCHANGES,
+            max_exchanges: self.max_exchanges,
             output_bytes_used: self.output_bytes,
             max_total_output_bytes: limits::MAX_TOTAL_OUTPUT_BYTES,
             output_bytes_per_trial: limits::MAX_OUTPUT_BYTES_PER_TRIAL,
@@ -272,6 +313,37 @@ mod tests {
         let snapshot = ledger.snapshot();
         assert_eq!(snapshot.state_changes, 0);
         assert_eq!(snapshot.external_egress_bytes, 0);
+    }
+
+    #[test]
+    fn a_caller_supplied_ceiling_can_only_tighten_a_hard_bound() {
+        // A flag that could raise a hard bound is not a limit, it is a bypass.
+        let raised = AdmissionLedger::with_ceilings(u32::MAX, u32::MAX).expect("clamps");
+        let snapshot = raised.snapshot();
+        assert_eq!(snapshot.max_peers, limits::HARD_MAX_PEERS);
+        assert_eq!(snapshot.max_exchanges, limits::HARD_MAX_EXCHANGES);
+
+        let tightened = AdmissionLedger::with_ceilings(2, 3).expect("tightens");
+        assert_eq!(tightened.snapshot().max_peers, 2);
+        assert_eq!(tightened.snapshot().max_exchanges, 3);
+    }
+
+    #[test]
+    fn a_tightened_ceiling_refuses_rather_than_truncating_silently() {
+        // Truncation would produce a partial analysis reported as a complete
+        // one, which is worse than refusing to start.
+        let mut ledger = AdmissionLedger::with_ceilings(1, 1).expect("tightens");
+        ledger.admit_peer().expect("the first peer fits");
+        let error = ledger.admit_peer().expect_err("the second does not");
+        assert!(error.to_string().contains("ceiling of 1"), "{error}");
+        assert!(ledger.is_exhausted());
+    }
+
+    #[test]
+    fn a_ceiling_of_zero_is_refused_rather_than_admitting_nothing() {
+        // Zero would analyse nothing and then report that nothing was wrong.
+        assert!(AdmissionLedger::with_ceilings(0, 8).is_err());
+        assert!(AdmissionLedger::with_ceilings(8, 0).is_err());
     }
 
     #[test]

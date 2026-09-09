@@ -440,6 +440,7 @@ name = "dare-agent-security"
 version = "1.0.0-rc1"
 dependencies = [
  "clap",
+ "dare-a2a-security",
  "dare-adversarial",
  "dare-attack-graph",
  "dare-benchmark",
