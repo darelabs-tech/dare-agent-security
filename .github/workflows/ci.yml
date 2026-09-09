@@ -2826,6 +2826,8 @@ jobs:
 
       - name: No real credential, key or live identity endpoint anywhere
         run: python scripts/k20/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k20/verify_proof_citations.py
 
       - name: Offline CLI - an exchange that agrees with its approvals
         run: |
