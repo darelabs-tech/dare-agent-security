@@ -57,7 +57,7 @@ All implementation tasks below are approved for execution under `APPROVAL.md`. N
 - [x] task-048 — Implement `A2ASecurityResult`, bounded artifacts and Cycle 001 evidence bridge
 - [x] task-049 — Add `agentic-a2a-security-2026` profile
 - [x] task-050 — Add `validate a2a` CLI with local-safe flags only
-- [ ] task-051 — Add reproducibility/determinism checks and fixture generators where justified
+- [x] task-051 — Add reproducibility/determinism checks and fixture generators where justified
 - [ ] task-052 — Add dedicated `a2a-security-2026` CI job
 - [ ] task-053 — Run Cycle 012–019, MCP and coverage compatibility regressions
 - [ ] task-054 — Run full workspace fmt/clippy/test/audit gates
