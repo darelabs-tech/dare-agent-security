@@ -15,6 +15,7 @@
 - [Grafo de Ataque](concepts/attack-graph.md)
 - [Modos de Validação](concepts/validation.md)
 - [Cadeia de Suprimentos Agêntica e AI-BOM](concepts/supply-chain-security.md)
+- [Segurança A2A e de Comunicação Entre Agentes](concepts/a2a-security.md)
 
 # Comandos
 

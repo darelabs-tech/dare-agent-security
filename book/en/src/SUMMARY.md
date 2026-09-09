@@ -22,6 +22,7 @@
 - [RAG and Retrieval Security Validation](concepts/rag-security.md)
 - [MCP 2026 Auth Security Validation](concepts/mcp-auth-security.md)
 - [Agentic Supply Chain and AI-BOM Validation](concepts/supply-chain-security.md)
+- [A2A and Inter-Agent Communication Security](concepts/a2a-security.md)
 
 # Commands
 
@@ -72,5 +73,6 @@
 - [Extending RAG and Retrieval Security Validation](reference/extending-rag-security.md)
 - [Extending MCP Auth Security Validation](reference/extending-mcp-auth-security.md)
 - [Extending Agentic Supply Chain Validation](reference/extending-supply-chain-security.md)
+- [Extending A2A Security Validation](reference/extending-a2a-security.md)
 
 [Troubleshooting](troubleshooting.md)

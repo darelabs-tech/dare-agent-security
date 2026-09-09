@@ -61,7 +61,7 @@ All implementation tasks below are approved for execution under `APPROVAL.md`. N
 - [x] task-052 — Add dedicated `a2a-security-2026` CI job
 - [x] task-053 — Run Cycle 012–019, MCP and coverage compatibility regressions
 - [x] task-054 — Run full workspace fmt/clippy/test/audit gates
-- [ ] task-055 — Add EN/PT A2A security concepts/reference documentation and build both books
+- [x] task-055 — Add EN/PT A2A security concepts/reference documentation and build both books
 - [ ] task-056 — Produce `REGRESSION.md` with exact executed evidence and discovered corrections
 - [ ] task-057 — Produce `PROOF.md` mapping every approved acceptance criterion to executed evidence
 
