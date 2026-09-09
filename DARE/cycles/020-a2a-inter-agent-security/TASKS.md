@@ -48,12 +48,12 @@ All implementation tasks below are approved for execution under `APPROVAL.md`. N
 - [ ] task-039 — Implement offline REPLAY adapter that never re-sends captured traffic
 - [ ] task-040 — Implement SIMULATED adapter
 - [ ] task-041 — Implement LOCAL_SYNTHETIC adapter under bounded local safety rules
-- [ ] task-042 — Build A2A-LAB discovery/Agent Card corpus
-- [ ] task-043 — Build A2A-LAB peer/authentication/skill/message corpus
-- [ ] task-044 — Build A2A-LAB task/context/delegation/tenant/data corpus
-- [ ] task-045 — Build A2A-LAB replay/protocol/extension/push corpus
-- [ ] task-046 — Build hostile/refusal/admission corpus
-- [ ] task-047 — Build explicit missing-evidence INCONCLUSIVE and multi-violation regressions
+- [x] task-042 — Build A2A-LAB discovery/Agent Card corpus
+- [x] task-043 — Build A2A-LAB peer/authentication/skill/message corpus
+- [x] task-044 — Build A2A-LAB task/context/delegation/tenant/data corpus
+- [x] task-045 — Build A2A-LAB replay/protocol/extension/push corpus
+- [x] task-046 — Build hostile/refusal/admission corpus
+- [x] task-047 — Build explicit missing-evidence INCONCLUSIVE and multi-violation regressions
 - [ ] task-048 — Implement `A2ASecurityResult`, bounded artifacts and Cycle 001 evidence bridge
 - [ ] task-049 — Add `agentic-a2a-security-2026` profile
 - [ ] task-050 — Add `validate a2a` CLI with local-safe flags only

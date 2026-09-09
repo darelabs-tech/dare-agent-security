@@ -85,6 +85,7 @@ pub mod authorization;
 pub mod budget;
 pub mod canonical;
 pub mod capture;
+pub mod corpus;
 pub mod coverage;
 pub mod data_scope;
 pub mod delegation;
