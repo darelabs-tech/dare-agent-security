@@ -2,6 +2,7 @@
 //!
 //! Reuses Cycle 001 `Verdict`. Does not define a second evidence or CI-result model.
 
+mod a2a_standards;
 mod agentic;
 mod applicability;
 mod correlate;
@@ -23,6 +24,18 @@ mod status;
 mod supply_chain_standards;
 mod tool_security_standards;
 
+pub use a2a_standards::{
+    a2a_provenance, assert_no_a2a_conformance_claim, assert_no_a2a_status_promotion,
+    load_a2a_provenance, validate_a2a_provenance, A2aInheritedLesson, A2aPropertyMapping,
+    A2aProvenance, A2aSource, A2aSurfaceClass, A2aTrustStatement,
+    A2A_AUTHORITY_PROPAGATION_PROPERTY, A2A_DATA_SCOPE_BOUNDARY_PROPERTY,
+    A2A_DISCOVERY_TRUST_BOUNDARY_PROPERTY, A2A_EXTENSION_TRUST_BOUNDARY_PROPERTY,
+    A2A_MESSAGE_AUTHENTICITY_PROPERTY, A2A_MESSAGE_CONTEXT_BINDING_PROPERTY,
+    A2A_PEER_IDENTITY_BINDING_PROPERTY, A2A_PROTOCOL_NEGOTIATION_INTEGRITY_PROPERTY,
+    A2A_PUSH_NOTIFICATION_BOUNDARY_PROPERTY, A2A_REPLAY_BOUNDARY_PROPERTY,
+    A2A_SKILL_AUTHORIZATION_PROPERTY, A2A_TENANT_BOUNDARY_PROPERTY,
+    REQUIRED_MAPPED_PROPERTIES as A2A_MAPPED_PROPERTIES,
+};
 pub use agentic::{
     load_mcp_crosswalk, load_provenance, validate_agentic_assets,
     validate_agentic_registry_provenance, validate_mcp_crosswalk, validate_provenance,

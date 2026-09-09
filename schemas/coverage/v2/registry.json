@@ -1582,6 +1582,342 @@
         }
       ],
       "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.PEER_IDENTITY_BINDING",
+      "title": "Inter-agent peer identity binding",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "Authenticated peer evidence must bind to the intended logical agent, provider, audience and tenant. A service identity must not silently stand in for a delegated user identity.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "peer_authentication_evidence_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "POLICY",
+          "CONFIGURATION"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.DISCOVERY_TRUST_BOUNDARY",
+      "title": "Inter-agent discovery trust boundary",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "A peer selected from a discovery document must bind to the locally approved identity, card digest and interface set. Discovering a description is not evidence that the description is trustworthy.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "agent_card_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "CONFIGURATION",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.SKILL_AUTHORIZATION",
+      "title": "Inter-agent skill authorization",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "The effective principal or delegated authority must be authorized under local policy to invoke the remote skill that was invoked. Successful authentication is not skill authorization.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "skill_authorization_policy_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.MESSAGE_CONTEXT_BINDING",
+      "title": "Inter-agent message and task context binding",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "Message and task transitions must preserve the expected task, context and initiating principal. A matching task identifier is not a matching principal or context.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "a2a_exchange_present",
+          "task_context_binding_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.TENANT_BOUNDARY",
+      "title": "Inter-agent tenant boundary",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "The effective principal, skill and task in an inter-agent exchange must remain inside the locally approved tenant boundary. A tenant routing value is a claim, not authorization evidence.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "a2a_tenant_policy_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.DATA_SCOPE_BOUNDARY",
+      "title": "Inter-agent data scope boundary",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "Data labels and scopes carried across an inter-agent exchange must not widen disclosure or destination scope beyond local policy and the delegated grant.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "a2a_exchange_present",
+          "data_scope_policy_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.REPLAY_BOUNDARY",
+      "title": "Inter-agent replay and idempotency boundary",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "A repeated inter-agent action may be treated as safe only when idempotency or replay evidence proves it is allowed for that operation. A retry is not a safe replay.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "a2a_exchange_present",
+          "replay_policy_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.PROTOCOL_NEGOTIATION_INTEGRITY",
+      "title": "Inter-agent protocol negotiation integrity",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "The protocol version, interface and transport used must satisfy local policy and the overlap the evidence declares. Compatibility with a version is not permission to use it.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "protocol_policy_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE",
+          "CONFIGURATION",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.EXTENSION_TRUST_BOUNDARY",
+      "title": "Inter-agent extension trust boundary",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "An extension in use must be declared, locally approved and non-authoritative beyond its contract. An extension that cannot be interpreted safely fails closed rather than being ignored.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "a2a_extension_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "CONFIGURATION",
+          "POLICY",
+          "TRACE"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.A2A.PUSH_NOTIFICATION_BOUNDARY",
+      "title": "Inter-agent push notification boundary",
+      "risk_family": "INSECURE_INTER_AGENT_COMMUNICATION",
+      "category": "INTER_AGENT",
+      "description": "Push notification configuration must not delegate or disclose beyond the approved callback, tenant and data scope. The destination is analyzed as local data and is never contacted.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "multi_agent_present",
+          "push_notification_config_present"
+        ]
+      },
+      "supported_modes": [
+        "static",
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "CONFIGURATION",
+          "POLICY"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI07 Insecure Inter-Agent Communication",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
     }
   ]
 }

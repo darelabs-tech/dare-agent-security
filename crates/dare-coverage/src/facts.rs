@@ -174,6 +174,40 @@ pub struct AssessmentFacts {
     /// Cycle 019: both declared and observed component sets are recorded.
     #[serde(default)]
     pub declared_observed_components_present: bool,
+
+    /// Cycle 020: whether the target exchanges A2A messages at all.
+    #[serde(default)]
+    pub a2a_exchange_present: bool,
+    /// Cycle 020: whether a local Agent Card was supplied for the peer.
+    #[serde(default)]
+    pub agent_card_present: bool,
+    /// Cycle 020: whether any A2A extension is declared or used.
+    #[serde(default)]
+    pub a2a_extension_present: bool,
+    /// Cycle 020: whether push notification configuration exists.
+    #[serde(default)]
+    pub push_notification_config_present: bool,
+    /// Cycle 020: whether peer authentication evidence was collected.
+    #[serde(default)]
+    pub peer_authentication_evidence_present: bool,
+    /// Cycle 020: whether a local skill-authorization policy exists.
+    #[serde(default)]
+    pub skill_authorization_policy_present: bool,
+    /// Cycle 020: whether task/context binding evidence was collected.
+    #[serde(default)]
+    pub task_context_binding_present: bool,
+    /// Cycle 020: whether a local tenant policy covers the A2A exchange.
+    #[serde(default)]
+    pub a2a_tenant_policy_present: bool,
+    /// Cycle 020: whether a local data-scope policy exists.
+    #[serde(default)]
+    pub data_scope_policy_present: bool,
+    /// Cycle 020: whether a local replay/idempotency policy exists.
+    #[serde(default)]
+    pub replay_policy_present: bool,
+    /// Cycle 020: whether a local protocol/interface policy exists.
+    #[serde(default)]
+    pub protocol_policy_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

@@ -7,10 +7,10 @@
 
 All implementation tasks below are approved for execution under `APPROVAL.md`. No additional per-task approval is required while execution remains inside the frozen local/offline safety and semantic boundaries.
 
-- [ ] task-001 — Freeze Cycle 020 baseline, scope and compatibility contracts
-- [ ] task-002 — Record verified OWASP ASI07 and A2A 1.0.0 standards/status snapshot
-- [ ] task-003 — Additive registry design for Cycle 020 A2A properties with compatibility tests
-- [ ] task-004 — Add A2A applicability predicates and preserve existing coverage denominators
+- [x] task-001 — Freeze Cycle 020 baseline, scope and compatibility contracts
+- [x] task-002 — Record verified OWASP ASI07 and A2A 1.0.0 standards/status snapshot
+- [x] task-003 — Additive registry design for Cycle 020 A2A properties with compatibility tests
+- [x] task-004 — Add A2A applicability predicates and preserve existing coverage denominators
 - [ ] task-005 — Define closed Agent Card/security evidence schemas
 - [ ] task-006 — Define closed peer identity, principal and endpoint binding model
 - [ ] task-007 — Define closed A2A message/task/context envelope model
