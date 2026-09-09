@@ -193,8 +193,16 @@ pub enum SecuritySchemeKind {
     ApiKey,
     HttpBearer,
     HttpBasic,
+    // Spelled the way the specifications spell them. The derive's
+    // `SCREAMING_SNAKE_CASE` rename produces `O_AUTH2_CLIENT_CREDENTIALS` and
+    // `OPEN_ID_CONNECT`, which no real document carries — and a wire spelling
+    // that disagrees with `as_str` means a document readable by only half the
+    // engine.
+    #[serde(rename = "OAUTH2_CLIENT_CREDENTIALS")]
     OAuth2ClientCredentials,
+    #[serde(rename = "OAUTH2_AUTHORIZATION_CODE")]
     OAuth2AuthorizationCode,
+    #[serde(rename = "OPENID_CONNECT")]
     OpenIdConnect,
     MutualTls,
     SignedRequest,
@@ -244,6 +252,13 @@ impl SecuritySchemeKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TransportKind {
+    /// Spelled as A2A 1.0.0 spells it, rather than as the derive would.
+    ///
+    /// The default `SCREAMING_SNAKE_CASE` rename produces `JSON_RPC`, which is
+    /// not the token any real document carries. Leaving the two spellings to
+    /// diverge would mean `as_str` and the wire format disagreeing — and a
+    /// document written with either one being readable by only half the engine.
+    #[serde(rename = "JSONRPC")]
     JsonRpc,
     Grpc,
     HttpJson,
@@ -710,6 +725,44 @@ mod tests {
         assert!(!SecuritySchemeKind::MutualTls.may_carry_delegated_subject());
         assert!(SecuritySchemeKind::OAuth2AuthorizationCode.may_carry_delegated_subject());
         assert!(SecuritySchemeKind::OpenIdConnect.may_carry_delegated_subject());
+    }
+
+    #[test]
+    fn every_taxonomy_is_spelled_the_same_way_on_the_wire_and_in_prose() {
+        // `as_str` feeds reports; the serde representation feeds documents. If
+        // the two disagree, a document written with one spelling is readable by
+        // only half the engine.
+        //
+        // This is not hypothetical: the derive's `SCREAMING_SNAKE_CASE` turns
+        // `JsonRpc` into `JSON_RPC` and `OAuth2AuthorizationCode` into
+        // `O_AUTH2_AUTHORIZATION_CODE`, neither of which any real A2A document
+        // carries. Both were caught here, and this test covers the whole class
+        // rather than the two instances.
+        macro_rules! assert_spellings_agree {
+            ($type:ty, $values:expr) => {
+                for value in $values {
+                    let wire = serde_json::to_string(&value).expect("serializes");
+                    assert_eq!(
+                        wire.trim_matches('"'),
+                        value.as_str(),
+                        "{:?} is spelled two ways",
+                        value
+                    );
+                    let round_trip: $type = serde_json::from_str(&wire).expect("round-trips");
+                    assert_eq!(round_trip, value);
+                }
+            };
+        }
+
+        assert_spellings_agree!(TransportKind, TransportKind::all());
+        assert_spellings_agree!(SecuritySchemeKind, SecuritySchemeKind::all());
+        assert_spellings_agree!(EvidenceSource, EvidenceSource::all());
+        assert_spellings_agree!(VerificationStatus, VerificationStatus::all());
+        assert_spellings_agree!(IdentityKind, IdentityKind::all());
+        assert_spellings_agree!(DataSensitivity, DataSensitivity::all());
+        assert_spellings_agree!(OperationEffect, OperationEffect::all());
+        assert_spellings_agree!(ScenarioClass, ScenarioClass::all());
+        assert_spellings_agree!(A2aMode, A2aMode::all());
     }
 
     #[test]

@@ -84,12 +84,15 @@ pub mod authentication;
 pub mod authorization;
 pub mod budget;
 pub mod canonical;
+pub mod capture;
 pub mod coverage;
 pub mod data_scope;
 pub mod delegation;
 pub mod error;
 pub mod extension;
+pub mod harness;
 pub mod invariant;
+pub mod local_synthetic;
 pub mod message;
 pub mod model;
 pub mod normalize;
@@ -100,6 +103,7 @@ pub mod protocol;
 pub mod push_notification;
 pub mod replay;
 pub mod schema;
+pub mod simulated;
 pub mod source;
 pub mod tenant;
 
@@ -256,6 +260,7 @@ mod tests {
         let sources = [
             include_str!("agent_card.rs"),
             include_str!("authentication.rs"),
+            include_str!("harness.rs"),
             include_str!("message.rs"),
             include_str!("peer.rs"),
             include_str!("policy.rs"),
