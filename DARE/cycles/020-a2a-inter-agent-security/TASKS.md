@@ -11,43 +11,43 @@ All implementation tasks below are approved for execution under `APPROVAL.md`. N
 - [x] task-002 — Record verified OWASP ASI07 and A2A 1.0.0 standards/status snapshot
 - [x] task-003 — Additive registry design for Cycle 020 A2A properties with compatibility tests
 - [x] task-004 — Add A2A applicability predicates and preserve existing coverage denominators
-- [ ] task-005 — Define closed Agent Card/security evidence schemas
-- [ ] task-006 — Define closed peer identity, principal and endpoint binding model
-- [ ] task-007 — Define closed A2A message/task/context envelope model
-- [ ] task-008 — Define authentication verification evidence semantics
-- [ ] task-009 — Define skill authorization and local policy evidence model
-- [ ] task-010 — Reuse Cycle 015 delegation/authority semantics for inter-agent propagation
-- [ ] task-011 — Define tenant and resource-owner boundary projection
-- [ ] task-012 — Define data-scope/disclosure boundary projection
-- [ ] task-013 — Define replay/idempotency evidence and operation-safety model
-- [ ] task-014 — Define protocol version/interface negotiation model
-- [ ] task-015 — Define extension declaration/use trust boundary
-- [ ] task-016 — Define push-notification configuration safety model without network access
-- [ ] task-017 — Implement raw-byte/object/run-wide/output admission ledger
-- [ ] task-018 — Implement hostile secret/path/bidi/executable/remote-action refusal layer
-- [ ] task-019 — Implement bounded Agent Card importer
-- [ ] task-020 — Implement bounded captured A2A exchange importer
-- [ ] task-021 — Implement canonical peer/card/message/task normalization
-- [ ] task-022 — Implement discovery/Agent Card binding invariant
-- [ ] task-023 — Implement peer identity binding invariant
-- [ ] task-024 — Implement message authenticity invariant
-- [ ] task-025 — Implement security requirement satisfaction invariant
-- [ ] task-026 — Implement skill authorization invariant
-- [ ] task-027 — Implement A2A message authority-boundary invariant without duplicating Cycle 013
-- [ ] task-028 — Implement task/context/principal binding invariant
-- [ ] task-029 — Implement authority propagation/non-amplification invariant
-- [ ] task-030 — Implement tenant boundary invariant
-- [ ] task-031 — Implement data-scope boundary invariant
-- [ ] task-032 — Implement replay/idempotency invariant
-- [ ] task-033 — Implement protocol negotiation/downgrade invariant
-- [ ] task-034 — Implement extension trust-boundary invariant
-- [ ] task-035 — Implement push-notification local-only boundary invariant
-- [ ] task-036 — Implement invariant-specific PASS/INCONCLUSIVE coverage contracts
-- [ ] task-037 — Implement deterministic cross-invariant aggregation preserving Cycle 018 semantics
-- [ ] task-038 — Implement STATIC adapter
-- [ ] task-039 — Implement offline REPLAY adapter that never re-sends captured traffic
-- [ ] task-040 — Implement SIMULATED adapter
-- [ ] task-041 — Implement LOCAL_SYNTHETIC adapter under bounded local safety rules
+- [x] task-005 — Define closed Agent Card/security evidence schemas
+- [x] task-006 — Define closed peer identity, principal and endpoint binding model
+- [x] task-007 — Define closed A2A message/task/context envelope model
+- [x] task-008 — Define authentication verification evidence semantics
+- [x] task-009 — Define skill authorization and local policy evidence model
+- [x] task-010 — Reuse Cycle 015 delegation/authority semantics for inter-agent propagation
+- [x] task-011 — Define tenant and resource-owner boundary projection
+- [x] task-012 — Define data-scope/disclosure boundary projection
+- [x] task-013 — Define replay/idempotency evidence and operation-safety model
+- [x] task-014 — Define protocol version/interface negotiation model
+- [x] task-015 — Define extension declaration/use trust boundary
+- [x] task-016 — Define push-notification configuration safety model without network access
+- [x] task-017 — Implement raw-byte/object/run-wide/output admission ledger
+- [x] task-018 — Implement hostile secret/path/bidi/executable/remote-action refusal layer
+- [x] task-019 — Implement bounded Agent Card importer
+- [x] task-020 — Implement bounded captured A2A exchange importer
+- [x] task-021 — Implement canonical peer/card/message/task normalization
+- [x] task-022 — Implement discovery/Agent Card binding invariant
+- [x] task-023 — Implement peer identity binding invariant
+- [x] task-024 — Implement message authenticity invariant
+- [x] task-025 — Implement security requirement satisfaction invariant
+- [x] task-026 — Implement skill authorization invariant
+- [x] task-027 — Implement A2A message authority-boundary invariant without duplicating Cycle 013
+- [x] task-028 — Implement task/context/principal binding invariant
+- [x] task-029 — Implement authority propagation/non-amplification invariant
+- [x] task-030 — Implement tenant boundary invariant
+- [x] task-031 — Implement data-scope boundary invariant
+- [x] task-032 — Implement replay/idempotency invariant
+- [x] task-033 — Implement protocol negotiation/downgrade invariant
+- [x] task-034 — Implement extension trust-boundary invariant
+- [x] task-035 — Implement push-notification local-only boundary invariant
+- [x] task-036 — Implement invariant-specific PASS/INCONCLUSIVE coverage contracts
+- [x] task-037 — Implement deterministic cross-invariant aggregation preserving Cycle 018 semantics
+- [x] task-038 — Implement STATIC adapter
+- [x] task-039 — Implement offline REPLAY adapter that never re-sends captured traffic
+- [x] task-040 — Implement SIMULATED adapter
+- [x] task-041 — Implement LOCAL_SYNTHETIC adapter under bounded local safety rules
 - [x] task-042 — Build A2A-LAB discovery/Agent Card corpus
 - [x] task-043 — Build A2A-LAB peer/authentication/skill/message corpus
 - [x] task-044 — Build A2A-LAB task/context/delegation/tenant/data corpus
