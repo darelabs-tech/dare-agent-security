@@ -1,10 +1,11 @@
 # Cycle 020 — Tasks
 
-**Status:** PLANNED — AWAITING APPROVAL  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED  
 **Baseline:** `main @ d2bff1d3789074dffaae45a7ce57a3563daeb1ff`  
 **Branch:** `agent/cycle-020-a2a-inter-agent-security`
 
-No implementation task below is authorized until approval is recorded.
+All implementation tasks below are approved for execution under `APPROVAL.md`. No additional per-task approval is required while execution remains inside the frozen local/offline safety and semantic boundaries.
 
 - [ ] task-001 — Freeze Cycle 020 baseline, scope and compatibility contracts
 - [ ] task-002 — Record verified OWASP ASI07 and A2A 1.0.0 standards/status snapshot
@@ -66,7 +67,7 @@ No implementation task below is authorized until approval is recorded.
 
 ## Execution discipline
 
-For every task after approval:
+For every task:
 
 1. stay inside the frozen local/offline boundary;
 2. run focused tests for the changed surface;
