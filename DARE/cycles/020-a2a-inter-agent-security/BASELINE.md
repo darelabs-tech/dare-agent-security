@@ -1,7 +1,8 @@
 # Cycle 020 — Baseline
 
 **Cycle:** 020 — A2A / Inter-Agent Communication Security  
-**Status:** PLANNING — AWAITING APPROVAL  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED  
 **Branch:** `agent/cycle-020-a2a-inter-agent-security`  
 **Baseline:** `main @ d2bff1d3789074dffaae45a7ce57a3563daeb1ff`  
 **Date frozen:** 2026-09-09
@@ -44,7 +45,7 @@ Planning is frozen against the following current references:
 - RFC 8785 JSON Canonicalization Scheme for signed Agent Card canonicalization;
 - standard HTTPS/TLS and OAuth/OIDC/API-key authentication concepts only as declared local evidence, never by live credential use.
 
-This is a planning snapshot, not permission to fetch remote Agent Cards, keys, tokens, certificates, registries or endpoints during Cycle 020 execution.
+This is an approved implementation snapshot, not permission to fetch remote Agent Cards, keys, tokens, certificates, registries or endpoints during Cycle 020 execution.
 
 ## Frozen safety boundary
 
@@ -131,8 +132,8 @@ webhook URL                    != permission to connect
 tenant routing value           != proof of tenant authorization
 ```
 
-## Planning outcome
+## Approved outcome
 
-Cycle 020 should add one bounded offline A2A security engine, one additive profile, one CLI validation path, one A2A-LAB corpus, dedicated CI coverage, EN/PT documentation and exact proof artifacts.
+Cycle 020 is approved to add one bounded offline A2A security engine, one additive profile, one CLI validation path, one A2A-LAB corpus, dedicated CI coverage, EN/PT documentation and exact proof artifacts.
 
-No task is authorized until the user approves the Cycle 020 plan.
+All tasks `task-001` through `task-057` are approved under `APPROVAL.md` and `dare-dag.exec.yaml`. No additional per-task approval is required unless implementation would change the frozen semantic or safety boundary.
