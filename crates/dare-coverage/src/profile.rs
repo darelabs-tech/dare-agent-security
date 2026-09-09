@@ -31,6 +31,8 @@ pub const MCP_AUTH_HARDENING_PROFILE_JSON: &str =
     include_str!("../../../profiles/mcp-auth-hardening-2026.json");
 pub const AGENTIC_SUPPLY_CHAIN_PROFILE_JSON: &str =
     include_str!("../../../profiles/agentic-supply-chain-security-2026.json");
+pub const AGENTIC_A2A_PROFILE_JSON: &str =
+    include_str!("../../../profiles/agentic-a2a-security-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -267,6 +269,31 @@ pub fn agentic_supply_chain_profile() -> Result<AssessmentProfile, CoverageError
     load_profile(AGENTIC_SUPPLY_CHAIN_PROFILE_JSON)
 }
 
+/// The Cycle 020 agentic A2A profile.
+///
+/// Additive: it selects the two properties earlier cycles created and the ten
+/// this cycle added, and touches no earlier profile. A coverage percentage is a
+/// fraction whose denominator is a profile's property count, so changing an
+/// existing profile would silently change what every assessment already filed
+/// against it means.
+///
+/// Five properties are REQUIRED and seven are CONDITIONAL, and the split
+/// follows the predicate that gates each one. Where the extra predicate is an
+/// **evidence or control** predicate — peer authentication, skill grants, tenant
+/// policy, protocol policy — its absence is a gap in any deployment that speaks
+/// A2A at all, so the property is REQUIRED and reports NOT_TESTED rather than
+/// disappearing.
+///
+/// Where the extra predicate is a **target shape** — an Agent Card, an
+/// exchange, an extension, a push configuration, a delegated identity — its
+/// absence means the surface genuinely does not exist, and CONDITIONAL is
+/// honest. Marking push notifications REQUIRED would report a finding against
+/// every deployment that configures no callback, which is how an operator
+/// learns to ignore the profile.
+pub fn agentic_a2a_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(AGENTIC_A2A_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -287,6 +314,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "rag-security-baseline-2026" => rag_security_profile(),
         "mcp-auth-hardening-2026" => mcp_auth_hardening_profile(),
         "agentic-supply-chain-security-2026" => agentic_supply_chain_profile(),
+        "agentic-a2a-security-2026" => agentic_a2a_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {
