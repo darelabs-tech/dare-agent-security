@@ -452,20 +452,23 @@ fn peer_identity(observations: &ObservationSet) -> Vec<A2aViolation> {
                     );
                 }
             }
-            A2aObservation::PeerAuthenticationContext(context) => {
-                if context.status.is_concrete_failure() {
-                    violations.push(
-                        A2aViolation::new(
-                            A2aInvariant::PeerIdentityBound,
-                            format!(
-                                "authentication for `{}` was verified and found invalid",
-                                context.peer_id
-                            ),
-                            &[observation],
-                        )
-                        .for_peer(&context.peer_id),
-                    );
-                }
+            // A guard rather than a nested `if`: an authentication that was not
+            // *checked and found invalid* produces no violation here, and
+            // falling through to the wildcard says so in one place.
+            A2aObservation::PeerAuthenticationContext(context)
+                if context.status.is_concrete_failure() =>
+            {
+                violations.push(
+                    A2aViolation::new(
+                        A2aInvariant::PeerIdentityBound,
+                        format!(
+                            "authentication for `{}` was verified and found invalid",
+                            context.peer_id
+                        ),
+                        &[observation],
+                    )
+                    .for_peer(&context.peer_id),
+                );
             }
             _ => {}
         }
