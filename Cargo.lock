@@ -405,6 +405,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-a2a-security"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-adversarial",
+ "dare-coverage",
+ "dare-security-evidence",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "time",
+]
+
+[[package]]
 name = "dare-adversarial"
 version = "1.0.0-rc1"
 dependencies = [
@@ -425,6 +440,7 @@ name = "dare-agent-security"
 version = "1.0.0-rc1"
 dependencies = [
  "clap",
+ "dare-a2a-security",
  "dare-adversarial",
  "dare-attack-graph",
  "dare-benchmark",

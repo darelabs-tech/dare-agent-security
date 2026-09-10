@@ -2800,6 +2800,354 @@ jobs:
           cargo test -p dare-rag-security -- --nocapture
           cargo test -p dare-mcp-auth-security -- --nocapture
 
+  a2a-security-2026:
+    name: Cycle 020 A2A and inter-agent communication gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (types, bounds, importers, evaluators, adapters, artifact)
+        run: cargo test -p dare-a2a-security --lib -- --nocapture
+      - name: The A2A-LAB entries against the harness contract
+        run: cargo test -p dare-a2a-security --test a2a_lab -- --nocapture
+      - name: Missing evidence is inconclusive and a multi-violation run reports every crossing
+        run: cargo test -p dare-a2a-security --test a2a_missing_evidence -- --nocapture
+      - name: Generators are reproducible and no fixture carries a credential
+        run: cargo test -p dare-a2a-security --test generators -- --nocapture
+      - name: A2A profile and coverage integration
+        run: cargo test -p dare-coverage --test a2a_profile -- --nocapture
+      - name: A2A properties and standards provenance
+        run: |
+          cargo test -p dare-coverage --test a2a_properties -- --nocapture
+          cargo test -p dare-coverage --lib a2a_standards -- --nocapture
+      - name: CLI flag surface (no endpoint, token, key, webhook, fetch or shell flag)
+        run: cargo test -p dare-agent-security --lib a2a_security -- --nocapture
+
+      - name: No real credential, key or live identity endpoint anywhere
+        run: python scripts/k20/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k20/verify_proof_citations.py
+
+      - name: Offline CLI - an exchange that agrees with its approvals
+        run: |
+          rm -rf .dare-agent-security/cycle020-benign
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-benign
+          test -f .dare-agent-security/cycle020-benign/a2a-result.json
+          test -f .dare-agent-security/cycle020-benign/a2a-peers.json
+          test -f .dare-agent-security/cycle020-benign/a2a-exchanges.json
+          test -f .dare-agent-security/cycle020-benign/a2a-evidence.json
+          test -f .dare-agent-security/cycle020-benign/a2a-findings.json
+          test -f .dare-agent-security/cycle020-benign/summary.md
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-benign/a2a-result.json \
+            verdict=PASS class=DISCOVERY_BINDING mode=SIMULATED synthetic=true \
+            primary_invariant=DISCOVERY_BINDING_PRESERVED \
+            property_id=AGENT.A2A.DISCOVERY_TRUST_BOUNDARY \
+            redaction_state=REDACTED \
+            budget.state_changes=0 budget.external_egress_bytes=0 \
+            --present scenario_digest evidence_digest observation_digests \
+            --count outcomes=14 violations=0
+
+      - name: The card in hand is not the card policy pinned
+        run: |
+          rm -rf .dare-agent-security/cycle020-substituted
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-002 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-substituted
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a substituted Agent Card, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-substituted/a2a-result.json \
+            verdict=FAIL class=DISCOVERY_BINDING \
+            primary_invariant=DISCOVERY_BINDING_PRESERVED \
+            budget.state_changes=0 budget.external_egress_bytes=0
+
+      - name: A valid signature over a different envelope is not authenticity
+        run: |
+          rm -rf .dare-agent-security/cycle020-envelope
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-019 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-envelope
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a signature over another envelope, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-envelope/a2a-result.json \
+            verdict=FAIL class=MESSAGE_AUTHENTICITY \
+            primary_invariant=MESSAGE_AUTHENTICITY_ESTABLISHED \
+            property_id=AGENT.A2A.MESSAGE_AUTHENTICITY
+
+      - name: Authenticating is not being authorized
+        run: |
+          rm -rf .dare-agent-security/cycle020-skill
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-016 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-skill
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an unauthorized skill, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-skill/a2a-result.json \
+            verdict=FAIL class=SKILL_AUTHORIZATION \
+            primary_invariant=SKILL_AUTHORIZED \
+            property_id=AGENT.A2A.SKILL_AUTHORIZATION
+
+      - name: Peer content that became instruction crossed a boundary
+        run: |
+          rm -rf .dare-agent-security/cycle020-authority
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-021 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-authority
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for peer content reaching authority, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-authority/a2a-result.json \
+            verdict=FAIL class=MESSAGE_AUTHORITY \
+            primary_invariant=MESSAGE_AUTHORITY_BOUNDARY_PRESERVED \
+            property_id=AGENT.A2A.AUTHORITY_PROPAGATION
+
+      - name: Delegation is not privilege amplification
+        run: |
+          rm -rf .dare-agent-security/cycle020-delegation
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-028 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-delegation
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a widened delegation hop, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-delegation/a2a-result.json \
+            verdict=FAIL class=AUTHORITY_PROPAGATION \
+            primary_invariant=AUTHORITY_PROPAGATION_BOUNDED
+
+      - name: A tenant routing value is not proof of tenant authorization
+        run: |
+          rm -rf .dare-agent-security/cycle020-tenant
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-032 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-tenant
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a cross-tenant claim, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-tenant/a2a-result.json \
+            verdict=FAIL class=TENANT_BOUNDARY \
+            primary_invariant=TENANT_BOUNDARY_PRESERVED \
+            property_id=AGENT.A2A.TENANT_BOUNDARY
+
+      - name: Missing message authentication is inconclusive and never a pass
+        run: |
+          rm -rf .dare-agent-security/cycle020-gap
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-018 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-gap
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for evidence too thin to decide, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-gap/a2a-result.json \
+            verdict=INCONCLUSIVE class=MESSAGE_AUTHENTICITY \
+            --count violations=0
+
+      - name: A card nothing approved is undecidable rather than clean
+        run: |
+          rm -rf .dare-agent-security/cycle020-unpinned
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-004B \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-unpinned
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a card no policy pinned, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-unpinned/a2a-result.json \
+            verdict=INCONCLUSIVE class=DISCOVERY_BINDING \
+            --count violations=0
+
+      - name: One exchange crossing three boundaries reports three
+        run: |
+          rm -rf .dare-agent-security/cycle020-multi
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-050 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-multi
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for a multi-violation exchange, got $code"
+            exit 1
+          fi
+          python - <<'PY'
+          import json, pathlib, sys
+
+          result = json.loads(
+              pathlib.Path(
+                  ".dare-agent-security/cycle020-multi/a2a-result.json"
+              ).read_text(encoding="utf-8")
+          )
+          invariants = {violation["invariant"] for violation in result["violations"]}
+          expected = {
+              "MESSAGE_AUTHORITY_BOUNDARY_PRESERVED",
+              "AUTHORITY_PROPAGATION_BOUNDED",
+              "TENANT_BOUNDARY_PRESERVED",
+          }
+          missing = expected - invariants
+          if missing:
+              print(f"a multi-violation exchange lost {sorted(missing)}", file=sys.stderr)
+              sys.exit(1)
+          print(f"retained {sorted(invariants)}")
+          PY
+
+      - name: An oversized Agent Card is refused rather than parsed
+        run: |
+          rm -rf .dare-agent-security/cycle020-oversized
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-006 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-oversized
+          code=$?
+          set -e
+          if [ "$code" -ne 1 ]; then
+            echo "expected exit 1 for a refused document, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-oversized/a2a-result.json \
+            verdict=ERROR peers_evaluated=0 exchanges_evaluated=0
+
+      - name: A credential-bearing Agent Card is refused at the door
+        run: |
+          rm -rf .dare-agent-security/cycle020-hostile
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-053 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-hostile
+          code=$?
+          set -e
+          if [ "$code" -ne 1 ]; then
+            echo "expected exit 1 for a hostile document, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle020-hostile/a2a-result.json \
+            verdict=ERROR --count violations=0
+
+      - name: An unknown corpus vector is refused rather than run empty
+        run: |
+          rm -rf .dare-agent-security/cycle020-unknown
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-999 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle020-unknown
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for an unknown vector, got $code"
+            exit 1
+          fi
+
+      - name: Replay analyses a capture and never re-sends it
+        run: |
+          rm -rf .dare-agent-security/cycle020-replay
+          set +e
+          cargo run -p dare-agent-security -- validate a2a \
+            --scenario A2A-LAB-001 \
+            --mode replay \
+            --capture does-not-exist.json \
+            --output-dir .dare-agent-security/cycle020-replay
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 when replay is given no local policy, got $code"
+            exit 1
+          fi
+
+      - name: Every artifact this job wrote states its claim boundary
+        run: |
+          python - <<'PY'
+          import pathlib, sys
+
+          required = "not a statement that a remote agent is secure"
+          summaries = sorted(
+              pathlib.Path(".dare-agent-security").glob("cycle020-*/summary.md")
+          )
+          if not summaries:
+              print("no Cycle 020 summary was written", file=sys.stderr)
+              sys.exit(1)
+          for path in summaries:
+              text = path.read_text(encoding="utf-8")
+              if required not in text:
+                  print(f"{path} omits the claim boundary", file=sys.stderr)
+                  sys.exit(1)
+              if "No agent was contacted" not in text:
+                  print(f"{path} omits the offline statement", file=sys.stderr)
+                  sys.exit(1)
+          print(f"{len(summaries)} summaries state the claim boundary")
+          PY
+
+      - name: No artifact this job wrote carries a credential or live endpoint
+        run: python scripts/k20/assert_no_real_credentials.py
+
+      - name: Cycle 012 to 019 regressions still pass
+        run: |
+          cargo test -p dare-coverage --test agentic_registry -- --nocapture
+          cargo test -p dare-prompt-injection -- --nocapture
+          cargo test -p dare-tool-security -- --nocapture
+          cargo test -p dare-identity-security -- --nocapture
+          cargo test -p dare-memory-security -- --nocapture
+          cargo test -p dare-rag-security -- --nocapture
+          cargo test -p dare-mcp-auth-security -- --nocapture
+          cargo test -p dare-supply-chain-security -- --nocapture
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest
@@ -2815,3 +3163,6 @@ jobs:
         run: mdbook build book/en
       - name: Build Portuguese book
         run: mdbook build book/pt
+
+      - name: The canvas matches the task list it is generated from
+        run: python scripts/regen-canvas.py --check

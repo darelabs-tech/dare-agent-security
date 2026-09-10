@@ -1,0 +1,41 @@
+[package]
+name = "dare-a2a-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Bounded, evidence-first, offline A2A / inter-agent communication security validation (Cycle 020)"
+publish = false
+
+[lib]
+name = "dare_a2a_security"
+path = "src/lib.rs"
+
+# No HTTP client, no OAuth client, no JWT verifier, no JWKS resolver, no TLS
+# stack and no process spawner is declared here.
+#
+# That absence is the security boundary, and it is worth being precise about
+# what it does and does not claim. Every document this engine reads is *about*
+# a peer that lives somewhere reachable: an Agent Card names endpoints, a
+# security scheme names a token endpoint, a signature names a key URL, a push
+# notification configuration names a webhook. The documents are full of places.
+# This crate has no dependency through which one of those places could become a
+# request.
+#
+# It is not true that no transport stack exists transitively - `dare-coverage`
+# reaches one through the workspace - so the boundary asserted in `lib.rs` is
+# that nothing here *reaches* it, checked by a test over this crate's own
+# source rather than claimed in a comment.
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

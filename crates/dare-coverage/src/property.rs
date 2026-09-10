@@ -106,6 +106,26 @@ pub enum Predicate {
     ModelComponentPresent,
     DatasetComponentPresent,
     DeclaredObservedComponentsPresent,
+
+    // Cycle 020 A2A target-shape predicates. Each says whether the target has
+    // the surface at all: a system that exchanges no A2A messages has no
+    // message binding to answer for, and a peer that publishes no Agent Card
+    // has no discovery document to bind against.
+    A2aExchangePresent,
+    AgentCardPresent,
+    A2aExtensionPresent,
+    PushNotificationConfigPresent,
+
+    // Cycle 020 A2A control-or-evidence predicates. Each says whether the
+    // evidence needed to decide a question was collected. A target that speaks
+    // A2A and records no authentication evidence has a gap, not an exemption.
+    PeerAuthenticationEvidencePresent,
+    SkillAuthorizationPolicyPresent,
+    TaskContextBindingPresent,
+    A2aTenantPolicyPresent,
+    DataScopePolicyPresent,
+    ReplayPolicyPresent,
+    ProtocolPolicyPresent,
 }
 
 impl Predicate {
@@ -168,6 +188,17 @@ impl Predicate {
             Self::ModelComponentPresent => "model_component_present",
             Self::DatasetComponentPresent => "dataset_component_present",
             Self::DeclaredObservedComponentsPresent => "declared_observed_components_present",
+            Self::A2aExchangePresent => "a2a_exchange_present",
+            Self::AgentCardPresent => "agent_card_present",
+            Self::A2aExtensionPresent => "a2a_extension_present",
+            Self::PushNotificationConfigPresent => "push_notification_config_present",
+            Self::PeerAuthenticationEvidencePresent => "peer_authentication_evidence_present",
+            Self::SkillAuthorizationPolicyPresent => "skill_authorization_policy_present",
+            Self::TaskContextBindingPresent => "task_context_binding_present",
+            Self::A2aTenantPolicyPresent => "a2a_tenant_policy_present",
+            Self::DataScopePolicyPresent => "data_scope_policy_present",
+            Self::ReplayPolicyPresent => "replay_policy_present",
+            Self::ProtocolPolicyPresent => "protocol_policy_present",
         }
     }
 
@@ -214,6 +245,14 @@ impl Predicate {
                 | Self::McpHttpTransportPresent
                 | Self::McpAuthFlowPresent
                 | Self::McpIdentityMetadataPresent
+                // Cycle 020 target-shape predicates. A system that exchanges
+                // no A2A messages, publishes no Agent Card, uses no extension
+                // or configures no push notification genuinely has no such
+                // surface, and absence here is not a gap.
+                | Self::A2aExchangePresent
+                | Self::AgentCardPresent
+                | Self::A2aExtensionPresent
+                | Self::PushNotificationConfigPresent
         )
     }
 
@@ -258,6 +297,35 @@ impl Predicate {
                 | Self::AttestationPresent
                 | Self::DependencyGraphPresent
                 | Self::DeclaredObservedComponentsPresent
+        )
+    }
+
+    /// Whether this predicate names A2A evidence or a control rather than the
+    /// shape of the target.
+    ///
+    /// The Cycle 018 distinction, applied to a third domain. A system that
+    /// exchanges A2A messages but records no peer authentication evidence,
+    /// declares no skill-authorization policy, carries no task/context binding,
+    /// states no tenant, data-scope, replay or protocol policy has a **gap**,
+    /// not an exemption. Reporting NOT_APPLICABLE there would let a deployment
+    /// score better for supplying less — and these are precisely the properties
+    /// most worth asking about, because each one is the difference between an
+    /// authenticated peer and an authorized one.
+    ///
+    /// `a2a_exchange_present`, `agent_card_present`, `a2a_extension_present`
+    /// and `push_notification_config_present` are deliberately absent: those
+    /// describe what the target *is*, and a system that configures no push
+    /// notification genuinely has no callback boundary to answer for.
+    pub fn is_a2a_evidence(self) -> bool {
+        matches!(
+            self,
+            Self::PeerAuthenticationEvidencePresent
+                | Self::SkillAuthorizationPolicyPresent
+                | Self::TaskContextBindingPresent
+                | Self::A2aTenantPolicyPresent
+                | Self::DataScopePolicyPresent
+                | Self::ReplayPolicyPresent
+                | Self::ProtocolPolicyPresent
         )
     }
 

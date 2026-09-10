@@ -129,7 +129,18 @@
               "dependency_graph_present",
               "model_component_present",
               "dataset_component_present",
-              "declared_observed_components_present"
+              "declared_observed_components_present",
+              "a2a_exchange_present",
+              "agent_card_present",
+              "a2a_extension_present",
+              "push_notification_config_present",
+              "peer_authentication_evidence_present",
+              "skill_authorization_policy_present",
+              "task_context_binding_present",
+              "a2a_tenant_policy_present",
+              "data_scope_policy_present",
+              "replay_policy_present",
+              "protocol_policy_present"
             ]
           }
         }

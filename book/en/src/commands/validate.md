@@ -191,6 +191,46 @@ repository inside a document is inert metadata — naming a location is not
 authorization to fetch it. See
 [Agentic Supply Chain and AI-BOM Validation](../concepts/supply-chain-security.md).
 
+## `validate a2a`
+
+Bounded local A2A and inter-agent communication validation (Cycle 020). Reads
+local Agent Cards, captured exchanges, recorded verification results, delegation
+records and local policy, and evaluates fourteen invariants over discovery
+binding, peer identity, message authenticity, security requirements, skill
+authorization, message authority, task and context binding, authority
+propagation, tenant and data-scope boundaries, replay safety, protocol
+negotiation, extension trust and push-notification scope.
+
+```bash
+dare-agent-security validate a2a   --scenario A2A-LAB-032   --mode simulated   --output-dir .dare-agent-security/a2a
+
+dare-agent-security validate a2a   --scenario scenarios/production-peers.json   --mode static   --evidence-dir evidence/2026-q3   --output-dir .dare-agent-security/a2a
+```
+
+Modes are `static`, `replay`, `simulated` and `local-synthetic`; all four are
+local and offline. `replay` analyses a capture that already exists — it never
+re-sends traffic. There is no `--endpoint`, `--url`, `--token`, `--api-key`,
+`--client-secret`, `--username`, `--password`, `--private-key`, `--certificate`,
+`--login`, `--jwks-url`, `--webhook-test`, `--command`, `--shell`, `--download`
+or `--fetch` flag, and no credential is read from the environment.
+
+`--max-peers` and `--max-exchanges` only ever tighten: a value above the hard
+maximum is clamped down to it, because a flag that could raise a hard bound is
+not a limit.
+
+Under `--mode replay`, `--policy` is required alongside `--capture`: a capture
+may not supply the policy it is judged against, or a recorded run would declare
+its own approvals.
+
+No peer is contacted, no Agent Card is downloaded, no `.well-known` path or
+registry is queried, no JWK, JWKS or `jku` is resolved, no OAuth, OIDC, bearer
+or API-key credential is obtained or presented, no TLS handshake is performed,
+no message is sent, no remote task is created or cancelled, and no callback is
+invoked. An interface URL, issuer, token endpoint, key-set location or webhook
+inside a document is inert metadata — naming a location is not permission to
+connect to it. See
+[A2A and Inter-Agent Communication Security](../concepts/a2a-security.md).
+
 ## Exit codes
 
 Each subcommand has its own table — see [Exit Codes](../reference/exit-codes.md).

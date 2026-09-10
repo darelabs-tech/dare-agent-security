@@ -1,0 +1,313 @@
+{
+  "schema_version": "1",
+  "recorded_at": "2026-09-09",
+  "cycle": "020-a2a-inter-agent-security",
+  "fetch_policy": "NO_NETWORK_ACCESS",
+  "fetch_policy_note": "Nothing in this cycle retrieves a specification, an Agent Card, a key set, a token, a certificate, a registry entry or a webhook destination. Every source below is recorded as a pinned reference with the status the approval assigned it. An endpoint, issuer, jku, jwks_uri, token endpoint, webhook URL or Agent Card location appearing anywhere in imported evidence is inert metadata: it names a place, and naming a place is not authorization to go there.",
+  "reverification_note": "No upstream re-verification of any status below was performed during this cycle. These are the statuses the Cycle 020 approval froze on 2026-09-09. They should be re-checked against the publishers before being relied on, and this record says so rather than leaving a reader to assume currency from the presence of a version number.",
+  "conformance_disclaimer": "Nothing in this cycle asserts conformance with any specification listed here. The engine evaluates whether the security properties it names hold for the evidence it was given. It does not certify an Agent Card, an A2A exchange, a JWS signature or an OAuth deployment as conformant, and a PASS is never a conformance claim.",
+  "status_discipline_note": "A source's status governs what may depend on it. NORMATIVE sources may inform a mandatory PASS condition. INFORMATIVE and FUTURE sources may not, in this cycle or in a later one, unless a subsequent approval explicitly freezes the promotion. Property mappings therefore carry a status of their own, and none of them is NORMATIVE: a mapping records which specification a property draws its vocabulary from, never that the specification requires the property.",
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026_ASI07",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "version": "2026",
+      "canonical_reference": "ASI07 Insecure Inter-Agent Communication",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY",
+      "mapping_notes": "The risk taxonomy this cycle implements. ASI07 names the risk; the fourteen invariants are this engine's decomposition of it into questions that local evidence can actually answer."
+    },
+    {
+      "id": "A2A_PROTOCOL_1_0_0",
+      "title": "Agent2Agent (A2A) Protocol Specification",
+      "version": "1.0.0",
+      "canonical_reference": "A2A 1.0.0 message, task, context and transport model",
+      "status": "NORMATIVE",
+      "usage": "EVIDENCE_SHAPE",
+      "mapping_notes": "Defines the shapes this engine reads: message and task envelopes, contextId and taskId correlation, protocol version negotiation and the supported-interface set. The engine parses these shapes offline and speaks none of the protocol."
+    },
+    {
+      "id": "A2A_AGENT_CARD_1_0_0",
+      "title": "A2A Agent Card",
+      "version": "1.0.0",
+      "canonical_reference": "Agent Card provider, interfaces, security schemes, security requirements, skills, capabilities and extensions",
+      "status": "NORMATIVE",
+      "usage": "EVIDENCE_SHAPE",
+      "mapping_notes": "The discovery document this engine imports as local evidence. A card is read from a file the operator supplied; it is never fetched from a .well-known location, a registry or a URL the card itself carries."
+    },
+    {
+      "id": "A2A_PUSH_NOTIFICATION_1_0_0",
+      "title": "A2A push notification configuration",
+      "version": "1.0.0",
+      "canonical_reference": "A2A 1.0.0 push notification configuration and webhook security guidance",
+      "status": "NORMATIVE",
+      "usage": "EVIDENCE_SHAPE",
+      "mapping_notes": "Push notification configuration is analyzed as local data only. The destination URL is never contacted, no callback is invoked and no webhook is probed — the engine decides whether the configuration would disclose beyond the approved callback, tenant and data scope, which is answerable without connecting."
+    },
+    {
+      "id": "RFC_7515_JWS",
+      "title": "JSON Web Signature (JWS)",
+      "version": "RFC 7515",
+      "canonical_reference": "RFC 7515 JWS representation for signed Agent Cards",
+      "status": "INFORMATIVE",
+      "usage": "SIGNATURE_EVIDENCE_SHAPE",
+      "mapping_notes": "Read as the shape a signature record takes, never as a verification this engine performs. No key is resolved, no jku is followed and no signature is verified here: the engine reads a verification status another verifier recorded, and a recorded status is not a verification."
+    },
+    {
+      "id": "RFC_8785_JCS",
+      "title": "JSON Canonicalization Scheme (JCS)",
+      "version": "RFC 8785",
+      "canonical_reference": "RFC 8785 canonicalization for signed Agent Card material",
+      "status": "INFORMATIVE",
+      "usage": "CANONICALIZATION_REFERENCE",
+      "mapping_notes": "Names why a signed card's canonical form matters: two byte sequences that canonicalize differently are different material. This engine computes its own canonical digests over normalized structures and does not implement JCS."
+    },
+    {
+      "id": "OAUTH2_OIDC_CONCEPTS",
+      "title": "OAuth 2.0 and OpenID Connect authentication concepts",
+      "version": "concepts",
+      "canonical_reference": "Declared security-scheme vocabulary for A2A security requirements",
+      "status": "INFORMATIVE",
+      "usage": "DECLARED_SCHEME_VOCABULARY",
+      "mapping_notes": "Only the vocabulary. No token is obtained, no flow is performed, no introspection or discovery request is made. A declared security scheme is what a card says it accepts, and that is not evidence that authentication succeeded."
+    },
+    {
+      "id": "HTTPS_TLS_CONCEPTS",
+      "title": "HTTPS and TLS transport concepts",
+      "version": "concepts",
+      "canonical_reference": "Transport identity vocabulary for interface evidence",
+      "status": "INFORMATIVE",
+      "usage": "TRANSPORT_VOCABULARY",
+      "mapping_notes": "No handshake is performed and no certificate is validated. TLS server identity answers which host answered; it does not answer which agent is authorized, and the engine keeps those two facts in different fields."
+    }
+  ],
+  "inter_agent_trust_statement": {
+    "id": "A2A_TRUST_STATEMENT_V1",
+    "summary": "Every rule below is a place where two things that look alike are not the same thing. Treating one as the other is how an inter-agent boundary quietly stops existing, and each rule has an invariant behind it.",
+    "rules": [
+      "An external agent appearing in an inventory is not a trusted peer.",
+      "A discovered Agent Card is not an authenticated identity.",
+      "A signed Agent Card is not an authorized provider.",
+      "TLS server identity is not agent-level authorization.",
+      "A declared security scheme is not a successful authentication.",
+      "A successful authentication is not skill authorization.",
+      "A schema-valid message is not an authentic message.",
+      "An authentic message is not an authorized instruction.",
+      "Peer content is not a privileged instruction.",
+      "A matching taskId is not a matching principal or context.",
+      "Delegation is not privilege amplification.",
+      "A message retry is not a safe replay.",
+      "Protocol compatibility is not permission to downgrade.",
+      "An extension declaration is not extension authority.",
+      "A webhook URL is not permission to connect.",
+      "A tenant routing value is not proof of tenant authorization."
+    ]
+  },
+  "surface_classes": [
+    {
+      "id": "DISCOVERY_BINDING",
+      "summary": "Whether the card in hand is the card the policy approved."
+    },
+    {
+      "id": "PEER_IDENTITY",
+      "summary": "Whether the authenticated party is the intended agent, audience and tenant."
+    },
+    {
+      "id": "MESSAGE_AUTHENTICITY",
+      "summary": "Whether authentication evidence binds the exact message that was received."
+    },
+    {
+      "id": "SECURITY_REQUIREMENT",
+      "summary": "Whether the mechanism actually used satisfies an approved requirement."
+    },
+    {
+      "id": "SKILL_AUTHORIZATION",
+      "summary": "Whether the effective principal may invoke the skill that was invoked."
+    },
+    {
+      "id": "MESSAGE_AUTHORITY",
+      "summary": "Whether peer-controlled content stayed data instead of becoming instruction."
+    },
+    {
+      "id": "TASK_CONTEXT_BINDING",
+      "summary": "Whether the task, context and initiating principal stayed the same across the exchange."
+    },
+    {
+      "id": "AUTHORITY_PROPAGATION",
+      "summary": "Whether authority narrowed or held across each delegation hop, and never widened."
+    },
+    {
+      "id": "TENANT_BOUNDARY",
+      "summary": "Whether the exchange stayed inside the approved tenant."
+    },
+    {
+      "id": "DATA_SCOPE",
+      "summary": "Whether disclosure and destination scope stayed inside what policy allowed."
+    },
+    {
+      "id": "REPLAY_BOUNDARY",
+      "summary": "Whether a repeated action was proven safe to repeat."
+    },
+    {
+      "id": "PROTOCOL_NEGOTIATION",
+      "summary": "Whether the version and interface used were ones policy permits."
+    },
+    {
+      "id": "EXTENSION_TRUST",
+      "summary": "Whether an extension in use was declared, approved and non-authoritative."
+    },
+    {
+      "id": "PUSH_NOTIFICATION",
+      "summary": "Whether a callback configuration would disclose beyond the approved scope."
+    }
+  ],
+  "property_mappings": [
+    {
+      "property_id": "AGENT.A2A.MESSAGE_AUTHENTICITY",
+      "standard": "A2A_PROTOCOL_1_0_0",
+      "reference": "A2A 1.0.0 message envelope and sender identity semantics",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Pre-existing property from Cycle 012. Cycle 020 supplies evidence to it and leaves its id, predicates and registry entry unchanged."
+    },
+    {
+      "property_id": "AGENT.A2A.AUTHORITY_PROPAGATION",
+      "standard": "OWASP_AGENTIC_TOP10_2026_ASI07",
+      "reference": "ASI07 authority propagation across agent boundaries",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Pre-existing property from Cycle 012. Cycle 020 supplies evidence to it and creates no second authority property."
+    },
+    {
+      "property_id": "AGENT.A2A.PEER_IDENTITY_BINDING",
+      "standard": "A2A_AGENT_CARD_1_0_0",
+      "reference": "Agent Card provider identity and supported interfaces",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The card names a provider; authentication evidence names a principal. This property is about whether those two agree."
+    },
+    {
+      "property_id": "AGENT.A2A.DISCOVERY_TRUST_BOUNDARY",
+      "standard": "A2A_AGENT_CARD_1_0_0",
+      "reference": "Agent Card discovery and signature representation",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Discovery answers where a description came from. It does not answer whether the description is trustworthy."
+    },
+    {
+      "property_id": "AGENT.A2A.SKILL_AUTHORIZATION",
+      "standard": "A2A_AGENT_CARD_1_0_0",
+      "reference": "Agent Card skills and security requirements",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "A card advertising a skill says the skill exists. Local policy says who may invoke it."
+    },
+    {
+      "property_id": "AGENT.A2A.MESSAGE_CONTEXT_BINDING",
+      "standard": "A2A_PROTOCOL_1_0_0",
+      "reference": "A2A 1.0.0 taskId and contextId correlation",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The protocol supplies the correlation identifiers; this property is about whether the principal behind them stayed the same."
+    },
+    {
+      "property_id": "AGENT.A2A.TENANT_BOUNDARY",
+      "standard": "OWASP_AGENTIC_TOP10_2026_ASI07",
+      "reference": "ASI07 cross-boundary agent communication",
+      "relation": "COMPOSES_WITH",
+      "status": "INFORMATIVE",
+      "notes": "Composes with Cycle 015, which owns tenant identity semantics. Cycle 020 evaluates only the A2A projection of them."
+    },
+    {
+      "property_id": "AGENT.A2A.DATA_SCOPE_BOUNDARY",
+      "standard": "OWASP_AGENTIC_TOP10_2026_ASI07",
+      "reference": "ASI07 data disclosure across agent boundaries",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Data labels travel with a message. Whether they may travel to this destination is a policy question, not a protocol one."
+    },
+    {
+      "property_id": "AGENT.A2A.REPLAY_BOUNDARY",
+      "standard": "A2A_PROTOCOL_1_0_0",
+      "reference": "A2A 1.0.0 message identity and task lifecycle",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The protocol makes retries expressible. Whether a particular repeat is safe depends on the operation, which the protocol does not decide."
+    },
+    {
+      "property_id": "AGENT.A2A.PROTOCOL_NEGOTIATION_INTEGRITY",
+      "standard": "A2A_PROTOCOL_1_0_0",
+      "reference": "A2A 1.0.0 protocol version negotiation and supported interfaces",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "Negotiation finds a version both sides support. Policy decides which of those versions is acceptable here."
+    },
+    {
+      "property_id": "AGENT.A2A.EXTENSION_TRUST_BOUNDARY",
+      "standard": "A2A_AGENT_CARD_1_0_0",
+      "reference": "A2A 1.0.0 extension declaration and required extensions",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "An extension declares what it does. Whether it may do it here is a local approval, and an extension that cannot be interpreted safely fails closed."
+    },
+    {
+      "property_id": "AGENT.A2A.PUSH_NOTIFICATION_BOUNDARY",
+      "standard": "A2A_PUSH_NOTIFICATION_1_0_0",
+      "reference": "A2A 1.0.0 push notification configuration security",
+      "relation": "SPECIALIZES",
+      "status": "INFORMATIVE",
+      "notes": "The configuration is read as data. The destination is never contacted, and the question asked is whether the configuration would disclose beyond the approved scope."
+    }
+  ],
+  "explicitly_out_of_scope": [
+    "Connecting to a live A2A agent, endpoint or interface of any kind.",
+    "Downloading an Agent Card from a .well-known location, a registry or any URL.",
+    "Fetching JWK, JWKS or JWS key material, or following a jku.",
+    "Obtaining, exchanging, introspecting or presenting an OAuth or OIDC token.",
+    "Using a real API key, bearer token, client secret, password, private key or certificate.",
+    "Performing a TLS handshake or validating a certificate chain.",
+    "Sending an A2A message, creating or cancelling a remote task, or invoking a callback.",
+    "Probing, testing or connecting to a push-notification or webhook destination.",
+    "Executing a script, payload, artifact or model that appears in analyzed evidence.",
+    "Multi-turn adaptive adversarial loops, which remain reserved for Cycle 021.",
+    "Remote authorized validation against live endpoints, which remains reserved for Cycle 022.",
+    "Graph-wide attack-path construction, which remains reserved for Cycle 023."
+  ],
+  "inherited_lessons": [
+    {
+      "from": "cycle-017",
+      "lesson": "A replayed trace must not manufacture authority. Matching a scenario id is identity, not approval.",
+      "applied_as": "A captured A2A exchange is evidence about what happened, never the policy it is judged against. The replay adapter discards any policy a capture carries and applies a local one supplied separately."
+    },
+    {
+      "from": "cycle-018",
+      "lesson": "A recorded verification status is not a favourable one, and a token being present is not a token being valid.",
+      "applied_as": "VerificationStatus is a closed four-value enum. Only VALID may satisfy positive evidence; INDETERMINATE and UNRECORDED can never become PASS."
+    },
+    {
+      "from": "cycle-018",
+      "lesson": "One invariant's PASS must not mask another invariant's concrete FAIL.",
+      "applied_as": "Every applicable invariant is evaluated on the same evidence and every concrete violation is retained, with FAIL outranking everything in aggregation."
+    },
+    {
+      "from": "cycle-019",
+      "lesson": "An invariant with no subject in the evidence is not undecided — the question does not arise, and counting it as a gap makes a clean result unreachable.",
+      "applied_as": "Outcomes carry an applicability flag read from the observations, and inapplicable invariants are excluded from the aggregate."
+    },
+    {
+      "from": "cycle-019",
+      "lesson": "A channel can be present and carry nothing to compare, which is a PASS having compared nothing.",
+      "applied_as": "Coverage contracts check both that a channel was observed and that the comparison it enables could actually be made."
+    },
+    {
+      "from": "cycle-019",
+      "lesson": "A coordinate names something, and naming something is not authorization to fetch it.",
+      "applied_as": "Endpoints, jku values, JWKS URLs, token endpoints, webhook destinations and Agent Card locations are stored as inert metadata, and no client capable of resolving one is declared."
+    },
+    {
+      "from": "cycle-019",
+      "lesson": "An output artifact must account for itself in the run-wide budget, or the budget bounds everything except the largest thing written.",
+      "applied_as": "Every persisted artifact passes output admission before it is written, the result artifact included."
+    }
+  ]
+}

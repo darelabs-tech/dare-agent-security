@@ -1,0 +1,59 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "agentic-a2a-security-2026",
+  "version": "1.0.0",
+  "title": "DARE Agentic A2A and Inter-Agent Communication Security 2026",
+  "properties": [
+    {
+      "id": "AGENT.A2A.DISCOVERY_TRUST_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.A2A.PEER_IDENTITY_BINDING",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.A2A.MESSAGE_AUTHENTICITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.A2A.SKILL_AUTHORIZATION",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.A2A.AUTHORITY_PROPAGATION",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.A2A.MESSAGE_CONTEXT_BINDING",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.A2A.TENANT_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.A2A.DATA_SCOPE_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.A2A.REPLAY_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.A2A.PROTOCOL_NEGOTIATION_INTEGRITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.A2A.EXTENSION_TRUST_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.A2A.PUSH_NOTIFICATION_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    }
+  ]
+}

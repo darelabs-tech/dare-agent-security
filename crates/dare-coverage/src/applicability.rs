@@ -72,6 +72,21 @@ pub fn evaluate_applicability(
                 ),
             });
         }
+        // Cycle 020: the same rule for A2A evidence. A system that exchanges
+        // A2A messages but records no peer authentication, declares no
+        // skill-authorization policy or states no tenant/data/replay/protocol
+        // policy has a gap. Each of those is the difference between an
+        // authenticated peer and an authorized one, which is exactly the
+        // question worth asking.
+        if predicate.is_a2a_evidence() {
+            return Ok(ApplicabilityDecision {
+                status: CoverageStatus::NotTested,
+                rationale: format!(
+                    "A2A evidence {} is absent — a gap, not relabeled NOT_APPLICABLE",
+                    predicate.as_str()
+                ),
+            });
+        }
         // Cycle 018: an absent auth control or evidence channel on a target
         // that *does* have the auth surface is a gap, never an exemption.
         if predicate.is_auth_control_evidence() {
@@ -161,6 +176,17 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::ModelComponentPresent => facts.model_component_present,
         Predicate::DatasetComponentPresent => facts.dataset_component_present,
         Predicate::DeclaredObservedComponentsPresent => facts.declared_observed_components_present,
+        Predicate::A2aExchangePresent => facts.a2a_exchange_present,
+        Predicate::AgentCardPresent => facts.agent_card_present,
+        Predicate::A2aExtensionPresent => facts.a2a_extension_present,
+        Predicate::PushNotificationConfigPresent => facts.push_notification_config_present,
+        Predicate::PeerAuthenticationEvidencePresent => facts.peer_authentication_evidence_present,
+        Predicate::SkillAuthorizationPolicyPresent => facts.skill_authorization_policy_present,
+        Predicate::TaskContextBindingPresent => facts.task_context_binding_present,
+        Predicate::A2aTenantPolicyPresent => facts.a2a_tenant_policy_present,
+        Predicate::DataScopePolicyPresent => facts.data_scope_policy_present,
+        Predicate::ReplayPolicyPresent => facts.replay_policy_present,
+        Predicate::ProtocolPolicyPresent => facts.protocol_policy_present,
     }
 }
 

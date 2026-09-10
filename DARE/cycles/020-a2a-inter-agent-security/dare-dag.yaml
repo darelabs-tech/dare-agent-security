@@ -1,0 +1,42 @@
+cycle: 020
+name: a2a-inter-agent-security
+status: approved
+baseline:
+  branch: main
+  commit: d2bff1d3789074dffaae45a7ce57a3563daeb1ff
+execution_branch: agent/cycle-020-a2a-inter-agent-security
+approval_file: DARE/cycles/020-a2a-inter-agent-security/APPROVAL.md
+execution_authorized: true
+execution_tasks: 57
+safety_boundary:
+  network: prohibited
+  credentials: prohibited
+  target_state_changes: prohibited
+  remote_fetch: prohibited
+  live_a2a_calls: prohibited
+  arbitrary_shell_from_evidence: prohibited
+artifacts:
+  required:
+    - BASELINE.md
+    - DESIGN.md
+    - BLUEPRINT.md
+    - TASKS.md
+    - APPROVAL.md
+    - dare-dag.yaml
+    - dare-dag.exec.yaml
+    - REGRESSION.md
+    - PROOF.md
+    - EXECUTION/task-001.md..task-057.md
+completion_gate:
+  - cargo fmt --all --check
+  - cargo clippy --workspace --all-targets -- -D warnings
+  - cargo test --workspace
+  - cargo audit under repository policy
+  - python scripts/run-ci-job-locally.py .github/workflows/ci.yml a2a-security-2026
+  - Cycle 012-019 regressions green
+  - MCP baseline green
+  - EN mdBook build green
+  - PT mdBook build green
+  - REGRESSION.md complete
+  - PROOF.md complete
+  - final branch head pushed
