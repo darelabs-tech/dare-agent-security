@@ -3163,3 +3163,6 @@ jobs:
         run: mdbook build book/en
       - name: Build Portuguese book
         run: mdbook build book/pt
+
+      - name: The canvas matches the task list it is generated from
+        run: python scripts/regen-canvas.py --check

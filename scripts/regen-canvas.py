@@ -9,6 +9,10 @@ from the checkbox list means it cannot say something the task list does not.
 Usage:
     python scripts/regen-canvas.py                 # newest cycle directory
     python scripts/regen-canvas.py 019             # a specific cycle
+    python scripts/regen-canvas.py --check         # fail if the canvas has drifted
+
+`--check` ignores the `**Updated:**` stamp, which changes on every run and so
+would otherwise report drift even when the task table is current.
 """
 
 import datetime
@@ -33,8 +37,16 @@ def pick_cycle(argument: str | None) -> pathlib.Path:
     return directories[-1]
 
 
+def without_stamp(text: str) -> list[str]:
+    """The canvas minus its `**Updated:**` line, for comparison."""
+    return [line for line in text.splitlines() if not line.startswith("**Updated:**")]
+
+
 def main() -> int:
-    cycle = pick_cycle(sys.argv[1] if len(sys.argv) > 1 else None)
+    arguments = sys.argv[1:]
+    check_only = "--check" in arguments
+    selector = next((a for a in arguments if not a.startswith("-")), None)
+    cycle = pick_cycle(selector)
     tasks = (cycle / "TASKS.md").read_text(encoding="utf-8")
     rows = ROW.findall(tasks)
     if not rows:
@@ -75,7 +87,20 @@ def main() -> int:
         "",
     ]
 
-    CANVAS.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    rendered = "\n".join(lines)
+    if check_only:
+        current = CANVAS.read_text(encoding="utf-8") if CANVAS.exists() else ""
+        if without_stamp(current) != without_stamp(rendered):
+            print(
+                f"DARE/.canvas.md has drifted from {cycle.name}/TASKS.md; "
+                "run `python scripts/regen-canvas.py` and commit the result.",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"{cycle.name}: canvas is current ({done}/{total})")
+        return 0
+
+    CANVAS.write_text(rendered, encoding="utf-8", newline="\n")
     print(f"{cycle.name}: {done}/{total} ({percent}%)")
     return 0
 
