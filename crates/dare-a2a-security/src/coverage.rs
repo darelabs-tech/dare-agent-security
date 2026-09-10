@@ -168,9 +168,15 @@ fn comparison_reason(
             matches!(observation, O::PeerAuthenticationContext(context)
                 if context.status.is_recorded_evidence())
         }),
+        // Two facts, not one. `covers_observed_envelope` says a comparison was
+        // made; the status says what the verifier concluded. A signature that
+        // covers this envelope under a verification that could not conclude
+        // establishes nothing, and accepting it would turn somebody else's
+        // uncertainty into our confidence.
         I::MessageAuthenticityEstablished => any(&|observation| {
             matches!(observation, O::MessageAuthenticationContext(context)
-                if context.covers_observed_envelope.is_some())
+                if context.status.may_satisfy_positive_evidence()
+                    && context.covers_observed_envelope == Some(true))
         }),
         I::SecurityRequirementSatisfied => any(&|observation| {
             matches!(observation, O::SecurityRequirementContext(context)
