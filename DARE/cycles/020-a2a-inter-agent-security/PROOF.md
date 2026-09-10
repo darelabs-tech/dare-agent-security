@@ -18,11 +18,11 @@ three citations naming tests that did not exist, Cycle 018 two more, and Cycle
 | New crate | `crates/dare-a2a-security` |
 | Invariants | 14 (I01–I14) |
 | Registry properties | 12 (2 inherited, 10 added) |
-| A2A-LAB vectors | 59 |
-| Reference behaviours | 37 |
+| A2A-LAB vectors | 64 |
+| Reference behaviours | 42 |
 | Observation channels | 17 |
-| Cycle 020 tests | **390** |
-| Workspace tests | **3734**, zero failures |
+| Cycle 020 tests | **415** |
+| Workspace tests | **3759**, zero failures |
 
 `the_registry_holds_exactly_the_fourteen_approved_invariants` fails if the
 invariant count moves. `the_fourteen_evaluators_are_all_reachable` fails if one
@@ -293,21 +293,95 @@ produced.
 
 ## 13. The CI gate
 
-`a2a-security-2026`, 27 steps. **All 25 run-steps passed on the first local
-execution** under
+`a2a-security-2026`, 31 steps of which **29 are run-steps, all passing** under
 `python scripts/run-ci-job-locally.py .github/workflows/ci.yml a2a-security-2026`.
+
+(This section previously read "27 steps ... all 25 run-steps", which was wrong
+in both halves and disagreed with itself. The numbers above are counted from the
+workflow and from the runner's own output.)
 
 Every assertion is parsed structure via `scripts/assert-json.py`. There is no
 substring check for a verdict anywhere in the job — `SECURE` matches inside
 `INSECURE_INTER_AGENT_COMMUNICATION`, which *is* this cycle's risk family, and a
 substring gate would have reproduced Cycle 013's defect under its own name.
 
-The two INCONCLUSIVE steps assert `verdict=INCONCLUSIVE` **and**
+The three INCONCLUSIVE steps assert `verdict=INCONCLUSIVE` **and**
 `--count violations=0` together. Either alone passes for the wrong reason.
 
 ---
 
-## 14. What this cycle does not claim
+## 14. Post-merge hotfix: only a VALID verification may satisfy a positive claim
+
+Added after this cycle merged. Sections 1–13 describe Cycle 020 as approved and
+delivered; this section records the remediation of three false-`PASS` paths that
+post-merge security review found in I02, I03 and I04. Full narrative in
+`HOTFIX.md`, execution record in `EXECUTION/hotfix-001.md`.
+
+Every test below drives a **whole invariant**. The status predicate
+`only_valid_may_satisfy_positive_evidence_and_only_invalid_is_a_finding` was
+already green throughout, and the defect was that three call sites never
+consulted it — so a predicate test is not evidence for this claim.
+
+| Claim | Decided by |
+|---|---|
+| I02 authentication uncertainty cannot PASS | `only_a_valid_peer_verification_can_bind_peer_identity` |
+| I02 identity substitution cannot silently PASS | `a_logical_agent_that_differs_from_the_approved_one_fails` |
+| I02 a logical agent nobody approved cannot bind | `a_logical_agent_policy_never_approved_cannot_bind` |
+| I02 a service principal cannot stand in for a required delegate | `a_service_principal_standing_in_for_a_required_delegated_identity_fails` |
+| I02 legitimate service-to-service is not failed | `a_service_principal_is_not_a_finding_where_no_delegated_identity_is_expected` |
+| I02 an expected value never observed is not agreement | `an_expected_audience_that_was_never_observed_leaves_identity_undecided` |
+| I03 INDETERMINATE and UNRECORDED cannot PASS | `only_a_valid_message_verification_can_establish_authenticity` |
+| I03 a covered envelope does not rescue an uncertain verifier | `a_signature_covering_the_right_envelope_does_not_rescue_an_uncertain_verification` |
+| I03 envelope binding is required | `a_valid_verification_without_a_covered_digest_cannot_establish_authenticity` |
+| I04 scheme declaration alone cannot PASS | `a_scheme_the_card_merely_declares_is_not_a_satisfied_requirement` |
+| I04 verification must correspond to the selected scheme | `a_verification_for_another_scheme_never_satisfies_the_requirement` |
+| I04 another peer's verification never satisfies this requirement | `a_valid_verification_for_another_peer_never_satisfies_this_requirement` |
+| I04 only VALID may satisfy positive evidence | `only_a_valid_verification_can_satisfy_a_security_requirement` |
+| I04 no verification at all leaves the requirement undecided | `a_scheme_with_no_verification_at_all_leaves_the_requirement_undecided` |
+| the rule holds across all three, for every status | `no_uncertain_verification_produces_a_pass_in_any_of_the_three` |
+| a required binding is proven only by a match | `only_matches_proves_a_required_binding_and_unproven_never_does` |
+| FAIL precedence remains intact | `a_concrete_failure_still_outranks_an_undecided_invariant` |
+| an undecided invariant is not masked by passing ones | `an_undecided_invariant_cannot_be_masked_by_a_passing_one` |
+
+`no_uncertain_verification_produces_a_pass_in_any_of_the_three` walks
+`VerificationStatus::all()` and `only_matches_proves_a_required_binding_and_unproven_never_does`
+walks `BindingCheck::all()`, so a status or variant added later cannot default to
+permitted.
+
+The five corpus vectors are verified end to end through the CLI, not asserted in
+prose:
+
+```text
+A2A-LAB-059 -> INCONCLUSIVE | PEER_IDENTITY_BOUND
+A2A-LAB-060 -> FAIL         | PEER_IDENTITY_BOUND
+A2A-LAB-061 -> FAIL         | PEER_IDENTITY_BOUND
+A2A-LAB-062 -> INCONCLUSIVE | MESSAGE_AUTHENTICITY_ESTABLISHED
+A2A-LAB-063 -> INCONCLUSIVE | SECURITY_REQUIREMENT_SATISFIED
+```
+
+The tests were checked for teeth by mutation rather than trusted: forcing
+`binding_established` true fails four of them, and making
+`requirement_established` ignore the verification status fails six.
+
+The offline boundary is unchanged by this work.
+`this_crate_declares_no_network_dependency_of_its_own` still holds, no
+dependency was added, and `scripts/k20/assert_no_real_credentials.py` passes
+over the new fixtures. Authentication verification remains recorded evidence
+from another verifier, read as local data.
+
+Executed on `hotfix/cycle-020-a2a-security-contracts`:
+
+```text
+cargo test -p dare-a2a-security ......... 356 passed, 0 failed
+cargo test --workspace .................. 3759 passed, 0 failed
+cargo fmt --all -- --check ............... clean
+cargo clippy --workspace --all-targets ... 0 issues
+a2a-security-2026 ....................... 29/29 steps passed
+```
+
+---
+
+## 15. What this cycle does not claim
 
 - It does not claim any remote agent is secure, reachable, or behaving as its
   card describes.

@@ -101,6 +101,8 @@ pub mod normalize;
 pub mod observation;
 pub mod peer;
 pub mod policy;
+#[cfg(test)]
+mod positive_evidence;
 pub mod protocol;
 pub mod push_notification;
 pub mod replay;

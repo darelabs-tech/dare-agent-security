@@ -93,10 +93,18 @@ behavior_entry!(peer_identity_mismatch, PeerIdentityMismatch);
 behavior_entry!(audience_mismatch, AudienceMismatch);
 behavior_entry!(authentication_invalid, AuthenticationInvalid);
 behavior_entry!(authentication_unrecorded, AuthenticationUnrecorded);
+behavior_entry!(authentication_indeterminate, AuthenticationIndeterminate);
+behavior_entry!(logical_agent_substituted, LogicalAgentSubstituted);
+behavior_entry!(delegated_identity_substituted, DelegatedIdentitySubstituted);
+behavior_entry!(security_scheme_unverified, SecuritySchemeUnverified);
 behavior_entry!(security_scheme_unsatisfied, SecuritySchemeUnsatisfied);
 behavior_entry!(skill_not_authorized, SkillNotAuthorized);
 behavior_entry!(message_signature_invalid, MessageSignatureInvalid);
 behavior_entry!(message_signature_missing, MessageSignatureMissing);
+behavior_entry!(
+    message_signature_indeterminate,
+    MessageSignatureIndeterminate
+);
 behavior_entry!(peer_content_as_instruction, PeerContentTreatedAsInstruction);
 behavior_entry!(task_substituted, TaskSubstituted);
 behavior_entry!(context_substituted, ContextSubstituted);
@@ -610,6 +618,49 @@ pub fn corpus() -> Vec<A2aLabEntry> {
             I::DiscoveryBindingPreserved,
             "a realistic card carrying interface, issuer, token-endpoint and jku locations",
             card_full_of_locations,
+        ),
+        // --- positive authentication evidence ----------------------------
+        // Added by the post-merge hotfix. Each of these reached PASS before the
+        // positive-evidence contracts were enforced.
+        entry(
+            "A2A-LAB-059",
+            D::PeerIdentity,
+            C::Gap,
+            I::PeerIdentityBound,
+            "a peer verification that ran and could not conclude",
+            authentication_indeterminate,
+        ),
+        entry(
+            "A2A-LAB-060",
+            D::PeerIdentity,
+            C::Attack,
+            I::PeerIdentityBound,
+            "the peer presents a logical agent local policy never approved for the role",
+            logical_agent_substituted,
+        ),
+        entry(
+            "A2A-LAB-061",
+            D::PeerIdentity,
+            C::Attack,
+            I::PeerIdentityBound,
+            "a service principal stands in where policy requires a delegated subject",
+            delegated_identity_substituted,
+        ),
+        entry(
+            "A2A-LAB-062",
+            D::MessageAuthenticity,
+            C::Gap,
+            I::MessageAuthenticityEstablished,
+            "a signature over the observed envelope whose verification could not conclude",
+            message_signature_indeterminate,
+        ),
+        entry(
+            "A2A-LAB-063",
+            D::SecurityRequirement,
+            C::Gap,
+            I::SecurityRequirementSatisfied,
+            "the scheme the card requires was used and only another mechanism was verified",
+            security_scheme_unverified,
         ),
     ]
 }

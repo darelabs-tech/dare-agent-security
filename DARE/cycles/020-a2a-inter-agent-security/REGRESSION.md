@@ -8,6 +8,10 @@ local/offline boundary, the public property identifiers, the PASS semantics and
 the cycle-ownership split. None required redesigning an approved security
 contract, so none was stopped for Review.
 
+Section 13 was found **after this cycle merged**, by post-merge security review.
+It is remediation rather than approved scope, and is recorded in full in
+`HOTFIX.md` and `EXECUTION/hotfix-001.md`. The 57/57 task count is unchanged.
+
 ---
 
 ## 1. A word-ban refused the document's own denial — three times
@@ -310,6 +314,62 @@ the `**Updated:**` stamp, which changes on every run: regenerating and then
 running `git diff --exit-code` would have failed on every CI run whether or not
 the canvas had drifted. Verified both ways -- a stale timestamp alone passes, a
 changed task row fails with a message naming the fix.
+
+---
+
+## 13. Post-merge: a correct predicate that nothing called
+
+Found after Cycle 020 merged, by security review rather than by any gate here.
+Recorded in full in `HOTFIX.md`; kept short in this file, which is the cycle's
+regression narrative.
+
+Three invariants could report `PASS` without a `VALID` verification behind them:
+
+```text
+I02 INDETERMINATE peer authentication          -> PASS (want INCONCLUSIVE)
+I03 INDETERMINATE message authentication       -> PASS (want INCONCLUSIVE)
+I04 INDETERMINATE peer authentication          -> PASS (want INCONCLUSIVE)
+I03 a covered envelope rescuing an uncertain verifier
+I04 a VALID verification for a *different* scheme satisfying the requirement
+aggregation reporting PASS with I03 undecided
+```
+
+The uncomfortable part is where the defect was not. `may_satisfy_positive_evidence`
+implements the rule correctly and had a passing test — `only_valid_may_satisfy_positive_evidence_and_only_invalid_is_a_finding`
+walks all four statuses and has been green since task-008. The evaluators simply
+never called it. I02 asked `is_recorded_evidence()`, which answers "was it
+checked?" and is true of `INDETERMINATE`; I03 and I04 asked only whether a
+comparison had been *made*, never what it *concluded*.
+
+So this cycle shipped a correct predicate, a passing test for it, and three call
+sites that ignored both. A unit test on a predicate proves nothing about the
+code that does not consult it — which is why the hotfix's thirty regressions
+drive whole invariants and not the predicate.
+
+`Option<bool>` carried a second instance of the same shape. It has three answers
+where the identity question has four: "policy pinned nothing" and "policy pinned
+a value the evidence never carried" both arrived as `None`, so absence read as
+agreement. `BindingCheck` replaced it with four named answers and two explicit
+questions — `may_satisfy_positive_evidence()` for optional dimensions,
+`is_proven()` for required ones.
+
+Two corrections found while writing the fix, both caught by running things
+rather than assuming them:
+
+- the new CI steps first expected CLI exit **1** for a concrete failure; it is
+  **2**, confirmed by running a scenario before the assertion was written;
+- staging A2A-LAB-063 first gave a peer an API-key verification carrying a
+  delegated subject, and admission refused the bundle — correctly, since an API
+  key authenticates a service and carries no user. The refusal was right; the
+  vector was rewritten to vary the scheme id and hold the kind, which is the
+  binding actually under test.
+
+One fixture changed, and it is worth being explicit that it is not the forbidden
+kind. `base_policy()` in `simulated.rs` gained `expected_logical_agent` and
+`requires_delegated_identity` — evidence the strengthened contract now requires.
+No expectation, classification or verdict moved anywhere in the corpus, and
+`corpus.rs` needed no edit for the existing 59 vectors to keep passing. The
+corpus was already right; the evaluator was not.
 
 ---
 

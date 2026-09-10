@@ -2824,6 +2824,9 @@ jobs:
       - name: CLI flag surface (no endpoint, token, key, webhook, fetch or shell flag)
         run: cargo test -p dare-agent-security --lib a2a_security -- --nocapture
 
+      - name: Only a VALID verification may satisfy I02, I03 or I04
+        run: cargo test -p dare-a2a-security --lib positive_evidence -- --nocapture
+
       - name: No real credential, key or live identity endpoint anywhere
         run: python scripts/k20/assert_no_real_credentials.py
       - name: Every test PROOF.md cites actually exists
@@ -3008,6 +3011,38 @@ jobs:
             .dare-agent-security/cycle020-unpinned/a2a-result.json \
             verdict=INCONCLUSIVE class=DISCOVERY_BINDING \
             --count violations=0
+
+      - name: An uncertain verification is undecided rather than clean
+        run: |
+          for scenario in A2A-LAB-059 A2A-LAB-062 A2A-LAB-063; do
+            out=".dare-agent-security/cycle020-uncertain-$scenario"
+            rm -rf "$out"
+            set +e
+            cargo run -p dare-agent-security -- validate a2a               --scenario "$scenario"               --mode simulated               --output-dir "$out"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $scenario, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py               "$out/a2a-result.json"               verdict=INCONCLUSIVE               --count violations=0
+          done
+
+      - name: An identity nobody approved is a finding, not a gap
+        run: |
+          for scenario in A2A-LAB-060 A2A-LAB-061; do
+            out=".dare-agent-security/cycle020-identity-$scenario"
+            rm -rf "$out"
+            set +e
+            cargo run -p dare-agent-security -- validate a2a               --scenario "$scenario"               --mode simulated               --output-dir "$out"
+            code=$?
+            set -e
+            if [ "$code" -ne 2 ]; then
+              echo "expected exit 2 for $scenario, got $code"
+              exit 1
+            fi
+            python scripts/assert-json.py               "$out/a2a-result.json"               verdict=FAIL               primary_invariant=PEER_IDENTITY_BOUND               property_id=AGENT.A2A.PEER_IDENTITY_BINDING
+          done
 
       - name: One exchange crossing three boundaries reports three
         run: |

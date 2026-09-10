@@ -422,7 +422,7 @@ fn peer_identity(observations: &ObservationSet) -> Vec<A2aViolation> {
     for observation in &observations.observations {
         match observation {
             A2aObservation::PeerIdentityContext(context) => {
-                if context.audience_matches_policy == Some(false) {
+                if context.audience_binding.is_concrete_failure() {
                     violations.push(
                         A2aViolation::new(
                             A2aInvariant::PeerIdentityBound,
@@ -437,7 +437,7 @@ fn peer_identity(observations: &ObservationSet) -> Vec<A2aViolation> {
                         .for_peer(&context.peer_id),
                     );
                 }
-                if context.provider_matches_policy == Some(false) {
+                if context.provider_binding.is_concrete_failure() {
                     violations.push(
                         A2aViolation::new(
                             A2aInvariant::PeerIdentityBound,
@@ -445,6 +445,43 @@ fn peer_identity(observations: &ObservationSet) -> Vec<A2aViolation> {
                                 "the observed provider for `{}` is not the one the policy \
                                  expected",
                                 context.peer_id
+                            ),
+                            &[observation],
+                        )
+                        .for_peer(&context.peer_id),
+                    );
+                }
+                // The identity question this invariant exists for: a peer
+                // naming its own logical agent is a claim, and a claim that
+                // differs from what policy approved is a substitution.
+                if context.logical_agent_binding.is_concrete_failure() {
+                    violations.push(
+                        A2aViolation::new(
+                            A2aInvariant::PeerIdentityBound,
+                            format!(
+                                "`{}` presented itself as logical agent `{}`, which is not \
+                                 the agent local policy approved for that role",
+                                context.peer_id, context.logical_agent_id
+                            ),
+                            &[observation],
+                        )
+                        .for_peer(&context.peer_id),
+                    );
+                }
+                // Service identity standing in for delegated identity. Only
+                // reported where policy said this peer must act for somebody:
+                // legitimate service-to-service authentication carries no
+                // delegated subject and is not a finding.
+                if context.delegated_identity_substituted() {
+                    violations.push(
+                        A2aViolation::new(
+                            A2aInvariant::PeerIdentityBound,
+                            format!(
+                                "authentication for `{}` established the service principal \
+                                 `{}` where policy requires a delegated subject; a service \
+                                 account that authenticated is not the user it acts for",
+                                context.peer_id,
+                                context.authorization_subject.as_deref().unwrap_or("(none)")
                             ),
                             &[observation],
                         )
@@ -549,6 +586,27 @@ fn security_requirement(observations: &ObservationSet) -> Vec<A2aViolation> {
                         "message `{}` authenticated with a scheme kind the policy does not \
                          approve for `{}`",
                         context.message_id, context.peer_id
+                    ),
+                    &[observation],
+                )
+                .for_message(&context.message_id),
+            );
+        }
+        // A verification tied to the mechanism used and found invalid is a
+        // concrete failure, not a gap. An unconcluded or absent one is a gap,
+        // handled by the coverage contract rather than reported as a finding.
+        if context
+            .verification_status
+            .is_some_and(VerificationStatus::is_concrete_failure)
+        {
+            violations.push(
+                A2aViolation::new(
+                    A2aInvariant::SecurityRequirementSatisfied,
+                    format!(
+                        "the verification recorded for the scheme `{}` used by message `{}` \
+                         was performed and found invalid",
+                        context.scheme_used.as_deref().unwrap_or("(none)"),
+                        context.message_id
                     ),
                     &[observation],
                 )
