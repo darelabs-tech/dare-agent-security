@@ -189,3 +189,279 @@ fn an_undecided_invariant_cannot_be_masked_by_a_passing_one() {
     let aggregate = crate::invariant::aggregate(&outcomes);
     assert_ne!(aggregate, Verdict::Pass, "an undecided invariant passed");
 }
+
+// ---------------------------------------------------------------------------
+// I02 - the identity dimensions
+// ---------------------------------------------------------------------------
+
+/// A bundle whose observed peer has been edited.
+fn with_peer(edit: impl Fn(&mut crate::peer::PeerIdentity)) -> A2aEvidence {
+    let mut bundle = evidence();
+    for peer in &mut bundle.peers.peers {
+        edit(peer);
+    }
+    bundle
+}
+
+/// A bundle whose approved-peer policy entry has been edited.
+fn with_approved_peer(edit: impl Fn(&mut crate::policy::ApprovedPeer)) -> A2aEvidence {
+    let mut bundle = evidence();
+    let mut approved: Vec<crate::policy::ApprovedPeer> =
+        bundle.policy.approved_peers.iter().cloned().collect();
+    for entry in &mut approved {
+        edit(entry);
+    }
+    bundle.policy.approved_peers = approved.into_iter().collect();
+    bundle
+}
+
+#[test]
+fn an_expected_audience_that_was_never_observed_leaves_identity_undecided() {
+    // Policy pinned an audience and the evidence carried none. Absence is not
+    // agreement, and the old `Option<bool>` could not tell the two apart.
+    let bundle = with_peer(|peer| peer.audience = None);
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Inconclusive, "{}", outcome.reason);
+}
+
+#[test]
+fn an_audience_that_differs_from_the_expected_one_fails() {
+    let bundle = with_peer(|peer| peer.audience = Some("another-orchestrator".to_owned()));
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Fail, "{}", outcome.reason);
+}
+
+#[test]
+fn an_expected_provider_that_was_never_observed_leaves_identity_undecided() {
+    let bundle = with_peer(|peer| peer.card_provider = None);
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Inconclusive, "{}", outcome.reason);
+}
+
+#[test]
+fn a_provider_that_differs_from_the_expected_one_fails() {
+    let bundle = with_peer(|peer| peer.card_provider = Some("attacker".to_owned()));
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Fail, "{}", outcome.reason);
+}
+
+#[test]
+fn a_logical_agent_policy_never_approved_cannot_bind() {
+    // The peer said which agent it is and nothing local agreed. "The peer said
+    // it is X" is not "X is who we approved for this role".
+    let bundle = with_approved_peer(|approved| approved.expected_logical_agent = None);
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Inconclusive, "{}", outcome.reason);
+}
+
+#[test]
+fn a_logical_agent_that_differs_from_the_approved_one_fails() {
+    let bundle = with_approved_peer(|approved| {
+        approved.expected_logical_agent = Some("billing-agent".to_owned());
+    });
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Fail, "{}", outcome.reason);
+    assert!(outcome
+        .violations
+        .iter()
+        .any(|violation| violation.reason.contains("logical agent")));
+}
+
+#[test]
+fn a_service_principal_is_not_a_finding_where_no_delegated_identity_is_expected() {
+    // Legitimate service-to-service. A rule that failed every service principal
+    // would break `client_credentials` deployments that never carry a user, so
+    // this must stay passable.
+    let mut bundle = with_approved_peer(|approved| approved.requires_delegated_identity = false);
+    for peer in &mut bundle.peers.peers {
+        peer.delegated_subject = None;
+    }
+    for record in &mut bundle.peer_authentication {
+        record.delegated_subject = None;
+    }
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(
+        outcome.verdict,
+        Verdict::Pass,
+        "a legitimate service-to-service authentication was failed: {}",
+        outcome.reason
+    );
+}
+
+#[test]
+fn a_service_principal_standing_in_for_a_required_delegated_identity_fails() {
+    // Policy said this peer acts *for* somebody and only the service account
+    // was established. That is the substitution, not a gap.
+    let mut bundle = evidence();
+    for peer in &mut bundle.peers.peers {
+        peer.delegated_subject = None;
+    }
+    for record in &mut bundle.peer_authentication {
+        record.delegated_subject = None;
+    }
+    let outcome = outcome(A2aInvariant::PeerIdentityBound, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Fail, "{}", outcome.reason);
+    assert!(outcome
+        .violations
+        .iter()
+        .any(|violation| violation.reason.contains("delegated subject")));
+}
+
+#[test]
+fn an_undecided_identity_is_not_rescued_by_the_other_thirteen() {
+    // Aggregation, from the I02 side.
+    let bundle = with_peer(|peer| peer.audience = None);
+    let outcomes = crate::invariant::evaluate_all(&project(&bundle));
+    assert_ne!(
+        crate::invariant::aggregate(&outcomes),
+        Verdict::Pass,
+        "an undecided identity binding aggregated to PASS"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// I04 - the mechanism actually used
+// ---------------------------------------------------------------------------
+
+#[test]
+fn a_scheme_with_no_verification_at_all_leaves_the_requirement_undecided() {
+    let mut bundle = evidence();
+    bundle.peer_authentication.clear();
+    let outcome = outcome(A2aInvariant::SecurityRequirementSatisfied, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Inconclusive, "{}", outcome.reason);
+}
+
+#[test]
+fn a_scheme_kind_policy_does_not_approve_fails() {
+    let bundle = with_approved_peer(|approved| {
+        approved.approved_scheme_kinds =
+            std::collections::BTreeSet::from([crate::source::SecuritySchemeKind::ApiKey]);
+    });
+    let outcome = outcome(A2aInvariant::SecurityRequirementSatisfied, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Fail, "{}", outcome.reason);
+}
+
+#[test]
+fn a_scheme_the_card_merely_declares_is_not_a_satisfied_requirement() {
+    // The card declares `oauth-main` and the exchange named it. Without a
+    // verification tied to it, that is a declaration and nothing more.
+    let mut bundle = evidence();
+    for record in &mut bundle.peer_authentication {
+        record.scheme_id = None;
+    }
+    let outcome = outcome(A2aInvariant::SecurityRequirementSatisfied, &bundle);
+    assert_ne!(
+        outcome.verdict,
+        Verdict::Pass,
+        "a declared scheme satisfied a requirement: {}",
+        outcome.reason
+    );
+}
+
+#[test]
+fn a_valid_verification_for_another_peer_never_satisfies_this_requirement() {
+    // The verification is real, valid, and about somebody else.
+    let mut bundle = evidence();
+    let mut elsewhere = bundle.peer_authentication[0].clone();
+    elsewhere.peer_id = "reviewer".to_owned();
+    elsewhere.status = VerificationStatus::Valid;
+    let mut other = bundle.peers.peers[0].clone();
+    other.peer_id = "reviewer".to_owned();
+    other.logical_agent_id = "reviewer".to_owned();
+    bundle.peer_authentication.clear();
+    bundle.peer_authentication.push(elsewhere);
+    bundle.peers.peers.push(other);
+
+    let outcome = outcome(A2aInvariant::SecurityRequirementSatisfied, &bundle);
+    assert_ne!(
+        outcome.verdict,
+        Verdict::Pass,
+        "another peer verification satisfied this requirement: {}",
+        outcome.reason
+    );
+}
+
+#[test]
+fn a_bound_verification_found_invalid_is_a_concrete_failure() {
+    let bundle = with_peer_status(VerificationStatus::Invalid);
+    let outcome = outcome(A2aInvariant::SecurityRequirementSatisfied, &bundle);
+    assert_eq!(outcome.verdict, Verdict::Fail, "{}", outcome.reason);
+}
+
+// ---------------------------------------------------------------------------
+// The global rule, walked mechanically
+// ---------------------------------------------------------------------------
+
+#[test]
+fn no_uncertain_verification_produces_a_pass_in_any_of_the_three() {
+    // The systemic rule. Driven through the whole invariant rather than the
+    // status predicate, because the predicate was never the thing that broke.
+    for status in VerificationStatus::all() {
+        if status.may_satisfy_positive_evidence() {
+            continue;
+        }
+        for (invariant, bundle) in [
+            (A2aInvariant::PeerIdentityBound, with_peer_status(status)),
+            (
+                A2aInvariant::MessageAuthenticityEstablished,
+                with_message_status(status),
+            ),
+            (
+                A2aInvariant::SecurityRequirementSatisfied,
+                with_peer_status(status),
+            ),
+        ] {
+            let outcome = outcome(invariant, &bundle);
+            assert_ne!(
+                outcome.verdict,
+                Verdict::Pass,
+                "{} passed on {}: {}",
+                invariant.as_str(),
+                status.as_str(),
+                outcome.reason
+            );
+        }
+    }
+}
+
+#[test]
+fn only_matches_proves_a_required_binding_and_unproven_never_does() {
+    // The type that replaced `Option<bool>`, walked exhaustively so a variant
+    // added later cannot default to permitted.
+    use crate::source::BindingCheck;
+    for check in BindingCheck::all() {
+        assert_eq!(
+            check.is_proven(),
+            check == BindingCheck::Matches,
+            "{}",
+            check.as_str()
+        );
+        assert_eq!(
+            check.may_satisfy_positive_evidence(),
+            matches!(check, BindingCheck::Matches | BindingCheck::NotExpected),
+            "{}",
+            check.as_str()
+        );
+        assert_eq!(
+            check.is_concrete_failure(),
+            check == BindingCheck::Differs,
+            "{}",
+            check.as_str()
+        );
+    }
+}
+
+#[test]
+fn a_concrete_failure_still_outranks_an_undecided_invariant() {
+    // FAIL precedence, with I03 undecided and a skill violation in one bundle.
+    let mut bundle = with_message_status(VerificationStatus::Indeterminate);
+    for exchange in &mut bundle.exchanges.exchanges {
+        exchange.initiating_principal = Some("user-mallory".to_owned());
+    }
+    let outcomes = crate::invariant::evaluate_all(&project(&bundle));
+    assert_eq!(
+        crate::invariant::aggregate(&outcomes),
+        Verdict::Fail,
+        "a concrete failure was hidden behind a gap"
+    );
+}
