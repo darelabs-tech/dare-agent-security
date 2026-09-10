@@ -38,6 +38,13 @@ use crate::source::{DataSensitivity, SecuritySchemeKind, TransportKind};
 #[serde(deny_unknown_fields)]
 pub struct ApprovedPeer {
     pub peer_id: String,
+    /// The logical agent the deployment approved for this peer.
+    ///
+    /// Required before I02 may report a positive binding. A peer naming its own
+    /// logical agent proves nothing: "the peer said it is X" is not "X is who
+    /// we approved for this role".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expected_logical_agent: Option<String>,
     /// The provider the deployment expects the card to name.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expected_provider: Option<String>,
@@ -57,6 +64,15 @@ pub struct ApprovedPeer {
     /// Signer key ids the deployment approved for this peer's card.
     #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
     pub approved_signers: BTreeSet<String>,
+    /// Whether an authentication for this peer must establish a delegated
+    /// subject rather than only a service principal.
+    ///
+    /// Defaults to `false` so legitimate service-to-service authentication is
+    /// not failed for lacking a user it was never meant to carry. Set it where
+    /// the deployment expects the peer to act *for* somebody, and a service
+    /// principal can no longer quietly stand in for that somebody.
+    #[serde(default)]
+    pub requires_delegated_identity: bool,
 }
 
 impl ApprovedPeer {
@@ -70,6 +86,9 @@ impl ApprovedPeer {
         }
         if let Some(audience) = &self.expected_audience {
             assert_safe_identifier(audience, "an expected audience")?;
+        }
+        if let Some(agent) = &self.expected_logical_agent {
+            assert_safe_identifier(agent, "an expected logical agent")?;
         }
         for signer in &self.approved_signers {
             assert_safe_identifier(signer, "an approved signer")?;
@@ -404,6 +423,7 @@ pub(crate) mod tests {
             policy_id: Some("policy-1".to_owned()),
             approved_peers: BTreeSet::from([ApprovedPeer {
                 peer_id: "planner".to_owned(),
+                expected_logical_agent: Some("planner".to_owned()),
                 expected_provider: Some("acme".to_owned()),
                 expected_card_digest: None,
                 expected_audience: Some("local-orchestrator".to_owned()),
@@ -412,6 +432,7 @@ pub(crate) mod tests {
                     SecuritySchemeKind::OAuth2AuthorizationCode,
                 ]),
                 approved_signers: BTreeSet::from(["key-1".to_owned()]),
+                requires_delegated_identity: true,
             }]),
             skill_grants: BTreeSet::from([SkillGrant {
                 peer_id: "planner".to_owned(),

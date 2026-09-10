@@ -33,7 +33,8 @@ use crate::protocol::{self, ProtocolAssessment};
 use crate::push_notification::{self, PushNotificationAssessment};
 use crate::replay::{self, ReplayAssessment};
 use crate::source::{
-    EvidenceSource, HarnessErrorKind, MessageRole, SecuritySchemeKind, VerificationStatus,
+    BindingCheck, EvidenceSource, HarnessErrorKind, IdentityKind, MessageRole, SecuritySchemeKind,
+    VerificationStatus,
 };
 use crate::tenant::{self, TenantAssessment};
 
@@ -140,12 +141,45 @@ pub struct PeerIdentityContext {
     pub logical_agent_id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub authorization_subject: Option<String>,
+    /// Which kind of identity the authorization subject came from.
+    ///
+    /// Carried separately because substituting one for another is the failure:
+    /// a service account that authenticated is not the user it claims to act
+    /// for.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authorization_subject_kind: Option<IdentityKind>,
     pub is_authenticated: bool,
+    /// Whether the observed logical agent is the one policy approved.
+    pub logical_agent_binding: BindingCheck,
     /// Whether the authenticated audience is the one policy expected.
-    pub audience_matches_policy: Option<bool>,
+    pub audience_binding: BindingCheck,
     /// Whether the observed provider matches what policy expected.
-    pub provider_matches_policy: Option<bool>,
+    pub provider_binding: BindingCheck,
+    /// Whether policy requires this peer to establish a delegated subject.
+    pub requires_delegated_identity: bool,
     pub evidence_source: EvidenceSource,
+}
+
+impl PeerIdentityContext {
+    /// Whether a service principal stood in for a delegated identity policy
+    /// required.
+    ///
+    /// Concrete rather than merely unproven: an authentication established a
+    /// principal, and it was not the delegated subject the deployment said this
+    /// peer must act for.
+    pub fn delegated_identity_substituted(&self) -> bool {
+        self.requires_delegated_identity
+            && self.authorization_subject_kind == Some(IdentityKind::AuthenticatedPrincipal)
+    }
+
+    /// Whether every identity dimension this peer needs is established.
+    pub fn binding_established(&self) -> bool {
+        self.logical_agent_binding.is_proven()
+            && self.audience_binding.may_satisfy_positive_evidence()
+            && self.provider_binding.may_satisfy_positive_evidence()
+            && (!self.requires_delegated_identity
+                || self.authorization_subject_kind == Some(IdentityKind::DelegatedSubject))
+    }
 }
 
 /// What a verifier recorded about a peer's authentication.
@@ -429,13 +463,22 @@ pub fn project(evidence: &A2aEvidence) -> ObservationSet {
             peer_id: peer.peer_id.clone(),
             logical_agent_id: peer.logical_agent_id.clone(),
             authorization_subject: peer.authorization_subject().map(ToOwned::to_owned),
+            authorization_subject_kind: peer.authorization_subject_kind(),
             is_authenticated: peer.is_authenticated(),
-            audience_matches_policy: peer.audience_matches(
+            logical_agent_binding: BindingCheck::compare(
+                Some(peer.logical_agent_id.as_str()),
+                approved.and_then(|approved| approved.expected_logical_agent.as_deref()),
+            ),
+            audience_binding: BindingCheck::compare(
+                peer.audience.as_deref(),
                 approved.and_then(|approved| approved.expected_audience.as_deref()),
             ),
-            provider_matches_policy: peer.provider_matches(
+            provider_binding: BindingCheck::compare(
+                peer.card_provider.as_deref(),
                 approved.and_then(|approved| approved.expected_provider.as_deref()),
             ),
+            requires_delegated_identity: approved
+                .is_some_and(|approved| approved.requires_delegated_identity),
             evidence_source: peer.evidence_source,
         }));
 

@@ -256,12 +256,14 @@ mod tests {
         elsewhere.approved_peers =
             std::collections::BTreeSet::from([crate::policy::ApprovedPeer {
                 peer_id: "some-other-agent".to_owned(),
+                expected_logical_agent: None,
                 expected_provider: None,
                 expected_card_digest: None,
                 expected_audience: None,
                 approved_interfaces: Default::default(),
                 approved_scheme_kinds: Default::default(),
                 approved_signers: Default::default(),
+                requires_delegated_identity: false,
             }]);
 
         let mut ledger = AdmissionLedger::new();

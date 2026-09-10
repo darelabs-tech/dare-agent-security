@@ -124,6 +124,82 @@ impl VerificationStatus {
     }
 }
 
+/// Whether one identity dimension bound to what local policy approved.
+///
+/// Four answers, because `Option<bool>` only had three and the missing one is
+/// exactly where a false `PASS` gets in: "policy named no expectation" and
+/// "policy expected a value the evidence never carried" both arrived as `None`,
+/// and treating the second as the first is absence read as agreement.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum BindingCheck {
+    /// Local policy pinned nothing for this dimension.
+    NotExpected,
+    /// Policy pinned a value and the evidence did not carry one to compare.
+    Unproven,
+    /// Compared and equal.
+    Matches,
+    /// Compared and different.
+    Differs,
+}
+
+impl BindingCheck {
+    /// Compare an observed value with what policy pinned.
+    pub fn compare(observed: Option<&str>, expected: Option<&str>) -> Self {
+        match (observed, expected) {
+            (_, None) => Self::NotExpected,
+            (None, Some(_)) => Self::Unproven,
+            (Some(observed), Some(expected)) => {
+                if observed == expected {
+                    Self::Matches
+                } else {
+                    Self::Differs
+                }
+            }
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::NotExpected => "NOT_EXPECTED",
+            Self::Unproven => "UNPROVEN",
+            Self::Matches => "MATCHES",
+            Self::Differs => "DIFFERS",
+        }
+    }
+
+    pub fn all() -> [Self; 4] {
+        [
+            Self::NotExpected,
+            Self::Unproven,
+            Self::Matches,
+            Self::Differs,
+        ]
+    }
+
+    /// Whether an **optional** dimension may contribute to a positive result.
+    ///
+    /// `NotExpected` may: a policy that pinned nothing has nothing to
+    /// contradict. `Unproven` may not, which is the whole point of the type.
+    pub fn may_satisfy_positive_evidence(self) -> bool {
+        matches!(self, Self::Matches | Self::NotExpected)
+    }
+
+    /// Whether a **required** dimension was actually established.
+    ///
+    /// Stricter than [`Self::may_satisfy_positive_evidence`]: for a binding the
+    /// DESIGN requires, a policy that pinned nothing leaves the question
+    /// unanswered rather than agreed.
+    pub fn is_proven(self) -> bool {
+        matches!(self, Self::Matches)
+    }
+
+    /// Whether this is concrete evidence of a substitution.
+    pub fn is_concrete_failure(self) -> bool {
+        matches!(self, Self::Differs)
+    }
+}
+
 /// The kind of identity a claim names.
 ///
 /// Kept apart because substituting one for another is the failure. A service

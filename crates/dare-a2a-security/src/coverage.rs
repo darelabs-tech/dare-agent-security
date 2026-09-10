@@ -164,10 +164,28 @@ fn comparison_reason(
                     || context.provider_matches_policy.is_some()
                     || context.signer_approved.is_some())
         }),
-        I::PeerIdentityBound => any(&|observation| {
-            matches!(observation, O::PeerAuthenticationContext(context)
-                if context.status.is_recorded_evidence())
-        }),
+        // Two questions, and the old contract asked only the first.
+        // `is_recorded_evidence` answers "was it checked?", which is true of an
+        // INDETERMINATE result; positive binding needs "did it pass?", and then
+        // needs the authenticated party to be the one policy approved for the
+        // role. Every peer must bind: one proven peer does not vouch for a
+        // second the run never established.
+        I::PeerIdentityBound => {
+            let authenticated = observations.observations.iter().any(|observation| {
+                matches!(observation, O::PeerAuthenticationContext(context)
+                    if context.status.may_satisfy_positive_evidence())
+            });
+            let every_peer_bound = observations.observations.iter().all(|observation| {
+                match observation {
+                    O::PeerIdentityContext(context) => context.binding_established(),
+                    O::PeerAuthenticationContext(context) => {
+                        context.status.may_satisfy_positive_evidence()
+                    }
+                    _ => true,
+                }
+            });
+            authenticated && every_peer_bound
+        }
         // Two facts, not one. `covers_observed_envelope` says a comparison was
         // made; the status says what the verifier concluded. A signature that
         // covers this envelope under a verification that could not conclude

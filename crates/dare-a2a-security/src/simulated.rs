@@ -524,6 +524,7 @@ fn base_policy() -> A2aPolicy {
         policy_id: Some("staged-policy".to_owned()),
         approved_peers: BTreeSet::from([ApprovedPeer {
             peer_id: "planner".to_owned(),
+            expected_logical_agent: Some("planner".to_owned()),
             expected_provider: Some("acme".to_owned()),
             expected_card_digest: None,
             expected_audience: Some("local-orchestrator".to_owned()),
@@ -533,6 +534,7 @@ fn base_policy() -> A2aPolicy {
             ]),
             approved_scheme_kinds: BTreeSet::from([SecuritySchemeKind::OAuth2AuthorizationCode]),
             approved_signers: BTreeSet::from(["key-1".to_owned()]),
+            requires_delegated_identity: true,
         }]),
         skill_grants: BTreeSet::from([SkillGrant {
             peer_id: "planner".to_owned(),
