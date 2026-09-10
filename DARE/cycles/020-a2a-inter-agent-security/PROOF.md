@@ -22,7 +22,7 @@ three citations naming tests that did not exist, Cycle 018 two more, and Cycle
 | Reference behaviours | 37 |
 | Observation channels | 17 |
 | Cycle 020 tests | **390** |
-| Workspace tests | **3733**, zero failures |
+| Workspace tests | **3734**, zero failures |
 
 `the_registry_holds_exactly_the_fourteen_approved_invariants` fails if the
 invariant count moves. `the_fourteen_evaluators_are_all_reachable` fails if one

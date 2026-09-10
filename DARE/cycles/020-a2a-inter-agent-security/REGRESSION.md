@@ -232,6 +232,87 @@ No code changed. The expectation did.
 
 ---
 
+## 10. The workspace gate passed here and failed on CI's newer clippy
+
+`cargo clippy --workspace --all-targets -- -D warnings` was clean locally on
+clippy 0.1.94 and failed the `Rust workspace` job on the stable toolchain CI
+installs (1.98), which flags a shape the older lint let through:
+
+```text
+error: this `if` can be collapsed into the outer `match`
+  --> crates/dare-a2a-security/src/invariant.rs:456:17
+```
+
+`peer_identity` matched `A2aObservation::PeerAuthenticationContext(context)` and
+then tested `context.status.is_concrete_failure()` inside the arm. It is now a
+match guard, with the non-failing case falling through to the wildcard that
+already followed it. Because that arm sits immediately before `_ => {}`, the
+guard changes the outcome for no observation: an authentication that was not
+checked and found invalid raised no violation before and raises none now.
+
+The correction had been written into the working tree but never committed, so
+the head CI actually tested still carried the failure. A local gate is only as
+strong as the toolchain that runs it.
+
+Evidence: `cargo clippy --workspace --all-targets -- -D warnings` clean;
+`cargo test -p dare-a2a-security --lib` 300 passed.
+
+---
+
+## 11. A lab trace file could be read while it was empty
+
+`cargo test --workspace` failed in `dare-agent-security --test e2e_matrix`:
+
+```text
+stdio_current_protocol_trace_is_subset_of_allowlist
+expected SYNTHETIC_MCP_TRACE_PATH dump at ...
+```
+
+Measured rather than assumed: 1 of 10 full-binary runs failed, several passing
+runs burned the reader's entire five-second retry budget, and the test passed
+every time under `--test-threads=1`. The dump left behind by a failing run was
+zero bytes.
+
+The cause is in `labs/synthetic-mcp/src/trace.rs` -- Cycle 002 code this cycle
+never touched. `write_trace_file` opened the dump with `truncate(true)` and then
+wrote it, so the file existed and was empty for the width of that window. The
+discovery adapter sets `kill_on_drop(true)` on the lab process, and a kill
+landing inside that window left a permanently empty dump. That is why no amount
+of reader retrying recovered it, and why the earlier correction -- widening the
+retry budget -- had not fixed it.
+
+The write is now atomic: the body goes to a per-process, per-write sibling file
+that is renamed over the target, so the dump is either absent or one complete
+snapshot. A first hypothesis -- that same-nanosecond paths collided between
+parallel tests -- was tested and falsified before this one was adopted.
+
+Regression: `trace::tests::a_reader_never_observes_a_partial_trace_file` rewrites
+the dump on one thread while another reads it, and holds that a successful read
+never returns empty or partial JSON. Restoring the truncate-in-place write makes
+it fail with `reader observed an empty trace file`; with the fix it passes,
+`synthetic-mcp --lib` is 8 passed, and `e2e_matrix` went 15 runs for 15 with no
+zero-byte dump left behind.
+
+This is a test-harness durability fix. It touches no invariant, property id,
+verdict semantics or the offline boundary.
+
+---
+
+## 12. The canvas outlived its cycle, for the third time
+
+`DARE/.canvas.md` still described Cycle 019 at 53/53 while Cycle 020 ran. The
+generator's own docstring records the same drift twice before, which is the
+signal that regenerating by hand is not a control.
+
+It is regenerated for Cycle 020 (57/57) and `scripts/regen-canvas.py` grew a
+`--check` mode, wired into the docs gate. `--check` compares everything except
+the `**Updated:**` stamp, which changes on every run: regenerating and then
+running `git diff --exit-code` would have failed on every CI run whether or not
+the canvas had drifted. Verified both ways -- a stale timestamp alone passes, a
+changed task row fails with a message naming the fix.
+
+---
+
 ## What did not need correcting
 
 The fourteen invariants, their semantics and their design ids. The sixteen
