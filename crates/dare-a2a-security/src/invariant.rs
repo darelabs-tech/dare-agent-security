@@ -592,6 +592,27 @@ fn security_requirement(observations: &ObservationSet) -> Vec<A2aViolation> {
                 .for_message(&context.message_id),
             );
         }
+        // A verification tied to the mechanism used and found invalid is a
+        // concrete failure, not a gap. An unconcluded or absent one is a gap,
+        // handled by the coverage contract rather than reported as a finding.
+        if context
+            .verification_status
+            .is_some_and(VerificationStatus::is_concrete_failure)
+        {
+            violations.push(
+                A2aViolation::new(
+                    A2aInvariant::SecurityRequirementSatisfied,
+                    format!(
+                        "the verification recorded for the scheme `{}` used by message `{}` \
+                         was performed and found invalid",
+                        context.scheme_used.as_deref().unwrap_or("(none)"),
+                        context.message_id
+                    ),
+                    &[observation],
+                )
+                .for_message(&context.message_id),
+            );
+        }
     }
     violations
 }

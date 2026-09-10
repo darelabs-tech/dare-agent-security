@@ -196,10 +196,13 @@ fn comparison_reason(
                 if context.status.may_satisfy_positive_evidence()
                     && context.covers_observed_envelope == Some(true))
         }),
+        // Declaring a scheme is not satisfying it. The old contract accepted
+        // either comparison merely having been *made*, so a card that requires
+        // OAuth and an exchange that named OAuth satisfied coverage with no
+        // verification behind them at all.
         I::SecurityRequirementSatisfied => any(&|observation| {
             matches!(observation, O::SecurityRequirementContext(context)
-                if context.satisfies_card_requirement.is_some()
-                    || context.kind_approved_by_policy.is_some())
+                if context.requirement_established())
         }),
         I::SkillAuthorized => any(&|observation| {
             matches!(observation, O::SkillAuthorizationContext(assessment)

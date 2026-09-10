@@ -239,6 +239,30 @@ pub struct SecurityRequirementContext {
     pub satisfies_card_requirement: Option<bool>,
     /// Whether the scheme kind is one policy approved for this peer.
     pub kind_approved_by_policy: Option<bool>,
+    /// What a verifier concluded about *the mechanism this exchange used*.
+    ///
+    /// `None` when no recorded verification could be tied to that mechanism —
+    /// including when a verification exists for a different scheme. Finding
+    /// *a* valid record is not finding the one that covers what was used.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verification_status: Option<VerificationStatus>,
+}
+
+impl SecurityRequirementContext {
+    /// Whether the mechanism used was approved *and* shown to have been
+    /// satisfied.
+    ///
+    /// All four facts, because the first three are declarations: a card that
+    /// requires a scheme, a policy that permits its kind and an exchange that
+    /// named it still do not say the mechanism was ever satisfied.
+    pub fn requirement_established(&self) -> bool {
+        self.scheme_used.is_some()
+            && self.satisfies_card_requirement == Some(true)
+            && self.kind_approved_by_policy == Some(true)
+            && self
+                .verification_status
+                .is_some_and(VerificationStatus::may_satisfy_positive_evidence)
+    }
 }
 
 /// Whether peer content reached an authority position.
@@ -549,6 +573,14 @@ pub fn project(evidence: &A2aEvidence) -> ObservationSet {
                 _ => None,
             };
 
+            // Bound by scheme id, not by peer alone. A valid verification for
+            // some other mechanism this peer also offers says nothing about the
+            // one the exchange actually used.
+            let verification_status = evidence
+                .authentication_for(&exchange.peer_id)
+                .filter(|authentication| authentication.scheme_id.as_deref() == scheme_used)
+                .map(|authentication| authentication.status);
+
             observations.push(A2aObservation::SecurityRequirementContext(
                 SecurityRequirementContext {
                     message_id: exchange.message_id.clone(),
@@ -556,6 +588,7 @@ pub fn project(evidence: &A2aEvidence) -> ObservationSet {
                     scheme_used: exchange.security_scheme_used.clone(),
                     satisfies_card_requirement,
                     kind_approved_by_policy,
+                    verification_status,
                 },
             ));
         }
