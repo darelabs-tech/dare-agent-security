@@ -175,15 +175,17 @@ fn comparison_reason(
                 matches!(observation, O::PeerAuthenticationContext(context)
                     if context.status.may_satisfy_positive_evidence())
             });
-            let every_peer_bound = observations.observations.iter().all(|observation| {
-                match observation {
-                    O::PeerIdentityContext(context) => context.binding_established(),
-                    O::PeerAuthenticationContext(context) => {
-                        context.status.may_satisfy_positive_evidence()
-                    }
-                    _ => true,
-                }
-            });
+            let every_peer_bound =
+                observations
+                    .observations
+                    .iter()
+                    .all(|observation| match observation {
+                        O::PeerIdentityContext(context) => context.binding_established(),
+                        O::PeerAuthenticationContext(context) => {
+                            context.status.may_satisfy_positive_evidence()
+                        }
+                        _ => true,
+                    });
             authenticated && every_peer_bound
         }
         // Two facts, not one. `covers_observed_envelope` says a comparison was

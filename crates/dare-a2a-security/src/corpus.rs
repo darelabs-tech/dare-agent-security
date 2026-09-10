@@ -101,7 +101,10 @@ behavior_entry!(security_scheme_unsatisfied, SecuritySchemeUnsatisfied);
 behavior_entry!(skill_not_authorized, SkillNotAuthorized);
 behavior_entry!(message_signature_invalid, MessageSignatureInvalid);
 behavior_entry!(message_signature_missing, MessageSignatureMissing);
-behavior_entry!(message_signature_indeterminate, MessageSignatureIndeterminate);
+behavior_entry!(
+    message_signature_indeterminate,
+    MessageSignatureIndeterminate
+);
 behavior_entry!(peer_content_as_instruction, PeerContentTreatedAsInstruction);
 behavior_entry!(task_substituted, TaskSubstituted);
 behavior_entry!(context_substituted, ContextSubstituted);
