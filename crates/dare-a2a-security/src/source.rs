@@ -475,10 +475,15 @@ pub enum ReferenceBehavior {
     AudienceMismatch,
     AuthenticationInvalid,
     AuthenticationUnrecorded,
+    AuthenticationIndeterminate,
+    LogicalAgentSubstituted,
+    DelegatedIdentitySubstituted,
     SecuritySchemeUnsatisfied,
+    SecuritySchemeUnverified,
     SkillNotAuthorized,
     MessageSignatureInvalid,
     MessageSignatureMissing,
+    MessageSignatureIndeterminate,
     PeerContentTreatedAsInstruction,
     TaskSubstituted,
     ContextSubstituted,
@@ -515,7 +520,7 @@ impl ReferenceBehavior {
         matches!(self, Self::Compliant | Self::IdempotencyProven)
     }
 
-    pub fn all() -> [Self; 37] {
+    pub fn all() -> [Self; 42] {
         [
             Self::Compliant,
             Self::CardSubstituted,
@@ -526,10 +531,15 @@ impl ReferenceBehavior {
             Self::AudienceMismatch,
             Self::AuthenticationInvalid,
             Self::AuthenticationUnrecorded,
+            Self::AuthenticationIndeterminate,
+            Self::LogicalAgentSubstituted,
+            Self::DelegatedIdentitySubstituted,
             Self::SecuritySchemeUnsatisfied,
+            Self::SecuritySchemeUnverified,
             Self::SkillNotAuthorized,
             Self::MessageSignatureInvalid,
             Self::MessageSignatureMissing,
+            Self::MessageSignatureIndeterminate,
             Self::PeerContentTreatedAsInstruction,
             Self::TaskSubstituted,
             Self::ContextSubstituted,
@@ -700,7 +710,7 @@ mod tests {
         assert_eq!(classes.len(), 14);
         let behaviors: BTreeSet<ReferenceBehavior> =
             ReferenceBehavior::all().iter().copied().collect();
-        assert_eq!(behaviors.len(), 37);
+        assert_eq!(behaviors.len(), 42);
     }
 
     #[test]

@@ -137,6 +137,36 @@ pub fn stage(behavior: ReferenceBehavior, ledger: &mut AdmissionLedger) -> Resul
             peer.authenticated_principal = None;
             peer.delegated_subject = None;
         }
+        B::AuthenticationIndeterminate => {
+            // A verifier that ran and could not conclude. Distinct from no
+            // verifier at all: the evidence exists and says nothing.
+            if let Some(auth) = peer_auth.as_mut() {
+                auth.status = VerificationStatus::Indeterminate;
+            }
+        }
+        B::LogicalAgentSubstituted => {
+            // The peer names an agent local policy never approved for the role.
+            peer.logical_agent_id = "billing-agent".to_owned();
+        }
+        B::DelegatedIdentitySubstituted => {
+            // Policy requires this peer to act for somebody. Only the service
+            // account was established.
+            peer.delegated_subject = None;
+            if let Some(auth) = peer_auth.as_mut() {
+                auth.delegated_subject = None;
+            }
+        }
+        B::SecuritySchemeUnverified => {
+            // The exchange used the scheme the card requires, and the only
+            // verification on hand covers a different mechanism.
+            // Same kind, different mechanism: the verification on hand covers
+            // the peer's other OAuth scheme, not the one this exchange used.
+            // Switching kind here instead would be refused at admission, since
+            // an API key carries no delegated subject to speak of.
+            if let Some(auth) = peer_auth.as_mut() {
+                auth.scheme_id = Some("oauth-secondary".to_owned());
+            }
+        }
         B::SecuritySchemeUnsatisfied => {
             // The exchange used a scheme the card does not require for the
             // skill it invoked.
@@ -157,6 +187,11 @@ pub fn stage(behavior: ReferenceBehavior, ledger: &mut AdmissionLedger) -> Resul
         }
         B::MessageSignatureInvalid => {
             message_auth_status = VerificationStatus::Invalid;
+        }
+        B::MessageSignatureIndeterminate => {
+            // The signature covers the envelope observed and the verifier could
+            // not conclude. Covering the right message is not being valid.
+            message_auth_status = VerificationStatus::Indeterminate;
         }
         B::MessageSignatureMissing => {
             include_message_auth = false;
