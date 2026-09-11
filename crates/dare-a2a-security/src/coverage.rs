@@ -164,16 +164,18 @@ fn comparison_reason(invariant: A2aInvariant, observations: &ObservationSet) -> 
                     ));
                 }
 
-                let authentication = observations.observations.iter().find_map(|candidate| {
-                    match candidate {
-                        O::PeerAuthenticationContext(authentication)
-                            if authentication.peer_id == identity.peer_id =>
-                        {
-                            Some(authentication)
-                        }
-                        _ => None,
-                    }
-                });
+                let authentication =
+                    observations
+                        .observations
+                        .iter()
+                        .find_map(|candidate| match candidate {
+                            O::PeerAuthenticationContext(authentication)
+                                if authentication.peer_id == identity.peer_id =>
+                            {
+                                Some(authentication)
+                            }
+                            _ => None,
+                        });
 
                 match authentication {
                     Some(authentication)
@@ -202,16 +204,18 @@ fn comparison_reason(invariant: A2aInvariant, observations: &ObservationSet) -> 
                     continue;
                 };
 
-                let authentication = observations.observations.iter().find_map(|candidate| {
-                    match candidate {
-                        O::MessageAuthenticationContext(authentication)
-                            if authentication.message_id == message.message_id =>
-                        {
-                            Some(authentication)
-                        }
-                        _ => None,
-                    }
-                });
+                let authentication =
+                    observations
+                        .observations
+                        .iter()
+                        .find_map(|candidate| match candidate {
+                            O::MessageAuthenticationContext(authentication)
+                                if authentication.message_id == message.message_id =>
+                            {
+                                Some(authentication)
+                            }
+                            _ => None,
+                        });
 
                 match authentication {
                     Some(authentication)
@@ -241,17 +245,19 @@ fn comparison_reason(invariant: A2aInvariant, observations: &ObservationSet) -> 
                     continue;
                 };
 
-                let requirement = observations.observations.iter().find_map(|candidate| {
-                    match candidate {
-                        O::SecurityRequirementContext(requirement)
-                            if requirement.message_id == message.message_id
-                                && requirement.peer_id == message.peer_id =>
-                        {
-                            Some(requirement)
-                        }
-                        _ => None,
-                    }
-                });
+                let requirement =
+                    observations
+                        .observations
+                        .iter()
+                        .find_map(|candidate| match candidate {
+                            O::SecurityRequirementContext(requirement)
+                                if requirement.message_id == message.message_id
+                                    && requirement.peer_id == message.peer_id =>
+                            {
+                                Some(requirement)
+                            }
+                            _ => None,
+                        });
 
                 match requirement {
                     Some(requirement) if requirement.requirement_established() => {}
@@ -479,7 +485,11 @@ mod tests {
         let empty = ObservationSet::default();
         for invariant in A2aInvariant::all() {
             let decision = assess_coverage(invariant, &empty);
-            assert!(!decision.satisfied, "{} passed coverage having observed nothing", invariant.as_str());
+            assert!(
+                !decision.satisfied,
+                "{} passed coverage having observed nothing",
+                invariant.as_str()
+            );
             assert!(!decision.missing.is_empty());
         }
     }
@@ -595,10 +605,8 @@ mod tests {
 
         let decision = assess_coverage(A2aInvariant::MessageAuthenticityEstablished, &observations);
         assert!(!decision.satisfied);
-        let outcome = crate::invariant::evaluate(
-            A2aInvariant::MessageAuthenticityEstablished,
-            &observations,
-        );
+        let outcome =
+            crate::invariant::evaluate(A2aInvariant::MessageAuthenticityEstablished, &observations);
         assert_eq!(outcome.verdict, Verdict::Inconclusive);
     }
 
@@ -621,10 +629,8 @@ mod tests {
 
         let decision = assess_coverage(A2aInvariant::SecurityRequirementSatisfied, &observations);
         assert!(!decision.satisfied);
-        let outcome = crate::invariant::evaluate(
-            A2aInvariant::SecurityRequirementSatisfied,
-            &observations,
-        );
+        let outcome =
+            crate::invariant::evaluate(A2aInvariant::SecurityRequirementSatisfied, &observations);
         assert_eq!(outcome.verdict, Verdict::Inconclusive);
     }
 
@@ -682,7 +688,9 @@ mod tests {
         observations
             .observations
             .push(A2aObservation::DataScopeContext(second));
-        assert!(!assess_coverage(A2aInvariant::DataScopeBoundaryPreserved, &observations).satisfied);
+        assert!(
+            !assess_coverage(A2aInvariant::DataScopeBoundaryPreserved, &observations).satisfied
+        );
     }
 
     #[test]
@@ -702,11 +710,13 @@ mod tests {
         observations
             .observations
             .push(A2aObservation::ProtocolContext(second));
-        assert!(!assess_coverage(
-            A2aInvariant::ProtocolNegotiationIntegrityPreserved,
-            &observations,
-        )
-        .satisfied);
+        assert!(
+            !assess_coverage(
+                A2aInvariant::ProtocolNegotiationIntegrityPreserved,
+                &observations,
+            )
+            .satisfied
+        );
     }
 
     #[test]
@@ -724,7 +734,10 @@ mod tests {
             },
         )]);
 
-        let decision = assess_coverage(A2aInvariant::PushNotificationBoundaryPreserved, &observations);
+        let decision = assess_coverage(
+            A2aInvariant::PushNotificationBoundaryPreserved,
+            &observations,
+        );
         assert!(!decision.satisfied);
         let outcome = crate::invariant::evaluate(
             A2aInvariant::PushNotificationBoundaryPreserved,
