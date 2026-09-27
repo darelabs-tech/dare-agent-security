@@ -106,6 +106,10 @@ pub enum MultiTurnError {
     #[error("transcript for conversation `{conversation}` was altered at turn {index}")]
     TranscriptTampered { conversation: String, index: u32 },
 
+    /// The run departed from the approved strategy graph (I08). Always ERROR.
+    #[error("strategy fault: {0}")]
+    StrategyFault(String),
+
     /// A persisted artifact would cross the run-wide output budget.
     #[error("output budget exhausted: {0}")]
     OutputBudgetExceeded(String),
@@ -125,7 +129,10 @@ impl MultiTurnError {
     pub fn is_refusal(&self) -> bool {
         !matches!(
             self,
-            Self::OutputBudgetExceeded(_) | Self::Io(_) | Self::Serialization { .. }
+            Self::OutputBudgetExceeded(_)
+                | Self::StrategyFault(_)
+                | Self::Io(_)
+                | Self::Serialization { .. }
         )
     }
 }
@@ -196,6 +203,7 @@ mod tests {
                 conversation: "c1".into(),
                 index: 2,
             },
+            MultiTurnError::StrategyFault("turn out of order".into()),
             MultiTurnError::OutputBudgetExceeded("result".into()),
             MultiTurnError::Io("not found".into()),
             MultiTurnError::Serialization { kind: "result" },

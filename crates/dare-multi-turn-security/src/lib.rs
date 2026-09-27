@@ -41,11 +41,13 @@
 //! implemented here.
 
 pub mod canonical;
+pub mod conversation;
 pub mod error;
 pub mod graph;
 pub mod ids;
 pub mod limits;
 pub mod model;
+pub mod observation;
 pub mod schema;
 pub mod source;
 

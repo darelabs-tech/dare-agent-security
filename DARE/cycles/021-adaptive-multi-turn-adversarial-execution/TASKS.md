@@ -19,9 +19,9 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-008 — Implement `StrategyGraph` types and validation rules 1–7 and 11
 - [x] task-009 — Implement acyclicity, depth and DP path count (rules 8–10)
 - [x] task-010 — Implement canonical JSON and graph digest
-- [ ] task-011 — Implement `MultiTurnScenario` model and validation
-- [ ] task-012 — Implement `RawTurnOutput` normalization, canary matching and redaction
-- [ ] task-013 — Implement `Turn`/`ConversationState` with chained digest
+- [x] task-011 — Implement `MultiTurnScenario` model and validation
+- [x] task-012 — Implement `RawTurnOutput` normalization, canary matching and redaction
+- [x] task-013 — Implement `Turn`/`ConversationState` with chained digest
 - [ ] task-014 — Define `ConversationAdapter` trait, `HarnessMode` and `RawHarnessError`
 - [ ] task-015 — Implement `ReplayAdapter` with strategy-integrity (I08) and tamper checks
 - [ ] task-016 — Implement `SimulatedAdapter` and all `ReferenceAgent` variants
