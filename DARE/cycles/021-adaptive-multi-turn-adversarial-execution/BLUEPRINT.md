@@ -736,7 +736,7 @@ The profile `profiles/multi-turn-security-baseline-2026.json` lists the seven ID
 
 | Environment | Branch | Trigger | Infra |
 |---|---|---|---|
-| Local | `agent/cycle-021-adaptive-multi-turn-adversarial-execution` | developer | `cargo` |
+| Local | `claude/loving-newton-113zme` | developer | `cargo` |
 | CI | PR to `main` | `pull_request: [opened]` (existing convention; unchanged) | GitHub Actions `ubuntu-latest`, new job `multi-turn-security-2026` |
 | Release | `main` | human-approved merge | existing release flow (no change) |
 

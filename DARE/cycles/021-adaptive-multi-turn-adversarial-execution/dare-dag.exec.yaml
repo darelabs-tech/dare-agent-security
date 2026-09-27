@@ -1,9 +1,9 @@
 cycle: 021
 name: adaptive-multi-turn-adversarial-execution
-status: proposed
+status: approved-for-execution
 baseline_branch: main
 baseline_commit: 4ca06b2
-branch: agent/cycle-021-adaptive-multi-turn-adversarial-execution
+branch: claude/loving-newton-113zme
 approval_file: DARE/cycles/021-adaptive-multi-turn-adversarial-execution/APPROVAL.md
 execution_order:
   - task-001
@@ -43,7 +43,7 @@ execution_order:
   - task-035
   - task-036
   - task-037
-execution_authorized: false
+execution_authorized: true
 per_task_human_approval_required: false
 review_required_on_semantic_scope_change: true
 final_pr_after_release_gate_only: true

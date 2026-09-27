@@ -1,9 +1,9 @@
 # Cycle 021 — Tasks
 
-**Status:** PROPOSED — PENDING EXECUTION APPROVAL  
-**Approval:** Design and Blueprint APPROVED 2026-09-27; execution NOT yet authorized (see `APPROVAL.md`)  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-27 — see `APPROVAL.md`  
 **Baseline:** `main @ 4ca06b2`  
-**Branch:** `agent/cycle-021-adaptive-multi-turn-adversarial-execution`
+**Branch:** `claude/loving-newton-113zme`
 
 Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE only when its criterion is met by an executed test or command recorded in `EXECUTION/task-NNN.md`, and the Ralph Loop (`cargo fmt --check`, `cargo clippy -D warnings`, `cargo test --workspace`, `cargo audit` when dependencies change) is green. No task may add network, credential, generation or LLM capability.
 
