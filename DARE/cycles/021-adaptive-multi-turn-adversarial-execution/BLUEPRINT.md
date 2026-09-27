@@ -1,9 +1,9 @@
 # Cycle 021 — Blueprint: Adaptive Multi-Turn Adversarial Execution
 
-**Version:** v0.1 | **Date:** 2026-09-27 | **Status:** ARCHITECTURE PROPOSED — READY FOR REVIEW  
+**Version:** v0.1 | **Date:** 2026-09-27 | **Status:** ARCHITECTURE APPROVED  
 **Source of truth:** `DESIGN.md` (approved 2026-09-27) + `APPROVAL.md` (Design phase)  
-**Approval:** PENDING. `TASKS.md`, `dare-dag.yaml` and `EXECUTION/` are produced by
-`/dare-tasks` only after this Blueprint is approved.
+**Approval:** APPROVED 2026-09-27 (Product Owner). `TASKS.md`, `dare-dag.yaml` and `EXECUTION/` are produced by
+`/dare-tasks`.
 
 ---
 
@@ -744,10 +744,10 @@ The profile `profiles/multi-turn-security-baseline-2026.json` lists the seven ID
 
 ## 11. Approval checklist
 
-- [ ] Architectural decisions AD-01 to AD-10 accepted, including the Action-image rule (AD-10)
-- [ ] Normalization precedence table (§4.7) accepted
-- [ ] Invariant FAIL/PASS/INCONCLUSIVE table (§4.8) accepted, including the delegation of first-contact failures to Cycle 013 (I01, I04)
-- [ ] Reference agents (§4.9) are sufficient for the corpus
-- [ ] CLI flags and exit codes (§5.1) accepted
-- [ ] Registry families and the profile requirement split (§5.2) accepted
-- [ ] Phase plan and DONE criteria (§6) accepted
+- [x] Architectural decisions AD-01 to AD-10 accepted, including the Action-image rule (AD-10)
+- [x] Normalization precedence table (§4.7) accepted
+- [x] Invariant FAIL/PASS/INCONCLUSIVE table (§4.8) accepted, including the delegation of first-contact failures to Cycle 013 (I01, I04)
+- [x] Reference agents (§4.9) are sufficient for the corpus
+- [x] CLI flags and exit codes (§5.1) accepted
+- [x] Registry families and the profile requirement split (§5.2) accepted
+- [x] Phase plan and DONE criteria (§6) accepted

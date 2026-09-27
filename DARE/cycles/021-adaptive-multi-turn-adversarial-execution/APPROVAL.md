@@ -1,7 +1,7 @@
 # Cycle 021 — Approval
 
 **Cycle:** 021 — Adaptive Multi-Turn Adversarial Execution  
-**Approval:** DESIGN APPROVED — execution NOT yet authorized  
+**Approval:** DESIGN + BLUEPRINT APPROVED — execution NOT yet authorized  
 **Approved at:** 2026-09-27  
 **Approved by:** Product Owner  
 **Base:** `main @ 4ca06b2`
@@ -19,6 +19,11 @@ decisions recorded in its §13:
 3. Strategy graphs are strictly acyclic (DAG) in v1.
 4. The published MULTITURN-LAB corpus is synthetic-only. The REPLAY mode may read
    transcripts that a user supplies locally.
+
+## Blueprint approval
+
+`BLUEPRINT.md` was approved on 2026-09-27, including the Action-image rule (AD-10).
+`TASKS.md`, `dare-dag.yaml` and `dare-dag.exec.yaml` (37 tasks) are proposed for review.
 
 ## Next phase
 
