@@ -632,6 +632,7 @@ dependencies = [
  "dare-adversarial",
  "dare-coverage",
  "dare-security-evidence",
+ "jsonschema",
  "serde",
  "serde_json",
  "sha2",

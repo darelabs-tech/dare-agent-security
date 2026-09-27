@@ -43,6 +43,8 @@
 pub mod error;
 pub mod ids;
 pub mod limits;
+pub mod schema;
+pub mod source;
 
 #[cfg(test)]
 mod tests {

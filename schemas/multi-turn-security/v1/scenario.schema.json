@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/multi-turn-security/v1/scenario.schema.json",
+  "title": "DARE Multi-Turn Security Scenario v1",
+  "description": "A local, synthetic multi-turn scenario. It names the security property under test, the verified principal, the objective and prohibited request classes, the canaries and the conversations with their pinned strategy-graph digests. It never states its own expected verdict.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "invariant",
+    "principal",
+    "objective",
+    "prohibited",
+    "canaries",
+    "approval_required_action_classes",
+    "conversations",
+    "stop_on_first_fail"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "invariant": {
+      "enum": [
+        "I01_REFUSAL_PERSISTENCE",
+        "I02_CUMULATIVE_INTENT",
+        "I03_CLAIMED_AUTHORITY",
+        "I04_DELAYED_INSTRUCTION",
+        "I05_APPROVAL_CONTINUITY",
+        "I06_OBJECTIVE_STABILITY",
+        "I07_CONVERSATION_ISOLATION"
+      ]
+    },
+    "principal": {
+      "$ref": "#/$defs/principal"
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective_id",
+        "allowed_action_classes"
+      ],
+      "properties": {
+        "objective_id": {
+          "$ref": "#/$defs/id"
+        },
+        "allowed_action_classes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true,
+          "maxItems": 64
+        }
+      }
+    },
+    "prohibited": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refused_request_classes"
+      ],
+      "properties": {
+        "refused_request_classes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true,
+          "maxItems": 64
+        },
+        "composite": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true,
+          "minItems": 2,
+          "maxItems": 8
+        }
+      }
+    },
+    "canaries": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "canary_id",
+          "marker"
+        ],
+        "properties": {
+          "canary_id": {
+            "$ref": "#/$defs/id"
+          },
+          "marker": {
+            "type": "string",
+            "pattern": "^CANARY-[A-Z0-9]{12}$"
+          }
+        }
+      }
+    },
+    "approval_required_action_classes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "uniqueItems": true,
+      "maxItems": 64
+    },
+    "conversations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "conversation_id",
+          "principal",
+          "graph_digest"
+        ],
+        "properties": {
+          "conversation_id": {
+            "$ref": "#/$defs/id"
+          },
+          "principal": {
+            "$ref": "#/$defs/principal"
+          },
+          "graph_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    },
+    "stop_on_first_fail": {
+      "type": "boolean"
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "max_turns_per_conversation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "max_paths": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "max_total_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8388608
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "authority": {
+      "enum": [
+        "NONE",
+        "READ",
+        "WRITE",
+        "ADMIN"
+      ]
+    },
+    "principal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "principal_id",
+        "tenant_id",
+        "verified_authority"
+      ],
+      "properties": {
+        "principal_id": {
+          "$ref": "#/$defs/id"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/id"
+        },
+        "verified_authority": {
+          "$ref": "#/$defs/authority"
+        }
+      }
+    }
+  }
+}

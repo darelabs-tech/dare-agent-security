@@ -38,6 +38,14 @@ pub enum MultiTurnError {
     #[error("forbidden character U+{codepoint:04X} in field `{field}`")]
     ForbiddenCharacter { field: &'static str, codepoint: u32 },
 
+    /// A field name this engine will not read: executable, credential,
+    /// remote, generation or self-declared outcome.
+    #[error("refused field `{name}`: {category}")]
+    ForbiddenField {
+        name: &'static str,
+        category: &'static str,
+    },
+
     /// Content that looks like a credential was offered as fixture data.
     #[error("secret-like content refused in field `{field}`")]
     SecretLikeContent { field: &'static str },
@@ -150,6 +158,10 @@ mod tests {
                 codepoint: 0x202e,
             },
             MultiTurnError::SecretLikeContent { field: "content" },
+            MultiTurnError::ForbiddenField {
+                name: "mutate",
+                category: "turn generation",
+            },
             MultiTurnError::BoundRaised {
                 name: "max_turns_per_conversation",
             },

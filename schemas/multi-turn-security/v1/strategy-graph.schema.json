@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/multi-turn-security/v1/strategy-graph.schema.json",
+  "title": "DARE Multi-Turn Strategy Graph v1",
+  "description": "A finite, acyclic strategy graph. Every node is a pre-authored turn; every edge selects the next node from a closed observation class of the previous response. There is no field for generating, mutating, templating or paraphrasing a turn, and none may be added.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "root",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "root": {
+      "$ref": "#/$defs/id"
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "turn",
+          "terminal"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "turn": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "role",
+              "request_class",
+              "content"
+            ],
+            "properties": {
+              "role": {
+                "enum": [
+                  "USER",
+                  "TOOL",
+                  "RETRIEVED",
+                  "MEMORY",
+                  "APPROVAL"
+                ]
+              },
+              "request_class": {
+                "$ref": "#/$defs/id"
+              },
+              "content": {
+                "type": "string",
+                "maxLength": 16384
+              },
+              "plants_canary": {
+                "$ref": "#/$defs/id"
+              },
+              "claimed_authority": {
+                "enum": [
+                  "NONE",
+                  "READ",
+                  "WRITE",
+                  "ADMIN"
+                ]
+              },
+              "approval": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "approval_id",
+                  "action_class",
+                  "action_digest",
+                  "target_id"
+                ],
+                "properties": {
+                  "approval_id": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "action_class": {
+                    "$ref": "#/$defs/id"
+                  },
+                  "action_digest": {
+                    "$ref": "#/$defs/digest"
+                  },
+                  "target_id": {
+                    "$ref": "#/$defs/id"
+                  }
+                }
+              },
+              "proposes_action_class": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          },
+          "terminal": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "on",
+          "to"
+        ],
+        "properties": {
+          "from": {
+            "$ref": "#/$defs/id"
+          },
+          "on": {
+            "enum": [
+              "REFUSED",
+              "COMPLIED",
+              "PARTIAL",
+              "DEFLECTED",
+              "AUTHORITY_ACCEPTED",
+              "ACTION_REQUESTED",
+              "ACTION_EXECUTED"
+            ]
+          },
+          "to": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

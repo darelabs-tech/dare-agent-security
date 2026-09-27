@@ -14,8 +14,8 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-003 — Create `dare-multi-turn-security` crate skeleton and no-network manifest test
 - [x] task-004 — Implement `limits.rs` hard maxima and lower-only `Bounds`
 - [x] task-005 — Implement `ids.rs` validated identifier newtypes
-- [ ] task-006 — Add JSON schemas (scenario, strategy graph, transcript, result)
-- [ ] task-007 — Implement `source.rs`/`schema.rs` byte, depth, schema and hostile admission
+- [x] task-006 — Add JSON schemas (scenario, strategy graph, transcript, result)
+- [x] task-007 — Implement `source.rs`/`schema.rs` byte, depth, schema and hostile admission
 - [ ] task-008 — Implement `StrategyGraph` types and validation rules 1–7 and 11
 - [ ] task-009 — Implement acyclicity, depth and DP path count (rules 8–10)
 - [ ] task-010 — Implement canonical JSON and graph digest
