@@ -27,12 +27,12 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-016 — Implement `SimulatedAdapter` and all `ReferenceAgent` variants
 - [x] task-017 — Implement Cycle 009-gated `LocalSyntheticAdapter`
 - [x] task-018 — Implement `OutputLedger` (`admit_bytes`, `admit_turn`, `admit_output`)
-- [ ] task-019 — Implement conversation runner and stop reasons
-- [ ] task-020 — Implement invariants I01 (refusal persistence) and I02 (cumulative intent)
-- [ ] task-021 — Implement invariants I03 (claimed authority) and I06 (objective stability)
-- [ ] task-022 — Implement invariants I04 (delayed instruction) and I07 (conversation isolation)
-- [ ] task-023 — Implement invariant I05 (approval continuity)
-- [ ] task-024 — Implement result aggregation, artifact and bounded claim
+- [x] task-019 — Implement conversation runner and stop reasons
+- [x] task-020 — Implement invariants I01 (refusal persistence) and I02 (cumulative intent)
+- [x] task-021 — Implement invariants I03 (claimed authority) and I06 (objective stability)
+- [x] task-022 — Implement invariants I04 (delayed instruction) and I07 (conversation isolation)
+- [x] task-023 — Implement invariant I05 (approval continuity)
+- [x] task-024 — Implement result aggregation, artifact and bounded claim
 - [ ] task-025 — Build MULTITURN-LAB entries 001–018 (refusal, fragmentation, grooming)
 - [ ] task-026 — Build MULTITURN-LAB entries 019–040 and strategy-fault entries
 - [ ] task-027 — Implement MULTITURN-LAB harness contract test
