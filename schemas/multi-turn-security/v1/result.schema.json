@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/multi-turn-security/v1/result.schema.json",
+  "title": "DARE Multi-Turn Security Result v1",
+  "description": "The result of one multi-turn run. It records the path the target's own responses selected through each pinned strategy graph, the nodes that were never reached, and one outcome per applicable invariant. A PASS is bounded to that path and never claims the target is secure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "mode",
+    "synthetic",
+    "verdict",
+    "primary_invariant",
+    "graph_digests",
+    "conversations",
+    "invariants",
+    "delegated_findings",
+    "budget",
+    "redaction_state",
+    "bounded_claim",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "scenario_id": {
+      "$ref": "#/$defs/id"
+    },
+    "mode": {
+      "enum": [
+        "REPLAY",
+        "SIMULATED",
+        "LOCAL_SYNTHETIC"
+      ]
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE",
+        "ERROR"
+      ]
+    },
+    "primary_invariant": {
+      "enum": [
+        "I01_REFUSAL_PERSISTENCE",
+        "I02_CUMULATIVE_INTENT",
+        "I03_CLAIMED_AUTHORITY",
+        "I04_DELAYED_INSTRUCTION",
+        "I05_APPROVAL_CONTINUITY",
+        "I06_OBJECTIVE_STABILITY",
+        "I07_CONVERSATION_ISOLATION"
+      ]
+    },
+    "graph_digests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/digest"
+      },
+      "maxItems": 4
+    },
+    "conversations": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "conversation_id",
+          "stop",
+          "turns",
+          "path",
+          "unreached_nodes",
+          "final_chain_digest"
+        ],
+        "properties": {
+          "conversation_id": {
+            "$ref": "#/$defs/id"
+          },
+          "stop": {
+            "enum": [
+              "TERMINAL_REACHED",
+              "FIRST_FAIL",
+              "BUDGET_EXHAUSTED",
+              "HARNESS_ERROR",
+              "UNCLASSIFIABLE",
+              "NO_TRANSITION",
+              "STRATEGY_FAULT"
+            ]
+          },
+          "turns": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32
+          },
+          "path": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "$ref": "#/$defs/id"
+                },
+                {
+                  "enum": [
+                    "REFUSED",
+                    "COMPLIED",
+                    "PARTIAL",
+                    "DEFLECTED",
+                    "AUTHORITY_ACCEPTED",
+                    "ACTION_REQUESTED",
+                    "ACTION_EXECUTED",
+                    "UNCLASSIFIABLE"
+                  ]
+                }
+              ],
+              "items": false,
+              "minItems": 2
+            }
+          },
+          "unreached_nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/id"
+            },
+            "uniqueItems": true
+          },
+          "final_chain_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    },
+    "invariants": {
+      "type": "array",
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "invariant",
+          "property_id",
+          "applicable",
+          "verdict",
+          "reason",
+          "deciding_turns"
+        ],
+        "properties": {
+          "invariant": {
+            "enum": [
+              "I01_REFUSAL_PERSISTENCE",
+              "I02_CUMULATIVE_INTENT",
+              "I03_CLAIMED_AUTHORITY",
+              "I04_DELAYED_INSTRUCTION",
+              "I05_APPROVAL_CONTINUITY",
+              "I06_OBJECTIVE_STABILITY",
+              "I07_CONVERSATION_ISOLATION"
+            ]
+          },
+          "property_id": {
+            "type": "string",
+            "pattern": "^AGENT\\.[A-Z_]+\\.[A-Z_]+$"
+          },
+          "applicable": {
+            "type": "boolean"
+          },
+          "verdict": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "INCONCLUSIVE",
+              "ERROR"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z_]{0,63}$"
+          },
+          "deciding_turns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "conversation_id",
+                "index"
+              ],
+              "properties": {
+                "conversation_id": {
+                  "$ref": "#/$defs/id"
+                },
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "maxItems": 64
+          }
+        }
+      }
+    },
+    "delegated_findings": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "owning_property",
+          "reason",
+          "turn"
+        ],
+        "properties": {
+          "owning_property": {
+            "type": "string",
+            "pattern": "^AGENT\\.[A-Z_]+\\.[A-Z_]+$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z_]{0,63}$"
+          },
+          "turn": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "conversation_id",
+              "index"
+            ],
+            "properties": {
+              "conversation_id": {
+                "$ref": "#/$defs/id"
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turns",
+        "output_bytes",
+        "state_changes",
+        "egress_bytes"
+      ],
+      "properties": {
+        "turns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "state_changes": {
+          "const": 0
+        },
+        "egress_bytes": {
+          "const": 0
+        }
+      }
+    },
+    "redaction_state": {
+      "const": "REDACTED"
+    },
+    "bounded_claim": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

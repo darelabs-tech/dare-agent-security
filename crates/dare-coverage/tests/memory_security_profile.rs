@@ -21,6 +21,15 @@ use dare_coverage::{
     RiskFamily,
 };
 
+/// Properties a later cycle appended to this family, by name.
+///
+/// Cycle 021 (adaptive multi-turn validation) adds cross-turn properties to
+/// existing families, as its approval requires. The Product Owner decided on
+/// 2026-09-27 that this file keeps pinning Cycle 016's own six properties
+/// exactly, and tolerates only these named additions, never an anonymous one.
+/// See `DARE/cycles/021-adaptive-multi-turn-adversarial-execution/APPROVAL.md`.
+const CYCLE_021_ADDITIONS: [&str; 1] = ["AGENT.MEMORY.CONVERSATION_ISOLATION"];
+
 const PROFILE_ID: &str = "memory-security-baseline-2026";
 
 /// The six properties and requirement levels approved for Cycle 016.
@@ -218,7 +227,9 @@ fn every_memory_property_in_the_registry_is_selected() {
         .collect();
 
     for property in &registry.properties {
-        if property.id.starts_with("AGENT.MEMORY.") {
+        if property.id.starts_with("AGENT.MEMORY.")
+            && !CYCLE_021_ADDITIONS.contains(&property.id.as_str())
+        {
             assert!(
                 selected.contains(&property.id.as_str()),
                 "{} is in the registry but no profile selects it",
@@ -326,7 +337,10 @@ fn every_memory_property_belongs_to_the_same_risk_family_and_category() {
     let memory: Vec<_> = registry
         .properties
         .iter()
-        .filter(|property| property.id.starts_with("AGENT.MEMORY."))
+        .filter(|property| {
+            property.id.starts_with("AGENT.MEMORY.")
+                && !CYCLE_021_ADDITIONS.contains(&property.id.as_str())
+        })
         .collect();
 
     assert_eq!(memory.len(), 6);

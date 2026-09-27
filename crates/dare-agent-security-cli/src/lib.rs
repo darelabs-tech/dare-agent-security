@@ -12,6 +12,7 @@ pub mod coverage;
 pub mod identity_security;
 pub mod mcp_auth_security;
 pub mod memory_security;
+pub mod multi_turn_security;
 pub mod product;
 pub mod prompt_injection;
 pub mod rag_security;

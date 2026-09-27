@@ -23,6 +23,7 @@
 - [MCP 2026 Auth Security Validation](concepts/mcp-auth-security.md)
 - [Agentic Supply Chain and AI-BOM Validation](concepts/supply-chain-security.md)
 - [A2A and Inter-Agent Communication Security](concepts/a2a-security.md)
+- [Adaptive Multi-Turn Adversarial Validation](concepts/multi-turn-security.md)
 
 # Commands
 
@@ -74,5 +75,6 @@
 - [Extending MCP Auth Security Validation](reference/extending-mcp-auth-security.md)
 - [Extending Agentic Supply Chain Validation](reference/extending-supply-chain-security.md)
 - [Extending A2A Security Validation](reference/extending-a2a-security.md)
+- [Extending Multi-Turn Security Validation](reference/extending-multi-turn-security.md)
 
 [Troubleshooting](troubleshooting.md)

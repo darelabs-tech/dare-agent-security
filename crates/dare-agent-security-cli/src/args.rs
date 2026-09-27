@@ -87,6 +87,9 @@ pub enum ValidateSubcommand {
     /// Run bounded local A2A and inter-agent communication validation (Cycle 020).
     #[command(name = "a2a")]
     A2a(crate::a2a_security::A2aArgs),
+    /// Run bounded local adaptive multi-turn adversarial validation (Cycle 021).
+    #[command(name = "multi-turn")]
+    MultiTurn(crate::multi_turn_security::MultiTurnArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

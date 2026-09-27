@@ -17,6 +17,7 @@ use dare_agent_security::exit_code::{SCANNER_ERROR, SUCCESS, UNSUPPORTED_TARGET}
 use dare_agent_security::identity_security::run_identity_security;
 use dare_agent_security::mcp_auth_security::run_mcp_auth_security;
 use dare_agent_security::memory_security::run_memory_security;
+use dare_agent_security::multi_turn_security::run_multi_turn_security;
 use dare_agent_security::product::{run_assess, run_doctor_cmd, run_init, run_report};
 use dare_agent_security::prompt_injection::run_prompt_injection;
 use dare_agent_security::rag_security::run_rag_security;
@@ -67,6 +68,9 @@ async fn main() -> ExitCode {
                     ExitCode::from(run_supply_chain_security(args) as u8)
                 }
                 ValidateSubcommand::A2a(args) => ExitCode::from(run_a2a_security(args) as u8),
+                ValidateSubcommand::MultiTurn(args) => {
+                    ExitCode::from(run_multi_turn_security(args) as u8)
+                }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),
         },

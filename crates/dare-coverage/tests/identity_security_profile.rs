@@ -14,6 +14,15 @@ use dare_coverage::{
     validate_profile, PropertyRegistry, RequirementLevel,
 };
 
+/// Properties a later cycle appended to this family, by name.
+///
+/// Cycle 021 (adaptive multi-turn validation) adds cross-turn properties to
+/// existing families, as its approval requires. The Product Owner decided on
+/// 2026-09-27 that this file keeps pinning Cycle 015's own six properties
+/// exactly, and tolerates only these named additions, never an anonymous one.
+/// See `DARE/cycles/021-adaptive-multi-turn-adversarial-execution/APPROVAL.md`.
+const CYCLE_021_ADDITIONS: [&str; 1] = ["AGENT.IDENTITY.CLAIMED_AUTHORITY_BOUNDARY"];
+
 const PROFILE_ID: &str = "identity-security-baseline-2026";
 
 /// The six properties and requirement levels approved for Cycle 015.
@@ -183,7 +192,9 @@ fn every_identity_property_in_the_registry_is_selected() {
         .collect();
 
     for property in &registry.properties {
-        if property.id.starts_with("AGENT.IDENTITY.") {
+        if property.id.starts_with("AGENT.IDENTITY.")
+            && !CYCLE_021_ADDITIONS.contains(&property.id.as_str())
+        {
             assert!(
                 selected.contains(&property.id.as_str()),
                 "{} is in the registry but no profile selects it",
