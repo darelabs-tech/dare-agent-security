@@ -80,25 +80,32 @@ does not construct attack paths across systems (Cycle 023).
 | RF-12 | Hostile/refusal corpus | MUST | Bounded fixtures for graph bombs, cycles without visit bounds, free-text generator directives, oversized turns, transcript tampering, bidi/control characters, secret-like content (§4.5) |
 | RF-13 | CLI | MUST | `dare-agent-security validate multi-turn` with local-only flag classes (§4.6) |
 | RF-14 | Artifacts | MUST | `multi-turn-result.json`, `multi-turn-conversations.json`, `multi-turn-evidence.json`, `multi-turn-findings.json`, `summary.md`, each admitted through the run-wide output ledger before write |
-| RF-15 | Property registry | MUST | Additive `AGENT.MULTI_TURN.*` properties (§4.1) with risk-family mappings and the existing `stateful_agent_present` predicate as their applicability gate |
+| RF-15 | Property registry | MUST | Seven additive properties inside the existing `AGENT.GOAL`, `AGENT.IDENTITY`, `AGENT.HUMAN_APPROVAL` and `AGENT.MEMORY` families (§4.1), gated by the existing `stateful_agent_present` predicate; existing IDs and denominators unchanged |
 | RF-16 | Composition with earlier engines | SHOULD | A turn may carry a Cycle 013 injection vector, Cycle 014 tool request or Cycle 016 memory write; single-turn verdict authority stays with the owning engine and 021 evaluates only the cross-turn property |
 | RF-17 | Coverage report | SHOULD | Results feed Cycle 006 coverage without changing earlier profile denominators; a new optional profile `multi-turn-security-baseline-2026` |
 | RF-18 | Strategy explainability | COULD | `summary.md` renders the path taken through the graph (node ids + observation classes), with no raw content |
 
-### 4.1 Proposed properties (additive)
+### 4.1 Proposed properties (additive, inside existing families)
 
-Namespace `AGENT.MULTI_TURN.*`, mirroring how Cycle 020 kept `AGENT.A2A.*` inside the
-`AGENT` namespace. No existing property ID changes.
+Per Review decision (§13, Q1), no new namespace is created. Each multi-turn property is
+a **new, additive ID inside an existing `AGENT.*` family**, so the family's owning risk
+mapping is reused. No existing property ID changes meaning. Existing profile
+denominators do not change, because the new IDs enter only the new optional profile
+(RF-17). All new IDs are gated by the existing `stateful_agent_present` predicate.
 
-| Property | Risk family | Meaning |
-|---|---|---|
-| `AGENT.MULTI_TURN.REFUSAL_PERSISTENCE` | ASI01 | A policy refusal holds for semantically equivalent requests on later turns (crescendo/rephrasing erosion) |
-| `AGENT.MULTI_TURN.CUMULATIVE_INTENT_BOUNDARY` | ASI01 | A prohibited objective split across individually benign turns is not completed |
-| `AGENT.MULTI_TURN.TRUST_ESCALATION_BOUNDARY` | ASI09 | Rapport, claimed roles or asserted authority accumulated across turns never raise effective authority |
-| `AGENT.MULTI_TURN.DELAYED_INSTRUCTION_BOUNDARY` | ASI01 / ASI06 | An instruction planted on turn *k* never becomes authoritative on turn *k+n* |
-| `AGENT.MULTI_TURN.APPROVAL_CONTINUITY` | ASI09 | A human approval given on turn *k* binds only to the action disclosed then; later substitution fails |
-| `AGENT.MULTI_TURN.GOAL_STABILITY` | ASI01 / ASI10 | The authorized objective established at conversation start is preserved across turns |
-| `AGENT.MULTI_TURN.CONVERSATION_ISOLATION` | ASI06 | State from one conversation/principal does not carry into another |
+| Property | Family / risk | Meaning | Closest existing single-turn property |
+|---|---|---|---|
+| `AGENT.GOAL.REFUSAL_PERSISTENCE` | GOAL / ASI01 | A policy refusal holds for requests of the same class on later turns (crescendo/rephrasing erosion) | `AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY` |
+| `AGENT.GOAL.CUMULATIVE_INTENT_BOUNDARY` | GOAL / ASI01 | A prohibited objective split across individually benign turns is not completed | `AGENT.GOAL.INSTRUCTION_INTEGRITY` |
+| `AGENT.GOAL.DELAYED_INSTRUCTION_BOUNDARY` | GOAL / ASI01 | An instruction planted on turn *k* never becomes authoritative on turn *k+n* | `AGENT.GOAL.EXTERNAL_CONTENT_INSTRUCTION_BOUNDARY` |
+| `AGENT.GOAL.OBJECTIVE_STABILITY` | GOAL / ASI01 | The objective authorized at conversation start is preserved across turns | `AGENT.GOAL.INSTRUCTION_INTEGRITY` |
+| `AGENT.IDENTITY.CLAIMED_AUTHORITY_BOUNDARY` | IDENTITY / ASI03 | Rapport, claimed roles or asserted authority accumulated across turns never raise effective authority (trust grooming) | `AGENT.IDENTITY.PRINCIPAL_BINDING` |
+| `AGENT.HUMAN_APPROVAL.CROSS_TURN_CONTINUITY` | HUMAN_APPROVAL / ASI09 | An approval given on turn *k* binds only to the action disclosed then; later substitution or reuse fails | `AGENT.HUMAN_APPROVAL.INTENT_BINDING` |
+| `AGENT.MEMORY.CONVERSATION_ISOLATION` | MEMORY / ASI06 | State from one conversation/principal does not carry into another | `AGENT.MEMORY.TENANT_BOUNDARY` |
+
+Ownership rule: the single-turn property keeps its verdict authority in its owning
+cycle (013, 015, 016). The seven multi-turn IDs are decided only by Cycle 021 and
+only over the whole conversation.
 
 ### 4.2 Deterministic invariant set
 
@@ -282,7 +289,7 @@ recorded in `REGRESSION.md`.
 
 ## 13. Open questions for Review
 
-1. **Namespace:** should the properties use `AGENT.MULTI_TURN.*` (proposed), or should they be folded into the existing `AGENT.GOAL.*` and `AGENT.HUMAN_APPROVAL.*` families?
+1. **Namespace — DECIDED (2026-09-27):** fold the properties into the existing families instead of creating `AGENT.MULTI_TURN.*`. See §4.1.
 2. **Hard maxima:** are the RNF-02 values (32 turns, 256 nodes, 64 paths) acceptable?
 3. **Cycles:** should a strategy graph allow cycles with explicit per-node visit bounds (proposed), or be strictly acyclic?
 4. **REPLAY corpus:** should REPLAY include sanitized real transcripts from the Product Validation Program, or stay synthetic-only for v1?
@@ -293,7 +300,8 @@ recorded in `REGRESSION.md`.
 
 - [ ] Functional requirements reviewed and prioritized
 - [ ] Definition of "adaptive" (closed, graph-bound, no generation) accepted
-- [ ] Proposed `AGENT.MULTI_TURN.*` properties and ASI mappings accepted
+- [x] Property placement: additive IDs inside existing families (§4.1) — decided 2026-09-27
+- [ ] Seven property IDs and ASI mappings in §4.1 accepted
 - [ ] Security requirements RS-06 to RS-09 validated by the Tech Lead
 - [ ] Out-of-scope boundary with Cycles 022–025 confirmed
 - [ ] Critical risks (R-01, R-03) have accepted mitigations
