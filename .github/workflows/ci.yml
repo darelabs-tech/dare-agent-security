@@ -3213,6 +3213,8 @@ jobs:
 
       - name: No real credential or live model endpoint anywhere
         run: python scripts/k21/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k21/verify_proof_citations.py
 
       - name: Offline CLI - a refusal that holds across reframings passes
         run: |

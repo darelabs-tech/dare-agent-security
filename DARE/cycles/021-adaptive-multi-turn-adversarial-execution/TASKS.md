@@ -1,6 +1,6 @@
 # Cycle 021 — Tasks
 
-**Status:** APPROVED FOR EXECUTION  
+**Status:** COMPLETE — 37/37 tasks executed; pending human final review  
 **Approval:** APPROVED 2026-09-27 — see `APPROVAL.md`  
 **Baseline:** `main @ 4ca06b2`  
 **Branch:** `claude/loving-newton-113zme`
@@ -43,9 +43,9 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-032 — Add `validate multi-turn` CLI subcommand
 - [x] task-033 — Add `multi-turn-security-2026` CI job
 - [x] task-034 — Add determinism and compatibility tests (including embedded-asset locations)
-- [ ] task-035 — Security, dependency and container audit
-- [ ] task-036 — Write EN/PT concept and extension docs
-- [ ] task-037 — Write REGRESSION.md and PROOF.md and run the completion gate
+- [x] task-035 — Security, dependency and container audit
+- [x] task-036 — Write EN/PT concept and extension docs
+- [x] task-037 — Write REGRESSION.md and PROOF.md and run the completion gate
 
 ## Task table
 

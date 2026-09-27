@@ -1,6 +1,6 @@
 cycle: 021
 name: adaptive-multi-turn-adversarial-execution
-status: approved-for-execution
+status: complete
 baseline_branch: main
 baseline_commit: 4ca06b2
 branch: claude/loving-newton-113zme
