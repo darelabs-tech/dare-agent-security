@@ -46,7 +46,7 @@ flowchart TD
 | AD-07 | The output admission ledger is copied from `dare-a2a-security/src/budget.rs` (`admit_output` charges before write, including the result artifact) | This is the Cycle 019 F05 contract. The ledger is re-implemented locally because the a2a ledger carries A2A-specific ceilings. |
 | AD-08 | The corpus is built in code (`corpus.rs`), with class-level harness contracts | Same pattern as the A2A-LAB: fixtures never store an expected verdict. |
 | AD-09 | Canonical JSON = `serde_json::Value`, whose default `Map` is a `BTreeMap` (the workspace does not enable `preserve_order`), serialized compactly; SHA-256 via `sha2` | Byte-stable digests (RNF-01) with no new dependency. |
-| AD-10 | No containerization phase | The deliverable is a library + CLI subcommand run by `cargo`, and no cycle has shipped a container. A Dockerfile would add surface without a consumer. See §6, Phase 0. |
+| AD-10 | No new container; the existing Action image must keep building | The repository already ships a container: the root `Dockerfile` (Cycle 004) builds the `dare-agent-security` binary for the GitHub Action (`action.yml`, `action-e2e.yml`). The new crate is linked into that binary, so every file it reads with `include_str!` must sit in a directory the Dockerfile copies (`crates`, `schemas`, `profiles`, `standards`, `fixtures`, …). Cycle 012 broke the Action exactly this way (`standards/` was missing, PROOF §"GitHub Action Docker context"). The rule for this cycle: embed only from already-copied directories. The corpus is built in code, so no `corpus/` directory is needed. The build is proven in Phases 0 and 10. |
 
 ---
 
@@ -661,7 +661,7 @@ The profile `profiles/multi-turn-security-baseline-2026.json` lists the seven ID
 
 | Phase | Name | Goal | DONE criterion (verifiable) | Deliverables |
 |---|---|---|---|---|
-| 0 | Containerization — **N/A** | — | Justified in AD-10; recorded in `BASELINE.md` | — |
+| 0 | Container / Action image baseline | Prove the existing Action image builds before any change | `docker build -t dare-agent-security:baseline .` succeeds on `4ca06b2`, and the result is recorded in `BASELINE.md`. If Docker is unavailable locally, the last green `action-e2e.yml` run on `main` is cited instead. | `BASELINE.md` entry |
 | 1 | Baseline & crate skeleton | Freeze post-020 baseline; empty crate compiles in the workspace | `cargo test --workspace` count equals the pre-cycle count; `BASELINE.md` records commit `4ca06b2`, test count and the nine pinned denominators | `BASELINE.md`, `Cargo.toml` member, `lib.rs`, `error.rs`, `limits.rs`, `ids.rs`, no-network test |
 | 2 | Schemas & source admission | Hostile input is refused before parsing into domain types | Each §4.5 hostile fixture of the DESIGN is refused with its named `MultiTurnError`; schema files self-validate | `schemas/multi-turn-security/v1/*`, `source.rs`, `schema.rs`, `tests/hostile_refusal.rs` |
 | 3 | Strategy graph | Validated DAGs with bounded paths | Unit tests for rules 1–11 of §4.4, one failing case each; the path count equals a hand-computed value on 5 graphs; the digest is stable across 10 runs | `graph.rs` |
@@ -671,7 +671,7 @@ The profile `profiles/multi-turn-security-baseline-2026.json` lists the seven ID
 | 7 | MULTITURN-LAB corpus | ≥ 40 entries under the harness contract | `tests/multiturn_lab.rs`: every ATTACK gives FAIL on its invariant; every CONTROL gives PASS; every GAP gives INCONCLUSIVE; every REFUSAL is refused; every FAULT gives ERROR | `corpus.rs`, `tests/multiturn_lab.rs` |
 | 8 | Registry, profile, coverage, evidence | Additive property integration | `multi_turn_properties.rs` finds all 7 IDs with the §5.2 families; `no_earlier_profile_denominator_moved` passes unchanged and a new row pins `multi-turn-security-baseline-2026 = 7`; Cycle 001 evidence records validate | registry entries, profile, `coverage.rs`, `evidence_bridge.rs`, coverage tests |
 | 9 | CLI & CI | `validate multi-turn` + CI job | The CLI tests cover both §5.1 examples and all exit codes; the forbidden-flag help test passes; a `multi-turn-security-2026` job is added to `ci.yml` (PR-open-only trigger unchanged) | `multi_turn_security.rs`, `args.rs`, `ci.yml` |
-| 10 | Security & dependency audit (N-1) | Prove the frozen boundaries | `cargo audit` is clean; the no-network test passes; `determinism.rs` shows 10× byte-identical artifacts; `compatibility.rs` shows the Cycle 013/016/020 lab results unchanged; `scripts/k20/assert_no_real_credentials.py` passes | `tests/determinism.rs`, `tests/compatibility.rs`, audit log in `REGRESSION.md` |
+| 10 | Security, dependency audit & container re-check (N-1) | Prove the frozen boundaries and the unbroken Action image | `docker build .` succeeds with the new crate linked, and `docker run --rm <image> validate multi-turn --scenario multiturn-lab-001 --mode simulated --output-dir /tmp/o` exits 0; every `include_str!` in the new crate resolves under a directory the Dockerfile copies (asserted by `tests/compatibility.rs::embedded_assets_live_in_docker_copied_dirs`); `cargo audit` is clean; the no-network test passes; `determinism.rs` shows 10× byte-identical artifacts; `compatibility.rs` shows the Cycle 013/016/020 lab results unchanged; `scripts/k20/assert_no_real_credentials.py` passes | `tests/determinism.rs`, `tests/compatibility.rs`, audit log in `REGRESSION.md` |
 | 11 | Docs & proof | EN/PT docs, PROOF, REGRESSION | Every Design acceptance item maps to an executed test in `PROOF.md`; `verify_proof_citations.py` passes | `book/*`, `PROOF.md`, `REGRESSION.md`, `standards/multi-turn-security/2026/provenance.json` |
 
 **Dependencies between phases:**
@@ -691,6 +691,7 @@ The profile `profiles/multi-turn-security-baseline-2026.json` lists the seven ID
 | Build/Lint | `cargo clippy --workspace --all-targets -- -D warnings` |
 | Test | `cargo test --workspace` |
 | Audit | `cargo audit` (no HIGH/CRITICAL; no new dependency is expected) |
+| Container | `docker build .` (Phases 0 and 10); `action-e2e.yml` stays green on the PR |
 | Cycle job | `cargo test -p dare-multi-turn-security -- --nocapture` + `cargo test -p dare-coverage --test multi_turn_properties --test multi_turn_profile` |
 
 ---
@@ -743,7 +744,7 @@ The profile `profiles/multi-turn-security-baseline-2026.json` lists the seven ID
 
 ## 11. Approval checklist
 
-- [ ] Architectural decisions AD-01 to AD-10 accepted, including N/A containerization (AD-10)
+- [ ] Architectural decisions AD-01 to AD-10 accepted, including the Action-image rule (AD-10)
 - [ ] Normalization precedence table (§4.7) accepted
 - [ ] Invariant FAIL/PASS/INCONCLUSIVE table (§4.8) accepted, including the delegation of first-contact failures to Cycle 013 (I01, I04)
 - [ ] Reference agents (§4.9) are sufficient for the corpus
