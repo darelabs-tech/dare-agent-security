@@ -43,6 +43,7 @@
 pub mod budget;
 pub mod canonical;
 pub mod conversation;
+pub mod corpus;
 pub mod coverage;
 pub mod error;
 pub mod evidence_bridge;

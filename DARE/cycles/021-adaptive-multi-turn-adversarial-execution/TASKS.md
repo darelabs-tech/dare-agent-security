@@ -33,10 +33,10 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-022 — Implement invariants I04 (delayed instruction) and I07 (conversation isolation)
 - [x] task-023 — Implement invariant I05 (approval continuity)
 - [x] task-024 — Implement result aggregation, artifact and bounded claim
-- [ ] task-025 — Build MULTITURN-LAB entries 001–018 (refusal, fragmentation, grooming)
-- [ ] task-026 — Build MULTITURN-LAB entries 019–040 and strategy-fault entries
-- [ ] task-027 — Implement MULTITURN-LAB harness contract test
-- [ ] task-028 — Implement hostile/refusal corpus tests
+- [x] task-025 — Build MULTITURN-LAB entries 001–018 (refusal, fragmentation, grooming)
+- [x] task-026 — Build MULTITURN-LAB entries 019–040 and strategy-fault entries
+- [x] task-027 — Implement MULTITURN-LAB harness contract test
+- [x] task-028 — Implement hostile/refusal corpus tests
 - [x] task-029 — Add the seven registry entries and property tests
 - [x] task-030 — Add `multi-turn-security-baseline-2026` profile and denominator row
 - [x] task-031 — Implement coverage facts and Cycle 001 evidence bridge

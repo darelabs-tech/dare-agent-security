@@ -87,6 +87,20 @@ impl ReplayAdapter {
                     "transcript repeats a conversation".into(),
                 ));
             }
+            // Indices must be exactly 0, 1, 2, … in order. A duplicate, a gap or
+            // a reordering is visible without running anything, so it is refused
+            // here (DESIGN RF-10) rather than discovered as a strategy fault.
+            let misplaced = conversation
+                .turns
+                .iter()
+                .enumerate()
+                .find(|(position, turn)| turn.index as usize != *position);
+            if let Some((_, turn)) = misplaced {
+                return Err(MultiTurnError::TranscriptTampered {
+                    conversation: conversation.conversation_id.to_string(),
+                    index: turn.index,
+                });
+            }
         }
         Ok(Self {
             transcript,
@@ -215,12 +229,35 @@ mod tests {
     }
 
     #[test]
-    fn reordered_and_inserted_turns_are_strategy_faults() {
-        let (mut a, mut s) = setup(&[(1, "a"), (0, "b")]);
-        assert_eq!(step(&mut a, &mut s, "a"), Err(fault()), "reordered");
-        let (mut a, mut s) = setup(&[(0, "a"), (0, "x"), (1, "b")]);
-        step(&mut a, &mut s, "a").expect("turn 0");
-        assert_eq!(step(&mut a, &mut s, "b"), Err(fault()), "inserted");
+    fn reordered_duplicated_and_gapped_indices_are_refused_at_binding() {
+        for (turns, bad) in [
+            (vec![(1, "a"), (0, "b")], 1),
+            (vec![(0, "a"), (0, "x"), (1, "b")], 0),
+            (vec![(0, "a"), (2, "b")], 2),
+        ] {
+            let graphs = graph_set(&[two_step_graph()]);
+            let s = scenario(MultiTurnInvariant::I01RefusalPersistence, &graphs);
+            let t = Transcript {
+                schema_version: "1".into(),
+                graph_digests: graphs.keys().cloned().collect(),
+                conversations: vec![RecordedConversation {
+                    conversation_id: ConversationId::new("conv-a").expect("valid"),
+                    turns: turns
+                        .iter()
+                        .map(|(i, n)| RecordedTurn {
+                            index: *i,
+                            node_id: NodeId::new(*n).expect("valid"),
+                            output: raw(),
+                            chain_digest: None,
+                        })
+                        .collect(),
+                }],
+            };
+            match ReplayAdapter::new(t, &s) {
+                Err(MultiTurnError::TranscriptTampered { index, .. }) => assert_eq!(index, bad),
+                other => panic!("{turns:?} must be refused, got {other:?}"),
+            }
+        }
     }
 
     #[test]

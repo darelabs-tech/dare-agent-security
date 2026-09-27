@@ -19,7 +19,9 @@
 //! 7. every node reachable from the root;
 //! 8. acyclic (Kahn), naming the smallest node left on a cycle;
 //! 9. longest root-to-terminal path within the turn bound;
-//! 10. root-to-terminal path count within the path bound (saturating);
+//! 10. root-to-terminal path count within the path bound (saturating). A
+//!     path is a sequence of nodes: parallel edges to the same successor
+//!     count once;
 //! 11. an approval disclosure present exactly on `APPROVAL` turns, with a
 //!     well-formed digest.
 
@@ -183,7 +185,12 @@ impl StrategyGraph {
                     from: edge.from.to_string(),
                 });
             }
-            children.entry(&edge.from).or_default().push(&edge.to);
+            let successors = children.entry(&edge.from).or_default();
+            // Two classes leading to the same node are one path, not two: a path
+            // is a sequence of distinct nodes, which is what a run can execute.
+            if !successors.contains(&&edge.to) {
+                successors.push(&edge.to);
+            }
         }
 
         // 6. terminal / dead end
@@ -694,6 +701,19 @@ pub(crate) mod tests {
         assert!(check(&g).is_err());
         g.nodes[0].turn.approval = Some(disclosure);
         assert!(check(&g).is_ok());
+    }
+
+    #[test]
+    fn rule_10_parallel_edges_to_one_successor_are_one_path() {
+        let g = graph(
+            vec![node("a", false), node("b", true)],
+            vec![
+                edge("a", Refused, "b"),
+                edge("a", Deflected, "b"),
+                edge("a", Partial, "b"),
+            ],
+        );
+        assert_eq!(check(&g).expect("valid").path_count(), 1);
     }
 
     #[test]
