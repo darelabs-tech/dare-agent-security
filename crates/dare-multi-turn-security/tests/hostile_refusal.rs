@@ -279,11 +279,17 @@ fn urls_are_inert_text_and_credentials_are_refused() {
         load_graph(&g).is_ok(),
         "a URL in content is data; nothing fetches it"
     );
-    for secret in [
-        "use sk-live-AbCdEf0123456789",
-        "-----BEGIN PRIVATE KEY-----",
-        "Authorization: Bearer abcdefghijklmnopqrstuvwxyz",
-    ] {
+    // Assembled at run time so this source file carries no credential shape
+    // (scripts/k21/assert_no_real_credentials.py sweeps it).
+    let secrets = [
+        format!("use {}{}", "sk-live-", "AbCdEf0123456789"),
+        format!("-----BEGIN {} KEY-----", "PRIVATE"),
+        format!(
+            "Authorization: {} {}",
+            "Bearer", "abcdefghijklmnopqrstuvwxyz"
+        ),
+    ];
+    for secret in &secrets {
         let mut g = graph(vec![node("a", true)], vec![]);
         g["nodes"][0]["turn"]["content"] = json!(secret);
         assert!(

@@ -199,7 +199,7 @@ pub struct Artifact {
     pub bytes: Vec<u8>,
 }
 
-fn json_bytes<T: Serialize>(value: &T, kind: &'static str) -> Result<Vec<u8>> {
+pub fn json_bytes<T: Serialize>(value: &T, kind: &'static str) -> Result<Vec<u8>> {
     let mut bytes =
         serde_json::to_vec_pretty(value).map_err(|_| MultiTurnError::Serialization { kind })?;
     bytes.push(b'\n');
@@ -267,6 +267,7 @@ pub fn render_summary(result: &MultiTurnResult) -> String {
 pub fn render_artifacts(
     result: &MultiTurnResult,
     run: &RunOutcome,
+    extra: Vec<Artifact>,
     ledger: &mut OutputLedger,
 ) -> Result<Vec<Artifact>> {
     let findings = serde_json::json!({
@@ -295,6 +296,7 @@ pub fn render_artifacts(
             bytes: render_summary(result).into_bytes(),
         },
     ];
+    artifacts.extend(extra);
     for artifact in &artifacts {
         ledger.admit_output(artifact.bytes.len())?;
     }
@@ -494,7 +496,7 @@ mod tests {
         let (r, o, mut ledger) = run(ReferenceAgent::ErodingRefusal {
             refusals_before_comply: 1,
         });
-        let artifacts = render_artifacts(&r, &o, &mut ledger).expect("renders");
+        let artifacts = render_artifacts(&r, &o, Vec::new(), &mut ledger).expect("renders");
         let result = artifacts
             .iter()
             .find(|a| a.name == "multi-turn-result.json")
@@ -514,7 +516,7 @@ mod tests {
     #[test]
     fn output_budget_counts_the_result_artifact() {
         let (r, o, mut ledger) = run(ReferenceAgent::SecureRefuser);
-        let artifacts = render_artifacts(&r, &o, &mut ledger).expect("renders");
+        let artifacts = render_artifacts(&r, &o, Vec::new(), &mut ledger).expect("renders");
         let total: usize = artifacts.iter().map(|a| a.bytes.len()).sum();
         assert_eq!(ledger.snapshot().output_bytes, total as u64);
         let result = artifacts.last().expect("result last");
@@ -530,7 +532,7 @@ mod tests {
             ..EffectiveBounds::default()
         });
         assert!(matches!(
-            render_artifacts(&r, &o, &mut tight),
+            render_artifacts(&r, &o, Vec::new(), &mut tight),
             Err(MultiTurnError::OutputBudgetExceeded(_))
         ));
     }

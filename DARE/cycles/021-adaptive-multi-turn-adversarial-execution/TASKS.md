@@ -40,9 +40,9 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-029 — Add the seven registry entries and property tests
 - [x] task-030 — Add `multi-turn-security-baseline-2026` profile and denominator row
 - [x] task-031 — Implement coverage facts and Cycle 001 evidence bridge
-- [ ] task-032 — Add `validate multi-turn` CLI subcommand
-- [ ] task-033 — Add `multi-turn-security-2026` CI job
-- [ ] task-034 — Add determinism and compatibility tests (including embedded-asset locations)
+- [x] task-032 — Add `validate multi-turn` CLI subcommand
+- [x] task-033 — Add `multi-turn-security-2026` CI job
+- [x] task-034 — Add determinism and compatibility tests (including embedded-asset locations)
 - [ ] task-035 — Security, dependency and container audit
 - [ ] task-036 — Write EN/PT concept and extension docs
 - [ ] task-037 — Write REGRESSION.md and PROOF.md and run the completion gate

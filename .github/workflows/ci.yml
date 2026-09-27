@@ -3183,6 +3183,90 @@ jobs:
           cargo test -p dare-mcp-auth-security -- --nocapture
           cargo test -p dare-supply-chain-security -- --nocapture
 
+  multi-turn-security-2026:
+    name: Cycle 021 adaptive multi-turn adversarial gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Engine unit tests (graph, observation, chain, adapters, runner, invariants, artifact)
+        run: cargo test -p dare-multi-turn-security --lib -- --nocapture
+      - name: The MULTITURN-LAB entries against the harness contract, and replay equivalence
+        run: cargo test -p dare-multi-turn-security --test multiturn_lab -- --nocapture
+      - name: Hostile input is refused before any turn runs
+        run: cargo test -p dare-multi-turn-security --test hostile_refusal -- --nocapture
+      - name: Ten runs give byte-identical artifacts in every mode
+        run: cargo test -p dare-multi-turn-security --test determinism -- --nocapture
+      - name: Earlier registry entries, profiles, CI trigger and Action image assets are unchanged
+        run: cargo test -p dare-multi-turn-security --test compatibility -- --nocapture
+      - name: Multi-turn properties and profile; no earlier denominator moved
+        run: |
+          cargo test -p dare-coverage --test multi_turn_properties -- --nocapture
+          cargo test -p dare-coverage --test multi_turn_profile -- --nocapture
+      - name: Cycle 015/016 families keep their own six properties
+        run: |
+          cargo test -p dare-coverage --test identity_security_properties -- --nocapture
+          cargo test -p dare-coverage --test memory_security_properties -- --nocapture
+      - name: CLI flag surface (no model, provider, endpoint, token, seed, generator or shell flag)
+        run: cargo test -p dare-agent-security --lib multi_turn_security -- --nocapture
+
+      - name: No real credential or live model endpoint anywhere
+        run: python scripts/k21/assert_no_real_credentials.py
+
+      - name: Offline CLI - a refusal that holds across reframings passes
+        run: |
+          rm -rf .dare-agent-security/cycle021-control
+          cargo run -p dare-agent-security -- validate multi-turn \
+            --scenario multiturn-lab-001 \
+            --mode simulated \
+            --output-dir .dare-agent-security/cycle021-control
+          for f in multi-turn-result.json multi-turn-conversations.json multi-turn-evidence.json multi-turn-findings.json summary.md; do
+            test -f .dare-agent-security/cycle021-control/$f
+          done
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle021-control/multi-turn-result.json \
+            verdict=PASS mode=SIMULATED synthetic=true \
+            primary_invariant=I01_REFUSAL_PERSISTENCE \
+            redaction_state=REDACTED \
+            budget.state_changes=0 budget.egress_bytes=0 \
+            --count invariants=7
+
+      - name: Offline CLI - a refusal that erodes on a later turn fails (local-synthetic)
+        run: |
+          rm -rf .dare-agent-security/cycle021-erosion
+          set +e
+          cargo run -p dare-agent-security -- validate multi-turn \
+            --scenario multiturn-lab-002 \
+            --mode local-synthetic \
+            --output-dir .dare-agent-security/cycle021-erosion
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an eroded refusal, got $code"
+            exit 1
+          fi
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle021-erosion/multi-turn-result.json \
+            verdict=FAIL mode=LOCAL_SYNTHETIC \
+            invariants.0.verdict=FAIL invariants.0.reason=REFUSAL_ERODED \
+            budget.state_changes=0 budget.egress_bytes=0
+
+      - name: Offline CLI - a strategy graph with a cycle is refused and writes nothing
+        run: |
+          rm -rf .dare-agent-security/cycle021-refused
+          set +e
+          cargo run -p dare-agent-security -- validate multi-turn \
+            --scenario multiturn-lab-041 \
+            --output-dir .dare-agent-security/cycle021-refused
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for a cyclic strategy graph, got $code"
+            exit 1
+          fi
+          test ! -e .dare-agent-security/cycle021-refused
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

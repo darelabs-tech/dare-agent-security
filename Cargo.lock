@@ -451,6 +451,7 @@ dependencies = [
  "dare-mcp-auth-security",
  "dare-mcp-discovery",
  "dare-memory-security",
+ "dare-multi-turn-security",
  "dare-product",
  "dare-prompt-injection",
  "dare-rag-security",
