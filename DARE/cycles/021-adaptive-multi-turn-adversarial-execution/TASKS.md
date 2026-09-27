@@ -9,7 +9,7 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 
 ## Checklist
 
-- [ ] task-001 — Freeze post-020 baseline, test count, pinned denominators and Action image build
+- [x] task-001 — Freeze post-020 baseline, test count, pinned denominators and Action image build
 - [ ] task-002 — Record multi-turn standards provenance snapshot
 - [ ] task-003 — Create `dare-multi-turn-security` crate skeleton and no-network manifest test
 - [ ] task-004 — Implement `limits.rs` hard maxima and lower-only `Bounds`
