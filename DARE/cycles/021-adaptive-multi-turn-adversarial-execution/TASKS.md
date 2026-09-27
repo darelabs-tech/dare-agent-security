@@ -16,9 +16,9 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-005 — Implement `ids.rs` validated identifier newtypes
 - [x] task-006 — Add JSON schemas (scenario, strategy graph, transcript, result)
 - [x] task-007 — Implement `source.rs`/`schema.rs` byte, depth, schema and hostile admission
-- [ ] task-008 — Implement `StrategyGraph` types and validation rules 1–7 and 11
-- [ ] task-009 — Implement acyclicity, depth and DP path count (rules 8–10)
-- [ ] task-010 — Implement canonical JSON and graph digest
+- [x] task-008 — Implement `StrategyGraph` types and validation rules 1–7 and 11
+- [x] task-009 — Implement acyclicity, depth and DP path count (rules 8–10)
+- [x] task-010 — Implement canonical JSON and graph digest
 - [ ] task-011 — Implement `MultiTurnScenario` model and validation
 - [ ] task-012 — Implement `RawTurnOutput` normalization, canary matching and redaction
 - [ ] task-013 — Implement `Turn`/`ConversationState` with chained digest

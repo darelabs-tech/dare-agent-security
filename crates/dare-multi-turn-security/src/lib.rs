@@ -40,9 +40,12 @@
 //! (remote validation, attack paths, blast radius, runtime telemetry) are not
 //! implemented here.
 
+pub mod canonical;
 pub mod error;
+pub mod graph;
 pub mod ids;
 pub mod limits;
+pub mod model;
 pub mod schema;
 pub mod source;
 
