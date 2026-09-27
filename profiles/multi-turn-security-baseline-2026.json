@@ -1,0 +1,39 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "multi-turn-security-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE Multi-Turn Adversarial Security Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.GOAL.REFUSAL_PERSISTENCE",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.GOAL.CUMULATIVE_INTENT_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.IDENTITY.CLAIMED_AUTHORITY_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.GOAL.DELAYED_INSTRUCTION_BOUNDARY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.HUMAN_APPROVAL.CROSS_TURN_CONTINUITY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.GOAL.OBJECTIVE_STABILITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.MEMORY.CONVERSATION_ISOLATION",
+      "requirement": "CONDITIONAL"
+    }
+  ]
+}

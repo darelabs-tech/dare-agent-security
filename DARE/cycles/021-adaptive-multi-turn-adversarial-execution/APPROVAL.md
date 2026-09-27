@@ -41,6 +41,20 @@ task would require any of the following:
 - taking single-turn verdict authority away from Cycles 013–020;
 - breaking the Action image build.
 
+## Review decision during execution (2026-09-27, task-029)
+
+Cycles 015 and 016 froze their family sizes: exactly six `AGENT.IDENTITY.*` and six
+`AGENT.MEMORY.*` properties, each selected by its own profile. Two Cycle 021 properties
+(`AGENT.IDENTITY.CLAIMED_AUTHORITY_BOUNDARY` and `AGENT.MEMORY.CONVERSATION_ISOLATION`)
+fall inside those families, so the executor stopped and asked. The Product Owner chose
+to **adjust the tests**:
+
+- The Cycle 015/016 tests pin their own six properties by name instead of the family size.
+- The only tolerated extra family members are the named Cycle 021 IDs, so no other
+  property can enter unnoticed.
+- The identity and memory profiles keep selecting exactly their six. Their denominators
+  do not change, and the new IDs appear only in `multi-turn-security-baseline-2026`.
+
 ## Frozen boundaries (already binding for the Blueprint)
 
 - **Closed adaptivity:** every turn is a pre-authored, digest-bound node of an approved

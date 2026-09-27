@@ -33,6 +33,8 @@ pub const AGENTIC_SUPPLY_CHAIN_PROFILE_JSON: &str =
     include_str!("../../../profiles/agentic-supply-chain-security-2026.json");
 pub const AGENTIC_A2A_PROFILE_JSON: &str =
     include_str!("../../../profiles/agentic-a2a-security-2026.json");
+pub const MULTI_TURN_SECURITY_PROFILE_JSON: &str =
+    include_str!("../../../profiles/multi-turn-security-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -294,6 +296,22 @@ pub fn agentic_a2a_profile() -> Result<AssessmentProfile, CoverageError> {
     load_profile(AGENTIC_A2A_PROFILE_JSON)
 }
 
+/// The Cycle 021 multi-turn adversarial profile.
+///
+/// Additive: it selects only the seven cross-turn properties Cycle 021 added
+/// and touches no earlier profile, so no earlier denominator moves. Two of the
+/// seven sit in the identity and memory families; those families' own profiles
+/// keep selecting exactly their six (Product Owner decision, 2026-09-27).
+///
+/// Four are REQUIRED because every stateful agent can be asked the same thing
+/// twice, claim authority, receive planted content or be steered off its
+/// objective. Three are CONDITIONAL because their surface may not exist:
+/// a composite prohibited objective, human approvals, and more than one
+/// principal sharing the agent.
+pub fn multi_turn_security_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(MULTI_TURN_SECURITY_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -315,6 +333,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "mcp-auth-hardening-2026" => mcp_auth_hardening_profile(),
         "agentic-supply-chain-security-2026" => agentic_supply_chain_profile(),
         "agentic-a2a-security-2026" => agentic_a2a_profile(),
+        "multi-turn-security-baseline-2026" => multi_turn_security_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

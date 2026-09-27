@@ -11,6 +11,15 @@ use dare_coverage::{
     Predicate, PropertyRegistry, RiskFamily,
 };
 
+/// Properties a later cycle appended to this family, by name.
+///
+/// Cycle 021 (adaptive multi-turn validation) adds cross-turn properties to
+/// existing families, as its approval requires. The Product Owner decided on
+/// 2026-09-27 that this file keeps pinning Cycle 016's own six properties
+/// exactly, and tolerates only these named additions, never an anonymous one.
+/// See `DARE/cycles/021-adaptive-multi-turn-adversarial-execution/APPROVAL.md`.
+const CYCLE_021_ADDITIONS: [&str; 1] = ["AGENT.MEMORY.CONVERSATION_ISOLATION"];
+
 const CONTEXT_INTEGRITY: &str = "AGENT.MEMORY.CONTEXT_INTEGRITY";
 const TENANT_BOUNDARY: &str = "AGENT.MEMORY.TENANT_BOUNDARY";
 const PROVENANCE_INTEGRITY: &str = "AGENT.MEMORY.PROVENANCE_INTEGRITY";
@@ -60,7 +69,7 @@ fn the_memory_family_holds_exactly_six_properties() {
         .properties
         .iter()
         .map(|property| property.id.as_str())
-        .filter(|id| id.starts_with("AGENT.MEMORY."))
+        .filter(|id| id.starts_with("AGENT.MEMORY.") && !CYCLE_021_ADDITIONS.contains(id))
         .collect();
 
     assert_eq!(
@@ -291,7 +300,10 @@ fn registry_growth_is_additive_and_ids_stay_unique() {
         registry
             .properties
             .iter()
-            .filter(|property| property.id.starts_with("AGENT.MEMORY."))
+            .filter(|property| {
+                property.id.starts_with("AGENT.MEMORY.")
+                    && !CYCLE_021_ADDITIONS.contains(&property.id.as_str())
+            })
             .count(),
         6,
         "the memory property family changed size"
@@ -372,4 +384,17 @@ fn the_memory_properties_reference_asi06_without_claiming_conformance() {
         );
         assert_eq!(property.standards[0].status, "NORMATIVE", "{id}");
     }
+}
+
+#[test]
+fn the_only_later_memory_family_members_are_the_named_cycle_021_additions() {
+    let registry = registry();
+    let extra: Vec<&str> = registry
+        .properties
+        .iter()
+        .map(|property| property.id.as_str())
+        .filter(|id| id.starts_with("AGENT.MEMORY."))
+        .filter(|id| !PRE_EXISTING.contains(id) && !ADDED.contains(id))
+        .collect();
+    assert_eq!(extra, CYCLE_021_ADDITIONS);
 }

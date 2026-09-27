@@ -14,6 +14,15 @@ use dare_coverage::{
     PropertyCategory, RiskFamily, TransportKind,
 };
 
+/// Properties a later cycle appended to this family, by name.
+///
+/// Cycle 021 (adaptive multi-turn validation) adds cross-turn properties to
+/// existing families, as its approval requires. The Product Owner decided on
+/// 2026-09-27 that this file keeps pinning Cycle 015's own six properties
+/// exactly, and tolerates only these named additions, never an anonymous one.
+/// See `DARE/cycles/021-adaptive-multi-turn-adversarial-execution/APPROVAL.md`.
+const CYCLE_021_ADDITIONS: [&str; 1] = ["AGENT.IDENTITY.CLAIMED_AUTHORITY_BOUNDARY"];
+
 /// Facts with every Cycle 015 predicate independently controllable.
 #[allow(clippy::fn_params_excessive_bools)]
 fn facts(
@@ -95,7 +104,7 @@ fn the_registry_grew_by_exactly_four_properties() {
         .properties
         .iter()
         .map(|property| property.id.as_str())
-        .filter(|id| id.starts_with("AGENT.IDENTITY."))
+        .filter(|id| id.starts_with("AGENT.IDENTITY.") && !CYCLE_021_ADDITIONS.contains(id))
         .collect();
     assert_eq!(
         identity_family.len(),
@@ -107,7 +116,7 @@ fn the_registry_grew_by_exactly_four_properties() {
         .properties
         .iter()
         .map(|property| property.id.as_str())
-        .filter(|id| id.starts_with("AGENT.IDENTITY."))
+        .filter(|id| id.starts_with("AGENT.IDENTITY.") && !CYCLE_021_ADDITIONS.contains(id))
         .collect();
     assert_eq!(
         identity,
@@ -427,10 +436,8 @@ fn no_identity_property_declares_an_executable_or_credential_field() {
         .expect("properties")
         .iter()
         .filter(|property| {
-            property["id"]
-                .as_str()
-                .unwrap_or_default()
-                .starts_with("AGENT.IDENTITY.")
+            let id = property["id"].as_str().unwrap_or_default();
+            id.starts_with("AGENT.IDENTITY.") && !CYCLE_021_ADDITIONS.contains(&id)
         })
         .collect();
     assert_eq!(identity.len(), 6);
@@ -457,4 +464,29 @@ fn no_identity_property_declares_an_executable_or_credential_field() {
             );
         }
     }
+}
+
+#[test]
+fn the_only_later_identity_family_members_are_the_named_cycle_021_additions() {
+    // The counterpart of tolerating named additions: every family member is
+    // either one of Cycle 015's six or one of the named Cycle 021 ids.
+    let registry = agentic_registry().expect("agentic registry");
+    let extra: Vec<&str> = registry
+        .properties
+        .iter()
+        .map(|property| property.id.as_str())
+        .filter(|id| id.starts_with("AGENT.IDENTITY."))
+        .filter(|id| {
+            ![
+                DELEGATION_INTEGRITY,
+                PRIVILEGE_AMPLIFICATION,
+                PRINCIPAL_BINDING,
+                DELEGATION_SCOPE,
+                TENANT_RESOURCE,
+                AUTHORIZATION_BINDING,
+            ]
+            .contains(id)
+        })
+        .collect();
+    assert_eq!(extra, CYCLE_021_ADDITIONS);
 }

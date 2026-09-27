@@ -43,7 +43,9 @@
 pub mod budget;
 pub mod canonical;
 pub mod conversation;
+pub mod coverage;
 pub mod error;
+pub mod evidence_bridge;
 pub mod graph;
 pub mod harness;
 pub mod ids;
