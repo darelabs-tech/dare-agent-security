@@ -1,7 +1,7 @@
 # Cycle 015 — Evaluation
 
 **Cycle:** 015 — Identity, Privilege & Delegation Security
-**Status:** READY FOR REVIEW
+**Status:** APPROVED
 **Planning date:** 2026-09-05
 **Baseline:** `main` at `2f9c02b4f4f94daa5478a0785f74814fb2d021a2`
 

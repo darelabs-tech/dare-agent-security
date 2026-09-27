@@ -1,7 +1,7 @@
 # Cycle 017 — Evaluation
 
 **Cycle:** 017 — RAG & Retrieval Security  
-**Status:** READY FOR REVIEW  
+**Status:** APPROVED  
 **Baseline:** `main @ c0cd5edbb5a157d285b20177b7bd20a23b1811cc`  
 **Branch:** `agent/cycle-017-rag-retrieval-security`
 

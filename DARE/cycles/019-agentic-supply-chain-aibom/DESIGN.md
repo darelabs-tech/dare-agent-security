@@ -1,7 +1,7 @@
 # Cycle 019 — Design
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING  
+**Status:** APPROVED  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27  
 **Baseline:** `main @ 83fee819ef07f29a8d27cedd95db809b34829fd9`
 
 ## 1. Objective

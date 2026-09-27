@@ -1,6 +1,6 @@
 # Cycle 018 — Tasks
 
-**Status:** COMPLETE — 48/48 tasks closed, merged as PR #28
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #28, #29, #33) — see `../ACCEPTANCE.md`
 **Approval:** APPROVED
 **Post-merge:** SECURITY REVIEW APPLIED — see `POST-MERGE-REVIEW.md`
 

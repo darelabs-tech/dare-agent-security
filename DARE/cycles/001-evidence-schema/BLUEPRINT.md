@@ -1,6 +1,6 @@
 # Cycle 001 — Blueprint: Deterministic Security Evidence Schema
 
-> Status: **ARCHITECTURE PROPOSED**
+> Status: **APPROVED**
 > Depends on: `DESIGN.md` (approved)
 > Issue: #2
 

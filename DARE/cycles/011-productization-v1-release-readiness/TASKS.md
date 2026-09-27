@@ -1,7 +1,7 @@
 # Cycle 011 - Tasks
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #17) — see `../ACCEPTANCE.md`  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## task-001 - Reconcile post-Cycle-010 main
 

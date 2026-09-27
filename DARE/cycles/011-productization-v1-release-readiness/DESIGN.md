@@ -1,10 +1,10 @@
 # Cycle 011 - Productization & v1.0 Release Readiness
 
-**Status:** DESIGN READY FOR REVIEW  
+**Status:** APPROVED  
 **Base branch:** `main`  
 **Baseline:** Cycles 001-010 delivered  
 **Proposed branch:** `agent/cycle-011-productization-v1-release-readiness`  
-**Approval:** PENDING
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## 1. Purpose
 

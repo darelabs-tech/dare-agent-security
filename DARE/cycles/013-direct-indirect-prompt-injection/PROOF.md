@@ -1,6 +1,6 @@
 # Cycle 013 Final Proof — Direct + Indirect Prompt Injection Validation
 
-**Cycle status:** COMPLETE — awaiting DARE Review acceptance
+**Cycle status:** ACCEPTED 2026-09-27 — final human review complete
 **Completed:** 2026-09-05
 **Branch:** `agent/cycle-013-direct-indirect-prompt-injection`
 **Planning baseline:** `0bbab9d4e8734a4bd97dbf119cc5d3696a4df34a`

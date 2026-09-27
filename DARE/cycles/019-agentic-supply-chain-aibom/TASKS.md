@@ -1,6 +1,6 @@
 # Cycle 019 — Tasks
 
-**Status:** APPROVED FOR EXECUTION  
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #34, #39) — see `../ACCEPTANCE.md`  
 **Approval:** APPROVED  
 **Baseline:** `main @ 83fee819ef07f29a8d27cedd95db809b34829fd9`
 

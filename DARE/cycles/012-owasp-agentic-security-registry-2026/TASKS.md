@@ -1,6 +1,6 @@
 # Cycle 012 - Tasks
 
-**Status:** DONE  
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #18) — see `../ACCEPTANCE.md`  
 **Approval:** APPROVED 2026-09-03  
 **Completed:** 2026-09-05  
 **Final implementation head:** `0473ca9276e53bc8f739a3ae0f7ca99d61157d27`

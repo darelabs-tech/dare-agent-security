@@ -1,6 +1,6 @@
 # Cycle 014 — Tasks
 
-**Status:** IN PROGRESS
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #21) — see `../ACCEPTANCE.md`
 **Approval:** APPROVED — see `APPROVAL.md`
 
 - [x] task-001 — Reconcile current main baseline and freeze compatibility contracts

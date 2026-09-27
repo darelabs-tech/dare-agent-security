@@ -2,7 +2,7 @@
 
 **Baseline reviewed:** `3fcf3bb8177dbca3d5cbf49df9d9d8923d5681c1`  
 **Corrective branch:** `fix/cycle-019-post-merge-security-review`  
-**Status:** CORRECTIVE IMPLEMENTATION — CI PENDING
+**Status:** CORRECTIVE IMPLEMENTATION — MERGED (PR #39); ACCEPTED 2026-09-27
 
 ## Review rule
 

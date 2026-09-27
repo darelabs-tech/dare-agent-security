@@ -1,6 +1,6 @@
 # Cycle 020 — Tasks
 
-**Status:** APPROVED FOR EXECUTION  
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #41, #42, #43) — see `../ACCEPTANCE.md`  
 **Approval:** APPROVED  
 **Baseline:** `main @ d2bff1d3789074dffaae45a7ce57a3563daeb1ff`  
 **Branch:** `agent/cycle-020-a2a-inter-agent-security`

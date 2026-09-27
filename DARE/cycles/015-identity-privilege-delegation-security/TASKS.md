@@ -1,6 +1,6 @@
 # Cycle 015 — Tasks
 
-**Status:** COMPLETE — all 35 tasks executed; see `REGRESSION.md` and `PROOF.md`
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #22) — see `../ACCEPTANCE.md`
 **Approval:** APPROVED — see `APPROVAL.md`
 
 - [x] task-001 — Reconcile current main/Cycle 014 baseline and freeze compatibility contracts

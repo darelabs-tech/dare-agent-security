@@ -1,7 +1,7 @@
 # Cycle 016 — Memory & Context Poisoning Security — Blueprint
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** APPROVED  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## Architecture
 

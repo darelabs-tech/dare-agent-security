@@ -1,6 +1,6 @@
 # Cycle 017 — Tasks
 
-**Status:** IN PROGRESS  
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #24, #27) — see `../ACCEPTANCE.md`  
 **Approval:** APPROVED
 
 - [x] task-001 — Freeze post-Cycle-016 baseline and compatibility contracts

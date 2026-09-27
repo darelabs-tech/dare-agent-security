@@ -1,11 +1,11 @@
 # Cycle 016 — Memory & Context Poisoning Security — Evaluation
 
-**Status:** READY FOR REVIEW  
+**Status:** APPROVED  
 **Cycle:** 016  
 **Base branch:** `main`  
 **Baseline commit:** `9d543ae0ec202b7ad05a852179ca5703857a317a`  
 **Branch:** `agent/cycle-016-memory-context-poisoning-security`  
-**Approval:** PENDING — no `APPROVAL.md` before explicit Product Owner approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## Problem
 

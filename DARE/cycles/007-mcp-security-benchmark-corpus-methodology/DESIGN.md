@@ -1,12 +1,12 @@
 # Cycle 007 — MCP Security Benchmark & Corpus Methodology
 
-**Status:** DESIGN READY FOR REVIEW  
+**Status:** APPROVED  
 **Cycle:** 007  
 **Name:** MCP Security Benchmark & Corpus Methodology  
 **Base branch:** `main`  
 **Planning baseline:** Cycles 001–006 delivered on `main`  
 **Proposed branch:** `agent/cycle-007-mcp-security-benchmark-corpus-methodology`  
-**Approval:** PENDING — do not create `APPROVAL.md` before explicit human approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## Context
 
