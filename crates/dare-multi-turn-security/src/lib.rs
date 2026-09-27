@@ -40,15 +40,20 @@
 //! (remote validation, attack paths, blast radius, runtime telemetry) are not
 //! implemented here.
 
+pub mod budget;
 pub mod canonical;
 pub mod conversation;
 pub mod error;
 pub mod graph;
+pub mod harness;
 pub mod ids;
 pub mod limits;
+pub mod local_synthetic;
 pub mod model;
 pub mod observation;
+pub mod replay;
 pub mod schema;
+pub mod simulated;
 pub mod source;
 
 #[cfg(test)]

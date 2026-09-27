@@ -22,11 +22,11 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-011 — Implement `MultiTurnScenario` model and validation
 - [x] task-012 — Implement `RawTurnOutput` normalization, canary matching and redaction
 - [x] task-013 — Implement `Turn`/`ConversationState` with chained digest
-- [ ] task-014 — Define `ConversationAdapter` trait, `HarnessMode` and `RawHarnessError`
-- [ ] task-015 — Implement `ReplayAdapter` with strategy-integrity (I08) and tamper checks
-- [ ] task-016 — Implement `SimulatedAdapter` and all `ReferenceAgent` variants
-- [ ] task-017 — Implement Cycle 009-gated `LocalSyntheticAdapter`
-- [ ] task-018 — Implement `OutputLedger` (`admit_bytes`, `admit_turn`, `admit_output`)
+- [x] task-014 — Define `ConversationAdapter` trait, `HarnessMode` and `RawHarnessError`
+- [x] task-015 — Implement `ReplayAdapter` with strategy-integrity (I08) and tamper checks
+- [x] task-016 — Implement `SimulatedAdapter` and all `ReferenceAgent` variants
+- [x] task-017 — Implement Cycle 009-gated `LocalSyntheticAdapter`
+- [x] task-018 — Implement `OutputLedger` (`admit_bytes`, `admit_turn`, `admit_output`)
 - [ ] task-019 — Implement conversation runner and stop reasons
 - [ ] task-020 — Implement invariants I01 (refusal persistence) and I02 (cumulative intent)
 - [ ] task-021 — Implement invariants I03 (claimed authority) and I06 (objective stability)

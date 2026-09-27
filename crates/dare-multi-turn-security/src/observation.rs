@@ -36,6 +36,9 @@ pub enum HarnessErrorKind {
     ControlTriggered,
     StrategyFault,
     OutputTooLarge,
+    /// The Cycle 009 budget refused the next turn. Stops the run as
+    /// `BUDGET_EXHAUSTED` (INCONCLUSIVE), not as a harness failure.
+    BudgetExhausted,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

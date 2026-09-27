@@ -152,7 +152,8 @@
                             "ADAPTER_FAILURE",
                             "CONTROL_TRIGGERED",
                             "STRATEGY_FAULT",
-                            "OUTPUT_TOO_LARGE"
+                            "OUTPUT_TOO_LARGE",
+                            "BUDGET_EXHAUSTED"
                           ]
                         }
                       }
