@@ -1,0 +1,34 @@
+[package]
+name = "dare-multi-turn-security"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Bounded, deterministic, offline validation of adaptive multi-turn adversarial conversations (Cycle 021)"
+publish = false
+
+[lib]
+name = "dare_multi_turn_security"
+path = "src/lib.rs"
+
+# No HTTP client, no TLS stack, no process spawner, no random-number generator
+# and no model client is declared here.
+#
+# "Adaptive" in this crate means selecting the next pre-approved turn from a
+# closed strategy graph. It never means generating one. The absence of any
+# dependency that could reach a model, sample a random choice or send a request
+# is what makes that true, and `lib.rs` checks the manifest rather than trusting
+# this comment.
+[dependencies]
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.14"

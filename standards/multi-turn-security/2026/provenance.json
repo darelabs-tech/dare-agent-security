@@ -1,0 +1,73 @@
+{
+  "schema_version": "1",
+  "recorded_at": "2026-09-27",
+  "cycle": "021-adaptive-multi-turn-adversarial-execution",
+  "fetch_policy": "NO_NETWORK_ACCESS",
+  "fetch_policy_note": "Nothing in this cycle retrieves a specification, a model, a transcript or a strategy from anywhere. Every source below is a pinned reference recorded with the status the Cycle 021 approval assigned it.",
+  "reverification_note": "No upstream re-verification of any source below was performed during this cycle. These are the references the Cycle 021 approval froze on 2026-09-27, reusing the exact strings already present in schemas/coverage/v2/registry.json. They should be re-checked against the publishers before being relied on.",
+  "conformance_disclaimer": "Nothing in this cycle asserts conformance with any source listed here. A PASS states that a named cross-turn property held on the path a target's own responses selected through an approved strategy graph. It is never a claim that the target is secure, that unreached nodes would also hold, or that any specification is satisfied.",
+  "status_discipline_note": "Only NORMATIVE sources may inform a mandatory PASS condition. The OWASP families below name the risks; the seven invariants are this engine's decomposition of their multi-turn forms into questions local evidence can answer. No mapping is itself normative.",
+  "sources": [
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026_ASI01",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "version": "2026",
+      "canonical_reference": "ASI01 Agent Goal Hijacking",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY",
+      "mapping_notes": "Refusal erosion, cumulative (fragmented) intent, delayed instructions and objective drift are multi-turn forms of goal hijacking."
+    },
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026_ASI03",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "version": "2026",
+      "canonical_reference": "ASI03 Identity and Privilege Abuse",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY",
+      "mapping_notes": "Trust grooming: authority claimed or accumulated across turns must never exceed the principal's verified authority."
+    },
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026_ASI06",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "version": "2026",
+      "canonical_reference": "ASI06 Memory and Context Poisoning",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY",
+      "mapping_notes": "Conversation isolation: state from one conversation or principal must not surface in another. Storage-level memory semantics stay with Cycle 016."
+    },
+    {
+      "id": "OWASP_AGENTIC_TOP10_2026_ASI09",
+      "title": "OWASP Top 10 for Agentic Applications 2026",
+      "version": "2026",
+      "canonical_reference": "ASI09 Human-Agent Trust Exploitation",
+      "status": "NORMATIVE",
+      "usage": "RISK_TAXONOMY",
+      "mapping_notes": "Approval bait-and-switch: an approval given on one turn binds only to the action disclosed on that turn."
+    },
+    {
+      "id": "OWASP_LLM_TOP10_2025",
+      "title": "OWASP Top 10 for LLM Applications",
+      "version": "2025",
+      "canonical_reference": "LLM01 Prompt Injection",
+      "status": "INFORMATIVE",
+      "usage": "DELIVERY_TECHNIQUE",
+      "mapping_notes": "Prompt injection is a delivery technique, not a risk family here. Single-turn injection verdicts remain owned by Cycle 013; this cycle records a same-turn emission only as a delegated finding."
+    }
+  ],
+  "property_mappings": [
+    {"property_id": "AGENT.GOAL.REFUSAL_PERSISTENCE", "invariant": "I01", "source": "OWASP_AGENTIC_TOP10_2026_ASI01", "status": "MAPPING"},
+    {"property_id": "AGENT.GOAL.CUMULATIVE_INTENT_BOUNDARY", "invariant": "I02", "source": "OWASP_AGENTIC_TOP10_2026_ASI01", "status": "MAPPING"},
+    {"property_id": "AGENT.IDENTITY.CLAIMED_AUTHORITY_BOUNDARY", "invariant": "I03", "source": "OWASP_AGENTIC_TOP10_2026_ASI03", "status": "MAPPING"},
+    {"property_id": "AGENT.GOAL.DELAYED_INSTRUCTION_BOUNDARY", "invariant": "I04", "source": "OWASP_AGENTIC_TOP10_2026_ASI01", "status": "MAPPING"},
+    {"property_id": "AGENT.HUMAN_APPROVAL.CROSS_TURN_CONTINUITY", "invariant": "I05", "source": "OWASP_AGENTIC_TOP10_2026_ASI09", "status": "MAPPING"},
+    {"property_id": "AGENT.GOAL.OBJECTIVE_STABILITY", "invariant": "I06", "source": "OWASP_AGENTIC_TOP10_2026_ASI01", "status": "MAPPING"},
+    {"property_id": "AGENT.MEMORY.CONVERSATION_ISOLATION", "invariant": "I07", "source": "OWASP_AGENTIC_TOP10_2026_ASI06", "status": "MAPPING"}
+  ],
+  "deferred": [
+    {"scope": "live or remote conversational targets", "cycle": "022"},
+    {"scope": "attack-path construction", "cycle": "023"},
+    {"scope": "blast-radius analysis", "cycle": "024"},
+    {"scope": "runtime OpenTelemetry security", "cycle": "025"},
+    {"scope": "generated, mutated or paraphrased turns", "cycle": "none — excluded by design"}
+  ]
+}
