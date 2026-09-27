@@ -1,9 +1,9 @@
 # Cycle 021 — Design: Adaptive Multi-Turn Adversarial Execution
 
-**Version:** v0.1 | **Date:** 2026-09-27 | **Status:** DRAFT — READY FOR REVIEW  
+**Version:** v0.1 | **Date:** 2026-09-27 | **Status:** DESIGN APPROVED  
 **Base branch:** `main` (`4ca06b2`, Cycles 001–020 accepted — see `../ACCEPTANCE.md`)  
 **Proposed crate:** `crates/dare-multi-turn-security`  
-**Approval:** PENDING — `APPROVAL.md` must remain absent until explicit Product Owner approval.
+**Approval:** APPROVED (Design phase) 2026-09-27 — see `APPROVAL.md`. Execution is not yet authorized.
 
 ---
 
@@ -68,7 +68,7 @@ does not construct attack paths across systems (Cycle 023).
 |----|-------------|----------|----------------------|
 | RF-01 | Conversation model | MUST | `Conversation`, `Turn`, `TurnRole` and `TurnObservation` types exist; every turn carries index, role, principal, bounded redacted content digest, and a chained digest over all prior turns |
 | RF-02 | Stateful adapter contract | MUST | `ConversationAdapter::respond(&ConversationState) -> RawTurnOutput` receives the normalized transcript so far; it is the only adapter in the workspace that sees prior turns and it has no network, filesystem-write or process capability |
-| RF-03 | Finite strategy graph | MUST | `StrategyGraph` = nodes (pre-authored turns from a closed turn library) + edges labelled by a closed `ObservationClass`; schema-validated, acyclic or with an explicit per-node visit bound, and digest-bound into the plan |
+| RF-03 | Finite strategy graph | MUST | `StrategyGraph` = nodes (pre-authored turns from a closed turn library) + edges labelled by a closed `ObservationClass`; schema-validated, **strictly acyclic (DAG)**, path count computed and bounded before execution, and digest-bound into the plan |
 | RF-04 | Deterministic branch selection | MUST | Next node is a pure function of `(graph, normalized observation history)`; no randomness, no clock, no LLM; tested by repeated-run byte equality |
 | RF-05 | Closed observation classification | MUST | Target output normalizes into a closed enum (e.g. `REFUSED`, `COMPLIED`, `PARTIAL`, `DEFLECTED`, `AUTHORITY_ACCEPTED`, `ACTION_REQUESTED`, `ACTION_EXECUTED`, `UNCLASSIFIABLE`) using exact canary/decision evidence, reusing the Cycle 013 canary approach; `UNCLASSIFIABLE` never selects a "secure" edge |
 | RF-06 | Multi-turn invariants | MUST | Invariants I01–I08 (§4.2) implemented as deterministic evaluators over the full conversation, each with positive PASS coverage rules |
@@ -77,7 +77,7 @@ does not construct attack paths across systems (Cycle 023).
 | RF-09 | Modes | MUST | `REPLAY` (captured multi-turn transcripts), `SIMULATED` (deterministic stateful reference agents), `LOCAL_SYNTHETIC` (through the Cycle 009 substrate: every turn is a `VectorStep` inspected by `kill_switch` and charged to `BudgetState`) |
 | RF-10 | Replay binding | MUST | A replayed transcript binds to the plan's graph digest, and each turn to the node it claims; reordered, inserted, dropped or substituted turns are refused before evaluation |
 | RF-11 | MULTITURN-LAB corpus | MUST | ≥ 40 entries (§4.4) with harness contracts; fixtures store class and evidence, never the expected verdict |
-| RF-12 | Hostile/refusal corpus | MUST | Bounded fixtures for graph bombs, cycles without visit bounds, free-text generator directives, oversized turns, transcript tampering, bidi/control characters, secret-like content (§4.5) |
+| RF-12 | Hostile/refusal corpus | MUST | Bounded fixtures for graph bombs, any cycle, free-text generator directives, oversized turns, transcript tampering, bidi/control characters, secret-like content (§4.5) |
 | RF-13 | CLI | MUST | `dare-agent-security validate multi-turn` with local-only flag classes (§4.6) |
 | RF-14 | Artifacts | MUST | `multi-turn-result.json`, `multi-turn-conversations.json`, `multi-turn-evidence.json`, `multi-turn-findings.json`, `summary.md`, each admitted through the run-wide output ledger before write |
 | RF-15 | Property registry | MUST | Seven additive properties inside the existing `AGENT.GOAL`, `AGENT.IDENTITY`, `AGENT.HUMAN_APPROVAL` and `AGENT.MEMORY` families (§4.1), gated by the existing `stateful_agent_present` predicate; existing IDs and denominators unchanged |
@@ -149,7 +149,7 @@ Each one is paired with a secure twin that serves as its control.
 
 ### 4.5 Hostile / refusal corpus
 
-- **Graph shape:** graphs exceeding node, edge, depth or path hard maxima; unbounded cycles; exponential path fan-out (graph bomb).
+- **Graph shape:** graphs exceeding node, edge, depth or path hard maxima; any cycle (graphs must be acyclic); exponential path fan-out (graph bomb).
 - **Forbidden turn types:** nodes carrying a free-text generator directive, template expansion or "mutate" operation.
 - **Turn content:** oversized turns, deeply nested JSON, duplicate turn indices.
 - **Transcript tampering:** reordered, inserted or dropped turns in a replayed transcript; a chained-digest mismatch.
@@ -181,7 +181,7 @@ Each one is paired with a secure twin that serves as its control.
 | ID | Category | Requirement | Target |
 |----|----------|-------------|--------|
 | RNF-01 | Determinism | Identical inputs give byte-identical artifacts; no clock, RNG or hash-map iteration order in outputs | 10/10 repeated runs identical |
-| RNF-02 | Boundedness | Hard maxima (input may only lower them): turns per conversation, nodes, edges, paths, bytes per turn, total output | Proposed: 32 turns, 256 nodes, 64 paths, 16 KiB/turn, 8 MiB output (to be confirmed in Blueprint) |
+| RNF-02 | Boundedness | Hard maxima (input may only lower them): turns per conversation, nodes, edges, paths, bytes per turn, total output | 32 turns, 256 nodes, 64 enumerable paths per graph, 16 KiB/turn, 8 MiB output (decided 2026-09-27; byte limits may be tuned in Blueprint) |
 | RNF-03 | Performance | Full MULTITURN-LAB run in CI | < 60 s on `ubuntu-latest` |
 | RNF-04 | Offline | No network, DNS, process spawn or filesystem write outside the output directory | Enforced by tests + Cycle 009 kill switch |
 | RNF-05 | Observability | Every stop reason is explicit (`TERMINAL_REACHED`, `FIRST_FAIL`, `BUDGET_EXHAUSTED`, `HARNESS_ERROR`, `STRATEGY_FAULT`) | 100 % of results |
@@ -290,19 +290,19 @@ recorded in `REGRESSION.md`.
 ## 13. Open questions for Review
 
 1. **Namespace — DECIDED (2026-09-27):** fold the properties into the existing families instead of creating `AGENT.MULTI_TURN.*`. See §4.1.
-2. **Hard maxima:** are the RNF-02 values (32 turns, 256 nodes, 64 paths) acceptable?
-3. **Cycles:** should a strategy graph allow cycles with explicit per-node visit bounds (proposed), or be strictly acyclic?
-4. **REPLAY corpus:** should REPLAY include sanitized real transcripts from the Product Validation Program, or stay synthetic-only for v1?
+2. **Hard maxima — DECIDED (2026-09-27):** 32 turns per conversation, 256 nodes and 64 enumerable paths per graph. Input may only lower them. Only one path executes per conversation; the path limit bounds the graph and is checked before execution.
+3. **Cycles — DECIDED (2026-09-27):** strategy graphs are strictly acyclic (DAG) in v1. Retries with a different framing are written as explicit nodes. Visit-bounded cycles may be added later as a compatible change.
+4. **REPLAY corpus — DECIDED (2026-09-27):** the published MULTITURN-LAB corpus is synthetic-only (Product Design §10.6–7). REPLAY **mode** still accepts real transcripts that a user supplies locally for private use; they never enter repository fixtures.
 
 ---
 
 ## 14. Approval checklist
 
-- [ ] Functional requirements reviewed and prioritized
-- [ ] Definition of "adaptive" (closed, graph-bound, no generation) accepted
+- [x] Functional requirements reviewed and prioritized
+- [x] Definition of "adaptive" (closed, graph-bound, no generation) accepted
 - [x] Property placement: additive IDs inside existing families (§4.1) — decided 2026-09-27
-- [ ] Seven property IDs and ASI mappings in §4.1 accepted
-- [ ] Security requirements RS-06 to RS-09 validated by the Tech Lead
-- [ ] Out-of-scope boundary with Cycles 022–025 confirmed
-- [ ] Critical risks (R-01, R-03) have accepted mitigations
-- [ ] Open questions in §13 answered
+- [x] Seven property IDs and ASI mappings in §4.1 accepted
+- [x] Security requirements RS-06 to RS-09 validated by the Tech Lead
+- [x] Out-of-scope boundary with Cycles 022–025 confirmed
+- [x] Critical risks (R-01, R-03) have accepted mitigations
+- [x] Open questions in §13 answered — 2026-09-27
