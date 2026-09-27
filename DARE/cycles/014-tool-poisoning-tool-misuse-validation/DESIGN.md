@@ -1,12 +1,12 @@
 # Cycle 014 — Tool Poisoning & Tool Misuse Validation
 
-**Status:** READY FOR REVIEW
+**Status:** APPROVED
 **Cycle:** 014
 **Name:** Tool Poisoning & Tool Misuse Validation
 **Base branch:** `main`
 **Baseline commit:** `1fa9ba04e55e53e25d71621675cba9a70d174e8e`
 **Branch:** `agent/cycle-014-tool-poisoning-tool-misuse-validation`
-**Approval:** PENDING — `APPROVAL.md` must remain absent until explicit Product Owner approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## 1. Context
 

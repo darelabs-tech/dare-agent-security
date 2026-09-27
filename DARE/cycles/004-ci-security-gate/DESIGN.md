@@ -1,10 +1,10 @@
 # Cycle 004 — CI Security Gate
 
-**Status:** DESIGN READY FOR REVIEW  
+**Status:** APPROVED  
 **Cycle:** 004  
 **Name:** CI Security Gate  
 **Proposed branch:** `agent/cycle-004-ci-security-gate`  
-**Approval:** PENDING — do not create `APPROVAL.md` before explicit human approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## Context
 

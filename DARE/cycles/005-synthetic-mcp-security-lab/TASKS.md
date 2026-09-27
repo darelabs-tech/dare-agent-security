@@ -1,6 +1,6 @@
 # Cycle 005 — Tasks
 
-> Status: **APPROVED FOR EXECUTION**
+> Status: **DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #10) — see `../ACCEPTANCE.md`**
 > Design: `DESIGN.md` (approved)
 > Architecture: `BLUEPRINT.md` (approved)
 > Approval: `APPROVAL.md`

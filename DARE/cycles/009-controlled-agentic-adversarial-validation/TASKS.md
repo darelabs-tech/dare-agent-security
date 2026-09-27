@@ -1,6 +1,6 @@
 # Cycle 009 — Tasks
 
-**Status:** EXECUTED (20/20 DONE)  
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #15) — see `../ACCEPTANCE.md`  
 **Approval:** APPROVED (2026-08-20)
 
 ## task-001 — Reconcile post-Cycle-008 `main`

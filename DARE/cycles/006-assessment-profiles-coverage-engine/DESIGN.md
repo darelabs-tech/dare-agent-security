@@ -1,13 +1,13 @@
 # Cycle 006 — Assessment Profiles & Coverage Engine
 
-**Status:** DESIGN READY FOR REVIEW  
+**Status:** APPROVED  
 **Cycle:** 006  
 **Name:** Assessment Profiles & Coverage Engine  
 **Base branch:** `main`  
 **Confirmed planning baseline:** Cycles 001–004 delivered on `main`  
 **Cycle 005:** not assumed to be merged; integration is optional/conditional  
 **Proposed branch:** `agent/cycle-006-assessment-profiles-coverage-engine`  
-**Approval:** PENDING — do not create `APPROVAL.md` before explicit human approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## Context
 

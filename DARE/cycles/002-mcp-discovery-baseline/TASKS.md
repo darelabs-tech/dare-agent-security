@@ -1,6 +1,6 @@
 # Cycle 002 — Tasks: Passive MCP Discovery and Enterprise Security Baseline
 
-> Status: **IMPLEMENTATION COMPLETE — PENDING HUMAN FINAL REVIEW**
+> Status: **DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #6) — see `../ACCEPTANCE.md`**
 > Issue: #3
 > Design: `DESIGN.md` (approved)
 > Architecture: `BLUEPRINT.md` (approved)

@@ -1,6 +1,6 @@
 # Cycle 003 — Tasks: COAZ-MCP Authorization-to-Execution Integrity
 
-> Status: **approved**
+> Status: **DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #8) — see `../ACCEPTANCE.md`**
 > Issue: #4
 > Design: `DESIGN.md` (approved)
 > Architecture: `BLUEPRINT.md` (approved)

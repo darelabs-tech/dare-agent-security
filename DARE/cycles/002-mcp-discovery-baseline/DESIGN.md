@@ -1,6 +1,6 @@
 # Cycle 002 — Passive MCP Discovery & Enterprise Security Baseline
 
-> Status: **DESIGN READY FOR REVIEW**
+> Status: **APPROVED**
 > Tracks: #3
 > Depends on: Cycle 001 — Deterministic Security Evidence Schema
 > Proposed: 2026-08-18

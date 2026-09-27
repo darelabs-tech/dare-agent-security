@@ -1,7 +1,7 @@
 # Cycle 004 — Blueprint
 
-**Status:** ARCHITECTURE PROPOSED  
-**Approval:** PENDING
+**Status:** APPROVED  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## Dependency statement
 

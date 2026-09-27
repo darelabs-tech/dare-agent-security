@@ -1,8 +1,8 @@
 # Cycle 018 — Evaluation
 
 **Title:** MCP 2026 Security & Auth Hardening  
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING  
+**Status:** APPROVED  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27  
 **Baseline:** `main @ f5906e8b24679b7affffcdc9db5d6116ba9b045d`
 
 ## 1. Problem

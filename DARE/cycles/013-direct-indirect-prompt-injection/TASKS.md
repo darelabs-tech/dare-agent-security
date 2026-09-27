@@ -1,6 +1,6 @@
 # Cycle 013 — Tasks
 
-**Status:** COMPLETE — awaiting DARE Review acceptance
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #19, #20) — see `../ACCEPTANCE.md`
 **Approval:** APPROVED 2026-09-05
 **Completed:** 2026-09-05
 **Validated implementation head:** recorded in `PROOF.md`

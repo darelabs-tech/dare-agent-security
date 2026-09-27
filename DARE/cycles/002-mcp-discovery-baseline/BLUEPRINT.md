@@ -1,6 +1,6 @@
 # Cycle 002 — Blueprint: Passive MCP Discovery and Enterprise Security Baseline
 
-> Status: **ARCHITECTURE PROPOSED**
+> Status: **APPROVED**
 > Issue: #3
 > Depends on: approved `DESIGN.md`, Cycle 001 evidence kernel
 

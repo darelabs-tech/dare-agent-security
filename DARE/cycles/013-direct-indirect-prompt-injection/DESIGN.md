@@ -1,13 +1,13 @@
 # Cycle 013 — Direct + Indirect Prompt Injection Validation
 
-**Status:** READY FOR REVIEW  
+**Status:** APPROVED  
 **Cycle:** 013  
 **Name:** Direct + Indirect Prompt Injection Validation  
 **Base branch:** `main`  
 **Planning baseline:** Cycle 012 merged via PR #18  
 **Baseline commit:** `09e1279cd9ee2b2319d85272af35775b64ccba5c`  
 **Branch:** `agent/cycle-013-direct-indirect-prompt-injection`  
-**Approval:** PENDING — `APPROVAL.md` must remain absent until explicit Product Owner approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## 1. Context
 

@@ -1,6 +1,6 @@
 # Cycle 015 — Blueprint
 
-**Status:** READY FOR REVIEW
+**Status:** APPROVED
 **Cycle:** 015 — Identity, Privilege & Delegation Security
 
 ## Architecture intent

@@ -1,6 +1,6 @@
 # Cycle 010 — Tasks
 
-**Status:** IMPLEMENTED — TASKS 001–024 DONE, PENDING FINAL HUMAN REVIEW  
+**Status:** DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #16) — see `../ACCEPTANCE.md`  
 **Approval:** APPROVED (2026-08-20)
 
 **Execution result:** Tasks 002–024 implemented with schemas, `dare-continuous`, fixture/security tests, CLI, CI, documentation, final proof, and mandatory Ralph Loop evidence. Task 001 reconciliation remains preserved.

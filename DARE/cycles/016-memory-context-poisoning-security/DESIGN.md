@@ -1,7 +1,7 @@
 # Cycle 016 — Memory & Context Poisoning Security — Design
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING  
+**Status:** APPROVED  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27  
 **Baseline:** `main @ 9d543ae0ec202b7ad05a852179ca5703857a317a`
 
 ## 1. Goal

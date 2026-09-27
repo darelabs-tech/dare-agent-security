@@ -1,7 +1,7 @@
 # DARE Agent Security — Cycle 001 TASKS
 
 > Cycle: `001-evidence-schema`
-> Status: **READY FOR EXECUTION SPECIFICATION**
+> Status: **DONE — ACCEPTED 2026-09-27 (final human review; merged via PR #5) — see `../ACCEPTANCE.md`**
 > Issue: #2
 > Source of truth: `DESIGN.md` + approved `BLUEPRINT.md`
 > Implementation language: Rust

@@ -1,11 +1,11 @@
 # Cycle 015 — Identity, Privilege & Delegation Security
 
-**Status:** READY FOR REVIEW  
+**Status:** APPROVED  
 **Cycle:** 015  
 **Base branch:** `main`  
 **Baseline commit:** `2f9c02b4f4f94daa5478a0785f74814fb2d021a2`  
 **Branch:** `agent/cycle-015-identity-privilege-delegation-security`  
-**Approval:** PENDING — `APPROVAL.md` must remain absent until explicit Product Owner approval.
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## 1. Context
 

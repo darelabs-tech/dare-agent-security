@@ -1,7 +1,7 @@
 # Cycle 018 — Design
 
-**Status:** READY FOR REVIEW  
-**Approval:** PENDING
+**Status:** APPROVED  
+**Approval:** APPROVED — see `APPROVAL.md`; final acceptance 2026-09-27
 
 ## 1. Objective
 
