@@ -24,12 +24,12 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-013 — Implement the `RemotePlan` model
 - [x] task-014 — Implement the `Authorization` model and `verify` rules 1–16
 - [x] task-015 — Implement `address.rs` IP classification and `permitted`
-- [ ] task-016 — Implement `PinnedResolver` (`reqwest::dns::Resolve`)
+- [x] task-016 — Implement `PinnedResolver` (`reqwest::dns::Resolve`)
 - [x] task-017 — Implement `Credential` and `Scrubber`
-- [ ] task-018 — Implement `RateLimiter`, the budget wrapper over `BudgetState` and `RemoteKillSwitch`
-- [ ] task-019 — Implement `capture.rs` with chained digests and `verify`
-- [ ] task-020 — Implement `audit.rs`
-- [ ] task-021 — Implement `outcome.rs` transport overlay
+- [x] task-018 — Implement `RateLimiter`, the budget wrapper over `BudgetState` and `RemoteKillSwitch`
+- [x] task-019 — Implement `capture.rs` with chained digests and `verify`
+- [x] task-020 — Implement `audit.rs`
+- [x] task-021 — Implement `outcome.rs` transport overlay
 - [ ] task-022 — Implement `EgressGateway::new` and `send` steps 1–10
 - [ ] task-023 — Build the REMOTE-LAB harness (`LabCa` with rcgen, `LabServer`, behaviours)
 - [ ] task-024 — Implement the A2A protocol client

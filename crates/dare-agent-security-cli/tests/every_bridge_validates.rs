@@ -239,6 +239,7 @@ fn every_record_of_every_bridge_is_valid_cycle_001_evidence() {
             "{name} produced no undecided record: {seen:?}"
         );
     }
+    let _ = std::fs::remove_dir_all(&scratch);
     let cells: usize = covered.values().map(BTreeSet::len).sum();
     eprintln!("validated {total} records; bridge x verdict cells covered: {cells}; {covered:?}");
 }

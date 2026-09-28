@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/capture.schema.json",
+  "title": "DARE Remote Validation Capture v1",
+  "description": "Every exchange with an authorized target, in order, with bodies scrubbed of the referenced credential and of credential shapes, and with control, bidi and zero-width characters replaced by U+FFFD. Each entry is chained to the previous one from a seed that binds the authorization digest, plan digest and origin. Verdicts are decided offline from this document; timing fields are never read by a verdict.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capture_id",
+    "authorization_id",
+    "authorization_digest",
+    "plan_digest",
+    "origin",
+    "pinned_addresses",
+    "started_at",
+    "ended_at",
+    "entries",
+    "stop_reason"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "capture_id": {
+      "type": "string",
+      "pattern": "^cap-[0-9a-f]{16}$"
+    },
+    "authorization_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "authorization_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^https://",
+      "maxLength": 262
+    },
+    "pinned_addresses": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "string",
+        "maxLength": 64
+      }
+    },
+    "started_at": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "ended_at": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "entries": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index",
+          "scenario_ref",
+          "method",
+          "request_digest",
+          "outcome",
+          "scrubbed_credential",
+          "scrubbed_shapes",
+          "neutralized_chars",
+          "elapsed_ms",
+          "chain_digest"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "scenario_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "engine",
+              "scenario_id"
+            ],
+            "properties": {
+              "engine": {
+                "enum": [
+                  "PROMPT_INJECTION",
+                  "MULTI_TURN",
+                  "A2A",
+                  "MCP_AUTH"
+                ]
+              },
+              "scenario_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "conversation_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "node_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "step": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              }
+            }
+          },
+          "method": {
+            "enum": [
+              "A2A_AGENT_CARD_GET",
+              "A2A_MESSAGE_SEND",
+              "A2A_TASKS_GET",
+              "MCP_INITIALIZE",
+              "MCP_TOOLS_LIST",
+              "MCP_RESOURCES_LIST",
+              "MCP_PROMPTS_LIST",
+              "MCP_RESOURCES_READ",
+              "MCP_PROMPTS_GET",
+              "MCP_PROTECTED_RESOURCE_METADATA_GET",
+              "MCP_AUTH_SERVER_METADATA_GET",
+              "DARE_CONVERSATION_TURN"
+            ]
+          },
+          "request_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "request_body": {
+            "type": "string",
+            "maxLength": 65536
+          },
+          "outcome": {
+            "enum": [
+              "RESPONSE",
+              "TRANSPORT_ERROR"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 599
+          },
+          "content_type": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "response_body": {
+            "type": "string",
+            "maxLength": 1048576
+          },
+          "response_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "www_authenticate": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "transport_error": {
+            "enum": [
+              "CONNECT_TIMEOUT",
+              "READ_TIMEOUT",
+              "TLS",
+              "CONNECTION",
+              "OVERSIZE",
+              "RATE_LIMITED",
+              "SERVER_ERROR",
+              "UNEXPECTED_AUTH",
+              "PROTOCOL_VIOLATION",
+              "NOT_FOUND"
+            ]
+          },
+          "detail": {
+            "enum": [
+              "BINARY"
+            ]
+          },
+          "scrubbed_credential": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "scrubbed_shapes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "neutralized_chars": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "elapsed_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "chain_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "stop_reason": {
+      "enum": [
+        "COMPLETED",
+        "FIRST_FAIL",
+        "BUDGET_EXHAUSTED",
+        "RATE_LIMITED",
+        "TRANSPORT_ERROR",
+        "KILL_SWITCH",
+        "WINDOW_EXPIRED"
+      ]
+    }
+  }
+}

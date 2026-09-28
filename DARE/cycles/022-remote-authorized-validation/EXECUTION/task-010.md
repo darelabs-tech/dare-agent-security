@@ -1,6 +1,6 @@
 # task-010 — Add the seven `schemas/remote-validation/v1` JSON schemas
 
-**Status:** IN PROGRESS: 4 of 7 schemas added
+**Status:** IN PROGRESS: 6 of 7 schemas added (capture and audit added with tasks 019 and 020)
 
 ## Done
 

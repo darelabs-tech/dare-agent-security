@@ -15,6 +15,10 @@ pub const AUTHORIZATION_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/authorization.schema.json");
 pub const PLAN_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/plan.schema.json");
+pub const CAPTURE_SCHEMA_V1_JSON: &str =
+    include_str!("../../../schemas/remote-validation/v1/capture.schema.json");
+pub const AUDIT_SCHEMA_V1_JSON: &str =
+    include_str!("../../../schemas/remote-validation/v1/audit.schema.json");
 pub const CONVERSATION_REQUEST_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/conversation-request.schema.json");
 pub const CONVERSATION_RESPONSE_SCHEMA_V1_JSON: &str =
@@ -24,14 +28,18 @@ pub const CONVERSATION_RESPONSE_SCHEMA_V1_JSON: &str =
 pub enum DocumentKind {
     Authorization,
     Plan,
+    Capture,
+    Audit,
     ConversationRequest,
     ConversationResponse,
 }
 
 impl DocumentKind {
-    pub const ALL: [DocumentKind; 4] = [
+    pub const ALL: [DocumentKind; 6] = [
         Self::Authorization,
         Self::Plan,
+        Self::Capture,
+        Self::Audit,
         Self::ConversationRequest,
         Self::ConversationResponse,
     ];
@@ -40,6 +48,8 @@ impl DocumentKind {
         match self {
             Self::Authorization => "authorization",
             Self::Plan => "plan",
+            Self::Capture => "capture",
+            Self::Audit => "audit record",
             Self::ConversationRequest => "conversation request",
             Self::ConversationResponse => "conversation response",
         }
@@ -49,6 +59,8 @@ impl DocumentKind {
         match self {
             Self::Authorization => "authorization.schema.json",
             Self::Plan => "plan.schema.json",
+            Self::Capture => "capture.schema.json",
+            Self::Audit => "audit.schema.json",
             Self::ConversationRequest => "conversation-request.schema.json",
             Self::ConversationResponse => "conversation-response.schema.json",
         }
@@ -58,6 +70,8 @@ impl DocumentKind {
         match self {
             Self::Authorization => AUTHORIZATION_SCHEMA_V1_JSON,
             Self::Plan => PLAN_SCHEMA_V1_JSON,
+            Self::Capture => CAPTURE_SCHEMA_V1_JSON,
+            Self::Audit => AUDIT_SCHEMA_V1_JSON,
             Self::ConversationRequest => CONVERSATION_REQUEST_SCHEMA_V1_JSON,
             Self::ConversationResponse => CONVERSATION_RESPONSE_SCHEMA_V1_JSON,
         }
@@ -80,6 +94,8 @@ pub fn assert_supported_version(value: &Value, kind: DocumentKind) -> Result<()>
         _ => Err(RemoteError::Refused(match kind {
             DocumentKind::Authorization => "authorization schema_version must be \"1\"",
             DocumentKind::Plan => "plan schema_version must be \"1\"",
+            DocumentKind::Capture => "capture schema_version must be \"1\"",
+            DocumentKind::Audit => "audit schema_version must be \"1\"",
             DocumentKind::ConversationRequest | DocumentKind::ConversationResponse => {
                 "conversation schema_version must be \"1\""
             }

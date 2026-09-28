@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/audit.schema.json",
+  "title": "DARE Remote Validation Audit Record v1",
+  "description": "What was authorized, which origin the operator confirmed, and every request, response, transport error, kill, stop and verdict in order, chained from a seed binding the authorization digest, plan digest, origin and confirmation. Details are closed vocabulary words, never values from the target. Written for every run that passed admission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "authorization_id",
+    "authorization_digest",
+    "plan_digest",
+    "origin",
+    "confirmed_origin",
+    "events",
+    "totals"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "authorization_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "authorization_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^https://",
+      "maxLength": 262
+    },
+    "confirmed_origin": {
+      "type": "string",
+      "pattern": "^https://",
+      "maxLength": 262
+    },
+    "events": {
+      "type": "array",
+      "maxItems": 2048,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index",
+          "at",
+          "kind",
+          "chain_digest"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "at": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "kind": {
+            "enum": [
+              "ADMITTED",
+              "REQUEST",
+              "RESPONSE",
+              "TRANSPORT_ERROR",
+              "KILL",
+              "STOP",
+              "VERDICT"
+            ]
+          },
+          "method": {
+            "enum": [
+              "A2A_AGENT_CARD_GET",
+              "A2A_MESSAGE_SEND",
+              "A2A_TASKS_GET",
+              "MCP_INITIALIZE",
+              "MCP_TOOLS_LIST",
+              "MCP_RESOURCES_LIST",
+              "MCP_PROMPTS_LIST",
+              "MCP_RESOURCES_READ",
+              "MCP_PROMPTS_GET",
+              "MCP_PROTECTED_RESOURCE_METADATA_GET",
+              "MCP_AUTH_SERVER_METADATA_GET",
+              "DARE_CONVERSATION_TURN"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z_]{0,63}$"
+          },
+          "chain_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requests",
+        "bytes_sent",
+        "bytes_received",
+        "duration_ms"
+      ],
+      "properties": {
+        "requests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "bytes_sent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bytes_received": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

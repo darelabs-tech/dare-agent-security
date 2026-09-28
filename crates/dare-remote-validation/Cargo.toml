@@ -35,6 +35,12 @@ time = { workspace = true }
 tokio = { workspace = true, features = ["net"] }
 zeroize = "1.9"
 
+[features]
+# Test-only seams (injected DNS answers, a lab TLS root). The CLI never
+# enables this feature; `tests/compatibility.rs` checks that.
+lab = []
+
 [dev-dependencies]
+dare-remote-validation = { path = ".", features = ["lab"] }
 tempfile = "3.14"
 tokio = { workspace = true, features = ["net", "test-util"] }
