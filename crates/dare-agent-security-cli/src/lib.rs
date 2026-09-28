@@ -3,6 +3,7 @@
 pub mod a2a_security;
 pub mod adversarial;
 pub mod attack_graph;
+pub mod attack_paths;
 pub mod benchmark;
 pub mod ci;
 pub mod ci_output;

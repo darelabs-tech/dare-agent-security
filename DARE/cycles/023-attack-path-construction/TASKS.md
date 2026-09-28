@@ -56,8 +56,8 @@ Throughout the cycle:
 - [x] task-034 — Implement `chokepoint.rs`
 - [x] task-035 — Implement path classification, v2 impact factors and `AttackPathsDoc`
 - [x] task-036 — Add the scale test (O-09)
-- [ ] task-037 — Add the `validate attack-paths` CLI subcommand
-- [ ] task-038 — Add the refusal corpus (§8.3)
+- [x] task-037 — Add the `validate attack-paths` CLI subcommand
+- [x] task-038 — Add the refusal corpus (§8.3)
 - [ ] task-039 — Build the ATTACK-PATH-LAB harness and scenarios APL-001..APL-012
 - [ ] task-040 — Add scenarios APL-013..APL-026 and the class-contract test
 - [ ] task-041 — Add the `attack-path-2026` CI job

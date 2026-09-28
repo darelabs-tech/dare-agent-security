@@ -492,6 +492,7 @@ dependencies = [
  "dare-a2a-security",
  "dare-adversarial",
  "dare-attack-graph",
+ "dare-attack-path",
  "dare-benchmark",
  "dare-coaz-integrity",
  "dare-continuous",

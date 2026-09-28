@@ -7,6 +7,7 @@ use dare_agent_security::a2a_security::run_a2a_security;
 use dare_agent_security::adversarial::run_adversarial;
 use dare_agent_security::args::{Cli, Command, ValidateSubcommand};
 use dare_agent_security::attack_graph::run_attack_graph;
+use dare_agent_security::attack_paths::run_attack_paths;
 use dare_agent_security::benchmark::run_benchmark;
 use dare_agent_security::ci::run_ci;
 use dare_agent_security::coaz_integrity::run_coaz_integrity;
@@ -77,6 +78,9 @@ async fn main() -> ExitCode {
                 }
                 ValidateSubcommand::ReplayCapture(args) => {
                     ExitCode::from(run_replay_capture(args) as u8)
+                }
+                ValidateSubcommand::AttackPaths(args) => {
+                    ExitCode::from(run_attack_paths(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

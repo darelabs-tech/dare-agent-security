@@ -24,6 +24,7 @@ dare-security-evidence = { path = "../dare-security-evidence" }
 dare-coverage = { path = "../dare-coverage" }
 dare-benchmark = { path = "../dare-benchmark" }
 dare-attack-graph = { path = "../dare-attack-graph" }
+dare-attack-path = { path = "../dare-attack-path" }
 dare-adversarial = { path = "../dare-adversarial" }
 dare-continuous = { path = "../dare-continuous" }
 dare-product = { path = "../dare-product" }
