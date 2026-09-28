@@ -11,7 +11,7 @@ use dare_remote_validation::capture::Capture;
 use dare_remote_validation::gateway::TrustRoots;
 use dare_remote_validation::outcome::StopReason;
 use dare_remote_validation::result::{
-    AUDIT_FILE, CAPTURE_FILE, EVIDENCE_FILE, RESULT_FILE, SUMMARY_FILE,
+    AUDIT_FILE, CAPTURE_FILE, COVERAGE_FILE, EVIDENCE_FILE, RESULT_FILE, SUMMARY_FILE,
 };
 use dare_remote_validation::runner::{replay_capture, run_remote, RemoteRun};
 use dare_remote_validation::RemoteError;
@@ -112,7 +112,8 @@ async fn a_live_run_and_its_replay_are_byte_identical_and_the_artifacts_are_clea
             CAPTURE_FILE,
             EVIDENCE_FILE,
             AUDIT_FILE,
-            SUMMARY_FILE
+            SUMMARY_FILE,
+            COVERAGE_FILE
         ]
         .into()
     );

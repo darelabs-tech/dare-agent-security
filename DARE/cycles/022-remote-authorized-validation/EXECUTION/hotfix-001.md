@@ -10,7 +10,7 @@
 |---|---|
 | `crates/dare-coverage/src/correlate.rs` | `ExecutionsDocument` (`schema_version`, `execution_mode`, `evidence_class`, `source`, `executions`; unknown fields refused), `check(&facts)`, `annotate(&mut report)`, `parse_executions` (bare array or document) |
 | `crates/dare-remote-validation/src/coverage.rs` (new) | `executions_document(result, evidence)`: the property is read from each engine's own extension (`property_id` for prompt injection, `property` for the others). A record without one fails closed. The verdict is `result::aggregate` over that property's records. |
-| `crates/dare-remote-validation/src/result.rs` | `COVERAGE_FILE = "remote-coverage.json"`, rendered and admitted through the output ledger as the sixth artifact |
+| `crates/dare-remote-validation/src/result.rs`, `tests/runner.rs`, `tests/replay_equivalence.rs`, CLI `tests/remote_cli.rs` | the artifact-set assertions now include it; `COVERAGE_FILE = "remote-coverage.json"`, rendered and admitted through the output ledger as the sixth artifact |
 | `crates/dare-agent-security-cli/src/coverage.rs` | `--executions` accepts the document; checks it against the facts (a contradiction is a usage error, exit 3); annotates decided rows |
 | `crates/dare-agent-security-cli/tests/fixtures/remote-replay/coverage-facts.json` (new) | facts for the CI step: stateful agent over HTTP, dynamic authorization allowed |
 
@@ -59,7 +59,7 @@ Both steps were run locally with the job's own commands.
 
 - **Build:** `cargo build --workspace`
 - **Test:**
-  - `cargo test --workspace` green (totals in the hotfix commit message);
+  - `cargo test --workspace --no-fail-fast`: 314 suites, **4 224 passed, 0 failed**, 4 ignored (4 209 before the hotfix);
   - new tests: 6 in `dare-coverage`, 3 in the CLI listener, 2 CLI process tests, 2 gateway tests, 2 replay/runner tests.
 - **Lint:**
   - `cargo fmt --all --check` and `cargo clippy --workspace --all-targets -- -D warnings`;
