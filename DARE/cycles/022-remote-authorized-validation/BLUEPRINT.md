@@ -1,6 +1,6 @@
 # Cycle 022 — Blueprint: Remote Authorized Validation
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** PROPOSED — awaiting DARE Review  
+**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** PROPOSED — BQ-1 to BQ-4 decided 2026-09-28; Blueprint approval pending  
 **Source of truth:** `DESIGN.md` and `APPROVAL.md` (Design approved 2026-09-28)  
 **Base:** `main @ b6f14b9`
 
@@ -855,7 +855,8 @@ impl LabServer { pub async fn start(ca: &LabCa, behaviour: Behaviour) -> LabServ
    - **(b)** Defer live 018 to a later cycle. MCP in v1 would then cover only
      authenticated inventory.
 
-   **Recommendation: (a).**
+   **Recommendation: (a).**  
+   **DECIDED (2026-09-28): (a).**
 2. **BQ-2: target-reported fields in `dare-conversation`.** `refusal`, `decision`,
    `fulfillment` and `accepted_authority` are reported by the target's own shim.
    - Decisive FAIL facts (canaries in output or actions, executed actions, approval digests) do not depend on the target telling the truth.
@@ -863,20 +864,23 @@ impl LabServer { pub async fn start(ca: &LabCa, behaviour: Behaviour) -> LabServ
 
    **Recommendation:** accept, and give every live PASS for an invariant that reads a
    target-reported field this line in `summary.md` and `extensions["dare.remote"].self_reported_fields`:
-   "PASS relies on target-reported `<field>`".
+   "PASS relies on target-reported `<field>`".  
+   **DECIDED (2026-09-28): accepted, with the marking.**
 3. **BQ-3: `rcgen` as a dev-dependency.** It is needed to generate the lab CA at test
    time without checking in a private key. The alternative is to spawn `openssl` from
    tests, which is platform-fragile, adds a process capability to tests, and still
    generates keys.
 
-   **Recommendation: `rcgen`, dev-only.** `cargo audit` covers it.
+   **Recommendation: `rcgen`, dev-only.** `cargo audit` covers it.  
+   **DECIDED (2026-09-28): `rcgen` as a dev-dependency only.**
 4. **BQ-4: two passes, and the engine trait doc comments.** The live pass drives the
    engine's own runner through adapters in this crate, and the verdict comes only from
    the replay (AD-02). The doc comments on `ConversationAdapter` and 013's
    `HarnessAdapter` are amended to state the single exception. The code of the 013 and
    021 engines does not change.
 
-   **Recommendation: accept.**
+   **Recommendation: accept.**  
+   **DECIDED (2026-09-28): accepted.**
 
 Two further refinements to the Design are recorded here for the same Review:
 - **`endpoints`** in the authorization (§4.5): the request path is fixed by the
@@ -897,4 +901,4 @@ Two further refinements to the Design are recorded here for the same Review:
 - [ ] Engine conversions and the Agent Card mapping (§6) accepted
 - [ ] Evidence-bridge correction (§4.12) accepted
 - [ ] Phase plan and DONE criteria (§8) accepted
-- [ ] BQ-1 to BQ-4 decided
+- [x] BQ-1 to BQ-4 decided (2026-09-28)

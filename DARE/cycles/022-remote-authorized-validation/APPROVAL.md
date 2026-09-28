@@ -45,3 +45,21 @@ Neither the Blueprint nor execution may, without a new Review:
 
 `/dare-blueprint` produces `BLUEPRINT.md`, `TASKS.md` and `dare-dag.yaml` for Review.
 Execution is **not** authorized until the task set is approved.
+
+## Blueprint Review decisions (2026-09-28)
+
+1. **BQ-1.** `dare-mcp-auth-security` gains an additive, network-free
+   `scenario_with_observed_resource` API. It maps URLs to opaque ids that preserve
+   equality, and records the trust class as `SELF_REPORTED`.
+2. **BQ-2.** The `dare-conversation` fields reported by the target (`refusal`,
+   `decision`, `fulfillment`, `accepted_authority`) are accepted. Every live PASS that
+   relies on one of them is marked as such.
+3. **BQ-3.** `rcgen` is added as a dev-dependency only, to generate the lab CA at test
+   time.
+4. **BQ-4.** Two passes: the live pass is discarded, and the verdict comes only from the
+   offline replay of the capture. The engine adapter-trait doc comments name this single
+   exception, and the engine code is unchanged.
+
+The `endpoints` refinement to the authorization (Blueprint §4.5) and the rule that A2A
+exchange fields not observable from outside the target stay at most INCONCLUSIVE
+(Blueprint §6.2) are part of the Blueprint under review.
