@@ -64,7 +64,7 @@ Throughout the cycle:
 - [x] task-042 — Read a v2 graph in `dare-product` (RF-16, BQ-3 (a))
 - [x] task-043 — Add compatibility tests (§8.4)
 - [ ] task-044 — Security, dependency and container audit
-- [ ] task-045 — Write the EN/PT attack-path pages and the system-model reference
+- [x] task-045 — Write the EN/PT attack-path pages and the system-model reference
 - [ ] task-046 — Write REGRESSION.md and PROOF.md, run the completion gate and create the cycle archive branch
 
 ## Task table

@@ -61,6 +61,15 @@ Categorized errors print as `[category] message`, where category is one of:
 | 2 | Fact, schema, or semantic validation failure. |
 | 3 | Usage error or traversal safety refusal. |
 
+## `validate attack-paths`
+
+| Code | Meaning |
+|---|---|
+| 0 | Every feasible path is `CONTROLS_HELD` (or there is none), and enumeration was not truncated. This is not a claim that the system is secure. |
+| 1 | Internal error. |
+| 2 | A feasible path is `CONTROL_FAILED` or `CONTROL_UNDECIDED`, or enumeration was truncated. |
+| 3 | Refusal: an invalid, unbound or duplicate artifact, an invalid system model, or a bound above its maximum. Nothing is written. |
+
 ## `validate adversarial`
 
 | Code | Meaning |

@@ -69,6 +69,31 @@ dare-agent-security validate attack-graph \
 limit 10000) bound the analysis. Analysis only — no attack path is executed.
 See [Attack Graph](../concepts/attack-graph.md).
 
+## `validate attack-paths`
+
+Join engine artifacts into one evidence-derived attack graph and enumerate its paths
+(Cycle 023).
+
+```bash
+dare-agent-security validate attack-paths \
+  --artifacts .dare-agent-security/rag-security \
+  --artifacts .dare-agent-security/identity-security \
+  --system-model system-model.json \
+  --output-dir .dare-agent-security/attack-paths
+```
+
+`--artifacts` is repeatable (1 to 64). Each directory is one engine's output, with the
+inputs its result pins copied under `inputs/`. `--system-model` is optional. Without
+it, no two runs are joined. `--max-path-edges` (default 8, maximum 12), `--max-paths`
+(maximum 10000) and `--max-paths-per-pair` (maximum 64) bound enumeration. A value
+above its maximum is refused. `--json` also prints `attack-paths.json`.
+
+The command writes `attack-graph.json`, `attack-paths.json`, `projection-report.json`,
+`graph.mmd`, `graph.dot` and `summary.md`. It reads local files only. There is no URL,
+endpoint, token or remote flag, and no path is executed. See
+[Evidence-Derived Attack Paths](../concepts/attack-paths.md) and the
+[system model reference](../reference/attack-path-system-model.md).
+
 ## `validate adversarial`
 
 Controlled, offline-first adversarial validation (Cycle 009).

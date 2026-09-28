@@ -14,6 +14,7 @@
 - [Assessment Coverage](concepts/assessment-coverage.md)
 - [Agentic Security Registry 2026](concepts/agentic-security-registry.md)
 - [Attack Graph](concepts/attack-graph.md)
+- [Evidence-Derived Attack Paths](concepts/attack-paths.md)
 - [Validation Modes](concepts/validation.md)
 - [Prompt Injection Validation](concepts/prompt-injection.md)
 - [Tool Security Validation](concepts/tool-security.md)
@@ -78,5 +79,6 @@
 - [Extending A2A Security Validation](reference/extending-a2a-security.md)
 - [Extending Multi-Turn Security Validation](reference/extending-multi-turn-security.md)
 - [Remote Authorization Reference](reference/remote-authorization.md)
+- [Attack-Path System Model Reference](reference/attack-path-system-model.md)
 
 [Troubleshooting](troubleshooting.md)
