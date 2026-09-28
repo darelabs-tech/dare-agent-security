@@ -1,7 +1,7 @@
 # Cycle 022 — Approval
 
 **Cycle:** 022 — Remote Authorized Validation  
-**Approval:** DESIGN APPROVED — Blueprint pending  
+**Approval:** DESIGN AND BLUEPRINT APPROVED — task set pending  
 **Approved at:** 2026-09-28  
 **Approved by:** Product Owner  
 **Base:** `main @ b6f14b9`  
@@ -63,3 +63,10 @@ Execution is **not** authorized until the task set is approved.
 The `endpoints` refinement to the authorization (Blueprint §4.5) and the rule that A2A
 exchange fields not observable from outside the target stay at most INCONCLUSIVE
 (Blueprint §6.2) are part of the Blueprint under review.
+
+## Blueprint approval
+
+`BLUEPRINT.md` was approved on 2026-09-28, including AD-01 to AD-17, the `endpoints`
+refinement and BQ-1 to BQ-4. `/dare-tasks` now produces `TASKS.md`, `dare-dag.yaml`
+and `dare-dag.exec.yaml` for Review. Execution is **not** authorized until that task set
+is approved.

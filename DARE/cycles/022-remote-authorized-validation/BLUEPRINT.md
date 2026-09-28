@@ -1,6 +1,7 @@
 # Cycle 022 — Blueprint: Remote Authorized Validation
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** PROPOSED — BQ-1 to BQ-4 decided 2026-09-28; Blueprint approval pending  
+**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** ARCHITECTURE APPROVED  
+**Approval:** APPROVED 2026-09-28 (Product Owner), including BQ-1 to BQ-4.  
 **Source of truth:** `DESIGN.md` and `APPROVAL.md` (Design approved 2026-09-28)  
 **Base:** `main @ b6f14b9`
 
@@ -892,13 +893,13 @@ Two further refinements to the Design are recorded here for the same Review:
 
 ## 13. Approval checklist
 
-- [ ] Architectural decisions AD-01 to AD-17 accepted
-- [ ] Authorization rules (§4.5) and the `endpoints` refinement accepted
-- [ ] Address classification table (§4.4) accepted
-- [ ] Gateway `send` order and kill triggers (§4.8) accepted
-- [ ] Transport overlay table (§4.10) accepted
-- [ ] `dare-conversation` v1 contract (§5.3) and closed method table (§5.4) accepted
-- [ ] Engine conversions and the Agent Card mapping (§6) accepted
-- [ ] Evidence-bridge correction (§4.12) accepted
-- [ ] Phase plan and DONE criteria (§8) accepted
+- [x] Architectural decisions AD-01 to AD-17 accepted
+- [x] Authorization rules (§4.5) and the `endpoints` refinement accepted
+- [x] Address classification table (§4.4) accepted
+- [x] Gateway `send` order and kill triggers (§4.8) accepted
+- [x] Transport overlay table (§4.10) accepted
+- [x] `dare-conversation` v1 contract (§5.3) and closed method table (§5.4) accepted
+- [x] Engine conversions and the Agent Card mapping (§6) accepted
+- [x] Evidence-bridge correction (§4.12) accepted
+- [x] Phase plan and DONE criteria (§8) accepted
 - [x] BQ-1 to BQ-4 decided (2026-09-28)
