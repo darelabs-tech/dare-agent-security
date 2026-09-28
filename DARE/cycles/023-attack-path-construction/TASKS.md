@@ -37,17 +37,17 @@ Throughout the cycle:
 - [x] task-015 — Implement input binding for supply-chain and a2a through `StaticAdapter::collect`
 - [x] task-016 — Implement bundle handling for prompt-injection, multi-turn and remote
 - [x] task-017 — Implement `evidence_index.rs`
-- [ ] task-018 — Implement `facts.rs` and the `guard_table.rs` verdict rule
-- [ ] task-019 — Implement the tool projector (§6.1)
-- [ ] task-020 — Implement the identity projector (§6.2)
-- [ ] task-021 — Implement the memory projector (§6.3)
-- [ ] task-022 — Implement the RAG projector (§6.4)
-- [ ] task-023 — Implement the MCP Auth projector (§6.5)
-- [ ] task-024 — Implement the supply-chain projector (§6.6)
-- [ ] task-025 — Implement the A2A projector (§6.7)
-- [ ] task-026 — Implement the prompt-injection projector (§6.8)
-- [ ] task-027 — Implement the multi-turn projector (§6.8)
-- [ ] task-028 — Implement the remote (022) projector (§6.9)
+- [x] task-018 — Implement `facts.rs` and the `guard_table.rs` verdict rule
+- [x] task-019 — Implement the tool projector (§6.1)
+- [x] task-020 — Implement the identity projector (§6.2)
+- [x] task-021 — Implement the memory projector (§6.3)
+- [x] task-022 — Implement the RAG projector (§6.4)
+- [x] task-023 — Implement the MCP Auth projector (§6.5)
+- [x] task-024 — Implement the supply-chain projector (§6.6)
+- [x] task-025 — Implement the A2A projector (§6.7)
+- [x] task-026 — Implement the prompt-injection projector (§6.8)
+- [x] task-027 — Implement the multi-turn projector (§6.8)
+- [x] task-028 — Implement the remote (022) projector (§6.9)
 - [ ] task-029 — Implement `merge.rs`
 - [ ] task-030 — Implement `designate.rs` default designations and model overrides
 - [ ] task-031 — Implement graph construction in `run.rs` and the determinism test

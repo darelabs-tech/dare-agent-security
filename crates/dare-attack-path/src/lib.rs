@@ -13,10 +13,13 @@ pub mod admit;
 pub mod bundle;
 pub mod error;
 pub mod evidence_index;
+pub mod facts;
+pub mod guard_table;
 pub mod ids;
 pub mod limits;
 pub mod load;
 pub mod model;
+pub mod project;
 pub mod sweep;
 
 pub use error::{AttackPathError, ModelRefusal, Refusal, Result};
