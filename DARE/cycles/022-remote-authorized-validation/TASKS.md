@@ -19,13 +19,13 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-008 — Implement `limits.rs` hard maxima and lower-only `Limits`
 - [x] task-009 — Implement `error.rs`, `ids.rs` and `canonical.rs`
 - [ ] task-010 — Add the seven `schemas/remote-validation/v1` JSON schemas
-- [ ] task-011 — Implement `source.rs`/`schema.rs` byte, depth, hostile and schema admission
-- [ ] task-012 — Implement `origin.rs` `Origin::parse`
-- [ ] task-013 — Implement the `RemotePlan` model
-- [ ] task-014 — Implement the `Authorization` model and `verify` rules 1–16
-- [ ] task-015 — Implement `address.rs` IP classification and `permitted`
+- [x] task-011 — Implement `source.rs`/`schema.rs` byte, depth, hostile and schema admission
+- [x] task-012 — Implement `origin.rs` `Origin::parse`
+- [x] task-013 — Implement the `RemotePlan` model
+- [x] task-014 — Implement the `Authorization` model and `verify` rules 1–16
+- [x] task-015 — Implement `address.rs` IP classification and `permitted`
 - [ ] task-016 — Implement `PinnedResolver` (`reqwest::dns::Resolve`)
-- [ ] task-017 — Implement `Credential` and `Scrubber`
+- [x] task-017 — Implement `Credential` and `Scrubber`
 - [ ] task-018 — Implement `RateLimiter`, the budget wrapper over `BudgetState` and `RemoteKillSwitch`
 - [ ] task-019 — Implement `capture.rs` with chained digests and `verify`
 - [ ] task-020 — Implement `audit.rs`

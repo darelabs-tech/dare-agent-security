@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/authorization.schema.json",
+  "title": "DARE Remote Validation Authorization v1",
+  "description": "What a target owner authorized: exact origins, a time window of at most 7 days, protocols and closed methods, digest-pinned scenarios, data classes and lower-only limits. A credential is named by environment-variable reference, never included. Verification (16 ordered rules) runs before any DNS lookup or socket.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "authorization_id",
+    "target_owner",
+    "approved_by",
+    "environment",
+    "origins",
+    "not_before",
+    "not_after",
+    "endpoints",
+    "protocols",
+    "methods",
+    "scenarios",
+    "data_classes",
+    "prohibited"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "authorization_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "target_owner": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "approved_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "environment": {
+      "enum": [
+        "LAB",
+        "TEST",
+        "STAGING",
+        "PRODUCTION"
+      ],
+      "description": "PRODUCTION is listed so verification can refuse it by name; it is never accepted in v1."
+    },
+    "origins": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "string",
+        "minLength": 9,
+        "maxLength": 262,
+        "pattern": "^https://"
+      }
+    },
+    "network_scope": {
+      "enum": [
+        "PUBLIC",
+        "PRIVATE",
+        "LOOPBACK_LAB"
+      ]
+    },
+    "not_before": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "not_after": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "a2a_rpc": {
+          "type": "string",
+          "pattern": "^/[A-Za-z0-9._~/-]{0,200}$"
+        },
+        "mcp": {
+          "type": "string",
+          "pattern": "^/[A-Za-z0-9._~/-]{0,200}$"
+        },
+        "conversation": {
+          "type": "string",
+          "pattern": "^/[A-Za-z0-9._~/-]{0,200}$"
+        }
+      }
+    },
+    "protocols": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "A2A",
+          "MCP",
+          "DARE_CONVERSATION"
+        ]
+      }
+    },
+    "methods": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "A2A_AGENT_CARD_GET",
+          "A2A_MESSAGE_SEND",
+          "A2A_TASKS_GET",
+          "MCP_INITIALIZE",
+          "MCP_TOOLS_LIST",
+          "MCP_RESOURCES_LIST",
+          "MCP_PROMPTS_LIST",
+          "MCP_RESOURCES_READ",
+          "MCP_PROMPTS_GET",
+          "MCP_PROTECTED_RESOURCE_METADATA_GET",
+          "MCP_AUTH_SERVER_METADATA_GET",
+          "DARE_CONVERSATION_TURN"
+        ]
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "scenario_id",
+          "scenario_digest"
+        ],
+        "properties": {
+          "engine": {
+            "enum": [
+              "PROMPT_INJECTION",
+              "MULTI_TURN",
+              "A2A",
+              "MCP_AUTH"
+            ]
+          },
+          "scenario_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "scenario_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "graph_digests": {
+            "type": "array",
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "data_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "SYNTHETIC",
+          "CANARY",
+          "TEST",
+          "CUSTOMER",
+          "PERSONAL",
+          "CONFIDENTIAL"
+        ]
+      }
+    },
+    "credential_ref": {
+      "type": "string",
+      "pattern": "^DARE_REMOTE_[A-Z0-9_]{1,48}$"
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_requests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "max_rps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "max_duration_s": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_request_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_response_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "Lower-only limits. Absent means the hard maximum; zero and values above the ceiling are refused by verification, not silently clamped."
+    },
+    "prohibited": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "STATE_MUTATION",
+          "CREDENTIAL_EXTRACTION",
+          "DESTRUCTIVE_OPERATION",
+          "EXTERNAL_PUBLICATION"
+        ]
+      }
+    },
+    "signature": {
+      "description": "Reserved for a later compatible signature scheme (Review Q1). Verification refuses any value in v1."
+    }
+  }
+}

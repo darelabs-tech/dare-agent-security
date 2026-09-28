@@ -23,11 +23,19 @@
 //! - No method with a side effect exists (`protocol`).
 //! - No transport outcome can produce PASS (`outcome`).
 
+pub mod address;
+pub mod authorization;
 pub mod canonical;
+pub mod credential;
 pub mod error;
 pub mod ids;
 pub mod limits;
+pub mod origin;
 pub mod outcome;
+pub mod plan;
+pub mod protocol;
+pub mod schema;
+pub mod source;
 
 pub use error::{AuthorizationRefusal, EgressRefusal, RemoteError, Result};
 

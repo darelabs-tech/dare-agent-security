@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/plan.schema.json",
+  "title": "DARE Remote Validation Plan v1",
+  "description": "Which granted scenarios run, in order, against one planned origin under one authorization pinned by digest. A plan carries no payload: every byte sent comes from a built-in engine scenario named here and granted in the authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "authorization_id",
+    "authorization_digest",
+    "origin",
+    "protocol",
+    "methods",
+    "runs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "plan_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "authorization_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "authorization_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "origin": {
+      "type": "string",
+      "minLength": 9,
+      "maxLength": 262,
+      "pattern": "^https://"
+    },
+    "protocol": {
+      "enum": [
+        "A2A",
+        "MCP",
+        "DARE_CONVERSATION"
+      ]
+    },
+    "methods": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "A2A_AGENT_CARD_GET",
+          "A2A_MESSAGE_SEND",
+          "A2A_TASKS_GET",
+          "MCP_INITIALIZE",
+          "MCP_TOOLS_LIST",
+          "MCP_RESOURCES_LIST",
+          "MCP_PROMPTS_LIST",
+          "MCP_RESOURCES_READ",
+          "MCP_PROMPTS_GET",
+          "MCP_PROTECTED_RESOURCE_METADATA_GET",
+          "MCP_AUTH_SERVER_METADATA_GET",
+          "DARE_CONVERSATION_TURN"
+        ]
+      }
+    },
+    "runs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "scenario_id",
+          "scenario_digest"
+        ],
+        "properties": {
+          "engine": {
+            "enum": [
+              "PROMPT_INJECTION",
+              "MULTI_TURN",
+              "A2A",
+              "MCP_AUTH"
+            ]
+          },
+          "scenario_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "scenario_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "graph_digests": {
+            "type": "array",
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          },
+          "a2a_policy_file": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,63}-policy\\.json$"
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_requests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "max_rps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "max_duration_s": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_request_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_response_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "Lower-only limits. Absent means the hard maximum; zero and values above the ceiling are refused by verification, not silently clamped."
+    },
+    "stop_on_first_fail": {
+      "type": "boolean"
+    }
+  }
+}

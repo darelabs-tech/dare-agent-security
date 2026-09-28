@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/conversation-request.schema.json",
+  "title": "DARE Conversation Request v1",
+  "description": "One pre-approved turn sent to a target's DARE conversation shim. It never names a node, invariant, canary or expected outcome, so the target cannot tell which test is running.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "conversation_id",
+    "turn_index",
+    "principal_id",
+    "content"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "conversation_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "turn_index": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 31
+    },
+    "principal_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "content": {
+      "type": "string",
+      "maxLength": 16384
+    }
+  }
+}
