@@ -1,7 +1,7 @@
 # Cycle 024 — Approval
 
 **Cycle:** 024 — Blast-Radius Analysis  
-**Approval:** DESIGN APPROVED (execution not yet authorized)  
+**Approval:** DESIGN AND BLUEPRINT APPROVED (execution not yet authorized)  
 **Approved at:** 2026-09-28  
 **Approved by:** Product Owner  
 **Base:** `main @ d125081`  
@@ -40,7 +40,21 @@ Neither the Blueprint nor execution may, without a new Review:
   `dare-attack-path`, or let it execute, send or schedule anything;
 - add or change a property ID or a profile denominator.
 
+## Blueprint approval (2026-09-28)
+
+`BLUEPRINT.md` is approved, including AD-01 to AD-10, with the recommended option for
+each Review item:
+
+1. **BQ-1.** The witness route is the first route the breadth-first search reaches, over
+   adjacency sorted by `(target id, edge id)`.
+2. **BQ-2.** A third exposure state, `CONTAINMENT_UNKNOWN`. `CONTAINED` is claimed only
+   within `max_depth`, and only when the uncontained search was not truncated.
+3. **BQ-3.** Search states are keyed by `(node, principal, actors)`.
+4. **BQ-4.** A seed without a tenant has no cross-tenant targets (as Cycle 023 R-9).
+5. **BQ-5.** Exit 2 when any target is `EXPOSED` or any search was truncated; exit 0 when
+   every reached target is `CONTAINED` and nothing was cut.
+
 ## Next step
 
-`BLUEPRINT.md` follows for Review. Tasks are generated only after the Blueprint is
-approved.
+`TASKS.md`, `dare-dag.yaml` and `dare-dag.exec.yaml` (28 tasks) await approval. Execution
+starts only after the task set is approved.

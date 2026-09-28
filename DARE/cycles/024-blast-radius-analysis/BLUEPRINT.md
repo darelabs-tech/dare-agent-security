@@ -1,6 +1,7 @@
 # Cycle 024 — Blueprint: Blast-Radius Analysis
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DRAFT — awaiting Review  
+**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** ARCHITECTURE APPROVED  
+**Approval:** APPROVED 2026-09-28 (Product Owner), with the recommended option for BQ-1 to BQ-5  
 **Source of truth:** `DESIGN.md` (v0.2, approved) and `APPROVAL.md`  
 **Base:** `main @ d125081`
 
@@ -714,10 +715,13 @@ frontier properties.
 
 ## 13. Approval checklist
 
-- [ ] Architecture decisions AD-01 to AD-10 accepted, including the shared-rule move (AD-02, AD-03)
-- [ ] Scenario and output schemas (§4.3, §4.4) and invariants (§4.5) accepted
-- [ ] Reach algorithm (§6.3) and exposure rule (§6.4) accepted
-- [ ] Remediation delta (§6.7) accepted as SHOULD
-- [ ] BLAST-RADIUS-LAB (§7.1) and compatibility goldens (§7.3) accepted
-- [ ] Phases and DONE criteria (§8) accepted
-- [ ] BQ-1 to BQ-5 answered
+BQ-1 to BQ-5: **DECIDED (2026-09-28): accepted as recommended.**
+
+
+- [x] Architecture decisions AD-01 to AD-10 accepted, including the shared-rule move (AD-02, AD-03)
+- [x] Scenario and output schemas (§4.3, §4.4) and invariants (§4.5) accepted
+- [x] Reach algorithm (§6.3) and exposure rule (§6.4) accepted
+- [x] Remediation delta (§6.7) accepted as SHOULD
+- [x] BLAST-RADIUS-LAB (§7.1) and compatibility goldens (§7.3) accepted
+- [x] Phases and DONE criteria (§8) accepted
+- [x] BQ-1 to BQ-5 answered
