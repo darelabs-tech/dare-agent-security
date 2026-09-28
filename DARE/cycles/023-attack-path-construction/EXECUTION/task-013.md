@@ -27,7 +27,7 @@ CLI, using only `pub` engine items.
 ## Tests
 
 - `the_loaders_match_the_engines_on_every_shipped_scenario` (`tests/binding.rs`) runs over
-  every scenario file under the five engines' shipped scenario directories (132 files).
+  every scenario file under the five engines' shipped scenario directories (127 files).
   For each file:
   - it recomputes the engine CLI's own acceptance sequence independently;
   - it asserts that this crate accepts exactly the same files;
