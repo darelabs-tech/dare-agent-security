@@ -37,7 +37,7 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-026 — Implement the `dare-conversation` v1 client
 - [x] task-027 — Implement the prompt-injection live adapter and capture → transcript conversion
 - [x] task-028 — Implement the multi-turn live adapter (conversation and A2A) and capture → transcript conversion
-- [ ] task-029 — Implement the A2A card and exchange projection into STATIC documents
+- [x] task-029 — Implement the A2A card and exchange projection into STATIC documents
 - [ ] task-030 — Add `scenario_with_observed_resource` to `dare-mcp-auth-security` (BQ-1)
 - [ ] task-031 — Implement the MCP auth metadata conversion
 - [x] task-032 — Amend the 013 and 021 adapter trait doc comments (BQ-4)
