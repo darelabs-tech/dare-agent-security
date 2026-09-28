@@ -1,6 +1,6 @@
 # Cycle 022 — Design: Remote Authorized Validation
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DRAFT — awaiting DARE Review  
+**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DRAFT — Q1–Q4 decided 2026-09-28; Q5 and final Design approval pending  
 **Base branch:** `main` (`b6f14b9`, Cycles 001–021 merged; see `../ACCEPTANCE.md`)  
 **Proposed crate:** `crates/dare-remote-validation`  
 **Also in scope:** correction of the Cycle 001 evidence bridges in `dare-a2a-security`,
@@ -23,7 +23,7 @@ Cycle 022 adds **remote validation under an explicit, digest-bound, time-boxed
 authorization**, against a small closed set of wire protocols:
 - A2A;
 - MCP;
-- one conversational HTTP contract, pending Review Q2.
+- one closed, DARE-defined conversational HTTP contract (Q2).
 
 The central design choice is **live capture, offline verdict**:
 
@@ -84,7 +84,7 @@ does not scan, discover or crawl anything.
 | RF-03 | Operator confirmation | MUST | The CLI requires `--confirm-origin <origin>`, which must equal the authorized origin byte for byte. There is no `--yes` and no confirmation from an environment variable |
 | RF-04 | Egress gateway | MUST | The single place that opens sockets. It is HTTPS-only (loopback lab excepted, §4.5), verifies TLS, follows no redirects, and resolves DNS once, pinning and re-checking the IP on every connection. Private, loopback, link-local and metadata ranges are refused unless the authorization's `network_scope` names them. It bounds request and response bytes and applies connect, read and total timeouts |
 | RF-05 | Budget, rate limit and kill switch | MUST | These reuse the Cycle 009 `ExecutionBudget`/`BudgetState` and `kill_switch` semantics, plus `max_requests`, `max_rps` and `max_duration`. The first violation stops the run, and the next request is never sent |
-| RF-06 | Closed wire protocols | MUST | The adapters are **A2A** (Agent Card `GET` plus `message/send` over JSON-RPC) and **MCP** (streamable HTTP: `initialize`, `*/list`, `resources/read`, `prompts/get`, plus the Cycle 018 auth-metadata `GET`s). The conversational HTTP contract is pending Q2. Method lists are closed enums, and no free-form request is possible |
+| RF-06 | Closed wire protocols | MUST | The adapters are **A2A** (Agent Card `GET` plus `message/send` over JSON-RPC) and **MCP** (streamable HTTP: `initialize`, `*/list`, `resources/read`, `prompts/get`, plus the Cycle 018 auth-metadata `GET`s). The `dare-conversation` contract has a single `POST`. Method lists are closed enums, and no free-form request is possible |
 | RF-07 | Pre-approved payloads only | MUST | Every request body is produced from an existing engine scenario that is named by id and digest in the authorization: MULTITURN-LAB graph nodes (021), prompt-injection vectors (013), A2A scenarios (020) or MCP-auth scenarios (018). Nothing is generated, templated or mutated at run time |
 | RF-08 | Capture | MUST | Every exchange is recorded as a digest-chained capture: request digest and redacted bounded body, response status, redacted bounded body and digest, and timing. It is bound to the authorization digest and origin. Tampering is refused at replay (same contract as Cycle 021 RF-10) |
 | RF-09 | Offline verdict by the owning engine | MUST | A capture converts to the owning engine's existing REPLAY input, and that engine decides. `dare-remote-validation` has no verdict logic of its own beyond transport outcome → ERROR/INCONCLUSIVE |
@@ -95,7 +95,7 @@ does not scan, discover or crawl anything.
 | RF-14 | Audit record | MUST | An append-only, digest-chained audit record covering the authorization digest, operator confirmation, every request's origin, method, time and outcome, the stop reason and totals (requests, bytes, duration). It is written even for refusals that happen after admission |
 | RF-15 | REMOTE-LAB | MUST | At least 30 entries run against in-process loopback HTTPS lab servers: vulnerable and secure A2A and MCP targets, plus hostile servers (redirect off-origin, DNS answer that changes, oversized or slow responses, `429`/`5xx` storms, a server that echoes credentials back, TLS mismatch). Every class has a control |
 | RF-16 | Coverage | SHOULD | Remote evidence feeds the Cycle 006 coverage report as `SupportedMode::Dynamic` for the **existing** properties. No new property IDs are added and no profile denominator changes |
-| RF-17 | Conversational HTTP adapter | SHOULD | Pending Q2. A single closed request/response contract for a conversational agent endpoint, used by 013 and 021 scenarios |
+| RF-17 | Conversational HTTP adapter | MUST | Decided in Q2. A single closed request/response contract for a conversational agent endpoint, used by 013 and 021 scenarios |
 | RF-18 | Cycle 009 compatibility | MUST | `dare-adversarial` keeps refusing `local_only = false` ROEs. Remote validation is a separate, explicit entry point and never widens the Cycle 009 runner |
 | RF-19 | Continuous (Cycle 010) boundary | MUST | `dare-continuous` cannot schedule a remote run. Each remote run needs a live authorization and a human confirmation |
 | RF-20 | Evidence-bridge correction | MUST | See §4.8 |
@@ -111,7 +111,7 @@ does not scan, discover or crawl anything.
 | `origins[]` | Exact `https://host[:port]` origins. No wildcards, paths, credentials, query or fragment |
 | `network_scope` | `public` (default) \| `private` \| `loopback_lab`. The last two must be named explicitly |
 | `not_before`, `not_after` | RFC 3339 window, at most 7 days long |
-| `protocols` | A subset of `a2a`, `mcp`, and the conversational contract if Q2 is approved |
+| `protocols` | A subset of `a2a`, `mcp`, `dare-conversation` |
 | `methods` | A subset of the closed method enum for each protocol |
 | `scenarios[]` | Engine, scenario id and scenario digest, which pins every payload that may be sent |
 | `data_classes` | A subset of `SYNTHETIC`, `CANARY`, `TEST` (from Cycle 009) |
@@ -137,7 +137,7 @@ does not scan, discover or crawl anything.
 |---|---|---|
 | A2A | `GET /.well-known/agent-card.json`, JSON-RPC `message/send`, `tasks/get` | 020 (card and exchange invariants), 021 (multi-turn over A2A) |
 | MCP (streamable HTTP) | `initialize`, `tools/list`, `resources/list`, `resources/read`, `prompts/list`, `prompts/get`, plus the RFC 9728 / RFC 8414 metadata `GET`s | 018 (auth metadata), 002 (inventory, now with authentication) |
-| Conversational HTTP (Q2) | One `POST` carrying a closed JSON contract | 013, 021 |
+| DARE conversational contract (`dare-conversation`) | One `POST` carrying the closed JSON contract `{conversation_id, turn}` → `{output, actions[]}` | 013, 021 |
 
 `tools/call` is **not** in v1: it executes code on the target (Q4).
 
@@ -269,7 +269,7 @@ profile or result artifact changes. `REGRESSION.md` records the change.
 |---|---|---|---|---|---|
 | Authorized A2A agent | Target under test | HTTPS, JSON-RPC 2.0 | Outbound | Pre-approved synthetic/canary messages; Agent Card | Target owner |
 | Authorized MCP server | Target under test | HTTPS, streamable HTTP | Outbound | Read-only listings, reads, auth metadata | Target owner |
-| Conversational agent endpoint | Target under test | HTTPS, JSON | Outbound | To be confirmed (Q2) | Target owner |
+| Conversational agent endpoint | Target under test | HTTPS, JSON (`dare-conversation` contract) | Outbound | Pre-approved synthetic/canary turns; bounded outputs and declared actions | Target owner |
 
 There is no other integration: no telemetry, no cloud service and no model provider
 called by the tool.
@@ -295,11 +295,11 @@ called by the tool.
 
 ## 10. Out of scope (v1)
 
-- **Production targets:** refused in v1, pending Q3.
+- **Production targets:** refused in v1 (Q3).
 - **State-changing operations:** `tools/call`, writes, and A2A tasks that trigger side effects beyond a message exchange (Q4).
 - **Discovery, scanning or crawling:** exact origins only, with no port or path enumeration and no following of links found in responses.
 - **Generated attacks:** no attacker-LLM, mutation, fuzzing or load testing; no WAF or rate-limit evasion.
-- **Calling model providers directly** (OpenAI/Anthropic-style APIs) as targets, unless Q2 decides the conversational contract covers them.
+- **Calling model providers directly** (OpenAI/Anthropic-style APIs) as targets (Q2).
 - **Scheduled or continuous remote runs:** Cycle 010 stays offline.
 - **Attack-path construction (023), blast radius (024), runtime OpenTelemetry (025).**
 - **New property IDs.** Remote validation is a mode that produces evidence for the existing properties.
@@ -340,19 +340,10 @@ and defects are recorded in `REGRESSION.md`.
 
 ## 13. Open questions for Review
 
-1. **Authorization signature.** Choose one:
-   - (a) digest pin plus `--confirm-origin` plus audit, with no new dependency;
-   - (b) a detached Ed25519 signature by a target-owner key listed in a local trust file, which adds `ed25519-dalek`.
-
-   **Recommendation:** (a) in v1, with the schema reserving a `signature` field so that (b) is a compatible later change.
-2. **Conversational HTTP contract.** Choose one:
-   - (a) omit it, and serve only A2A and MCP in v1;
-   - (b) one closed, DARE-defined JSON contract (`{conversation_id, turn}` → `{output, actions[]}`);
-   - (c) an OpenAI-compatible chat-completions shape.
-
-   **Recommendation:** (b). It lets 013 and 021 run remotely without making the tool a model-provider client.
-3. **Production.** Should `environment: production` be refused in v1? **Recommendation:** yes, and reconsider once v1 evidence exists.
-4. **`tools/call` and other side-effecting methods.** Should they be excluded from v1? **Recommendation:** yes. They need an authorization model for side effects (per-tool allowlist, dry-run evidence) that deserves its own design.
+1. **Authorization signature — DECIDED (2026-09-28):** (a) digest pin plus `--confirm-origin` plus the audit record, with no new dependency. The schema reserves an optional `signature` field so that a detached Ed25519 signature can be added later as a compatible change.
+2. **Conversational HTTP contract — DECIDED (2026-09-28):** (b) one closed, DARE-defined JSON contract (`{conversation_id, turn}` → `{output, actions[]}`). RF-17 is therefore MUST. No OpenAI-compatible or provider shape is supported.
+3. **Production — DECIDED (2026-09-28):** `environment: production` is refused in v1. Only `lab`, `test` and `staging` are accepted.
+4. **`tools/call` and side-effecting methods — DECIDED (2026-09-28):** excluded from v1. Only read and message-exchange operations are allowed.
 5. **Evidence-bridge `observed.result`** for INCONCLUSIVE and ERROR. Choose one:
    - (a) `None`, the same as the 013–017 bridges;
    - (b) keep the descriptive string.
@@ -371,4 +362,4 @@ and defects are recorded in `REGRESSION.md`.
 - [ ] Evidence-bridge correction (§4.8) and its artifact change accepted
 - [ ] Out-of-scope boundary with Cycles 023–025 confirmed
 - [ ] Critical risks (R-01, R-02, R-03) have accepted mitigations
-- [ ] Open questions in §13 answered
+- [ ] Open questions in §13 answered (Q1–Q4 decided 2026-09-28; Q5 open)
