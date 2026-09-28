@@ -48,7 +48,7 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-037 — Add the `validate remote` and `validate replay-capture` CLI subcommands
 - [x] task-038 — Add the `remote-validation-2026` CI job
 - [x] task-039 — Add compatibility tests
-- [ ] task-040 — Security, dependency and container audit
+- [x] task-040 — Security, dependency and container audit
 - [x] task-041 — Record the remote-validation standards provenance snapshot
 - [x] task-042 — Write the EN/PT concept page and the EN authorization reference
 - [ ] task-043 — Write REGRESSION.md and PROOF.md, run the completion gate and create the cycle archive branch

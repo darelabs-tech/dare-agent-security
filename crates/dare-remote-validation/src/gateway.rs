@@ -522,14 +522,19 @@ impl EgressGateway {
                 (None, 0)
             }
         };
+        // A credential echoed in the challenge header is as much an echo as
+        // one in the body: scrubbed, counted, and a kill trigger.
+        let mut header_exact = 0;
         let challenge = www_authenticate.map(|raw| {
-            let (scrubbed, _, _) = self.scrubber.scrub(&raw);
+            let (scrubbed, echoed, _) = self.scrubber.scrub(&raw);
+            header_exact = echoed;
             neutralize(&String::from_utf8_lossy(&scrubbed))
                 .0
                 .chars()
                 .take(4096)
                 .collect::<String>()
         });
+        let exact = exact + header_exact;
         entry.response_digest = text.as_ref().map(|t| digest_bytes(t.as_bytes()));
         entry.response_body = text.clone();
         entry.www_authenticate = challenge.clone();

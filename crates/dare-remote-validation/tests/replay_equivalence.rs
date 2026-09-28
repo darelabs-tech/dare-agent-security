@@ -145,3 +145,28 @@ async fn a_changed_audit_or_a_changed_header_is_refused() {
         "a dropped entry no longer matches the audit totals"
     );
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn ten_replays_of_one_capture_are_byte_identical() {
+    let (run, auth, plan, work) = live().await;
+    let first = serde_json::to_vec(&run.result).unwrap();
+    for _ in 0..10 {
+        let replay = replay_capture(
+            &auth,
+            &plan,
+            &run.capture,
+            &run.audit,
+            None,
+            &sources(),
+            work.path(),
+        )
+        .unwrap();
+        assert_eq!(serde_json::to_vec(&replay.result).unwrap(), first);
+        assert_eq!(
+            serde_json::to_vec(&replay.evidence).unwrap(),
+            serde_json::to_vec(&run.evidence).unwrap()
+        );
+        let artifacts = replay.artifacts().unwrap();
+        assert_eq!(artifacts.len(), 5);
+    }
+}

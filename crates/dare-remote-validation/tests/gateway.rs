@@ -366,3 +366,50 @@ async fn control_and_bidi_characters_in_a_response_are_neutralized() {
     let (capture, _) = gw.finish(None).unwrap();
     assert_eq!(capture.entries[0].neutralized_chars, 1);
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_credential_echoed_in_the_challenge_header_is_scrubbed_and_kills() {
+    let ca = LabCa::generate();
+    let echo: Handler = Arc::new(|hit| {
+        LabReply::status(401).with_header(
+            "www-authenticate",
+            &format!(
+                "Bearer error=\"invalid\", seen=\"{}\"",
+                hit.authorization.clone().unwrap_or_default()
+            ),
+        )
+    });
+    let server = serve(&ca, echo).await;
+    let mut gw = gateway(&ca, &server.origin, json!({}));
+    let reply = gw.send(request(0, b"{}")).await.expect("recorded");
+    let challenge = reply.www_authenticate.expect("kept");
+    assert!(
+        !challenge.contains(TOKEN) && challenge.contains(REDACTED_CREDENTIAL),
+        "{challenge}"
+    );
+    assert!(matches!(
+        gw.send(request(1, b"{}")).await,
+        Err(RemoteError::Killed(KillTrigger::SecretDetected))
+    ));
+    let (capture, audit) = gw.finish(None).unwrap();
+    assert!(!serde_json::to_string(&(&capture, &audit))
+        .unwrap()
+        .contains(TOKEN));
+    assert_eq!(capture.entries[0].scrubbed_credential, 1);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_reply_slower_than_the_read_timeout_is_a_timeout_never_a_pass() {
+    let ca = LabCa::generate();
+    let slow = LabReply::json(200, json!({"ok": true})).delayed(Duration::from_millis(16_000));
+    let server = serve(&ca, always(slow)).await;
+    let mut gw = gateway(&ca, &server.origin, json!({}));
+    let started = std::time::Instant::now();
+    let reply = gw.send(request(0, b"{}")).await.expect("recorded");
+    assert_eq!(reply.transport, Some(TransportOutcome::ReadTimeout));
+    assert!(
+        started.elapsed() < Duration::from_millis(16_000),
+        "the client gave up first"
+    );
+    assert_eq!(reply.body, None);
+}
