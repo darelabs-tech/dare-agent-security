@@ -1,7 +1,7 @@
 # Cycle 023 — Approval
 
 **Cycle:** 023 — Attack-Path Construction  
-**Approval:** DESIGN APPROVED — Blueprint pending  
+**Approval:** DESIGN AND BLUEPRINT APPROVED — task set pending  
 **Approved at:** 2026-09-28  
 **Approved by:** Product Owner  
 **Base:** `main @ 32909ea`  
@@ -51,8 +51,25 @@ Neither the Blueprint nor execution may, without a new Review:
 - add a risk score, probability or weighting;
 - add or change a property ID or a profile denominator.
 
+## Blueprint approval (2026-09-28)
+
+`BLUEPRINT.md` is approved, including AD-01 to AD-12. The Product Owner asked for the
+tasks to be generated, and with that accepted the recommended option for each Review
+item:
+
+1. **BQ-1.** `BELONGS_TO_TENANT` and `ENFORCED_BY` are exempt from the guard
+   requirement of RF-11. Every other edge without a guard still makes its path
+   `CONTROL_UNDECIDED`.
+2. **BQ-2.** Unaliased node ids are scoped by run, not by engine. An alias may omit
+   `run` to cover every run of an engine. Every run exposes one `sut` node that the
+   system model aliases to join runs.
+3. **BQ-3.** (a) `dare-product` reads a v2 graph produced by `validate attack-paths`
+   and validates it with `dare_attack_graph::v2` only. It does not depend on
+   `dare-attack-path`.
+4. **BQ-4.** `validate attack-paths` exits 2 when any feasible path is
+   `CONTROL_FAILED` or `CONTROL_UNDECIDED`, or when enumeration was truncated.
+
 ## Next step
 
-`/dare-blueprint` produces `BLUEPRINT.md` for Review. Tasks are not generated until the
-Blueprint is approved, and execution is **not** authorized until the task set is
-approved.
+`TASKS.md`, `dare-dag.yaml` and `dare-dag.exec.yaml` (46 tasks) are proposed for
+Review. Execution is **not** authorized until that task set is approved.

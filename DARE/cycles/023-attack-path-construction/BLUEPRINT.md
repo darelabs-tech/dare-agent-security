@@ -1,6 +1,7 @@
 # Cycle 023 — Blueprint: Attack-Path Construction
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** PROPOSED — awaiting DARE Review  
+**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** ARCHITECTURE APPROVED  
+**Approval:** APPROVED 2026-09-28 (Product Owner), with the recommended option for BQ-1 to BQ-4 (BQ-3: (a)).  
 **Source of truth:** `DESIGN.md` and `APPROVAL.md` (Design approved 2026-09-28)  
 **Base:** `main @ 32909ea`
 
@@ -1010,7 +1011,8 @@ content echo:
    RF-11 would make every path through a tenant membership undecided forever.
    - **Proposal:** those two edge types are exempt from the guard requirement (§7.4).
      Every other edge type without a guard still gives `CONTROL_UNDECIDED`.
-   - **Recommendation: accept.**
+   - **Recommendation: accept.**  
+   **DECIDED (2026-09-28): accepted.**
 2. **BQ-2: run-scoped ids and the SUT node.** RF-05 scopes unaliased ids by engine. The
    engines' ids are in fact **scenario-local**: two tool scenarios can both name a tool
    `search`. Engine scope would silently merge them, the risk RS-06 exists to prevent.
@@ -1020,7 +1022,8 @@ content echo:
      - an alias may omit `run` to cover every run of that engine, an explicit human
        choice;
      - every run exposes one `sut` node that the model aliases to join runs (AD-08).
-   - **Recommendation: accept.** It is stricter than the Design and adds no merge path.
+   - **Recommendation: accept.** It is stricter than the Design and adds no merge path.  
+   **DECIDED (2026-09-28): accepted.**
 3. **BQ-3: product integration (RF-16, SHOULD).**
    - **(a) Recommended:** `dare-product` gains an optional fixture field,
      `attack_graph_v2: <path>`. It reads a v2 graph produced by `validate attack-paths`
@@ -1028,11 +1031,14 @@ content echo:
      on the ten engine crates.
    - **(b)** `dare-product` depends on `dare-attack-path` and constructs the graph
      itself.
+
+   **DECIDED (2026-09-28): (a).**
 4. **BQ-4: exit code for undecided and truncated results.** The Design does not fix
    one. The proposal follows the Cycle 022 convention: exit 2 when any feasible path is
    `CONTROL_FAILED` or `CONTROL_UNDECIDED`, or when enumeration was truncated. A gate
    must not pass on what was not decided.
-   - **Recommendation: accept.**
+   - **Recommendation: accept.**  
+   **DECIDED (2026-09-28): accepted.**
 
 **Observations** (not in scope; recorded in `BASELINE.md` for the separate hotfix
 decided in Q6):
@@ -1053,14 +1059,14 @@ decided in Q6):
 
 ## 14. Approval checklist
 
-- [ ] Architectural decisions AD-01 to AD-12 accepted
-- [ ] Bundle contract and input binding (§4.4) accepted
-- [ ] System-model schema and resolution rules (§4.5) accepted
-- [ ] v2 contract and its invariants (§4.7) accepted
-- [ ] Projection tables §6.1–§6.9 and the guard rule §6.11 accepted
-- [ ] Default designations (§6.10) accepted
-- [ ] Continuity table C1–C6 (§7.3) and control-state rule (§7.4) accepted
-- [ ] Enumeration algorithm and bounds (§7.2, §4.2) accepted
-- [ ] ATTACK-PATH-LAB plan (§8.1) accepted
-- [ ] Phase plan and DONE criteria (§9) accepted
-- [ ] BQ-1 to BQ-4 decided
+- [x] Architectural decisions AD-01 to AD-12 accepted
+- [x] Bundle contract and input binding (§4.4) accepted
+- [x] System-model schema and resolution rules (§4.5) accepted
+- [x] v2 contract and its invariants (§4.7) accepted
+- [x] Projection tables §6.1–§6.9 and the guard rule §6.11 accepted
+- [x] Default designations (§6.10) accepted
+- [x] Continuity table C1–C6 (§7.3) and control-state rule (§7.4) accepted
+- [x] Enumeration algorithm and bounds (§7.2, §4.2) accepted
+- [x] ATTACK-PATH-LAB plan (§8.1) accepted
+- [x] Phase plan and DONE criteria (§9) accepted
+- [x] BQ-1 to BQ-4 decided (2026-09-28)
