@@ -1,0 +1,32 @@
+[
+  {
+    "message_id": "msg-1",
+    "peer_id": "planner",
+    "role": "REMOTE_PEER",
+    "sender_claim": "svc-planner",
+    "task_id": "task-1",
+    "context_id": "context-1",
+    "tenant_claim": "tenant-a",
+    "initiating_principal": "user-alice",
+    "requested_skill": "summarize",
+    "protocol_version": "1.0.0",
+    "transport": "JSONRPC",
+    "interface_url": "https://peer.example/a2a",
+    "security_scheme_used": "oauth-main",
+    "delegation_chain_id": "chain-1",
+    "operation_effect": "READ_ONLY",
+    "is_repeat": false,
+    "parts": [
+      {
+        "part_id": "part-1",
+        "kind": "text",
+        "bytes": 128,
+        "treated_as_instruction": false,
+        "data_labels": [
+          "INTERNAL"
+        ]
+      }
+    ],
+    "evidence_source": "CAPTURED_TRACE"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "peer_id": "planner",
+    "logical_agent_id": "planner",
+    "card_provider": "acme",
+    "endpoint_identity": "peer.example",
+    "authenticated_principal": "svc-planner",
+    "delegated_subject": "user-alice",
+    "tenant": "tenant-a",
+    "audience": "local-orchestrator",
+    "evidence_source": "CAPTURED_TRACE"
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "chain_id": "chain-1",
+    "hops": [
+      {
+        "hop_id": "hop-1",
+        "grantor": "user-alice",
+        "grantee": "orchestrator",
+        "subject": "user-alice",
+        "audience": "local-orchestrator",
+        "tenant": "tenant-a",
+        "allowed_skills": [
+          "search",
+          "summarize"
+        ],
+        "max_sensitivity": "INTERNAL",
+        "purpose": "summarize-report",
+        "evidence_source": "LOCAL_DELEGATION_RECORD"
+      },
+      {
+        "hop_id": "hop-2",
+        "grantor": "orchestrator",
+        "grantee": "planner",
+        "subject": "user-alice",
+        "audience": "local-orchestrator",
+        "tenant": "tenant-a",
+        "allowed_skills": [
+          "summarize"
+        ],
+        "max_sensitivity": "INTERNAL",
+        "purpose": "summarize-report",
+        "evidence_source": "LOCAL_DELEGATION_RECORD"
+      }
+    ]
+  }
+]

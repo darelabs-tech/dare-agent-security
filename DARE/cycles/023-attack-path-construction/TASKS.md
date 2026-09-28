@@ -32,11 +32,11 @@ Throughout the cycle:
 - [x] task-010 — Implement `ids.rs` run-scoped and entity node ids
 - [x] task-011 — Add `schemas/attack-path/v1/system-model.schema.json`
 - [x] task-012 — Implement `model.rs` system-model admission and resolution rules 1–7
-- [ ] task-013 — Implement `load.rs` scenario loaders over the engines' public validators
-- [ ] task-014 — Implement bundle detection and input binding for tool, identity, memory, rag and mcp-auth
-- [ ] task-015 — Implement input binding for supply-chain and a2a through `StaticAdapter::collect`
-- [ ] task-016 — Implement bundle handling for prompt-injection, multi-turn and remote
-- [ ] task-017 — Implement `evidence_index.rs`
+- [x] task-013 — Implement `load.rs` scenario loaders over the engines' public validators
+- [x] task-014 — Implement bundle detection and input binding for tool, identity, memory, rag and mcp-auth
+- [x] task-015 — Implement input binding for supply-chain and a2a through `StaticAdapter::collect`
+- [x] task-016 — Implement bundle handling for prompt-injection, multi-turn and remote
+- [x] task-017 — Implement `evidence_index.rs`
 - [ ] task-018 — Implement `facts.rs` and the `guard_table.rs` verdict rule
 - [ ] task-019 — Implement the tool projector (§6.1)
 - [ ] task-020 — Implement the identity projector (§6.2)

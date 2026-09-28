@@ -10,9 +10,12 @@
 //! This crate never re-judges a property, never executes a path, and has no
 //! network capability.
 pub mod admit;
+pub mod bundle;
 pub mod error;
+pub mod evidence_index;
 pub mod ids;
 pub mod limits;
+pub mod load;
 pub mod model;
 pub mod sweep;
 
