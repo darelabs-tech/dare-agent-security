@@ -31,6 +31,7 @@ pub mod capture;
 pub mod control;
 pub mod credential;
 pub mod error;
+pub mod gateway;
 pub mod ids;
 pub mod limits;
 pub mod origin;

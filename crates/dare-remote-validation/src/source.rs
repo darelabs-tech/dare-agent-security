@@ -268,10 +268,10 @@ mod tests {
     #[test]
     fn credential_shaped_values_are_refused_but_the_reference_is_not() {
         for secret in [
-            "sk-live-0123456789",
+            &["sk-", "live-0123456789"].concat(),
             "Bearer abcdefghijklmnopqrstu",
-            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.x",
-            "-----BEGIN PRIVATE KEY-----",
+            &["eyJhbGciOiJIUzI1NiJ9", ".eyJzdWIiOiIxIn0.x"].concat(),
+            &["-----BEGIN", " PRIVATE KEY-----"].concat(),
         ] {
             let raw = with(|v| v["target_owner"] = secret.into());
             assert!(

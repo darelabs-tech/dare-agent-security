@@ -42,5 +42,14 @@ lab = []
 
 [dev-dependencies]
 dare-remote-validation = { path = ".", features = ["lab"] }
+http-body-util = "0.1"
+hyper = { version = "1", features = ["http1", "server"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+# Generates the REMOTE-LAB CA and server keys in memory at test time, so no
+# private key is ever checked in (Review BQ-3). Dev-only; never linked into the
+# binary. aws-lc-rs is the backend rustls already uses.
+rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem"] }
+rustls = { version = "0.23", default-features = false, features = ["aws_lc_rs", "std", "tls12"] }
 tempfile = "3.14"
-tokio = { workspace = true, features = ["net", "test-util"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["aws_lc_rs", "tls12"] }
+tokio = { workspace = true, features = ["net", "test-util", "io-util", "sync"] }

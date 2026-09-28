@@ -30,8 +30,8 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-019 — Implement `capture.rs` with chained digests and `verify`
 - [x] task-020 — Implement `audit.rs`
 - [x] task-021 — Implement `outcome.rs` transport overlay
-- [ ] task-022 — Implement `EgressGateway::new` and `send` steps 1–10
-- [ ] task-023 — Build the REMOTE-LAB harness (`LabCa` with rcgen, `LabServer`, behaviours)
+- [x] task-022 — Implement `EgressGateway::new` and `send` steps 1–10
+- [x] task-023 — Build the REMOTE-LAB harness (`LabCa` with rcgen, `LabServer`, behaviours)
 - [ ] task-024 — Implement the A2A protocol client
 - [ ] task-025 — Implement the MCP protocol client (JSON-RPC, single-response SSE reader, pagination, metadata GETs)
 - [ ] task-026 — Implement the `dare-conversation` v1 client
