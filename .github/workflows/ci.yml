@@ -3407,6 +3407,15 @@ jobs:
       - name: ATTACK-PATH-LAB - APL-001..026 through the real binary, twins and class contract
         run: cargo test -p dare-agent-security --test attack_path_lab -- --nocapture
 
+      - name: Compatibility - v1/v2 path eligibility, registries, profiles, engine trees, Docker inputs
+        run: cargo test -p dare-agent-security --test attack_path_compatibility -- --nocapture
+      - name: Earlier consumers run unchanged (Cycle 009 eligibility, Cycle 010 drift, profile denominators)
+        run: |
+          cargo test -p dare-adversarial -- --nocapture
+          cargo test -p dare-continuous -- --nocapture
+          cargo test -p dare-coverage --test a2a_profile no_earlier_profile_denominator_moved -- --nocapture
+          cargo test -p dare-coverage --test multi_turn_profile no_earlier_profile_denominator_moved -- --nocapture
+
       - name: Offline CLI - two engine bundles give a validated graph without a system model
         run: |
           rm -rf .dare-agent-security/cycle023-paths
