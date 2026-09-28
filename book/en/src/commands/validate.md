@@ -262,10 +262,16 @@ the observed window, and the summary names every target-reported field it
 relies on. See [Authorized Remote Validation](../concepts/remote-validation.md)
 and the [Remote Authorization Reference](../reference/remote-authorization.md).
 
+A first Ctrl-C stops the run: nothing more is sent and every artifact is still
+written. A second Ctrl-C aborts with exit `130` and writes nothing.
+`remote-coverage.json` can be passed to `validate coverage --executions`.
+Its rows are then marked as dynamic evidence, and the facts must allow dynamic
+authorization.
+
 ## `validate replay-capture`
 
 Recomputes a remote run's verdicts from its stored capture and audit record,
-with no network, no credential and no open window. It writes the same five
+with no network, no credential and no open window. It writes the same six
 artifacts as `validate remote`. For an unchanged capture, `remote-result.json`
 is byte-identical to the live run's. A capture or audit record that was
 changed in any way is refused with exit `3`.

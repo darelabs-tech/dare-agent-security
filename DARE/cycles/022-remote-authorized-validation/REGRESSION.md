@@ -98,9 +98,9 @@ the trust class means authentication of origin only.
 | BLUEPRINT §6 A2A row (task-029) | one message per scenario text probe (≤ 16) | one probe whose text is the scenario's `description` | A2A-LAB entries declare no probe texts; the description is their only pre-approved, digest-pinned text |
 | BLUEPRINT §5.2 (task-034) | `run_remote(…, handle)` | plus `sources` and `work_root`; `run_remote_lowered` adds CLI lowering | the engines' scenario files and A2A's scratch directory needed a location |
 | BLUEPRINT §5.1 (task-037) | `--max-*` lower the plan | lowered on the **verified authorization** after `verify` | lowering the plan would change its digest and break replay |
-| CLI (task-037) | Ctrl-C ⇒ `OperatorStop` | Ctrl-C terminates without writing | the stop flag remains a library entry point (`the_operator_stop_flag_blocks_the_next_send`). Wiring it needs tokio's `signal` feature; recorded as a follow-up |
+| CLI (task-037) | Ctrl-C ⇒ `OperatorStop` | Ctrl-C terminated without writing | **resolved by hotfix-001** (§8) |
 | BLUEPRINT §7.1 | `Behaviour` enum; `with_lookup` under `cfg(test)` | handler closures; `with_lookup` under `cfg(test)` **or** feature `lab` | integration tests are separate crates and cannot see `cfg(test)`. `the_cli_never_enables_the_lab_feature` keeps the seam out of the binary |
-| Design RF-16 (SHOULD) | remote evidence feeds coverage as `Dynamic` | **not implemented** | no coverage file changes in this cycle (`the_registry_and_every_profile_are_byte_for_byte_unchanged`). Recorded as a follow-up |
+| Design RF-16 (SHOULD) | remote evidence feeds coverage as `Dynamic` | not implemented at merge | **resolved by hotfix-001** (§8) |
 | Design §4.5, 009–016 | includes "authenticated inventory" | the MCP client supports `initialize`, lists and reads (`every_mcp_method_round_trips_in_json_and_event_stream_form`), but no REMOTE-LAB entry decides an inventory verdict | no engine consumes a live inventory in v1 |
 | Design §4.5, 023–027 | timeout and slow drip | the timeout is `a_reply_slower_than_the_read_timeout_is_a_timeout_never_a_pass` (gateway suite); a slow drip is bounded by the same 15 s total timeout, so no separate entry was staged | a slow drip ends as the same `READ_TIMEOUT` |
 
@@ -121,3 +121,24 @@ the trust class means authentication of origin only.
   check.
 - **`mdbook` was not installed.** v0.4.40, the CI's pinned release, was downloaded to
   `~/.local/bin` to build both books.
+
+## 8. Hotfix-001, after merge: RF-16 and Ctrl-C
+
+The two items this record left as follow-ups were fixed on the same cycle, at the
+Product Owner's request, instead of opening a new cycle. Details are in
+`EXECUTION/hotfix-001.md`.
+
+| Item | Change | Test now holding it |
+|---|---|---|
+| RF-16 | `validate remote`/`replay-capture` write a sixth artifact, `remote-coverage.json`: an `ExecutionsDocument` (`execution_mode: dynamic`, `evidence_class: DYNAMIC_AUTHORIZED`, provenance, and per-property verdict and evidence ids). Each property is read from its engine's own extension, and its verdict is the run's aggregation of that property's records. `validate coverage --executions` accepts the document as well as the original array, marks the rows it decided, and refuses (exit 3) when the facts deny dynamic authorization. | `the_coverage_artifact_regroups_the_engines_evidence_and_replays_identically`, `remote_evidence_feeds_the_coverage_report_as_dynamic`, `remote_evidence_is_refused_against_facts_that_deny_dynamic_testing`, `annotation_marks_only_rows_the_document_decided_and_moves_no_number`, `dynamic_evidence_is_refused_when_the_facts_deny_dynamic_authorization` |
+| Ctrl-C | A listener installed before anything is sent. The first Ctrl-C sets the gateway's operator stop, so nothing more leaves, the run ends `KILL_SWITCH`, and every artifact is written. The second Ctrl-C exits 130 without writing. | `the_first_signal_stops_and_the_second_aborts`, `one_signal_stops_without_aborting`, `an_operator_stop_sends_nothing_more_and_still_writes_every_artifact`, `a_caller_held_flag_is_the_one_the_gateway_obeys` |
+| Gap found while wiring | The operator stop was checked only **before** the rate-limit wait, so a Ctrl-C during that wait (up to 500 ms at 2 rps) still let one request leave. It is now re-checked after the wait. | `a_stop_during_the_rate_wait_keeps_the_request_from_leaving` |
+
+**What changes for existing artifacts:**
+- `remote-result.json`, `remote-evidence.json`, the capture and the audit record
+  are unchanged. The committed CLI fixture still replays byte for byte.
+- The artifact set grows from five to six. The two tests that counted artifacts now
+  count six.
+- No registry entry, profile, property ID or denominator changed.
+- `Cargo.lock` is unchanged: tokio's `signal` feature needs no crate that was not
+  already locked.

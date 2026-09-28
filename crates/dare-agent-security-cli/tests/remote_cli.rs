@@ -148,6 +148,7 @@ fn replay_capture_reproduces_the_committed_result_byte_for_byte() {
         [
             "remote-audit.json",
             "remote-capture.json",
+            "remote-coverage.json",
             "remote-evidence.json",
             "remote-result.json",
             "summary.md"
@@ -187,4 +188,110 @@ fn replay_capture_refuses_a_tampered_capture_and_writes_nothing() {
     ]);
     assert_eq!(out.status.code(), Some(3));
     assert!(!target.exists());
+}
+
+fn replay_into(target: &Path) {
+    let out = run(&[
+        "validate",
+        "replay-capture",
+        "--capture",
+        fixture("capture.json").to_str().unwrap(),
+        "--audit",
+        fixture("audit.json").to_str().unwrap(),
+        "--authorization",
+        fixture("authorization.json").to_str().unwrap(),
+        "--plan",
+        fixture("plan.json").to_str().unwrap(),
+        "--output-dir",
+        target.to_str().unwrap(),
+    ]);
+    assert_eq!(out.status.code(), Some(2));
+}
+
+fn coverage(executions: &Path, facts: &Path, out: &Path) -> Output {
+    run(&[
+        "validate",
+        "coverage",
+        "--profile",
+        "multi-turn-security-baseline-2026",
+        "--facts",
+        facts.to_str().unwrap(),
+        "--executions",
+        executions.to_str().unwrap(),
+        "--output-dir",
+        out.to_str().unwrap(),
+    ])
+}
+
+#[test]
+fn remote_evidence_feeds_the_coverage_report_as_dynamic() {
+    let dir = tempfile::tempdir().unwrap();
+    let replayed = dir.path().join("replayed");
+    replay_into(&replayed);
+    let report_dir = dir.path().join("coverage");
+    let out = coverage(
+        &replayed.join("remote-coverage.json"),
+        &fixture("coverage-facts.json"),
+        &report_dir,
+    );
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let report: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(report_dir.join("coverage-report.json")).unwrap())
+            .unwrap();
+    let evidence: Vec<serde_json::Value> =
+        serde_json::from_slice(&std::fs::read(replayed.join("remote-evidence.json")).unwrap())
+            .unwrap();
+    let ids: Vec<&str> = evidence.iter().map(|r| r["id"].as_str().unwrap()).collect();
+    // Seven properties, all decided from the remote records; the eroded
+    // refusal is the FAIL, and no property or denominator was added.
+    assert_eq!(
+        (report["eligible"].as_u64(), report["tested"].as_u64()),
+        (Some(7), Some(7))
+    );
+    for row in report["properties"].as_array().unwrap() {
+        let rationale = row["rationale"].as_str().unwrap();
+        assert!(
+            rationale.contains("dynamic evidence from remote run under authorization lab-auth-1"),
+            "{rationale}"
+        );
+        for id in row["evidence_ids"].as_array().unwrap() {
+            assert!(ids.contains(&id.as_str().unwrap()));
+        }
+        let expected = if row["property_id"] == "AGENT.GOAL.REFUSAL_PERSISTENCE" {
+            "FAIL"
+        } else {
+            "INCONCLUSIVE"
+        };
+        assert_eq!(row["verdict"], expected, "{}", row["property_id"]);
+    }
+}
+
+#[test]
+fn remote_evidence_is_refused_against_facts_that_deny_dynamic_testing() {
+    let dir = tempfile::tempdir().unwrap();
+    let replayed = dir.path().join("replayed");
+    replay_into(&replayed);
+    let mut facts: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(fixture("coverage-facts.json")).unwrap()).unwrap();
+    facts["dynamic_authorization_allowed"] = false.into();
+    let facts_path = dir.path().join("facts.json");
+    std::fs::write(&facts_path, facts.to_string()).unwrap();
+    let report_dir = dir.path().join("coverage");
+    let out = coverage(
+        &replayed.join("remote-coverage.json"),
+        &facts_path,
+        &report_dir,
+    );
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "a contradiction is a usage error"
+    );
+    assert!(String::from_utf8_lossy(&out.stderr).contains("deny dynamic authorization"));
+    assert!(!report_dir.exists());
 }

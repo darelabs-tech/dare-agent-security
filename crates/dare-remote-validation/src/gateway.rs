@@ -257,6 +257,13 @@ impl EgressGateway {
         self.operator_stop.clone()
     }
 
+    /// Use a stop flag the caller already holds (the CLI's Ctrl-C listener
+    /// is installed before the gateway exists).
+    pub fn with_operator_stop(mut self, flag: Arc<AtomicBool>) -> Self {
+        self.operator_stop = flag;
+        self
+    }
+
     pub fn stop_reason(&self) -> Option<StopReason> {
         self.stop
     }
@@ -343,6 +350,13 @@ impl EgressGateway {
         if let Err(error) = self.limiter.wait(deadline).await {
             self.halt(StopReason::BudgetExhausted, "BUDGET_EXHAUSTED");
             return Err(error);
+        }
+        // An operator stop that arrived while waiting for the rate slot must
+        // still keep the request from leaving.
+        if self.operator_stop.load(Ordering::SeqCst) {
+            self.kill(KillTrigger::OperatorStop);
+            self.halt(StopReason::KillSwitch, "KILL_SWITCH");
+            return Err(RemoteError::Killed(KillTrigger::OperatorStop));
         }
         Ok((path, length))
     }

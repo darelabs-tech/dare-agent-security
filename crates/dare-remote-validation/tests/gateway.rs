@@ -353,6 +353,46 @@ async fn the_operator_stop_flag_blocks_the_next_send() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
+async fn a_stop_during_the_rate_wait_keeps_the_request_from_leaving() {
+    // At 2 rps the second send waits about 500 ms for its slot. The flag is
+    // clear when the send starts and set while it waits.
+    let ca = LabCa::generate();
+    let server = serve(&ca, ok()).await;
+    let mut gw = gateway(&ca, &server.origin, json!({}));
+    gw.send(request(0, b"{}")).await.unwrap();
+    let flag = gw.operator_stop_flag();
+    let setter = tokio::spawn(async move {
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        flag.store(true, Ordering::SeqCst);
+    });
+    assert!(matches!(
+        gw.send(request(1, b"{}")).await,
+        Err(RemoteError::Killed(KillTrigger::OperatorStop))
+    ));
+    setter.await.unwrap();
+    assert_eq!(server.hits().len(), 1, "nothing left after the stop");
+    let (_, audit) = gw.finish(None).unwrap();
+    assert!(serde_json::to_string(&audit)
+        .unwrap()
+        .contains("OPERATOR_STOP"));
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_caller_held_flag_is_the_one_the_gateway_obeys() {
+    let ca = LabCa::generate();
+    let server = serve(&ca, ok()).await;
+    let flag = Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let mut gw = gateway(&ca, &server.origin, json!({})).with_operator_stop(flag.clone());
+    gw.send(request(0, b"{}")).await.unwrap();
+    flag.store(true, Ordering::SeqCst);
+    assert!(matches!(
+        gw.send(request(1, b"{}")).await,
+        Err(RemoteError::Killed(KillTrigger::OperatorStop))
+    ));
+    assert_eq!(server.hits().len(), 1);
+}
+
+#[tokio::test(flavor = "multi_thread")]
 async fn control_and_bidi_characters_in_a_response_are_neutralized() {
     let ca = LabCa::generate();
     let hostile = LabReply {

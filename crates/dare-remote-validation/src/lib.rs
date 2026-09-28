@@ -29,6 +29,7 @@ pub mod authorization;
 pub mod canonical;
 pub mod capture;
 pub mod control;
+pub mod coverage;
 pub mod credential;
 pub mod engines;
 pub mod error;

@@ -43,7 +43,9 @@ pub use agentic::{
     AGENTIC_PROVENANCE_JSON, MCP_AGENTIC_CROSSWALK_JSON,
 };
 pub use applicability::{evaluate_applicability, ApplicabilityDecision};
-pub use correlate::{correlate, CorrelatedRow, EvidenceRef, PropertyExecution};
+pub use correlate::{
+    correlate, parse_executions, CorrelatedRow, EvidenceRef, ExecutionsDocument, PropertyExecution,
+};
 pub use cycle005::{load_scenario_property_map, map_corpus, ScenarioMapping, LAB_SCENARIO_IDS};
 pub use error::CoverageError;
 pub use facts::{AssessmentFacts, TransportKind};

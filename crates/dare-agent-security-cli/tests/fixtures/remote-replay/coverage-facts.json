@@ -1,0 +1,12 @@
+{
+  "tools_count": 0,
+  "resources_count": 0,
+  "prompts_count": 0,
+  "transport": "http",
+  "authorization_present": true,
+  "dynamic_authorization_allowed": true,
+  "execution_integrity_supported": false,
+  "confused_deputy_supported": false,
+  "agent_present": true,
+  "stateful_agent_present": true
+}

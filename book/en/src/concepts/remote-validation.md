@@ -114,10 +114,37 @@ No transport outcome can produce a PASS.
 | `remote-evidence.json` | the engines' evidence records, each marked `PROTOCOL_RESPONSE` with its provenance |
 | `remote-audit.json` | what was authorized and confirmed, and every request, response, stop and kill, hash-chained |
 | `summary.md` | the verdicts, what each PASS relies on, and what was not observable |
+| `remote-coverage.json` | the coverage input: each property's verdict and evidence ids, marked `execution_mode: dynamic` and `evidence_class: DYNAMIC_AUTHORIZED` |
 
 The credential is never written anywhere. Every artifact is scrubbed of it (in
 raw, base64 and percent-encoded forms) and of credential-shaped strings before
 it is written. A target that echoes the credential stops the run.
+
+## Coverage
+
+`remote-coverage.json` feeds the existing coverage report:
+
+```bash
+dare-agent-security validate coverage --profile multi-turn-security-baseline-2026 \
+  --facts facts.json --executions out/remote-coverage.json --output-dir coverage/
+```
+
+Each property's verdict is the run's own aggregation of the engines' records
+for it, so nothing new is decided. No property is added and no profile
+denominator moves. Every decided row's rationale names the remote run it came
+from. The facts must allow dynamic authorization
+(`dynamic_authorization_allowed: true`). Otherwise the command refuses with
+exit `3`, because live evidence cannot be scored against an ROE that
+prohibits it.
+
+## Stopping a run
+
+Press Ctrl-C once to stop: no further request is sent, including one waiting
+for its rate slot. The run ends with stop reason `KILL_SWITCH`, the audit
+record logs `OPERATOR_STOP`, and all six artifacts are still written.
+Unfinished scenarios are INCONCLUSIVE. A request already on the wire finishes
+or times out. Press Ctrl-C a second time to abort at once with exit `130`,
+without writing anything.
 
 See [Remote Authorization Reference](../reference/remote-authorization.md) for
 the authorization and plan formats.
