@@ -1,0 +1,121 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-g",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "alice",
+      "type": "HUMAN",
+      "display_name": "Alice (tenant-a user)",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "assistant",
+      "type": "AGENT",
+      "display_name": "Support assistant"
+    },
+    {
+      "entity_id": "index-admin-cred",
+      "type": "CREDENTIAL",
+      "display_name": "Index admin credential",
+      "security": {
+        "privileged": true
+      }
+    },
+    {
+      "entity_id": "index-service",
+      "type": "IDENTITY",
+      "display_name": "Index service identity",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "mallory",
+      "type": "HUMAN",
+      "display_name": "Mallory (tenant-b user)",
+      "security": {
+        "tenant": "tenant-b"
+      }
+    },
+    {
+      "entity_id": "ticket-doc",
+      "type": "RESOURCE",
+      "display_name": "Ticket document",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "planner-peer",
+      "type": "AGENT",
+      "display_name": "Planner peer agent",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "identity",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "identity",
+      "local_id": "agent-1",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "identity",
+      "local_id": "svc-index",
+      "entity_id": "index-service"
+    },
+    {
+      "engine": "identity",
+      "local_id": "cred-index-admin",
+      "entity_id": "index-admin-cred"
+    },
+    {
+      "engine": "identity",
+      "local_id": "document-123",
+      "entity_id": "ticket-doc"
+    },
+    {
+      "engine": "tool",
+      "local_id": "sut",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "a2a",
+      "local_id": "sut",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "a2a",
+      "local_id": "planner",
+      "entity_id": "planner-peer"
+    }
+  ],
+  "targets": [
+    {
+      "entity_id": "ticket-doc",
+      "class": "SENSITIVE_RESOURCE"
+    }
+  ],
+  "declared_edges": [
+    {
+      "type": "CAN_REACH",
+      "source": "assistant",
+      "target": "ticket-doc",
+      "status": "INFERRED",
+      "authority": {
+        "principal": "mallory"
+      },
+      "rationale": "Deployment note: the assistant's document connector runs under this principal. No engine artifact explains how the assistant acquired it."
+    }
+  ]
+}

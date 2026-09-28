@@ -1,0 +1,20 @@
+{
+  "id": "APL-018",
+  "class": "E",
+  "role": "attack",
+  "title": "E: low-privilege principal -> inbound MCP token -> MCP server -> upstream credential passthrough -> MCP resource",
+  "runs": [
+    {
+      "engine": "mcp-auth-security",
+      "scenario": "MCP-AUTH-LAB-030"
+    },
+    {
+      "engine": "mcp-auth-security",
+      "scenario": "MCP-AUTH-LAB-033"
+    },
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-019"
+    }
+  ]
+}

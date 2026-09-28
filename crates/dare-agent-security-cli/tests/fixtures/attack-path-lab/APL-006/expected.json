@@ -1,0 +1,34 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:credential:index-admin-cred"
+      ],
+      "control_state": "CONTROLS_HELD",
+      "failed_properties": [],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    }
+  ],
+  "absent": [
+    [
+      "node:human:mallory",
+      "node:data:tenant-b-memory",
+      "node:human:alice",
+      "node:credential:index-admin-cred"
+    ],
+    [
+      "node:human:alice",
+      "node:data:tenant-b-memory"
+    ]
+  ],
+  "no_failed_property": [
+    "AGENT.MEMORY.WRITE_TRUST_BOUNDARY",
+    "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+    "AGENT.MEMORY.TENANT_BOUNDARY",
+    "AGENT.MEMORY.PROVENANCE_INTEGRITY",
+    "AGENT.MEMORY.RECALL_AUTHORITY_BOUNDARY"
+  ]
+}

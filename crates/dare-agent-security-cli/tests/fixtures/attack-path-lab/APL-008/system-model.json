@@ -1,0 +1,105 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-b",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "alice",
+      "type": "HUMAN",
+      "display_name": "Alice (tenant-a user)",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "assistant",
+      "type": "AGENT",
+      "display_name": "Support assistant"
+    },
+    {
+      "entity_id": "index-admin-cred",
+      "type": "CREDENTIAL",
+      "display_name": "Index admin credential",
+      "security": {
+        "privileged": true
+      }
+    },
+    {
+      "entity_id": "index-service",
+      "type": "IDENTITY",
+      "display_name": "Index service identity",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "mallory",
+      "type": "HUMAN",
+      "display_name": "Mallory (tenant-b user)",
+      "security": {
+        "tenant": "tenant-b"
+      }
+    },
+    {
+      "entity_id": "tenant-b-memory",
+      "type": "DATA",
+      "display_name": "Tenant B memory item",
+      "security": {
+        "tenant": "tenant-b"
+      }
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "identity",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "identity",
+      "local_id": "agent-1",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "identity",
+      "local_id": "svc-index",
+      "entity_id": "index-service"
+    },
+    {
+      "engine": "identity",
+      "local_id": "cred-index-admin",
+      "entity_id": "index-admin-cred"
+    },
+    {
+      "engine": "memory",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "memory",
+      "local_id": "agent-1",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "memory",
+      "local_id": "user-9",
+      "entity_id": "mallory"
+    },
+    {
+      "engine": "memory",
+      "local_id": "mem-other-tenant",
+      "entity_id": "tenant-b-memory"
+    }
+  ],
+  "entry_points": [
+    {
+      "entity_id": "mallory",
+      "class": "LOW_PRIVILEGE_PRINCIPAL"
+    },
+    {
+      "entity_id": "alice",
+      "class": "LOW_PRIVILEGE_PRINCIPAL"
+    }
+  ]
+}

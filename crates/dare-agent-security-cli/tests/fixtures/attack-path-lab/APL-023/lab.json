@@ -1,0 +1,17 @@
+{
+  "id": "APL-023",
+  "class": "G",
+  "role": "structural",
+  "title": "G: an access made under a principal the path never acquired (declared, unexplained authority change)",
+  "runs": [
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-004"
+    },
+    {
+      "engine": "a2a",
+      "scenario": "A2A-LAB-016"
+    }
+  ],
+  "declared_edges": true
+}

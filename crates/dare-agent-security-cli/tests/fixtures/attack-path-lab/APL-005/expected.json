@@ -1,0 +1,32 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:human:mallory",
+        "node:data:tenant-b-memory",
+        "node:human:alice",
+        "node:credential:index-admin-cred"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+        "AGENT.MEMORY.WRITE_TRUST_BOUNDARY"
+      ],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    },
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:data:tenant-b-memory"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.MEMORY.TENANT_BOUNDARY"
+      ],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "CROSS_TENANT_RESOURCE"
+    }
+  ]
+}

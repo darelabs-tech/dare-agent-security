@@ -1,0 +1,16 @@
+{
+  "id": "APL-004",
+  "class": "A",
+  "role": "variant",
+  "title": "A: retrieved document -> acting principal -> cross-tenant document or privileged credential",
+  "runs": [
+    {
+      "engine": "rag-security",
+      "scenario": "RAG-LAB-014"
+    },
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-019"
+    }
+  ]
+}

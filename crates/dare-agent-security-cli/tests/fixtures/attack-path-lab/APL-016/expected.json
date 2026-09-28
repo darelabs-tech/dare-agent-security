@@ -1,0 +1,46 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:credential:inbound-token",
+        "node:mcp-server:mcp-auth:${run:0}:mcp-invoices",
+        "node:credential:mcp-auth:${run:0}:cred-upstream"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "MCP.AUTH.CREDENTIAL_SEPARATION"
+      ],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    },
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:credential:inbound-token",
+        "node:mcp-server:mcp-auth:${run:0}:mcp-invoices",
+        "node:credential:mcp-auth:${run:0}:cred-upstream",
+        "node:resource:mcp-auth:${run:0}:mcp-invoices"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "MCP.AUTH.CREDENTIAL_SEPARATION"
+      ],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "SENSITIVE_RESOURCE"
+    },
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:credential:index-admin-cred"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION"
+      ],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:data:user-channel",
+        "node:agent:assistant",
+        "node:tool:payments-transfer"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY"
+      ],
+      "entry_class": "UNTRUSTED_INPUT",
+      "target_class": "DESTRUCTIVE_CAPABILITY"
+    },
+    {
+      "nodes": [
+        "node:data:conversation-channel",
+        "node:agent:assistant",
+        "node:tool:payments-transfer"
+      ],
+      "control_state": "CONTROL_UNDECIDED",
+      "failed_properties": [],
+      "entry_class": "UNTRUSTED_INPUT",
+      "target_class": "DESTRUCTIVE_CAPABILITY"
+    }
+  ]
+}

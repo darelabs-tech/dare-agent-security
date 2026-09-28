@@ -1,0 +1,88 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-e",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "alice",
+      "type": "HUMAN",
+      "display_name": "Alice (tenant-a user)",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "assistant",
+      "type": "AGENT",
+      "display_name": "Support assistant"
+    },
+    {
+      "entity_id": "index-admin-cred",
+      "type": "CREDENTIAL",
+      "display_name": "Index admin credential",
+      "security": {
+        "privileged": true
+      }
+    },
+    {
+      "entity_id": "index-service",
+      "type": "IDENTITY",
+      "display_name": "Index service identity",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "inbound-token",
+      "type": "CREDENTIAL",
+      "display_name": "Inbound MCP token"
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "identity",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "identity",
+      "local_id": "agent-1",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "identity",
+      "local_id": "svc-index",
+      "entity_id": "index-service"
+    },
+    {
+      "engine": "identity",
+      "local_id": "cred-index-admin",
+      "entity_id": "index-admin-cred"
+    },
+    {
+      "engine": "mcp-auth",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "mcp-auth",
+      "local_id": "cred-inbound",
+      "entity_id": "inbound-token"
+    }
+  ],
+  "targets": [
+    {
+      "node_id": "node:resource:mcp-auth:${run:0}:mcp-invoices",
+      "class": "SENSITIVE_RESOURCE"
+    },
+    {
+      "node_id": "node:resource:mcp-auth:${run:1}:mcp-invoices",
+      "class": "SENSITIVE_RESOURCE"
+    },
+    {
+      "node_id": "node:resource:mcp-auth:${run:2}:mcp-invoices",
+      "class": "SENSITIVE_RESOURCE"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "exit": 2,
+  "discontinuous": [
+    {
+      "nodes": [
+        "node:agent:planner-peer",
+        "node:agent:assistant",
+        "node:resource:ticket-doc"
+      ],
+      "at": 1
+    },
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:agent:assistant",
+        "node:resource:ticket-doc"
+      ],
+      "at": 1
+    }
+  ],
+  "paths": [
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:agent:assistant",
+        "node:identity:index-service",
+        "node:credential:index-admin-cred",
+        "node:resource:ticket-doc"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.IDENTITY.DELEGATION_SCOPE_BOUNDARY"
+      ],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "SENSITIVE_RESOURCE"
+    }
+  ]
+}

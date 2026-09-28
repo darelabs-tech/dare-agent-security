@@ -1,0 +1,21 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:agent:planner-peer",
+        "node:agent:assistant",
+        "node:identity:index-service",
+        "node:credential:index-admin-cred"
+      ],
+      "control_state": "CONTROL_UNDECIDED",
+      "failed_properties": [],
+      "entry_class": "PEER_AGENT",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    }
+  ],
+  "no_failed_property": [
+    "AGENT.A2A.SKILL_AUTHORIZATION",
+    "AGENT.A2A.PEER_IDENTITY_BINDING"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:data:user-channel",
+        "node:agent:assistant",
+        "node:tool:payments-transfer"
+      ],
+      "control_state": "CONTROLS_HELD",
+      "failed_properties": [],
+      "entry_class": "UNTRUSTED_INPUT",
+      "target_class": "DESTRUCTIVE_CAPABILITY"
+    }
+  ],
+  "no_failed_property": [
+    "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY",
+    "AGENT.HUMAN_APPROVAL.CROSS_TURN_CONTINUITY"
+  ]
+}

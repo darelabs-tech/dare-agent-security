@@ -1,0 +1,11 @@
+{
+  "scenario_id": "supply-static-001",
+  "class": "COMPONENT_IDENTITY",
+  "mode": "STATIC",
+  "primary_invariant": "COMPONENT_IDENTITY_UNAMBIGUOUS",
+  "evidence_files": [
+    "app.cdx.json",
+    "manifest.json"
+  ],
+  "description": "every component resolves to one canonical identity"
+}

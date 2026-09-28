@@ -1,0 +1,20 @@
+{
+  "id": "APL-005",
+  "class": "B",
+  "role": "attack",
+  "title": "B: memory written by one principal -> recalled by another -> privileged credential",
+  "runs": [
+    {
+      "engine": "memory-security",
+      "scenario": "MEMORY-LAB-008"
+    },
+    {
+      "engine": "memory-security",
+      "scenario": "MEMORY-LAB-004"
+    },
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-006"
+    }
+  ]
+}

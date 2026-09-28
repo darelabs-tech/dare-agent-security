@@ -1,0 +1,15 @@
+{
+  "id": "APL-026",
+  "class": "I",
+  "role": "structural",
+  "title": "I: an authorized remote (Cycle 022) run joined to a local identity run",
+  "runs": [
+    {
+      "engine": "replay-capture"
+    },
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-001"
+    }
+  ]
+}

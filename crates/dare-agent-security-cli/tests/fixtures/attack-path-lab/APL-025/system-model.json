@@ -1,0 +1,54 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-h",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "alice",
+      "type": "HUMAN",
+      "display_name": "Alice (tenant-a user)",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "tenant-b-memory",
+      "type": "DATA",
+      "display_name": "Tenant B memory item",
+      "security": {
+        "tenant": "tenant-b"
+      }
+    },
+    {
+      "entity_id": "salary-doc",
+      "type": "DATA",
+      "display_name": "Salary document",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "memory",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "rag",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "memory",
+      "local_id": "mem-other-tenant",
+      "entity_id": "tenant-b-memory"
+    },
+    {
+      "engine": "rag",
+      "local_id": "doc-salary",
+      "entity_id": "salary-doc"
+    }
+  ]
+}

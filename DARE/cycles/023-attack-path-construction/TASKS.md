@@ -58,8 +58,8 @@ Throughout the cycle:
 - [x] task-036 — Add the scale test (O-09)
 - [x] task-037 — Add the `validate attack-paths` CLI subcommand
 - [x] task-038 — Add the refusal corpus (§8.3)
-- [ ] task-039 — Build the ATTACK-PATH-LAB harness and scenarios APL-001..APL-012
-- [ ] task-040 — Add scenarios APL-013..APL-026 and the class-contract test
+- [x] task-039 — Build the ATTACK-PATH-LAB harness and scenarios APL-001..APL-012
+- [x] task-040 — Add scenarios APL-013..APL-026 and the class-contract test
 - [ ] task-041 — Add the `attack-path-2026` CI job
 - [ ] task-042 — Read a v2 graph in `dare-product` (RF-16, BQ-3 (a))
 - [ ] task-043 — Add compatibility tests (§8.4)

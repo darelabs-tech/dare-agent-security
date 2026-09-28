@@ -1,0 +1,16 @@
+{
+  "id": "APL-024",
+  "class": "H",
+  "role": "structural",
+  "title": "H: the same local id in two engines joins only through a system-model alias",
+  "runs": [
+    {
+      "engine": "memory-security",
+      "scenario": "MEMORY-LAB-008"
+    },
+    {
+      "engine": "rag-security",
+      "scenario": "RAG-LAB-004"
+    }
+  ]
+}
