@@ -35,12 +35,12 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-024 — Implement the A2A protocol client
 - [x] task-025 — Implement the MCP protocol client (JSON-RPC, single-response SSE reader, pagination, metadata GETs)
 - [x] task-026 — Implement the `dare-conversation` v1 client
-- [ ] task-027 — Implement the prompt-injection live adapter and capture → transcript conversion
-- [ ] task-028 — Implement the multi-turn live adapter (conversation and A2A) and capture → transcript conversion
+- [x] task-027 — Implement the prompt-injection live adapter and capture → transcript conversion
+- [x] task-028 — Implement the multi-turn live adapter (conversation and A2A) and capture → transcript conversion
 - [ ] task-029 — Implement the A2A card and exchange projection into STATIC documents
 - [ ] task-030 — Add `scenario_with_observed_resource` to `dare-mcp-auth-security` (BQ-1)
 - [ ] task-031 — Implement the MCP auth metadata conversion
-- [ ] task-032 — Amend the 013 and 021 adapter trait doc comments (BQ-4)
+- [x] task-032 — Amend the 013 and 021 adapter trait doc comments (BQ-4)
 - [ ] task-033 — Implement `ledger.rs`, `evidence.rs` and `result.rs` (including self-reported marking and `summary.md`)
 - [ ] task-034 — Implement `run_remote` and `replay_capture`
 - [ ] task-035 — Add the REMOTE-LAB corpus (≥ 30 entries) and class-contract test

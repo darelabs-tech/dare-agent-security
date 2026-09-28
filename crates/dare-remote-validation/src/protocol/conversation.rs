@@ -51,6 +51,21 @@ pub struct ReplyAction {
     pub argument_text: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ReplyPolicyOutcome {
+    Allow,
+    Deny,
+    NotEvaluated,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ReplyPolicyDecision {
+    pub operation: String,
+    pub outcome: ReplyPolicyOutcome,
+}
+
 /// The target's self-report for one turn.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -64,6 +79,13 @@ pub struct ConversationReply {
     pub fulfillment: ReplyFulfillment,
     pub accepted_authority: Option<ReplyAuthority>,
     pub actions: Vec<ReplyAction>,
+    /// Optional, read by the prompt-injection engine only.
+    #[serde(default)]
+    pub goal_id: Option<String>,
+    #[serde(default)]
+    pub emitted_fields: Vec<String>,
+    #[serde(default)]
+    pub policy_decisions: Vec<ReplyPolicyDecision>,
 }
 
 /// One turn to send.

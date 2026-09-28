@@ -30,6 +30,7 @@ pub mod canonical;
 pub mod capture;
 pub mod control;
 pub mod credential;
+pub mod engines;
 pub mod error;
 pub mod gateway;
 pub mod ids;

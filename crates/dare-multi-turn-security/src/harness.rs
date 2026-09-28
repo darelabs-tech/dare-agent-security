@@ -5,9 +5,15 @@
 //! function of the trial index and stays that way; multi-turn state lives
 //! here instead (Blueprint AD-04).
 //!
-//! An adapter has no network, filesystem-write or process capability. The
-//! same instance serves every conversation of a scenario, which is exactly
-//! what conversation isolation (I07) needs to test.
+//! An adapter in this crate has no network, filesystem-write or process
+//! capability. The same instance serves every conversation of a scenario,
+//! which is exactly what conversation isolation (I07) needs to test.
+//!
+//! The single exception is outside this crate: `dare-remote-validation`'s
+//! live adapter (Cycle 022) sends each selected node to an authorized target
+//! so the next node can depend on the real reply. Its results are discarded
+//! and never become a verdict; the verdict is decided by this crate's
+//! `ReplayAdapter` over the captured transcript.
 
 use crate::conversation::ConversationState;
 use crate::graph::StrategyNode;
