@@ -114,3 +114,14 @@ must not treat either as one. A refusal writes no artifact.
 
 Exit `2` covers both a violation and an undecided run. Neither is a pass, and CI
 must not treat either as one. A refusal writes no artifact.
+
+## `validate remote` and `validate replay-capture`
+
+| Code | Meaning |
+|---|---|
+| 0 | Every planned scenario PASS. |
+| 1 | ERROR: connection, TLS, protocol or engine failure. |
+| 2 | A FAIL was observed, or a scenario was INCONCLUSIVE. |
+| 3 | Refusal of the authorization, plan, confirmation, limits or capture. Nothing is written and, for `validate remote`, nothing is sent. |
+
+No transport outcome can produce exit `0`.

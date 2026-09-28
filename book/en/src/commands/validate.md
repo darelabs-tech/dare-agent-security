@@ -231,6 +231,51 @@ inside a document is inert metadata — naming a location is not permission to
 connect to it. See
 [A2A and Inter-Agent Communication Security](../concepts/a2a-security.md).
 
+## `validate remote`
+
+Authorized validation against one remote target (Cycle 022). This is the only
+subcommand that opens a network connection. It sends only the closed,
+read-only methods that a verified, owner-approved authorization grants, to its
+single origin, over HTTPS with certificate verification, no proxy and no
+redirects, within its window and limits. Verdicts are decided offline from the
+recorded capture by the owning engine: prompt injection, multi-turn, A2A or
+MCP authorization.
+
+```bash
+DARE_REMOTE_TOKEN=… dare-agent-security validate remote \
+  --authorization auth.json --plan plan.json \
+  --confirm-origin https://agent.staging.example.test \
+  --output-dir .dare-agent-security/remote
+```
+
+`--confirm-origin` must equal the plan's origin, retyped by the operator.
+`--max-requests`, `--max-rps`, `--max-duration` and `--max-response-bytes`
+only lower the authorized limits, and a raised or zero value is refused.
+`--policy-dir` is required when the plan runs an A2A scenario. There is no
+`--url`, `--endpoint`, `--header`, `--token`, `--api-key`, `--bearer`,
+`--proxy`, `--insecure`, `--no-verify`, `--ca`, `--follow-redirects`,
+`--model`, `--provider`, `--seed`, `--generate`, `--shell` or `--yes` flag.
+
+A refused authorization, plan or confirmation exits `3`, writes nothing and
+sends nothing. A PASS covers only the listed scenarios against this origin in
+the observed window, and the summary names every target-reported field it
+relies on. See [Authorized Remote Validation](../concepts/remote-validation.md)
+and the [Remote Authorization Reference](../reference/remote-authorization.md).
+
+## `validate replay-capture`
+
+Recomputes a remote run's verdicts from its stored capture and audit record,
+with no network, no credential and no open window. It writes the same five
+artifacts as `validate remote`. For an unchanged capture, `remote-result.json`
+is byte-identical to the live run's. A capture or audit record that was
+changed in any way is refused with exit `3`.
+
+```bash
+dare-agent-security validate replay-capture \
+  --capture out/remote-capture.json --audit out/remote-audit.json \
+  --authorization auth.json --plan plan.json --output-dir replayed/
+```
+
 ## Exit codes
 
 Each subcommand has its own table — see [Exit Codes](../reference/exit-codes.md).

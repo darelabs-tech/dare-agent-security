@@ -24,6 +24,7 @@
 - [Agentic Supply Chain and AI-BOM Validation](concepts/supply-chain-security.md)
 - [A2A and Inter-Agent Communication Security](concepts/a2a-security.md)
 - [Adaptive Multi-Turn Adversarial Validation](concepts/multi-turn-security.md)
+- [Authorized Remote Validation](concepts/remote-validation.md)
 
 # Commands
 
@@ -76,5 +77,6 @@
 - [Extending Agentic Supply Chain Validation](reference/extending-supply-chain-security.md)
 - [Extending A2A Security Validation](reference/extending-a2a-security.md)
 - [Extending Multi-Turn Security Validation](reference/extending-multi-turn-security.md)
+- [Remote Authorization Reference](reference/remote-authorization.md)
 
 [Troubleshooting](troubleshooting.md)
