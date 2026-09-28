@@ -22,10 +22,10 @@ Throughout the cycle:
 
 - [x] task-001 — Record the post-022 baseline, v1 golden digests and observations O-1..O-4
 - [x] task-002 — Remove the `unwrap()` from v1 `make_path` and pin v1 output with golden digests
-- [ ] task-003 — Add the three `schemas/attack-graph/v2` JSON schemas
-- [ ] task-004 — Implement the `dare_attack_graph::v2` model types
-- [ ] task-005 — Implement the v2 control-state rule and `validate_graph_v2` invariants 1–7
-- [ ] task-006 — Implement the v2 Mermaid and DOT renderers
+- [x] task-003 — Add the three `schemas/attack-graph/v2` JSON schemas
+- [x] task-004 — Implement the `dare_attack_graph::v2` model types
+- [x] task-005 — Implement the v2 control-state rule and `validate_graph_v2` invariants 1–7
+- [x] task-006 — Implement the v2 Mermaid and DOT renderers
 - [ ] task-007 — Create the `dare-attack-path` crate skeleton and the containment manifest guard
 - [ ] task-008 — Implement `limits.rs` and `error.rs`
 - [ ] task-009 — Implement `admit.rs` file admission and the `sweep.rs` artifact secret sweep
