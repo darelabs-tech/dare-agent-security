@@ -3416,6 +3416,9 @@ jobs:
           cargo test -p dare-coverage --test a2a_profile no_earlier_profile_denominator_moved -- --nocapture
           cargo test -p dare-coverage --test multi_turn_profile no_earlier_profile_denominator_moved -- --nocapture
 
+      - name: No real credential or live endpoint anywhere
+        run: python scripts/k23/assert_no_real_credentials.py
+
       - name: Offline CLI - two engine bundles give a validated graph without a system model
         run: |
           rm -rf .dare-agent-security/cycle023-paths
