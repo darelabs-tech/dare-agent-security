@@ -74,7 +74,8 @@ def collect_tests() -> set[str]:
             pending = False
             for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
                 stripped = line.strip()
-                if stripped.startswith("#[test]"):
+                # Cycle 022 tests are mostly async (`#[tokio::test(...)]`).
+                if stripped.startswith("#[test]") or stripped.startswith("#[tokio::test"):
                     pending = True
                     continue
                 if pending and " fn " in f" {stripped}":
