@@ -37,6 +37,15 @@ use crate::resolver::PinnedResolver;
 /// The MCP revision the client speaks (standards provenance, Cycle 018 pin).
 pub const MCP_PROTOCOL_VERSION: &str = "2026-07-28";
 
+/// The streamable HTTP session header.
+pub const MCP_SESSION_HEADER: &str = "mcp-session-id";
+
+/// A session id is echoed back only when it is 1–128 visible ASCII characters.
+fn valid_session(value: &HeaderValue) -> bool {
+    let bytes = value.as_bytes();
+    (1..=128).contains(&bytes.len()) && bytes.iter().all(|b| (0x21..=0x7e).contains(b))
+}
+
 /// Which roots the TLS client trusts.
 pub enum TrustRoots {
     /// The platform verifier's roots.
@@ -88,6 +97,9 @@ pub struct EgressGateway {
     capture: Capture,
     audit: AuditRecord,
     stop: Option<StopReason>,
+    /// The streamable HTTP session id the MCP server assigned, echoed back on
+    /// later MCP requests. The only response value ever sent back.
+    mcp_session: Option<HeaderValue>,
     bytes_sent: u64,
     bytes_received: u64,
 }
@@ -156,7 +168,7 @@ impl EgressGateway {
         let origin = auth.origin().clone();
         let resolver =
             resolver.unwrap_or_else(|| PinnedResolver::new(&origin.host().name(), auth.scope()));
-        let mut builder = reqwest::Client::builder()
+        let builder = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())
             .https_only(true)
             .no_proxy()
@@ -165,15 +177,15 @@ impl EgressGateway {
             .timeout(Duration::from_millis(READ_TIMEOUT_MS))
             .dns_resolver(resolver.clone())
             .default_headers(HeaderMap::new());
-        match trust {
-            TrustRoots::BuiltIn => {}
+        let builder = match trust {
+            TrustRoots::BuiltIn => builder,
             #[cfg(any(test, feature = "lab"))]
             TrustRoots::LabRoot(der) => {
                 let root = reqwest::Certificate::from_der(&der)
                     .map_err(|_| RemoteError::Refused("lab root is not a certificate"))?;
-                builder = builder.tls_certs_only([root]);
+                builder.tls_certs_only([root])
             }
-        }
+        };
         let client = builder
             .build()
             .map_err(|_| RemoteError::Refused("the HTTP client could not be built"))?;
@@ -224,6 +236,7 @@ impl EgressGateway {
             capture,
             audit,
             stop: None,
+            mcp_session: None,
             bytes_sent: 0,
             bytes_received: 0,
         })
@@ -337,6 +350,9 @@ impl EgressGateway {
                 HeaderName::from_static("mcp-protocol-version"),
                 HeaderValue::from_static(MCP_PROTOCOL_VERSION),
             );
+            if let Some(session) = &self.mcp_session {
+                headers.insert(HeaderName::from_static(MCP_SESSION_HEADER), session.clone());
+            }
         }
         if let Some(credential) = &self.credential {
             let (name, value) = credential.header()?;
@@ -440,6 +456,15 @@ impl EgressGateway {
             .headers()
             .get(WWW_AUTHENTICATE)
             .map(|v| v.as_bytes().to_vec());
+        if request.method.protocol() == Protocol::Mcp {
+            if let Some(session) = response
+                .headers()
+                .get(MCP_SESSION_HEADER)
+                .filter(|v| valid_session(v))
+            {
+                self.mcp_session = Some(session.clone());
+            }
+        }
         let mut response = response;
         let mut body = Vec::new();
         let mut oversize = false;

@@ -54,6 +54,7 @@
           "A2A_MESSAGE_SEND",
           "A2A_TASKS_GET",
           "MCP_INITIALIZE",
+        "MCP_INITIALIZED",
           "MCP_TOOLS_LIST",
           "MCP_RESOURCES_LIST",
           "MCP_PROMPTS_LIST",

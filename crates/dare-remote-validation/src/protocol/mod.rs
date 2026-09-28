@@ -5,6 +5,10 @@
 //! configuration. A method that is not in this enum cannot be planned,
 //! authorized or sent.
 
+pub mod a2a;
+pub mod conversation;
+pub mod mcp;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -48,6 +52,10 @@ pub enum Method {
     A2aMessageSend,
     A2aTasksGet,
     McpInitialize,
+    /// `notifications/initialized`: the notification the streamable HTTP
+    /// transport requires after `initialize`. It carries no data and has no
+    /// effect on the target beyond completing the handshake.
+    McpInitialized,
     McpToolsList,
     McpResourcesList,
     McpPromptsList,
@@ -59,11 +67,12 @@ pub enum Method {
 }
 
 impl Method {
-    pub const ALL: [Method; 12] = [
+    pub const ALL: [Method; 13] = [
         Self::A2aAgentCardGet,
         Self::A2aMessageSend,
         Self::A2aTasksGet,
         Self::McpInitialize,
+        Self::McpInitialized,
         Self::McpToolsList,
         Self::McpResourcesList,
         Self::McpPromptsList,
@@ -108,6 +117,7 @@ impl Method {
             Self::A2aMessageSend => "A2A_MESSAGE_SEND",
             Self::A2aTasksGet => "A2A_TASKS_GET",
             Self::McpInitialize => "MCP_INITIALIZE",
+            Self::McpInitialized => "MCP_INITIALIZED",
             Self::McpToolsList => "MCP_TOOLS_LIST",
             Self::McpResourcesList => "MCP_RESOURCES_LIST",
             Self::McpPromptsList => "MCP_PROMPTS_LIST",
