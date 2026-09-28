@@ -330,6 +330,12 @@ pub fn build_trial_evidence(
     validate_secret_safety(&evidence).map_err(|err| {
         IdentitySecurityError::refusal(format!("evidence failed secret-safety validation: {err}"))
     })?;
+    // Cycle 001 consistency: a record whose verdict disagrees with its own
+    // expected/observed comparison, or whose fields are malformed, is never
+    // returned (Cycle 022 DESIGN §4.8).
+    dare_security_evidence::validate(&evidence).map_err(|err| {
+        IdentitySecurityError::refusal(format!("evidence failed Cycle 001 validation: {err}"))
+    })?;
 
     Ok(evidence)
 }

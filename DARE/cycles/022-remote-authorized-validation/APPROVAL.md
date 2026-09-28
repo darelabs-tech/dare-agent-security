@@ -1,7 +1,7 @@
 # Cycle 022 — Approval
 
 **Cycle:** 022 — Remote Authorized Validation  
-**Approval:** DESIGN AND BLUEPRINT APPROVED — task set pending  
+**Approval:** APPROVED FOR EXECUTION  
 **Approved at:** 2026-09-28  
 **Approved by:** Product Owner  
 **Base:** `main @ b6f14b9`  
@@ -70,3 +70,17 @@ exchange fields not observable from outside the target stay at most INCONCLUSIVE
 refinement and BQ-1 to BQ-4. `/dare-tasks` now produces `TASKS.md`, `dare-dag.yaml`
 and `dare-dag.exec.yaml` for Review. Execution is **not** authorized until that task set
 is approved.
+
+## Authorized execution
+
+The task set (`TASKS.md`, `dare-dag.yaml`, `dare-dag.exec.yaml`, 43 tasks) was approved on
+2026-09-28. Tasks `task-001` through `task-043` are approved for execution in the
+dependency order of `dare-dag.exec.yaml`. No additional human approval is required
+between tasks while execution stays inside the frozen boundaries above.
+
+The executor must stop and record the discrepancy for Review instead of proceeding if a
+task would require any of the following:
+- crossing a frozen boundary;
+- contacting any host other than the loopback REMOTE-LAB during development or CI;
+- adding a runtime dependency beyond those in BLUEPRINT §2;
+- changing an engine's verdict semantics.

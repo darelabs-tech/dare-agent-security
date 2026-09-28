@@ -209,6 +209,8 @@ fn build_one(
     };
     validate_secret_safety(&evidence)
         .map_err(|_| MultiTurnError::SecretLikeContent { field: "evidence" })?;
+    // Cycle 001 consistency (Cycle 022 DESIGN §4.8).
+    dare_security_evidence::validate(&evidence).map_err(|_| MultiTurnError::EvidenceInvalid)?;
     Ok(evidence)
 }
 

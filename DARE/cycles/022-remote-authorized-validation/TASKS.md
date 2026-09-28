@@ -1,7 +1,7 @@
 # Cycle 022 — Tasks
 
-**Status:** PROPOSED — awaiting task-set approval  
-**Approval:** Design and Blueprint APPROVED 2026-09-28 — see `APPROVAL.md`. Execution is **not** authorized until this task set is approved.  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-28 — see `APPROVAL.md`  
 **Baseline:** `main @ b6f14b9`  
 **Branch:** `claude/loving-newton-113zme`
 
@@ -9,12 +9,12 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 
 ## Checklist
 
-- [ ] task-001 — Freeze post-021 baseline, test count, pinned denominators and Action image build
-- [ ] task-002 — Correct the A2A evidence bridge for INCONCLUSIVE/ERROR
-- [ ] task-003 — Correct the MCP Auth evidence bridge for INCONCLUSIVE/ERROR
-- [ ] task-004 — Correct the supply-chain evidence bridge for INCONCLUSIVE/ERROR
-- [ ] task-005 — Validate every record in all 9 engine evidence bridges
-- [ ] task-006 — Add the 32-record every-bridge validation test and update the changed 018/019/020 assertions
+- [x] task-001 — Freeze post-021 baseline, test count, pinned denominators and Action image build
+- [x] task-002 — Correct the A2A evidence bridge for INCONCLUSIVE/ERROR
+- [x] task-003 — Correct the MCP Auth evidence bridge for INCONCLUSIVE/ERROR
+- [x] task-004 — Correct the supply-chain evidence bridge for INCONCLUSIVE/ERROR
+- [x] task-005 — Validate every record in all 9 engine evidence bridges
+- [x] task-006 — Add the 32-record every-bridge validation test and update the changed 018/019/020 assertions
 - [ ] task-007 — Create the `dare-remote-validation` crate skeleton and network-stack manifest guard
 - [ ] task-008 — Implement `limits.rs` hard maxima and lower-only `Limits`
 - [ ] task-009 — Implement `error.rs`, `ids.rs` and `canonical.rs`
@@ -49,7 +49,7 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [ ] task-038 — Add the `remote-validation-2026` CI job
 - [ ] task-039 — Add compatibility tests
 - [ ] task-040 — Security, dependency and container audit
-- [ ] task-041 — Record the remote-validation standards provenance snapshot
+- [x] task-041 — Record the remote-validation standards provenance snapshot
 - [ ] task-042 — Write the EN/PT concept page and the EN authorization reference
 - [ ] task-043 — Write REGRESSION.md and PROOF.md, run the completion gate and create the cycle archive branch
 

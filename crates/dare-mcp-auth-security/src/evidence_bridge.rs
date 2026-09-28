@@ -54,6 +54,13 @@ pub fn evidence_id(scenario: &McpAuthScenario, trial_index: u32) -> Result<Strin
     ))
 }
 
+/// Cycle 001 records the algorithm and the digest separately, as bare lowercase
+/// hex. The engine's digests carry an `sha256:` prefix, which the Cycle 001
+/// validator rejects inside `hashes[].value` (Cycle 022 DESIGN §4.8).
+fn bare_hex(digest: &str) -> String {
+    digest.trim_start_matches("sha256:").to_owned()
+}
+
 /// How the observed outcome is described, without restating the verdict twice.
 fn observed_description(verdict: Verdict, invariant: &str) -> String {
     match verdict {
@@ -150,15 +157,15 @@ pub fn build_trial_evidence(
     let hashes = vec![
         HashRef {
             algorithm: "sha256".to_owned(),
-            value: binding.scenario_digest.clone(),
+            value: bare_hex(&binding.scenario_digest),
         },
         HashRef {
             algorithm: "sha256".to_owned(),
-            value: binding.authorization_digest.clone(),
+            value: bare_hex(&binding.authorization_digest),
         },
         HashRef {
             algorithm: "sha256".to_owned(),
-            value: binding.token_digest.clone(),
+            value: bare_hex(&binding.token_digest),
         },
     ];
 
@@ -216,17 +223,20 @@ pub fn build_trial_evidence(
             description: Some(format!("security invariant {invariant} holds")),
         },
         observed: ObservedOutcome {
-            decision: Some(match trial.verdict {
-                Verdict::Fail => Decision::Allow,
-                Verdict::Pass => Decision::Deny,
-                _ => Decision::NotApplicable,
-            }),
-            result: Some(match trial.verdict {
-                Verdict::Pass => INVARIANT_HOLDS.to_owned(),
-                Verdict::Fail => "invariant-violated".to_owned(),
-                Verdict::Inconclusive => "evidence-insufficient".to_owned(),
-                Verdict::Error => "harness-error".to_owned(),
-            }),
+            // Only a decided verdict observed a decision. An undecided record that
+            // carried one would compare against `expected` as a mismatch, and the
+            // Cycle 001 validator rejects that as INCONCLUSIVE/ERROR masquerading
+            // as FAIL (Cycle 022 DESIGN §4.8).
+            decision: match trial.verdict {
+                Verdict::Fail => Some(Decision::Allow),
+                Verdict::Pass => Some(Decision::Deny),
+                Verdict::Inconclusive | Verdict::Error => None,
+            },
+            result: match trial.verdict {
+                Verdict::Pass => Some(INVARIANT_HOLDS.to_owned()),
+                Verdict::Fail => Some("invariant-violated".to_owned()),
+                Verdict::Inconclusive | Verdict::Error => None,
+            },
             description: Some(observed_description(trial.verdict, invariant)),
             // Observations come from local fixtures and traces, never a live
             // authorization server or MCP deployment.
@@ -261,6 +271,12 @@ pub fn build_trial_evidence(
     // and the boundary is the right place to enforce it.
     validate_secret_safety(&evidence).map_err(|err| {
         McpAuthSecurityError::refusal(format!("evidence failed secret safety: {err}"))
+    })?;
+    // Cycle 001 consistency: a record whose verdict disagrees with its own
+    // expected/observed comparison, or whose fields are malformed, is never
+    // returned (Cycle 022 DESIGN §4.8).
+    dare_security_evidence::validate(&evidence).map_err(|err| {
+        McpAuthSecurityError::refusal(format!("evidence failed Cycle 001 validation: {err}"))
     })?;
 
     Ok(evidence)
@@ -439,8 +455,10 @@ mod tests {
 
     #[test]
     fn an_undecided_trial_carries_no_decision_in_either_direction() {
-        // NotApplicable rather than allow or deny: a run that could not decide
-        // has not observed a permit and has not observed a refusal.
+        // No decision rather than allow or deny: a run that could not decide
+        // has not observed a permit and has not observed a refusal. Not
+        // `NotApplicable` either, which compares against `expected` as a
+        // mismatch and so reads as a FAIL (Cycle 022 DESIGN §4.8).
         let mut quiet = scenario();
         quiet.lab = Some(crate::model::McpAuthLabSpec {
             reference_behavior: crate::model::ReferenceBehavior::NoRelevantObservation,
@@ -469,7 +487,10 @@ mod tests {
         .expect("evidence");
         for record in records {
             assert_eq!(record.verdict, Verdict::Inconclusive);
-            assert_eq!(record.observed.decision, Some(Decision::NotApplicable));
+            assert_eq!(record.observed.decision, None);
+            assert_eq!(record.observed.result, None);
+            dare_security_evidence::validate(&record)
+                .expect("an undecided record is valid Cycle 001 evidence");
         }
     }
 

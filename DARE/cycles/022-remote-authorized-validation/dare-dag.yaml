@@ -1,12 +1,12 @@
 cycle: 022
 name: remote-authorized-validation
-status: proposed
+status: approved-for-execution
 baseline:
   branch: main
   commit: b6f14b9
 execution_branch: claude/loving-newton-113zme
 approval_file: DARE/cycles/022-remote-authorized-validation/APPROVAL.md
-execution_authorized: false
+execution_authorized: true
 execution_tasks: 43
 safety_boundary:
   network: only through dare-remote-validation EgressGateway, to authorized origins
