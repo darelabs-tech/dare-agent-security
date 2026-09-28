@@ -135,10 +135,16 @@ fn dfs(
 }
 
 fn make_path(graph: &AttackGraph, nodes: &[String], edge_ids: &[String]) -> Result<Path> {
-    let edges: Vec<_> = edge_ids
+    let edges = edge_ids
         .iter()
-        .map(|id| graph.edges.iter().find(|edge| &edge.id == id).unwrap())
-        .collect();
+        .map(|id| {
+            graph
+                .edges
+                .iter()
+                .find(|edge| &edge.id == id)
+                .ok_or_else(|| GraphError::Invalid("path references missing edge".into()))
+        })
+        .collect::<Result<Vec<_>>>()?;
     let status = if edges
         .iter()
         .any(|edge| edge.evidence.status == EdgeEvidenceStatus::NotTested)
@@ -180,4 +186,22 @@ fn make_path(graph: &AttackGraph, nodes: &[String], edge_ids: &[String]) -> Resu
         status,
         impact_factors,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{build_attack_graph, GraphFactsInput};
+
+    #[test]
+    fn a_path_naming_a_missing_edge_is_an_error_not_a_panic() {
+        let facts: GraphFactsInput = serde_json::from_str(include_str!(
+            "../../../fixtures/attack-graph/safe-read.json"
+        ))
+        .unwrap();
+        let graph = build_attack_graph(&facts).unwrap();
+        let nodes = vec![graph.nodes[0].id.clone(), graph.nodes[1].id.clone()];
+        let error = make_path(&graph, &nodes, &["edge:absent".to_owned()]).unwrap_err();
+        assert!(matches!(error, GraphError::Invalid(_)));
+    }
 }
