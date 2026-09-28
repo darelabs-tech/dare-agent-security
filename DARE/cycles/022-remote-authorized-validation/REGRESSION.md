@@ -34,6 +34,8 @@ artifact, property or coverage number changed.
 - `dare-mcp-auth-security/src/evidence_bridge.rs:457`: `an_undecided_trial_carries_no_decision_in_either_direction` (body)
 - `dare-supply-chain-security/src/evidence_bridge.rs:434`: `an_undecidable_invariant_is_recorded_as_insufficient_evidence_not_as_a_pass` (body)
 
+The Cycle 020 `PROOF.md` cited the renamed A2A test by its old name, which failed `scripts/k20/verify_proof_citations.py` in CI. The citation now names the new test. The row's claim (an undecided record never reaches Cycle 001 as `invariant-holds`) is unchanged.
+
 ## 2. O-09 measured as 29 of 36 cells, not "32/32" (task-006)
 
 The Design assumed 8 bridges × 4 verdicts. There are 9 bridges.
