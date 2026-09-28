@@ -6,7 +6,10 @@
 //! verified authorization, and the operator must retype the origin.
 
 use std::fs;
+use std::future::Future;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 use clap::Args;
 use dare_remote_validation::audit::AuditRecord;
@@ -16,7 +19,7 @@ use dare_remote_validation::engines::Sources;
 use dare_remote_validation::gateway::TrustRoots;
 use dare_remote_validation::limits::{Limits, MAX_CAPTURE_BYTES};
 use dare_remote_validation::plan::RemotePlan;
-use dare_remote_validation::runner::{replay_capture, run_remote_lowered, RemoteRun};
+use dare_remote_validation::runner::{replay_capture, run_remote_stoppable, RemoteRun};
 use dare_remote_validation::schema::DocumentKind;
 use dare_remote_validation::source::{admit_file, read_bounded};
 use dare_remote_validation::RemoteError;
@@ -41,7 +44,7 @@ pub struct RemoteArgs {
     /// Directory holding the A2A policy files the plan names.
     #[arg(long = "policy-dir", value_name = "DIR")]
     pub policy_dir: Option<PathBuf>,
-    /// Where the five artifacts are written.
+    /// Where the six artifacts are written.
     #[arg(long = "output-dir", value_name = "DIR")]
     pub output_dir: PathBuf,
     /// Lower the request ceiling (never raises it).
@@ -192,7 +195,15 @@ fn remote_inner(args: &RemoteArgs) -> Result<i32, RemoteError> {
     };
     let handle = tokio::runtime::Handle::try_current()
         .map_err(|_| RemoteError::Refused("no async runtime"))?;
-    let run = run_remote_lowered(
+    // Installed before anything is sent, so a Ctrl-C at any point stops the
+    // next request. A second Ctrl-C aborts at once.
+    let stop = Arc::new(AtomicBool::new(false));
+    let listener = handle.spawn(operator_stop_listener(
+        stop.clone(),
+        || async { tokio::signal::ctrl_c().await.is_ok() },
+        || std::process::exit(OPERATOR_ABORT),
+    ));
+    let run = run_remote_stoppable(
         &auth,
         &plan,
         &args.confirm_origin,
@@ -203,8 +214,35 @@ fn remote_inner(args: &RemoteArgs) -> Result<i32, RemoteError> {
         &sources(),
         &args.output_dir,
         &lower,
-    )?;
-    write(&args.output_dir, &run, args.json)
+        stop,
+    );
+    listener.abort();
+    write(&args.output_dir, &run?, args.json)
+}
+
+/// Exit code of a second Ctrl-C (128 + SIGINT), which writes nothing.
+const OPERATOR_ABORT: i32 = 130;
+
+/// First signal: set the operator stop, so no further request leaves and the
+/// run ends with `KILL_SWITCH`, still writing its artifacts and audit record.
+/// Second signal: `abort`.
+async fn operator_stop_listener<S, F>(stop: Arc<AtomicBool>, mut signal: S, abort: impl FnOnce())
+where
+    S: FnMut() -> F,
+    F: Future<Output = bool>,
+{
+    if !signal().await {
+        return;
+    }
+    stop.store(true, Ordering::SeqCst);
+    eprintln!(
+        "validate remote: operator stop; no further request will be sent. \
+         Press Ctrl-C again to abort without writing."
+    );
+    if signal().await {
+        eprintln!("validate remote: aborted by the operator");
+        abort();
+    }
 }
 
 pub fn run_replay_capture(args: ReplayCaptureArgs) -> i32 {
@@ -233,4 +271,63 @@ fn replay_inner(args: &ReplayCaptureArgs) -> Result<i32, RemoteError> {
         &args.output_dir,
     )?;
     write(&args.output_dir, &run, args.json)
+}
+
+#[cfg(test)]
+mod operator_stop_tests {
+    use super::*;
+    use std::sync::atomic::AtomicUsize;
+    use tokio::sync::mpsc;
+
+    /// Signals delivered through a channel; a closed channel is "no signal".
+    fn signals(
+        rx: mpsc::UnboundedReceiver<()>,
+    ) -> impl FnMut() -> std::pin::Pin<Box<dyn Future<Output = bool> + Send>> {
+        let rx = Arc::new(tokio::sync::Mutex::new(rx));
+        move || {
+            let rx = rx.clone();
+            Box::pin(async move { rx.lock().await.recv().await.is_some() })
+        }
+    }
+
+    #[tokio::test]
+    async fn the_first_signal_stops_and_the_second_aborts() {
+        let stop = Arc::new(AtomicBool::new(false));
+        let aborted = Arc::new(AtomicUsize::new(0));
+        let (tx, rx) = mpsc::unbounded_channel();
+        let counter = aborted.clone();
+        let listener = tokio::spawn(operator_stop_listener(
+            stop.clone(),
+            signals(rx),
+            move || {
+                counter.fetch_add(1, Ordering::SeqCst);
+            },
+        ));
+        tokio::task::yield_now().await;
+        assert!(!stop.load(Ordering::SeqCst), "nothing before a signal");
+        tx.send(()).unwrap();
+        tx.send(()).unwrap();
+        listener.await.unwrap();
+        assert!(stop.load(Ordering::SeqCst));
+        assert_eq!(aborted.load(Ordering::SeqCst), 1);
+    }
+
+    #[tokio::test]
+    async fn one_signal_stops_without_aborting() {
+        let stop = Arc::new(AtomicBool::new(false));
+        let (tx, rx) = mpsc::unbounded_channel();
+        tx.send(()).unwrap();
+        drop(tx);
+        operator_stop_listener(stop.clone(), signals(rx), || panic!("must not abort")).await;
+        assert!(stop.load(Ordering::SeqCst));
+    }
+
+    #[tokio::test]
+    async fn a_listener_that_cannot_register_changes_nothing() {
+        let stop = Arc::new(AtomicBool::new(false));
+        let (tx, rx) = mpsc::unbounded_channel::<()>();
+        drop(tx);
+        operator_stop_listener(stop.clone(), signals(rx), || panic!("must not abort")).await;
+        assert!(!stop.load(Ordering::SeqCst));
+    }
 }

@@ -3331,7 +3331,7 @@ jobs:
             echo "expected exit 2 for an eroded refusal, got $code"
             exit 1
           fi
-          for f in remote-result.json remote-capture.json remote-evidence.json remote-audit.json summary.md; do
+          for f in remote-result.json remote-capture.json remote-evidence.json remote-audit.json summary.md remote-coverage.json; do
             test -f .dare-agent-security/cycle022-replay/$f
           done
           cmp .dare-agent-security/cycle022-replay/remote-result.json \
@@ -3339,6 +3339,21 @@ jobs:
           python scripts/assert-json.py \
             .dare-agent-security/cycle022-replay/remote-result.json \
             verdict=FAIL protocol=DARE_CONVERSATION runs.0.engine=MULTI_TURN runs.0.verdict=FAIL
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle022-replay/remote-coverage.json \
+            execution_mode=dynamic evidence_class=DYNAMIC_AUTHORIZED
+
+      - name: Offline CLI - remote evidence feeds the coverage report as dynamic
+        run: |
+          rm -rf .dare-agent-security/cycle022-coverage
+          cargo run -p dare-agent-security -- validate coverage \
+            --profile multi-turn-security-baseline-2026 \
+            --facts crates/dare-agent-security-cli/tests/fixtures/remote-replay/coverage-facts.json \
+            --executions .dare-agent-security/cycle022-replay/remote-coverage.json \
+            --output-dir .dare-agent-security/cycle022-coverage
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle022-coverage/coverage-report.json \
+            eligible=7 tested=7 counts.FAIL=1
 
       - name: Offline CLI - an authorization for another origin is refused and writes nothing
         run: |

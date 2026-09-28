@@ -1,4 +1,4 @@
-//! The remote result and the five artifacts (BLUEPRINT §5.2).
+//! The remote result and the six artifacts (BLUEPRINT §5.2).
 //!
 //! `RemoteResult` carries no wall-clock value except the observed window,
 //! copied from the capture, so a live run and `replay_capture` over its
@@ -222,6 +222,7 @@ pub const CAPTURE_FILE: &str = "remote-capture.json";
 pub const EVIDENCE_FILE: &str = "remote-evidence.json";
 pub const AUDIT_FILE: &str = "remote-audit.json";
 pub const SUMMARY_FILE: &str = "summary.md";
+pub const COVERAGE_FILE: &str = "remote-coverage.json";
 
 /// One artifact, scrubbed and charged.
 pub struct Artifact {
@@ -236,7 +237,7 @@ fn json<T: Serialize>(value: &T) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
-/// The five artifacts, each admitted through the ledger.
+/// The six artifacts, each admitted through the ledger.
 pub fn render_artifacts(
     ledger: &mut OutputLedger,
     result: &RemoteResult,
@@ -264,6 +265,12 @@ pub fn render_artifacts(
         Artifact {
             name: SUMMARY_FILE,
             bytes: ledger.admit(render_summary(result).as_bytes())?,
+        },
+        Artifact {
+            name: COVERAGE_FILE,
+            bytes: ledger.admit(&json(&crate::coverage::executions_document(
+                result, evidence,
+            )?)?)?,
         },
     ])
 }

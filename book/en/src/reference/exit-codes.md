@@ -41,7 +41,7 @@ Categorized errors print as `[category] message`, where category is one of:
 | 0 | Coverage gate passed. |
 | 1 | Harness error. |
 | 2 | Coverage threshold or required-`BLOCKED` policy failed. |
-| 3 | Usage error. |
+| 3 | Usage error, including an executions document whose dynamic evidence contradicts facts that deny dynamic authorization. |
 
 ## `validate benchmark`
 
@@ -125,3 +125,7 @@ must not treat either as one. A refusal writes no artifact.
 | 3 | Refusal of the authorization, plan, confirmation, limits or capture. Nothing is written and, for `validate remote`, nothing is sent. |
 
 No transport outcome can produce exit `0`.
+
+A first Ctrl-C during `validate remote` stops the run and ends with the exit
+code of its verdicts, which is never `0` when a scenario was left unfinished.
+A second Ctrl-C exits `130` without writing anything.

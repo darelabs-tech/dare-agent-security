@@ -5,8 +5,8 @@ use std::path::PathBuf;
 
 use clap::Args;
 use dare_coverage::{
-    derive_risk_family_coverage, registry_for_profile, resolve_profile, run_assessment,
-    AssessmentFacts, CoveragePolicy, PropertyExecution,
+    derive_risk_family_coverage, parse_executions, registry_for_profile, resolve_profile,
+    run_assessment, AssessmentFacts, CoveragePolicy, PropertyExecution,
 };
 use dare_mcp_discovery::sanitize_stream;
 
@@ -23,7 +23,9 @@ pub struct CoverageArgs {
     #[arg(long, value_name = "PATH")]
     pub facts: PathBuf,
 
-    /// Optional property execution JSON array (verdict + Cycle 001 evidence ids).
+    /// Optional property executions (verdict + Cycle 001 evidence ids): a JSON
+    /// array, or an executions document such as `validate remote`'s
+    /// `remote-coverage.json`, which also declares the mode that produced them.
     #[arg(long, value_name = "PATH")]
     pub executions: Option<PathBuf>,
 
@@ -65,20 +67,27 @@ fn run_coverage_inner(args: CoverageArgs) -> Result<i32, String> {
     let facts: AssessmentFacts =
         serde_json::from_str(facts_raw.strip_prefix('\u{feff}').unwrap_or(&facts_raw))
             .map_err(|e| format!("facts parse: {e}"))?;
-    let executions = match args.executions {
+    let (executions, document) = match args.executions {
         Some(path) => {
             let raw = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-            serde_json::from_str(raw.strip_prefix('\u{feff}').unwrap_or(&raw))
-                .map_err(|e| format!("executions parse: {e}"))?
+            parse_executions(raw.strip_prefix('\u{feff}').unwrap_or(&raw))
+                .map_err(|e| e.to_string())?
         }
-        None => Vec::<PropertyExecution>::new(),
+        None => (Vec::<PropertyExecution>::new(), None),
     };
+    if let Some(document) = &document {
+        // A contradiction between the evidence and the facts is a usage error.
+        document.check(&facts).map_err(|e| format!("usage: {e}"))?;
+    }
     let policy = CoveragePolicy {
         min_required_coverage: args.min_required_coverage,
         fail_on_required_blocked: args.fail_on_required_blocked,
     };
-    let report = run_assessment(&profile, &registry, &facts, &executions, policy)
+    let mut report = run_assessment(&profile, &registry, &facts, &executions, policy)
         .map_err(|e| e.to_string())?;
+    if let Some(document) = &document {
+        document.annotate(&mut report);
+    }
 
     if args.json {
         let body = serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?;

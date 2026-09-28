@@ -117,11 +117,38 @@ Nenhum resultado de transporte pode produzir PASS.
 | `remote-evidence.json` | os registros de evidência dos motores, cada um marcado `PROTOCOL_RESPONSE` com sua proveniência |
 | `remote-audit.json` | o que foi autorizado e confirmado, e cada requisição, resposta, parada e kill, encadeados por hash |
 | `summary.md` | os vereditos, do que cada PASS depende e o que não foi observável |
+| `remote-coverage.json` | a entrada de cobertura: o veredito e os IDs de evidência de cada propriedade, marcados `execution_mode: dynamic` e `evidence_class: DYNAMIC_AUTHORIZED` |
 
 A credencial nunca é escrita em lugar nenhum. Antes de ser gravado, cada
 artefato é depurado dela (nas formas crua, base64 e percent-encoded) e de
 strings com formato de credencial. Um alvo que ecoa a credencial interrompe a
 execução.
+
+## Cobertura
+
+`remote-coverage.json` alimenta o relatório de cobertura existente:
+
+```bash
+dare-agent-security validate coverage --profile multi-turn-security-baseline-2026 \
+  --facts facts.json --executions out/remote-coverage.json --output-dir coverage/
+```
+
+O veredito de cada propriedade é a agregação, pela própria execução, dos
+registros dos motores para aquela propriedade; nada novo é decidido. Nenhuma
+propriedade é adicionada e nenhum denominador de perfil muda. A justificativa
+de cada linha decidida nomeia a execução remota de onde veio. Os fatos
+precisam permitir autorização dinâmica (`dynamic_authorization_allowed: true`).
+Caso contrário, o comando recusa com código `3`, porque evidência ao vivo não
+pode ser pontuada contra um ROE que a proíbe.
+
+## Interromper uma execução
+
+Um Ctrl-C interrompe: nenhuma requisição nova sai, nem uma que esteja
+esperando sua vez no limite de taxa. A execução termina com motivo
+`KILL_SWITCH`, a auditoria registra `OPERATOR_STOP` e os seis artefatos
+continuam sendo gravados. Cenários não terminados ficam INCONCLUSIVE. Uma
+requisição já em trânsito termina ou expira. Um segundo Ctrl-C aborta na hora,
+com código `130`, sem gravar nada.
 
 Os formatos de autorização e de plano estão na referência em inglês:
 [Remote Authorization Reference](https://darelabs-tech.github.io/dare-agent-security/en/reference/remote-authorization.html).

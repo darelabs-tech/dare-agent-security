@@ -38,6 +38,8 @@ SOURCE_ROOTS = [
     "crates/dare-agent-security-cli/tests",
     "crates/dare-a2a-security/src",
     "crates/dare-supply-chain-security/src",
+    # hotfix-001: the executions document lives in the coverage crate.
+    "crates/dare-coverage/src",
 ]
 
 # Cited as APIs, not tests. Each is checked for a real `fn` definition below.

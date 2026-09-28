@@ -43,7 +43,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = "2.0"
 time = { workspace = true }
-tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
 
 [dev-dependencies]
 dare-coaz-integrity = { path = "../dare-coaz-integrity" }

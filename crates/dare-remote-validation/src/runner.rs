@@ -8,6 +8,7 @@
 
 use std::collections::BTreeSet;
 use std::path::{Component, Path, PathBuf};
+use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
 use dare_security_evidence::{SecurityEvidence, Verdict};
@@ -107,7 +108,7 @@ pub struct RemoteRun {
 }
 
 impl RemoteRun {
-    /// The five artifacts, scrubbed and charged to a fresh output ledger.
+    /// The six artifacts, scrubbed and charged to a fresh output ledger.
     pub fn artifacts(&self) -> Result<Vec<Artifact>> {
         let mut ledger = OutputLedger::new(self.scrubber.clone());
         render_artifacts(
@@ -361,6 +362,38 @@ pub fn run_remote_lowered(
     work_root: &Path,
     lower: &Limits,
 ) -> Result<RemoteRun> {
+    run_remote_stoppable(
+        auth,
+        plan,
+        confirm_origin,
+        policy_dir,
+        now,
+        trust,
+        handle,
+        sources,
+        work_root,
+        lower,
+        Arc::new(AtomicBool::new(false)),
+    )
+}
+
+/// As `run_remote_lowered`, with an operator stop flag the caller sets
+/// (the CLI's Ctrl-C). Once set, no further request leaves; the run ends
+/// with `KILL_SWITCH` and its artifacts and audit record are still produced.
+#[allow(clippy::too_many_arguments)]
+pub fn run_remote_stoppable(
+    auth: &Authorization,
+    plan: &RemotePlan,
+    confirm_origin: &str,
+    policy_dir: Option<&Path>,
+    now: OffsetDateTime,
+    trust: TrustRoots,
+    handle: tokio::runtime::Handle,
+    sources: &Sources,
+    work_root: &Path,
+    lower: &Limits,
+    stop: Arc<AtomicBool>,
+) -> Result<RemoteRun> {
     let mut verified = verify(
         auth,
         plan,
@@ -371,7 +404,8 @@ pub fn run_remote_lowered(
     )?;
     verified.lower_limits(lower)?;
     let loaded = load_all(sources, plan, policy_dir)?;
-    let gateway = EgressGateway::new(&mut verified, plan, confirm_origin, trust)?;
+    let gateway =
+        EgressGateway::new(&mut verified, plan, confirm_origin, trust)?.with_operator_stop(stop);
     finish_run(auth, plan, loaded, gateway, handle, work_root)
 }
 
