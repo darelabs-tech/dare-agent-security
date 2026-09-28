@@ -65,7 +65,7 @@ Throughout the cycle:
 - [x] task-043 — Add compatibility tests (§8.4)
 - [x] task-044 — Security, dependency and container audit
 - [x] task-045 — Write the EN/PT attack-path pages and the system-model reference
-- [ ] task-046 — Write REGRESSION.md and PROOF.md, run the completion gate and create the cycle archive branch
+- [x] task-046 — Write REGRESSION.md and PROOF.md, run the completion gate and create the cycle archive branch
 
 ## Task table
 

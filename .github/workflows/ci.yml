@@ -3418,6 +3418,8 @@ jobs:
 
       - name: No real credential or live endpoint anywhere
         run: python scripts/k23/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k23/verify_proof_citations.py
 
       - name: Offline CLI - two engine bundles give a validated graph without a system model
         run: |
