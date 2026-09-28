@@ -26,10 +26,10 @@ Throughout the cycle:
 - [x] task-004 — Implement the `dare_attack_graph::v2` model types
 - [x] task-005 — Implement the v2 control-state rule and `validate_graph_v2` invariants 1–7
 - [x] task-006 — Implement the v2 Mermaid and DOT renderers
-- [ ] task-007 — Create the `dare-attack-path` crate skeleton and the containment manifest guard
-- [ ] task-008 — Implement `limits.rs` and `error.rs`
-- [ ] task-009 — Implement `admit.rs` file admission and the `sweep.rs` artifact secret sweep
-- [ ] task-010 — Implement `ids.rs` run-scoped and entity node ids
+- [x] task-007 — Create the `dare-attack-path` crate skeleton and the containment manifest guard
+- [x] task-008 — Implement `limits.rs` and `error.rs`
+- [x] task-009 — Implement `admit.rs` file admission and the `sweep.rs` artifact secret sweep
+- [x] task-010 — Implement `ids.rs` run-scoped and entity node ids
 - [ ] task-011 — Add `schemas/attack-path/v1/system-model.schema.json`
 - [ ] task-012 — Implement `model.rs` system-model admission and resolution rules 1–7
 - [ ] task-013 — Implement `load.rs` scenario loaders over the engines' public validators

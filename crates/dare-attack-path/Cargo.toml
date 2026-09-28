@@ -1,0 +1,42 @@
+[package]
+name = "dare-attack-path"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Evidence-derived attack-path construction over DARE engine artifacts (Cycle 023)"
+publish = false
+
+[lib]
+name = "dare_attack_path"
+path = "src/lib.rs"
+
+# Analysis only. No HTTP client, no socket, no process spawning and no
+# scheduler is declared here, and `dare-remote-validation` / `dare-mcp-discovery`
+# are deliberately absent: the 022 result is read as schema-validated JSON.
+# A transport stack exists transitively in the workspace; the boundary checked
+# by `tests/manifest.rs` is that nothing in this crate's own dependencies or
+# source reaches one.
+[dependencies]
+dare-a2a-security = { path = "../dare-a2a-security" }
+dare-adversarial = { path = "../dare-adversarial" }
+dare-attack-graph = { path = "../dare-attack-graph" }
+dare-coverage = { path = "../dare-coverage" }
+dare-identity-security = { path = "../dare-identity-security" }
+dare-mcp-auth-security = { path = "../dare-mcp-auth-security" }
+dare-memory-security = { path = "../dare-memory-security" }
+dare-multi-turn-security = { path = "../dare-multi-turn-security" }
+dare-prompt-injection = { path = "../dare-prompt-injection" }
+dare-rag-security = { path = "../dare-rag-security" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+dare-supply-chain-security = { path = "../dare-supply-chain-security" }
+dare-tool-security = { path = "../dare-tool-security" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+
+[dev-dependencies]
+tempfile = "3.14"

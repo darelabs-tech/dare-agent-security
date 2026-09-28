@@ -533,6 +533,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-attack-path"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-a2a-security",
+ "dare-adversarial",
+ "dare-attack-graph",
+ "dare-coverage",
+ "dare-identity-security",
+ "dare-mcp-auth-security",
+ "dare-memory-security",
+ "dare-multi-turn-security",
+ "dare-prompt-injection",
+ "dare-rag-security",
+ "dare-security-evidence",
+ "dare-supply-chain-security",
+ "dare-tool-security",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "dare-benchmark"
 version = "1.0.0-rc1"
 dependencies = [

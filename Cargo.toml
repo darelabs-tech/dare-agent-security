@@ -22,6 +22,7 @@ members = [
     "crates/dare-a2a-security",
     "crates/dare-multi-turn-security",
     "crates/dare-remote-validation",
+    "crates/dare-attack-path",
     "labs/synthetic-mcp",
 ]
 
