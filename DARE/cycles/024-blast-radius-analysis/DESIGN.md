@@ -1,12 +1,12 @@
 # Cycle 024 — Design: Blast-Radius Analysis
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DRAFT — awaiting Review  
+**Version:** v0.2 | **Date:** 2026-09-28 | **Status:** DESIGN APPROVED  
 **Base branch:** `main` (`d125081`, Cycles 001–023 merged, PR #48)  
 **Proposed crate:** `crates/dare-blast-radius` (Q1)  
 **Also touched:** `crates/dare-attack-graph`, which gains the continuity rule, moved from
 `dare-attack-path` without a behaviour change (Q1). The CLI gains one subcommand.
 Engine crates 013–022 stay unchanged.  
-**Approval:** not yet approved. Execution is not authorized.
+**Approval:** APPROVED (Design phase) 2026-09-28 — see `APPROVAL.md`. Execution is not yet authorized.
 
 ---
 
@@ -276,6 +276,10 @@ and defects are recorded in `REGRESSION.md`.
 
 ## 13. Open questions for Review
 
+All answered by the Product Owner on 2026-09-28 (the recommended option in each case):
+Q1 (a), Q2 (a), Q3 (a), Q4 (a), Q5 (a), Q6 (b), Q7 (a). RF-14 is therefore out of scope for
+v1, and RF-10 stays SHOULD.
+
 1. **Crate and shared continuity.**
    - **(a) Recommended:** a new crate, `dare-blast-radius`, depending only on
      `dare-attack-graph`. The continuity function moves from `dare-attack-path` into
@@ -316,12 +320,12 @@ and defects are recorded in `REGRESSION.md`.
 
 ## 14. Approval checklist
 
-- [ ] Functional requirements reviewed and prioritized
-- [ ] "Reach over the v2 graph, no re-judging, no score" architecture accepted
-- [ ] Compromise kinds and initial authority (§4.2) accepted
-- [ ] The two views and the containment rule (RF-06, RS-06) accepted
-- [ ] Hard maxima (§4.3) accepted
-- [ ] BLAST-RADIUS-LAB classes (§4.4) accepted
-- [ ] Out-of-scope boundary with Cycles 023 and 025 confirmed
-- [ ] Critical risks (R-01, R-03) have accepted mitigations
-- [ ] Open questions in §13 answered
+- [x] Functional requirements reviewed and prioritized
+- [x] "Reach over the v2 graph, no re-judging, no score" architecture accepted
+- [x] Compromise kinds and initial authority (§4.2) accepted
+- [x] The two views and the containment rule (RF-06, RS-06) accepted
+- [x] Hard maxima (§4.3) accepted
+- [x] BLAST-RADIUS-LAB classes (§4.4) accepted
+- [x] Out-of-scope boundary with Cycles 023 and 025 confirmed
+- [x] Critical risks (R-01, R-03) have accepted mitigations
+- [x] Open questions in §13 answered
