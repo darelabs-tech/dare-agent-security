@@ -46,8 +46,8 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-035 — Add the REMOTE-LAB corpus (≥ 30 entries) and class-contract test
 - [x] task-036 — Add the egress, rate/budget, credential-hygiene, authorization-refusal and replay-equivalence suites
 - [x] task-037 — Add the `validate remote` and `validate replay-capture` CLI subcommands
-- [ ] task-038 — Add the `remote-validation-2026` CI job
-- [ ] task-039 — Add compatibility tests
+- [x] task-038 — Add the `remote-validation-2026` CI job
+- [x] task-039 — Add compatibility tests
 - [ ] task-040 — Security, dependency and container audit
 - [x] task-041 — Record the remote-validation standards provenance snapshot
 - [ ] task-042 — Write the EN/PT concept page and the EN authorization reference

@@ -605,9 +605,7 @@ async fn remote_lab_015_oversize_metadata_is_never_a_pass() {
 #[tokio::test(flavor = "multi_thread")]
 async fn remote_lab_016_a_challenge_on_metadata_is_observed_not_killed() {
     let (run, _) = mcp_case(
-        always(
-            LabReply::status(401).with_header("www-authenticate", "Bearer resource_metadata=\"x\""),
-        ),
+        always(LabReply::status(401).with_header("www-authenticate", "Bearer realm=\"lab\"")),
         None,
         "MCP-AUTH-LAB-005",
     )
