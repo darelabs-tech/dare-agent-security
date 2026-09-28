@@ -1,0 +1,55 @@
+[package]
+name = "dare-remote-validation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Remote validation of authorized targets: live capture, offline verdict (Cycle 022)"
+publish = false
+
+[lib]
+name = "dare_remote_validation"
+path = "src/lib.rs"
+
+# This is the only crate in the workspace that validates a remote target, and
+# `reqwest` (rustls, no proxy, no redirects, pinned DNS) is its only network
+# stack. Engine crates stay offline: they decide verdicts from the capture this
+# crate records, through their existing replay and static inputs.
+# `lib.rs` checks this manifest rather than trusting this comment.
+[dependencies]
+dare-a2a-security = { path = "../dare-a2a-security" }
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-mcp-auth-security = { path = "../dare-mcp-auth-security" }
+dare-multi-turn-security = { path = "../dare-multi-turn-security" }
+dare-prompt-injection = { path = "../dare-prompt-injection" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+tokio = { workspace = true, features = ["net"] }
+zeroize = "1.9"
+
+[features]
+# Test-only seams (injected DNS answers, a lab TLS root). The CLI never
+# enables this feature; `tests/compatibility.rs` checks that.
+lab = []
+
+[dev-dependencies]
+dare-remote-validation = { path = ".", features = ["lab"] }
+http-body-util = "0.1"
+hyper = { version = "1", features = ["http1", "server"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+# Generates the REMOTE-LAB CA and server keys in memory at test time, so no
+# private key is ever checked in (Review BQ-3). Dev-only; never linked into the
+# binary. aws-lc-rs is the backend rustls already uses.
+rcgen = { version = "0.14", default-features = false, features = ["aws_lc_rs", "pem"] }
+rustls = { version = "0.23", default-features = false, features = ["aws_lc_rs", "std", "tls12"] }
+tempfile = "3.14"
+tokio-rustls = { version = "0.26", default-features = false, features = ["aws_lc_rs", "tls12"] }
+tokio = { workspace = true, features = ["net", "test-util", "io-util", "sync"] }

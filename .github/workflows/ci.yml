@@ -3269,6 +3269,94 @@ jobs:
           fi
           test ! -e .dare-agent-security/cycle021-refused
 
+  remote-validation-2026:
+    name: Cycle 022 authorized remote validation gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Unit tests (authorization rules, origin, classifier, credential, scrubber, capture chain, overlay)
+        run: cargo test -p dare-remote-validation --lib -- --nocapture
+      - name: REMOTE-LAB harness (in-memory CA, no key checked in)
+        run: cargo test -p dare-remote-validation --test lab_harness -- --nocapture
+      - name: Egress gateway, proxy variables ignored, window stop
+        run: |
+          cargo test -p dare-remote-validation --test gateway -- --nocapture
+          cargo test -p dare-remote-validation --test no_proxy -- --nocapture
+          cargo test -p dare-remote-validation --test window -- --nocapture
+          cargo test -p dare-remote-validation --test egress -- --nocapture
+      - name: Rate, budget and authorization refusals
+        run: |
+          cargo test -p dare-remote-validation --test rate_and_budget -- --nocapture
+          cargo test -p dare-remote-validation --test authorization_refusal -- --nocapture
+      - name: A2A, MCP and dare-conversation clients
+        run: cargo test -p dare-remote-validation --test protocols -- --nocapture
+      - name: Live verdicts equal offline verdicts (prompt injection, multi-turn, A2A, MCP Auth)
+        run: |
+          cargo test -p dare-remote-validation --test engines_live -- --nocapture
+          cargo test -p dare-remote-validation --test a2a_live -- --nocapture
+          cargo test -p dare-remote-validation --test mcp_auth_live -- --nocapture
+          cargo test -p dare-mcp-auth-security --lib observed -- --nocapture
+      - name: Runner, REMOTE-LAB corpus and replay equivalence
+        run: |
+          cargo test -p dare-remote-validation --test runner -- --nocapture
+          cargo test -p dare-remote-validation --test remote_lab -- --nocapture
+          cargo test -p dare-remote-validation --test replay_equivalence -- --nocapture
+      - name: Every engine bridge emits valid evidence
+        run: cargo test -p dare-agent-security --test every_bridge_validates -- --nocapture
+      - name: Earlier engines, registry, profiles, CI trigger and Action image are unchanged
+        run: cargo test -p dare-remote-validation --test compatibility -- --nocapture
+      - name: CLI flag surface and process boundary
+        run: cargo test -p dare-agent-security --test remote_cli -- --nocapture
+
+      - name: No real credential or live endpoint anywhere
+        run: python scripts/k22/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k22/verify_proof_citations.py
+
+      - name: Offline CLI - replay-capture reproduces a committed REMOTE-LAB run
+        run: |
+          rm -rf .dare-agent-security/cycle022-replay
+          set +e
+          cargo run -p dare-agent-security -- validate replay-capture \
+            --capture crates/dare-agent-security-cli/tests/fixtures/remote-replay/capture.json \
+            --audit crates/dare-agent-security-cli/tests/fixtures/remote-replay/audit.json \
+            --authorization crates/dare-agent-security-cli/tests/fixtures/remote-replay/authorization.json \
+            --plan crates/dare-agent-security-cli/tests/fixtures/remote-replay/plan.json \
+            --output-dir .dare-agent-security/cycle022-replay
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an eroded refusal, got $code"
+            exit 1
+          fi
+          for f in remote-result.json remote-capture.json remote-evidence.json remote-audit.json summary.md; do
+            test -f .dare-agent-security/cycle022-replay/$f
+          done
+          cmp .dare-agent-security/cycle022-replay/remote-result.json \
+            crates/dare-agent-security-cli/tests/fixtures/remote-replay/expected-result.json
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle022-replay/remote-result.json \
+            verdict=FAIL protocol=DARE_CONVERSATION runs.0.engine=MULTI_TURN runs.0.verdict=FAIL
+
+      - name: Offline CLI - an authorization for another origin is refused and writes nothing
+        run: |
+          rm -rf .dare-agent-security/cycle022-refused
+          set +e
+          cargo run -p dare-agent-security -- validate remote \
+            --authorization crates/dare-agent-security-cli/tests/fixtures/remote-replay/authorization.json \
+            --plan crates/dare-agent-security-cli/tests/fixtures/remote-replay/plan.json \
+            --confirm-origin https://127.0.0.1:1 \
+            --output-dir .dare-agent-security/cycle022-refused
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for a refused authorization, got $code"
+            exit 1
+          fi
+          test ! -e .dare-agent-security/cycle022-refused
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

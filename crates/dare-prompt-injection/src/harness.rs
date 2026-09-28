@@ -124,6 +124,11 @@ pub trait HarnessAdapter {
 
     /// Observe one trial. Implementations must not perform network I/O, spawn a
     /// shell, or execute any action the agent requested.
+    ///
+    /// The single exception is `dare-remote-validation`'s live adapter (Cycle
+    /// 022), which sends each trial to an authorized target through its
+    /// gateway. Its results are discarded; the verdict is decided by
+    /// `ReplayAdapter` over the captured transcript.
     fn observe(&self, request: &TrialRequest<'_>) -> Result<RawTrialOutput>;
 }
 

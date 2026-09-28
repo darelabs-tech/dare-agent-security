@@ -1,0 +1,46 @@
+{
+  "approved_by": "Product Owner",
+  "authorization_id": "lab-auth-1",
+  "credential_ref": "DARE_REMOTE_LAB_TOKEN",
+  "data_classes": [
+    "SYNTHETIC",
+    "CANARY"
+  ],
+  "endpoints": {
+    "a2a_rpc": "/a2a/v1",
+    "conversation": "/dare/v1/turn",
+    "mcp": "/mcp"
+  },
+  "environment": "LAB",
+  "limits": {},
+  "methods": [
+    "DARE_CONVERSATION_TURN"
+  ],
+  "network_scope": "LOOPBACK_LAB",
+  "not_after": "2026-09-28T03:09:18.70511938Z",
+  "not_before": "2026-09-28T01:09:18.705098715Z",
+  "origins": [
+    "https://127.0.0.1:36785"
+  ],
+  "prohibited": [
+    "STATE_MUTATION",
+    "CREDENTIAL_EXTRACTION",
+    "DESTRUCTIVE_OPERATION",
+    "EXTERNAL_PUBLICATION"
+  ],
+  "protocols": [
+    "DARE_CONVERSATION"
+  ],
+  "scenarios": [
+    {
+      "engine": "MULTI_TURN",
+      "graph_digests": [
+        "sha256:c502fb646a054975731f51d00461c2514c0624a6c76a455108a1a8ede31925cf"
+      ],
+      "scenario_digest": "sha256:b7d04e0ed87963bcdac8c43eeed089660d09d7c3daebde0637b5db36c20acfbd",
+      "scenario_id": "multiturn-lab-002"
+    }
+  ],
+  "schema_version": "1",
+  "target_owner": "DARE REMOTE-LAB"
+}

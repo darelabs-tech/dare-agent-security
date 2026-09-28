@@ -1,0 +1,97 @@
+{
+  "schema_version": "1",
+  "recorded_at": "2026-09-28",
+  "cycle": "022-remote-authorized-validation",
+  "fetch_policy": "NO_NETWORK_ACCESS",
+  "fetch_policy_note": "Nothing in this cycle retrieves a specification. The protocol versions below are the ones the remote clients speak; they are attributions pinned by earlier cycles, not retrieval targets. The only network peer this cycle ever contacts is a target named, by exact origin, in an admitted authorization.",
+  "reverification_note": "No upstream re-verification was performed during this cycle (the session has no route to the specification sites). Versions reuse the exact identifiers pinned by Cycle 018 (MCP) and Cycle 020 (A2A). Where a wire detail differs between A2A 0.3-era documents and 1.0.0 documents (Agent Card interface fields, JSON-RPC method names), the client accepts both documented shapes and selects method names from the card's declared protocolVersion; this is recorded in REGRESSION.md.",
+  "conformance_disclaimer": "DARE claims no conformance with A2A, MCP or OAuth specifications. The clients implement the minimum closed method set in BLUEPRINT \u00a75.4 needed to observe the properties earlier cycles already decide.",
+  "sources": [
+    {
+      "id": "A2A_PROTOCOL_1_0_0",
+      "version": "1.0.0",
+      "status": "NORMATIVE",
+      "pinned_by": "020-a2a-inter-agent-security",
+      "used_for": [
+        "A2A_AGENT_CARD_GET",
+        "A2A_MESSAGE_SEND",
+        "A2A_TASKS_GET"
+      ]
+    },
+    {
+      "id": "A2A_AGENT_CARD_1_0_0",
+      "version": "1.0.0",
+      "status": "NORMATIVE",
+      "pinned_by": "020-a2a-inter-agent-security",
+      "used_for": [
+        "Agent Card projection (BLUEPRINT \u00a76.1)"
+      ]
+    },
+    {
+      "id": "MCP_2026_07_28",
+      "version": "2026-07-28",
+      "status": "NORMATIVE",
+      "pinned_by": "018-mcp-2026-security-auth-hardening",
+      "used_for": [
+        "MCP_INITIALIZE protocolVersion",
+        "MCP_*_LIST",
+        "MCP_RESOURCES_READ",
+        "MCP_PROMPTS_GET",
+        "MCP-Protocol-Version header"
+      ]
+    },
+    {
+      "id": "MCP_AUTHORIZATION_2026_07_28",
+      "version": "2026-07-28",
+      "status": "NORMATIVE",
+      "pinned_by": "018-mcp-2026-security-auth-hardening",
+      "used_for": [
+        "MCP_PROTECTED_RESOURCE_METADATA_GET",
+        "MCP_AUTH_SERVER_METADATA_GET"
+      ]
+    },
+    {
+      "id": "RFC_9728",
+      "version": "RFC 9728",
+      "status": "NORMATIVE",
+      "pinned_by": "022-remote-authorized-validation",
+      "used_for": [
+        "/.well-known/oauth-protected-resource"
+      ]
+    },
+    {
+      "id": "RFC_8414",
+      "version": "RFC 8414",
+      "status": "NORMATIVE",
+      "pinned_by": "022-remote-authorized-validation",
+      "used_for": [
+        "/.well-known/oauth-authorization-server"
+      ]
+    },
+    {
+      "id": "RFC_6750",
+      "version": "RFC 6750",
+      "status": "INFORMATIVE",
+      "pinned_by": "022-remote-authorized-validation",
+      "used_for": [
+        "Authorization: Bearer placement of the referenced credential"
+      ]
+    },
+    {
+      "id": "DARE_CONVERSATION_V1",
+      "version": "1",
+      "status": "INTERNAL",
+      "pinned_by": "022-remote-authorized-validation",
+      "used_for": [
+        "DARE_CONVERSATION_TURN (BLUEPRINT \u00a75.3)"
+      ]
+    }
+  ],
+  "explicitly_out_of_scope": [
+    "production targets",
+    "tools/call and every side-effecting method",
+    "A2A push-notification configuration",
+    "model-provider APIs",
+    "signature verification of Agent Cards"
+  ]
+}

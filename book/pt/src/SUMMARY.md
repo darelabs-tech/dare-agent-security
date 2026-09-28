@@ -17,6 +17,7 @@
 - [Cadeia de Suprimentos Agêntica e AI-BOM](concepts/supply-chain-security.md)
 - [Segurança A2A e de Comunicação Entre Agentes](concepts/a2a-security.md)
 - [Validação Adversarial Adaptativa em Múltiplos Turnos](concepts/multi-turn-security.md)
+- [Validação Remota Autorizada](concepts/remote-validation.md)
 
 # Comandos
 

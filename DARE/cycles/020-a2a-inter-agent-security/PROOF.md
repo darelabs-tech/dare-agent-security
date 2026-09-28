@@ -90,7 +90,7 @@ The central rule of the cycle.
 | an empty run satisfies no contract | `an_empty_run_satisfies_no_contract` |
 | no corpus GAP reaches an applicable PASS | `no_gap_is_reported_as_an_applicable_pass` |
 | a missing signature is undecided; an invalid one is a failure | `a_missing_signature_is_undecided_and_an_invalid_one_is_a_failure` |
-| an undecided record never reaches Cycle 001 as `invariant-holds` | `an_undecided_record_is_not_applicable_and_never_a_pass` |
+| an undecided record never reaches Cycle 001 as `invariant-holds` | `an_undecided_record_carries_no_decision_and_never_a_pass` (renamed in Cycle 022, which removed the observed decision from undecided records; see Cycle 022 `REGRESSION.md` §1) |
 | a harness failure is ERROR, never a security conclusion | `a_harness_failure_reports_error_rather_than_a_security_conclusion` |
 | a harness failure still produces an artifact | `a_harness_failure_produces_an_error_artifact_rather_than_nothing` |
 | an A2A evidence gap resolves to `NOT_TESTED`, not `NOT_APPLICABLE` | `a_missing_a2a_control_is_a_gap_and_never_not_applicable` |

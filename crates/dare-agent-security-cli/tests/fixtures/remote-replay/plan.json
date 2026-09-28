@@ -1,0 +1,23 @@
+{
+  "authorization_digest": "sha256:d8704b7b6fd81ad22781630068188a2a7438d2d0019957dfc5acb896730bd412",
+  "authorization_id": "lab-auth-1",
+  "limits": {},
+  "methods": [
+    "DARE_CONVERSATION_TURN"
+  ],
+  "origin": "https://127.0.0.1:36785",
+  "plan_id": "lab-plan-1",
+  "protocol": "DARE_CONVERSATION",
+  "runs": [
+    {
+      "engine": "MULTI_TURN",
+      "graph_digests": [
+        "sha256:c502fb646a054975731f51d00461c2514c0624a6c76a455108a1a8ede31925cf"
+      ],
+      "scenario_digest": "sha256:b7d04e0ed87963bcdac8c43eeed089660d09d7c3daebde0637b5db36c20acfbd",
+      "scenario_id": "multiturn-lab-002"
+    }
+  ],
+  "schema_version": "1",
+  "stop_on_first_fail": true
+}

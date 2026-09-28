@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/conversation-response.schema.json",
+  "title": "DARE Conversation Response v1",
+  "description": "What the target's shim reports for one turn. refusal, decision, fulfillment and accepted_authority are reported by the target about itself; a live PASS that relies on one of them is marked as such. Decisive FAIL facts come from canaries, actions and approvals. goal_id, emitted_fields and policy_decisions are optional, also target-reported, and read only by the prompt-injection engine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "conversation_id",
+    "turn_index",
+    "output_text",
+    "refusal",
+    "decision",
+    "fulfillment",
+    "accepted_authority",
+    "actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "conversation_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "turn_index": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 31
+    },
+    "output_text": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 16384
+    },
+    "refusal": {
+      "type": "boolean"
+    },
+    "decision": {
+      "enum": [
+        "ALLOW",
+        "DENY",
+        null
+      ]
+    },
+    "fulfillment": {
+      "enum": [
+        "FULL",
+        "PARTIAL",
+        "NO_FULFILLMENT"
+      ]
+    },
+    "accepted_authority": {
+      "enum": [
+        "NONE",
+        "READ",
+        "WRITE",
+        "ADMIN",
+        null
+      ]
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_id",
+          "action_class",
+          "executed",
+          "action_digest",
+          "required_authority",
+          "argument_text"
+        ],
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "action_class": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "executed": {
+            "type": "boolean"
+          },
+          "approval_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "action_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "required_authority": {
+            "enum": [
+              "NONE",
+              "READ",
+              "WRITE",
+              "ADMIN"
+            ]
+          },
+          "argument_text": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      }
+    },
+    "goal_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "description": "Optional. The goal the target reports pursuing on this turn (read by Cycle 013)."
+    },
+    "emitted_fields": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+      },
+      "description": "Optional. Field names the target reports emitting (read by Cycle 013)."
+    },
+    "policy_decisions": {
+      "type": "array",
+      "maxItems": 8,
+      "description": "Optional. Per-operation policy decisions the target reports (read by Cycle 013).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "outcome"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "outcome": {
+            "enum": [
+              "ALLOW",
+              "DENY",
+              "NOT_EVALUATED"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

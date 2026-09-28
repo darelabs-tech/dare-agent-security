@@ -21,6 +21,7 @@ use dare_agent_security::multi_turn_security::run_multi_turn_security;
 use dare_agent_security::product::{run_assess, run_doctor_cmd, run_init, run_report};
 use dare_agent_security::prompt_injection::run_prompt_injection;
 use dare_agent_security::rag_security::run_rag_security;
+use dare_agent_security::remote_validation::{run_remote_validation, run_replay_capture};
 use dare_agent_security::supply_chain_security::run_supply_chain_security;
 use dare_agent_security::tool_security::run_tool_security;
 
@@ -70,6 +71,12 @@ async fn main() -> ExitCode {
                 ValidateSubcommand::A2a(args) => ExitCode::from(run_a2a_security(args) as u8),
                 ValidateSubcommand::MultiTurn(args) => {
                     ExitCode::from(run_multi_turn_security(args) as u8)
+                }
+                ValidateSubcommand::Remote(args) => {
+                    ExitCode::from(run_remote_validation(args) as u8)
+                }
+                ValidateSubcommand::ReplayCapture(args) => {
+                    ExitCode::from(run_replay_capture(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

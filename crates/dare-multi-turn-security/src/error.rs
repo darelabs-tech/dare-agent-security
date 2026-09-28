@@ -119,6 +119,11 @@ pub enum MultiTurnError {
 
     #[error("serialization failed for {kind}")]
     Serialization { kind: &'static str },
+
+    /// A built evidence record failed Cycle 001 validation. This is an engine
+    /// fault, never a verdict, and the record is not returned.
+    #[error("evidence record failed Cycle 001 validation")]
+    EvidenceInvalid,
 }
 
 impl MultiTurnError {
@@ -133,6 +138,7 @@ impl MultiTurnError {
                 | Self::StrategyFault(_)
                 | Self::Io(_)
                 | Self::Serialization { .. }
+                | Self::EvidenceInvalid
         )
     }
 }
@@ -149,6 +155,7 @@ mod tests {
 
     fn every_variant() -> Vec<MultiTurnError> {
         vec![
+            MultiTurnError::EvidenceInvalid,
             MultiTurnError::InputTooLarge {
                 label: "scenario",
                 len: 9,

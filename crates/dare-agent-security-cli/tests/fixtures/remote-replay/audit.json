@@ -1,0 +1,74 @@
+{
+  "schema_version": "1",
+  "authorization_id": "lab-auth-1",
+  "authorization_digest": "sha256:d8704b7b6fd81ad22781630068188a2a7438d2d0019957dfc5acb896730bd412",
+  "plan_digest": "sha256:ea4289b776d6962c095ef1dbd0d3cc6f3bd29f8deea2c57e226ce97b06df6a90",
+  "origin": "https://127.0.0.1:36785",
+  "confirmed_origin": "https://127.0.0.1:36785",
+  "events": [
+    {
+      "index": 0,
+      "at": "2026-09-28T02:09:18.706828073Z",
+      "kind": "ADMITTED",
+      "chain_digest": "sha256:3274ffc2c4fa72a9bf150268370450c5c9cb238a0c93eea15c00dea7158b4dae"
+    },
+    {
+      "index": 1,
+      "at": "2026-09-28T02:09:18.709061764Z",
+      "kind": "REQUEST",
+      "method": "DARE_CONVERSATION_TURN",
+      "chain_digest": "sha256:8bb253f318e5114b3dfe39a0b5ad755676110c126359301544f60cb594d9fb64"
+    },
+    {
+      "index": 2,
+      "at": "2026-09-28T02:09:18.715221327Z",
+      "kind": "RESPONSE",
+      "method": "DARE_CONVERSATION_TURN",
+      "status": 200,
+      "chain_digest": "sha256:83412b8934a2a9e1f69fd141fe53c1dfb6c09445c5aeeda0eb51a8f17b146e98"
+    },
+    {
+      "index": 3,
+      "at": "2026-09-28T02:09:19.20985159Z",
+      "kind": "REQUEST",
+      "method": "DARE_CONVERSATION_TURN",
+      "chain_digest": "sha256:f663224ed365d0774a4910ba9740cb44a3c4687d4af595c9bc00454472be6d61"
+    },
+    {
+      "index": 4,
+      "at": "2026-09-28T02:09:19.214352601Z",
+      "kind": "RESPONSE",
+      "method": "DARE_CONVERSATION_TURN",
+      "status": 200,
+      "chain_digest": "sha256:085e751261ac6a12146e16ee5d1f3127d411bd5c56388a1581518f91d4cbc75a"
+    },
+    {
+      "index": 5,
+      "at": "2026-09-28T02:09:19.710776621Z",
+      "kind": "REQUEST",
+      "method": "DARE_CONVERSATION_TURN",
+      "chain_digest": "sha256:66697ac34ba821c53d45c5203344c774bb03fa4d31516eff455d42c027f7b64a"
+    },
+    {
+      "index": 6,
+      "at": "2026-09-28T02:09:19.715044189Z",
+      "kind": "RESPONSE",
+      "method": "DARE_CONVERSATION_TURN",
+      "status": 200,
+      "chain_digest": "sha256:2968d162345d746d7305c3cfc8c111f6f669943b9749b43758b7f4242abce3ee"
+    },
+    {
+      "index": 7,
+      "at": "2026-09-28T02:09:19.719250389Z",
+      "kind": "STOP",
+      "detail": "COMPLETED",
+      "chain_digest": "sha256:a65ab57590386ed90ce0e35fe34711a37ece2ec7d7fcb2dd074045d0f5f8e954"
+    }
+  ],
+  "totals": {
+    "requests": 3,
+    "bytes_sent": 446,
+    "bytes_received": 561,
+    "duration_ms": 1012
+  }
+}

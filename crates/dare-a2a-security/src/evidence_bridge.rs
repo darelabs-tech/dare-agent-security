@@ -54,6 +54,13 @@ pub fn evidence_id(scenario: &A2aScenario, invariant: A2aInvariant) -> Result<St
     ))
 }
 
+/// Cycle 001 records the algorithm and the digest separately, as bare lowercase
+/// hex. The engine's digests carry an `sha256:` prefix, which the Cycle 001
+/// validator rejects inside `hashes[].value` (Cycle 022 DESIGN §4.8).
+fn bare_hex(digest: &str) -> String {
+    digest.trim_start_matches("sha256:").to_owned()
+}
+
 /// How the observed outcome is described, without restating the verdict twice.
 fn observed_description(verdict: Verdict, invariant: &str) -> String {
     match verdict {
@@ -162,16 +169,16 @@ pub fn build_invariant_evidence(
     let mut hashes = vec![
         HashRef {
             algorithm: "sha256".to_owned(),
-            value: result.scenario_digest.clone(),
+            value: bare_hex(&result.scenario_digest),
         },
         HashRef {
             algorithm: "sha256".to_owned(),
-            value: result.evidence_digest.clone(),
+            value: bare_hex(&result.evidence_digest),
         },
     ];
     hashes.extend(result.documents.iter().map(|document| HashRef {
         algorithm: "sha256".to_owned(),
-        value: document.content_digest.clone(),
+        value: bare_hex(&document.content_digest),
     }));
 
     // A standards attribution is a reference, not a retrieval target: this
@@ -231,17 +238,20 @@ pub fn build_invariant_evidence(
             description: Some(format!("security invariant {invariant} holds")),
         },
         observed: ObservedOutcome {
-            decision: Some(match outcome.verdict {
-                Verdict::Fail => Decision::Allow,
-                Verdict::Pass => Decision::Deny,
-                _ => Decision::NotApplicable,
-            }),
-            result: Some(match outcome.verdict {
-                Verdict::Pass => INVARIANT_HOLDS.to_owned(),
-                Verdict::Fail => "invariant-violated".to_owned(),
-                Verdict::Inconclusive => "evidence-insufficient".to_owned(),
-                Verdict::Error => "harness-error".to_owned(),
-            }),
+            // Only a decided verdict observed a decision. An undecided record that
+            // carried one would compare against `expected` as a mismatch, and the
+            // Cycle 001 validator rejects that as INCONCLUSIVE/ERROR masquerading
+            // as FAIL (Cycle 022 DESIGN §4.8).
+            decision: match outcome.verdict {
+                Verdict::Fail => Some(Decision::Allow),
+                Verdict::Pass => Some(Decision::Deny),
+                Verdict::Inconclusive | Verdict::Error => None,
+            },
+            result: match outcome.verdict {
+                Verdict::Pass => Some(INVARIANT_HOLDS.to_owned()),
+                Verdict::Fail => Some("invariant-violated".to_owned()),
+                Verdict::Inconclusive | Verdict::Error => None,
+            },
             description: Some(observed_description(outcome.verdict, invariant)),
             // Observations come from local documents and captures, never from a
             // live peer.
@@ -273,6 +283,12 @@ pub fn build_invariant_evidence(
     // and the boundary is the right place to enforce it.
     validate_secret_safety(&evidence).map_err(|error| {
         A2aSecurityError::refusal(format!("evidence failed secret safety: {error}"))
+    })?;
+    // Cycle 001 consistency: a record whose verdict disagrees with its own
+    // expected/observed comparison, or whose fields are malformed, is never
+    // returned (Cycle 022 DESIGN §4.8).
+    dare_security_evidence::validate(&evidence).map_err(|error| {
+        A2aSecurityError::refusal(format!("evidence failed Cycle 001 validation: {error}"))
     })?;
 
     Ok(evidence)
@@ -429,20 +445,26 @@ mod tests {
     }
 
     #[test]
-    fn an_undecided_record_is_not_applicable_and_never_a_pass() {
+    fn an_undecided_record_carries_no_decision_and_never_a_pass() {
         // Missing evidence reaching a Cycle 001 consumer as `invariant-holds`
-        // would be this cycle's central failure, one layer downstream.
+        // would be this cycle's central failure, one layer downstream. It must
+        // not read as a FAIL either: an observed decision on an undecided record
+        // compares as a mismatch (Cycle 022 DESIGN §4.8).
         let (scenario, result) = run(ReferenceBehavior::NoRelevantObservation);
+        let mut undecided = 0;
         for record in build_evidence(&scenario, &result, now()).expect("builds") {
             if record.verdict == Verdict::Inconclusive {
-                assert_eq!(record.observed.decision, Some(Decision::NotApplicable));
-                assert_eq!(
-                    record.observed.result.as_deref(),
-                    Some("evidence-insufficient")
-                );
-                assert_ne!(record.observed.result.as_deref(), Some(INVARIANT_HOLDS));
+                undecided += 1;
+                assert_eq!(record.observed.decision, None);
+                assert_eq!(record.observed.result, None);
+                dare_security_evidence::validate(&record)
+                    .expect("an undecided record is valid Cycle 001 evidence");
             }
         }
+        assert!(
+            undecided > 0,
+            "the scenario must produce an undecided record"
+        );
     }
 
     #[test]

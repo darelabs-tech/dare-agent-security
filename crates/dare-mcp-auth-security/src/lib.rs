@@ -92,6 +92,7 @@ pub mod local_synthetic;
 pub mod metadata;
 pub mod model;
 pub mod observation;
+pub mod observed;
 pub mod pkce;
 pub mod protocol;
 pub mod redirect;

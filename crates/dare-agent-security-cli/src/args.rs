@@ -90,6 +90,12 @@ pub enum ValidateSubcommand {
     /// Run bounded local adaptive multi-turn adversarial validation (Cycle 021).
     #[command(name = "multi-turn")]
     MultiTurn(crate::multi_turn_security::MultiTurnArgs),
+    /// Run authorized validation against one remote target (Cycle 022).
+    #[command(name = "remote", after_help = crate::remote_validation::REMOTE_AFTER_HELP)]
+    Remote(crate::remote_validation::RemoteArgs),
+    /// Recompute a remote run's verdicts from its capture, offline (Cycle 022).
+    #[command(name = "replay-capture")]
+    ReplayCapture(crate::remote_validation::ReplayCaptureArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.
