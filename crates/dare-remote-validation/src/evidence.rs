@@ -36,6 +36,21 @@ pub struct ObservedWindow {
 
 pub const EXTENSION: &str = "dare.remote";
 
+/// Lower a PASS record to INCONCLUSIVE: the engine decided PASS over fields
+/// the protocol cannot carry, so the record may not claim the invariant held.
+/// Decision and result are cleared, as for any INCONCLUSIVE record.
+pub fn downgrade_pass(mut evidence: SecurityEvidence, why: &str) -> Result<SecurityEvidence> {
+    if evidence.verdict == dare_security_evidence::Verdict::Pass {
+        evidence.verdict = dare_security_evidence::Verdict::Inconclusive;
+        evidence.observed.decision = None;
+        evidence.observed.result = None;
+        evidence.observed.description = Some(why.chars().take(512).collect());
+    }
+    validate(&evidence)
+        .map_err(|_| RemoteError::Serialization("downgraded evidence failed validation"))?;
+    Ok(evidence)
+}
+
 /// Re-tag one engine record for a live run.
 pub fn retag(
     mut evidence: SecurityEvidence,

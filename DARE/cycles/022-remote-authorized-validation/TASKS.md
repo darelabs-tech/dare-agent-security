@@ -43,8 +43,8 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-032 — Amend the 013 and 021 adapter trait doc comments (BQ-4)
 - [x] task-033 — Implement `ledger.rs`, `evidence.rs` and `result.rs` (including self-reported marking and `summary.md`)
 - [x] task-034 — Implement `run_remote` and `replay_capture`
-- [ ] task-035 — Add the REMOTE-LAB corpus (≥ 30 entries) and class-contract test
-- [ ] task-036 — Add the egress, rate/budget, credential-hygiene, authorization-refusal and replay-equivalence suites
+- [x] task-035 — Add the REMOTE-LAB corpus (≥ 30 entries) and class-contract test
+- [x] task-036 — Add the egress, rate/budget, credential-hygiene, authorization-refusal and replay-equivalence suites
 - [ ] task-037 — Add the `validate remote` and `validate replay-capture` CLI subcommands
 - [ ] task-038 — Add the `remote-validation-2026` CI job
 - [ ] task-039 — Add compatibility tests

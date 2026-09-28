@@ -281,15 +281,19 @@ impl EgressGateway {
 
     fn kill(&mut self, trigger: KillTrigger) {
         if self.kill.triggered().is_none() {
-            let detail = serde_json::to_value(trigger)
-                .ok()
-                .and_then(|v| v.as_str().map(str::to_owned))
-                .unwrap_or_default();
-            let _ = self
-                .audit
-                .record(&now_rfc3339(), AuditKind::Kill, None, None, Some(&detail));
+            self.record_kill(trigger);
         }
         self.kill.trigger(trigger);
+    }
+
+    fn record_kill(&mut self, trigger: KillTrigger) {
+        let detail = serde_json::to_value(trigger)
+            .ok()
+            .and_then(|v| v.as_str().map(str::to_owned))
+            .unwrap_or_default();
+        let _ = self
+            .audit
+            .record(&now_rfc3339(), AuditKind::Kill, None, None, Some(&detail));
     }
 
     /// Steps 1–5 (BLUEPRINT §4.8): everything checked before a byte leaves.
@@ -557,9 +561,12 @@ impl EgressGateway {
         if matches!(status, 401 | 403) && !request.challenge_expected {
             self.kill(KillTrigger::UnexpectedIdentity);
         }
+        // A status can arm the switch itself (redirect, instability); record
+        // that transition in the audit like any other trigger.
+        let armed = self.kill.triggered();
         self.kill.observe_status(status, self.stop_on_first_fail);
-        if let Some(trigger) = self.kill.triggered() {
-            self.kill(trigger);
+        if let (None, Some(trigger)) = (armed, self.kill.triggered()) {
+            self.record_kill(trigger);
         }
 
         Ok(InboundResponse {
@@ -611,6 +618,11 @@ impl EgressGateway {
     /// Close the run: stamp the capture and audit and hand them over.
     pub fn finish(mut self, verdict_detail: Option<&str>) -> Result<(Capture, AuditRecord)> {
         let ended = now_rfc3339();
+        // A trigger raised by the last exchange has no later send to stop,
+        // but the run was still killed.
+        if self.stop.is_none() && self.kill.triggered().is_some() {
+            self.halt(StopReason::KillSwitch, "KILL_SWITCH");
+        }
         let reason = self.stop.unwrap_or(StopReason::Completed);
         if self.stop.is_none() {
             self.audit

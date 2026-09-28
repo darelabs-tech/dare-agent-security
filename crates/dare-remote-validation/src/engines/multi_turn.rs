@@ -41,7 +41,10 @@ use crate::protocol::conversation::{
     parse_reply, send_turn, ConversationReply, ConversationTurn, ReplyAuthority, ReplyDecision,
     ReplyFulfillment,
 };
-use crate::protocol::Protocol;
+use crate::protocol::{Method, Protocol};
+
+/// Why a multi-turn PASS over A2A is reported as INCONCLUSIVE.
+pub const A2A_PASS_NOT_DECIDABLE: &str = "A2A carries only the reply text; refusal, decision, fulfillment, authority and actions were not observed, so the invariant cannot be shown to hold";
 
 /// A loaded MULTITURN-LAB case.
 #[derive(Debug, Clone)]
@@ -329,7 +332,14 @@ pub fn transcript(capture: &Capture, loaded: &Loaded, protocol: Protocol) -> Res
         .iter()
         .map(|c| (c.conversation_id.as_str().to_owned(), Vec::new()))
         .collect();
-    for entry in entries_for(capture, EngineKind::MultiTurn, scenario_id) {
+    // Only turns belong to the transcript; the Agent Card fetched before an
+    // A2A conversation is not a turn.
+    for entry in entries_for(capture, EngineKind::MultiTurn, scenario_id).filter(|e| {
+        matches!(
+            e.method,
+            Method::DareConversationTurn | Method::A2aMessageSend
+        )
+    }) {
         let (Some(conversation), Some(node), Some(turn)) = (
             &entry.scenario_ref.conversation_id,
             &entry.scenario_ref.node_id,
@@ -405,7 +415,20 @@ pub fn verdict(
     };
     let scenario_id = loaded.case.scenario.id.as_str();
     let transport = first_transport(capture, EngineKind::MultiTurn, scenario_id);
-    let verdict = final_verdict(engine_verdict, transport, unfinished);
+    let mut verdict = final_verdict(engine_verdict, transport, unfinished);
+    // Over A2A the refusal, decision, fulfillment, authority and actions of a
+    // turn are not carried and take defaults, so an engine PASS was decided
+    // over fabricated fields. Only a FAIL (decided from the text) stands.
+    let evidence = if protocol == Protocol::A2a && verdict == dare_security_evidence::Verdict::Pass
+    {
+        verdict = dare_security_evidence::Verdict::Inconclusive;
+        evidence
+            .into_iter()
+            .map(|e| crate::evidence::downgrade_pass(e, A2A_PASS_NOT_DECIDABLE))
+            .collect::<Result<Vec<_>>>()?
+    } else {
+        evidence
+    };
     let mut self_reported = BTreeSet::new();
     if verdict == dare_security_evidence::Verdict::Pass && protocol != Protocol::A2a {
         for entry in entries_for(capture, EngineKind::MultiTurn, scenario_id) {

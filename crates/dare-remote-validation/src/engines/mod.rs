@@ -118,7 +118,9 @@ pub fn unfinished(
 }
 
 /// Combine the engine verdict with the transport overlay and the
-/// unfinished-run rule. A FAIL always stands.
+/// unfinished-run rule. A FAIL always stands; a transport outcome decides
+/// next (ERROR or INCONCLUSIVE, never PASS, §4.10); a scenario the run
+/// stopped before finishing is INCONCLUSIVE.
 pub fn final_verdict(
     engine: Verdict,
     transport: Option<TransportOutcome>,
@@ -127,10 +129,13 @@ pub fn final_verdict(
     if engine == Verdict::Fail {
         return Verdict::Fail;
     }
+    if transport.is_some() {
+        return overlay(engine, transport);
+    }
     if unfinished.is_some() {
         return Verdict::Inconclusive;
     }
-    overlay(engine, transport)
+    engine
 }
 
 /// A deterministic evidence timestamp: the capture's end.

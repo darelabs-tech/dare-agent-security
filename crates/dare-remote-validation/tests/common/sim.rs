@@ -146,6 +146,41 @@ impl Answers {
             .verdict
     }
 
+    /// The same answers over A2A: the context id names the conversation and
+    /// the message id ends in the turn; only text parts are carried.
+    pub fn a2a_handler(self) -> Handler {
+        Arc::new(move |hit| match (hit.method.as_str(), hit.path.as_str()) {
+            ("GET", "/.well-known/agent-card.json") => LabReply::json(
+                200,
+                json!({"name": "lab-agent", "protocolVersion": "1.0.0", "provider": {"organization": "DARE Lab"}}),
+            ),
+            ("POST", "/a2a/v1") => {
+                let Ok(request) = serde_json::from_slice::<Value>(&hit.body) else {
+                    return LabReply::status(400);
+                };
+                let message = &request["params"]["message"];
+                let conversation = message["contextId"].as_str().unwrap_or("").to_owned();
+                let turn: u32 = message["messageId"]
+                    .as_str()
+                    .and_then(|m| m.rsplit('-').next())
+                    .and_then(|t| t.parse().ok())
+                    .unwrap_or(0);
+                let text = self
+                    .multi_turn
+                    .get(&(conversation.clone(), turn))
+                    .and_then(|o| o.output_text.clone())
+                    .unwrap_or_default();
+                LabReply::json(
+                    200,
+                    json!({"jsonrpc": "2.0", "id": request["id"], "result": {
+                        "role": "agent", "messageId": format!("r-{turn}"), "contextId": conversation, "parts": [{"kind": "text", "text": text}]
+                    }}),
+                )
+            }
+            _ => LabReply::status(404),
+        })
+    }
+
     pub fn handler(self) -> Handler {
         Arc::new(move |hit| {
             let Ok(request) = serde_json::from_slice::<Value>(&hit.body) else {
