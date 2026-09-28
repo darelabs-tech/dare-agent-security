@@ -697,6 +697,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-remote-validation"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-a2a-security",
+ "dare-adversarial",
+ "dare-coverage",
+ "dare-mcp-auth-security",
+ "dare-multi-turn-security",
+ "dare-prompt-injection",
+ "dare-security-evidence",
+ "jsonschema",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "time",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "dare-security-evidence"
 version = "1.0.0-rc1"
 dependencies = [

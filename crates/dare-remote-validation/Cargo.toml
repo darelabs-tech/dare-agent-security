@@ -1,0 +1,40 @@
+[package]
+name = "dare-remote-validation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Remote validation of authorized targets: live capture, offline verdict (Cycle 022)"
+publish = false
+
+[lib]
+name = "dare_remote_validation"
+path = "src/lib.rs"
+
+# This is the only crate in the workspace that validates a remote target, and
+# `reqwest` (rustls, no proxy, no redirects, pinned DNS) is its only network
+# stack. Engine crates stay offline: they decide verdicts from the capture this
+# crate records, through their existing replay and static inputs.
+# `lib.rs` checks this manifest rather than trusting this comment.
+[dependencies]
+dare-a2a-security = { path = "../dare-a2a-security" }
+dare-adversarial = { path = "../dare-adversarial" }
+dare-coverage = { path = "../dare-coverage" }
+dare-mcp-auth-security = { path = "../dare-mcp-auth-security" }
+dare-multi-turn-security = { path = "../dare-multi-turn-security" }
+dare-prompt-injection = { path = "../dare-prompt-injection" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+time = { workspace = true }
+tokio = { workspace = true, features = ["net"] }
+zeroize = "1.9"
+
+[dev-dependencies]
+tempfile = "3.14"
+tokio = { workspace = true, features = ["net", "test-util"] }

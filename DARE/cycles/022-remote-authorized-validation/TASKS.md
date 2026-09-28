@@ -15,9 +15,9 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-004 — Correct the supply-chain evidence bridge for INCONCLUSIVE/ERROR
 - [x] task-005 — Validate every record in all 9 engine evidence bridges
 - [x] task-006 — Add the 32-record every-bridge validation test and update the changed 018/019/020 assertions
-- [ ] task-007 — Create the `dare-remote-validation` crate skeleton and network-stack manifest guard
-- [ ] task-008 — Implement `limits.rs` hard maxima and lower-only `Limits`
-- [ ] task-009 — Implement `error.rs`, `ids.rs` and `canonical.rs`
+- [x] task-007 — Create the `dare-remote-validation` crate skeleton and network-stack manifest guard
+- [x] task-008 — Implement `limits.rs` hard maxima and lower-only `Limits`
+- [x] task-009 — Implement `error.rs`, `ids.rs` and `canonical.rs`
 - [ ] task-010 — Add the seven `schemas/remote-validation/v1` JSON schemas
 - [ ] task-011 — Implement `source.rs`/`schema.rs` byte, depth, hostile and schema admission
 - [ ] task-012 — Implement `origin.rs` `Origin::parse`
