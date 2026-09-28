@@ -1,0 +1,14 @@
+{
+  "scenario_id": "A2A-LAB-001",
+  "class": "DISCOVERY_BINDING",
+  "mode": "STATIC",
+  "primary_invariant": "DISCOVERY_BINDING_PRESERVED",
+  "evidence_files": [
+    "planner-card.json",
+    "peers.json",
+    "trace.json",
+    "delegation.json",
+    "policy.json"
+  ],
+  "description": "a discovered card binds to the identity, provider and interfaces policy approved"
+}

@@ -1,0 +1,41 @@
+{
+  "card_id": "planner",
+  "name": "planner-agent",
+  "description": "plans things",
+  "provider": "acme",
+  "interfaces": [
+    {
+      "url": "https://peer.example/a2a",
+      "transport": "JSONRPC",
+      "protocol_version": "1.0.0"
+    }
+  ],
+  "security_schemes": [
+    {
+      "scheme_id": "oauth-main",
+      "kind": "OAUTH2_AUTHORIZATION_CODE",
+      "issuer": "https://issuer.example",
+      "token_endpoint": "https://issuer.example/token",
+      "scopes": [
+        "a2a.invoke"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "skill_id": "summarize",
+      "name": "Summarize",
+      "security_requirements": [
+        "oauth-main"
+      ]
+    }
+  ],
+  "signature": {
+    "status": "VALID",
+    "signer_key_id": "key-1",
+    "key_location": "https://peer.example/jwks",
+    "recorded_by": "RECORDED_VERIFICATION"
+  },
+  "declares_push_notifications": false,
+  "evidence_source": "AGENT_CARD"
+}

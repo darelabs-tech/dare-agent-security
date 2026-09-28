@@ -1,0 +1,15 @@
+{
+  "id": "APL-015",
+  "class": "D",
+  "role": "not_tested",
+  "title": "D: supply-chain component -> dependent build -> (declared) assistant -> service identity -> privileged credential",
+  "runs": [
+    {
+      "engine": "supply-chain",
+      "scenario_file": "supply-chain/scenario.json",
+      "mode": "static",
+      "evidence_dir": "supply-chain/evidence"
+    }
+  ],
+  "declared_edges": true
+}

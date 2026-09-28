@@ -1,0 +1,12 @@
+{
+  "id": "APL-011",
+  "class": "C",
+  "role": "not_tested",
+  "title": "C: peer agent -> assistant -> delegated service identity -> privileged credential",
+  "runs": [
+    {
+      "engine": "a2a",
+      "scenario": "A2A-LAB-016"
+    }
+  ]
+}

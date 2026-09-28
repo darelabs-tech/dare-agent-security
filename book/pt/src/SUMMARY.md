@@ -13,6 +13,7 @@
 - [Evidência](concepts/evidence.md)
 - [Cobertura de Avaliação](concepts/assessment-coverage.md)
 - [Grafo de Ataque](concepts/attack-graph.md)
+- [Caminhos de Ataque Derivados de Evidência](concepts/attack-paths.md)
 - [Modos de Validação](concepts/validation.md)
 - [Cadeia de Suprimentos Agêntica e AI-BOM](concepts/supply-chain-security.md)
 - [Segurança A2A e de Comunicação Entre Agentes](concepts/a2a-security.md)

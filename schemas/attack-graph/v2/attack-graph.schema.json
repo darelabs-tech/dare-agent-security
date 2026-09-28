@@ -1,0 +1,604 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/attack-graph/v2/attack-graph.schema.json",
+  "title": "DARE Agent Attack Graph v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "target_id",
+    "target_version",
+    "sources",
+    "engine",
+    "nodes",
+    "edges",
+    "entry_points",
+    "targets"
+  ],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "const": "https://darelabs.tech/schemas/attack-graph/v2/attack-graph.schema.json"
+        },
+        "version": {
+          "const": "2.0.0"
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^graph:[0-9a-f]{64}$"
+    },
+    "target_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "target_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifacts"
+      ],
+      "properties": {
+        "model_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "commit"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 50000,
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "entry_points": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "node",
+          "class",
+          "origin"
+        ],
+        "properties": {
+          "node": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          },
+          "class": {
+            "$ref": "#/$defs/entryClass"
+          },
+          "origin": {
+            "enum": [
+              "DEFAULT",
+              "MODEL"
+            ]
+          }
+        }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "node",
+          "class",
+          "origin"
+        ],
+        "properties": {
+          "node": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          },
+          "class": {
+            "$ref": "#/$defs/targetClass"
+          },
+          "origin": {
+            "enum": [
+              "DEFAULT",
+              "MODEL"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "nodeType": {
+      "enum": [
+        "HUMAN",
+        "AGENT",
+        "IDENTITY",
+        "DELEGATED_AUTHORITY",
+        "MCP_SERVER",
+        "CAPABILITY",
+        "TOOL",
+        "CREDENTIAL",
+        "DOWNSTREAM_SERVICE",
+        "RESOURCE",
+        "DATA",
+        "TENANT",
+        "POLICY_DECISION_POINT",
+        "POLICY_ENFORCEMENT_POINT"
+      ]
+    },
+    "edgeType": {
+      "enum": [
+        "AUTHENTICATES_AS",
+        "DELEGATES_TO",
+        "CAN_INVOKE",
+        "CALLS",
+        "USES_CREDENTIAL",
+        "AUTHORIZED_BY",
+        "ENFORCED_BY",
+        "READS",
+        "WRITES",
+        "DELETES",
+        "TRANSFERS_TO",
+        "BELONGS_TO_TENANT",
+        "CROSSES_TRUST_BOUNDARY",
+        "CAN_REACH"
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "principal": {
+          "type": "string"
+        },
+        "agent_identity": {
+          "type": "string"
+        },
+        "service_identity": {
+          "type": "string"
+        },
+        "delegated": {
+          "type": "boolean"
+        },
+        "tenant": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "pattern": "^node:credential:[A-Za-z0-9._:-]+$"
+        },
+        "authorization_decision": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "OBSERVED",
+            "STATICALLY_PROVEN",
+            "INFERRED",
+            "NOT_TESTED"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_facts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "OBSERVED",
+                  "STATICALLY_PROVEN"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evidence_ids"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "INFERRED"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "rationale",
+              "source_facts"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "NOT_TESTED"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE",
+        "ERROR"
+      ]
+    },
+    "entryClass": {
+      "enum": [
+        "UNTRUSTED_INPUT",
+        "EXTERNAL_CONTENT",
+        "RETRIEVED_DOCUMENT",
+        "MEMORY_WRITE",
+        "PEER_AGENT",
+        "SUPPLY_CHAIN_COMPONENT",
+        "LOW_PRIVILEGE_PRINCIPAL"
+      ]
+    },
+    "targetClass": {
+      "enum": [
+        "SENSITIVE_RESOURCE",
+        "PRIVILEGED_CREDENTIAL",
+        "DESTRUCTIVE_CAPABILITY",
+        "CROSS_TENANT_RESOURCE",
+        "EXTERNAL_PUBLICATION"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "original_kind",
+        "locator"
+      ],
+      "properties": {
+        "artifact_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63
+        },
+        "original_kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    },
+    "guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "property",
+        "verdict",
+        "evidence_ids",
+        "scope",
+        "artifact_index"
+      ],
+      "properties": {
+        "property": {
+          "type": "string",
+          "pattern": "^(AGENT|MCP)\\.[A-Z0-9_]+(\\.[A-Z0-9_]+){1,2}$"
+        },
+        "verdict": {
+          "$ref": "#/$defs/verdict"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "scope": {
+          "enum": [
+            "RUN",
+            "ENTITY"
+          ]
+        },
+        "artifact_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "display_name",
+        "security",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "type": {
+          "$ref": "#/$defs/nodeType"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "security": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state_impact": {
+              "type": "string"
+            },
+            "tenant": {
+              "type": "string"
+            },
+            "privileged": {
+              "type": "boolean"
+            },
+            "sensitive": {
+              "type": "boolean"
+            },
+            "destructive": {
+              "type": "boolean"
+            }
+          }
+        },
+        "provenance": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/provenance"
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "source",
+        "target",
+        "authority",
+        "evidence",
+        "guards",
+        "authority_mutation",
+        "crosses_trust_boundary",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^edge:[0-9a-f]{64}$"
+        },
+        "type": {
+          "$ref": "#/$defs/edgeType"
+        },
+        "source": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "authority": {
+          "$ref": "#/$defs/authority"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "guards": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/guard"
+          }
+        },
+        "authority_mutation": {
+          "type": "boolean"
+        },
+        "crosses_trust_boundary": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          }
+        },
+        "provenance": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/provenance"
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "engine",
+        "run",
+        "mode",
+        "synthetic",
+        "dynamic_authorized",
+        "result_digest",
+        "evidence_digest",
+        "input_digests"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63
+        },
+        "engine": {
+          "enum": [
+            "prompt-injection",
+            "tool",
+            "identity",
+            "memory",
+            "rag",
+            "mcp-auth",
+            "supply-chain",
+            "a2a",
+            "multi-turn",
+            "remote"
+          ]
+        },
+        "run": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{12}$"
+        },
+        "mode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "synthetic": {
+          "type": "boolean"
+        },
+        "dynamic_authorized": {
+          "type": "boolean"
+        },
+        "result_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "evidence_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "input_digests": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    }
+  }
+}

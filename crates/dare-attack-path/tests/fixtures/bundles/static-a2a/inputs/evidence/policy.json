@@ -1,0 +1,76 @@
+{
+  "schema_version": "1",
+  "policy_id": "staged-policy",
+  "approved_peers": [
+    {
+      "peer_id": "planner",
+      "expected_logical_agent": "planner",
+      "expected_provider": "acme",
+      "expected_audience": "local-orchestrator",
+      "approved_interfaces": [
+        "https://peer.example/a2a",
+        "https://peer.example/a2a/grpc"
+      ],
+      "approved_scheme_kinds": [
+        "OAUTH2_AUTHORIZATION_CODE"
+      ],
+      "approved_signers": [
+        "key-1"
+      ],
+      "requires_delegated_identity": true
+    }
+  ],
+  "skill_grants": [
+    {
+      "peer_id": "planner",
+      "skill_id": "summarize",
+      "allowed_subjects": [
+        "user-alice"
+      ]
+    }
+  ],
+  "tenant_policy": {
+    "subject_tenants": {
+      "user-alice": "tenant-a"
+    },
+    "tenant_peers": {
+      "tenant-a": [
+        "planner"
+      ]
+    }
+  },
+  "data_scope_policy": {
+    "peer_max_sensitivity": {
+      "planner": "INTERNAL"
+    },
+    "approved_destinations": [
+      "https://callback.example/hook"
+    ]
+  },
+  "replay_policy": {
+    "idempotent_skills": [
+      "summarize"
+    ],
+    "requires_idempotency_key": true
+  },
+  "protocol_policy": {
+    "approved_versions": [
+      "1.0.0"
+    ],
+    "approved_transports": [
+      "JSONRPC"
+    ],
+    "minimum_version": "1.0.0"
+  },
+  "extension_policy": {
+    "approved_extensions": [
+      "ext-trace"
+    ]
+  },
+  "push_notification_policy": {
+    "approved_destinations": [
+      "https://callback.example/hook"
+    ],
+    "max_sensitivity": "INTERNAL"
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/attack-graph/v2/projection-report.schema.json",
+  "title": "DARE Attack-Path Projection Report v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "graph_id",
+    "artifacts",
+    "aliases_used",
+    "aliases_unused"
+  ],
+  "properties": {
+    "schema_id": {
+      "const": "https://darelabs.tech/schemas/attack-graph/v2/projection-report.schema.json"
+    },
+    "schema_version": {
+      "const": "2"
+    },
+    "graph_id": {
+      "type": "string",
+      "pattern": "^graph:[0-9a-f]{64}$"
+    },
+    "model_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "index",
+          "engine",
+          "run",
+          "mode",
+          "synthetic",
+          "dynamic_authorized",
+          "result_digest",
+          "evidence_digest",
+          "verified_inputs",
+          "facts",
+          "unprojected"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 63
+          },
+          "engine": {
+            "enum": [
+              "prompt-injection",
+              "tool",
+              "identity",
+              "memory",
+              "rag",
+              "mcp-auth",
+              "supply-chain",
+              "a2a",
+              "multi-turn",
+              "remote"
+            ]
+          },
+          "run": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{12}$"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "synthetic": {
+            "type": "boolean"
+          },
+          "dynamic_authorized": {
+            "type": "boolean"
+          },
+          "result_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "evidence_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "verified_inputs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "facts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "nodes",
+              "edges",
+              "guards",
+              "entries",
+              "targets"
+            ],
+            "properties": {
+              "nodes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "edges": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "guards": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "entries": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "targets": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "unprojected": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "aliases_used": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "local_id",
+          "entity_id",
+          "matched_nodes"
+        ],
+        "properties": {
+          "engine": {
+            "type": "string",
+            "minLength": 1
+          },
+          "local_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "run": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{12}$"
+          },
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "matched_nodes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "aliases_unused": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "local_id",
+          "entity_id",
+          "matched_nodes"
+        ],
+        "properties": {
+          "engine": {
+            "type": "string",
+            "minLength": 1
+          },
+          "local_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "run": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{12}$"
+          },
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "matched_nodes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

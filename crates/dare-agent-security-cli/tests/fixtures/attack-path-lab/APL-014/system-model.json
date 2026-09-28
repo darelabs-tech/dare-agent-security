@@ -1,0 +1,88 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-d",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "alice",
+      "type": "HUMAN",
+      "display_name": "Alice (tenant-a user)",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "assistant",
+      "type": "AGENT",
+      "display_name": "Support assistant"
+    },
+    {
+      "entity_id": "index-admin-cred",
+      "type": "CREDENTIAL",
+      "display_name": "Index admin credential",
+      "security": {
+        "privileged": true
+      }
+    },
+    {
+      "entity_id": "index-service",
+      "type": "IDENTITY",
+      "display_name": "Index service identity",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "left-pad",
+      "type": "CAPABILITY",
+      "display_name": "left-pad package"
+    },
+    {
+      "entity_id": "support-agent",
+      "type": "CAPABILITY",
+      "display_name": "support-agent build"
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "identity",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "identity",
+      "local_id": "agent-1",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "identity",
+      "local_id": "svc-index",
+      "entity_id": "index-service"
+    },
+    {
+      "engine": "identity",
+      "local_id": "cred-index-admin",
+      "entity_id": "index-admin-cred"
+    },
+    {
+      "engine": "supply-chain",
+      "local_id": "left-pad",
+      "entity_id": "left-pad"
+    },
+    {
+      "engine": "supply-chain",
+      "local_id": "support-agent",
+      "entity_id": "support-agent"
+    }
+  ],
+  "declared_edges": [
+    {
+      "type": "TRANSFERS_TO",
+      "source": "support-agent",
+      "target": "assistant",
+      "status": "INFERRED",
+      "rationale": "The support-agent build is the code the assistant runs; no engine artifact states this deployment relation."
+    }
+  ]
+}

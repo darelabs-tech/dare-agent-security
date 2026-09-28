@@ -1,0 +1,26 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:data:uploaded-doc",
+        "node:human:alice",
+        "node:data:tenant-b-doc"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.RAG.CONTENT_TRUST_BOUNDARY",
+        "AGENT.RAG.TENANT_DOCUMENT_ISOLATION"
+      ],
+      "entry_class": "RETRIEVED_DOCUMENT",
+      "target_class": "CROSS_TENANT_RESOURCE"
+    }
+  ],
+  "absent": [
+    [
+      "node:data:uploaded-doc",
+      "node:human:alice",
+      "node:credential:index-admin-cred"
+    ]
+  ]
+}

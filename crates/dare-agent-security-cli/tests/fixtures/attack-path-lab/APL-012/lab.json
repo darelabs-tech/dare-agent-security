@@ -1,0 +1,16 @@
+{
+  "id": "APL-012",
+  "class": "C",
+  "role": "attack",
+  "title": "C: peer agent -> assistant -> delegated service identity -> privileged credential",
+  "runs": [
+    {
+      "engine": "a2a",
+      "scenario": "A2A-LAB-011"
+    },
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-004"
+    }
+  ]
+}

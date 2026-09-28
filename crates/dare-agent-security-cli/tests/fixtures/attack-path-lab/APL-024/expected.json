@@ -1,0 +1,19 @@
+{
+  "exit": 2,
+  "node_ids": [
+    "node:human:memory:${run:0}:user-7",
+    "node:human:rag:${run:1}:user-7"
+  ],
+  "absent": [
+    [
+      "node:data:memory:${run:0}:mem-other-tenant",
+      "node:human:memory:${run:0}:user-7",
+      "node:data:rag:${run:1}:doc-salary"
+    ],
+    [
+      "node:data:memory:${run:0}:mem-other-tenant",
+      "node:human:rag:${run:1}:user-7",
+      "node:data:rag:${run:1}:doc-salary"
+    ]
+  ]
+}

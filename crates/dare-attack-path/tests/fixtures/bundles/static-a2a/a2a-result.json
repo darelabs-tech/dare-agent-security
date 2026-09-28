@@ -1,0 +1,205 @@
+{
+  "schema_version": "1",
+  "schema_id": "https://darelabs.tech/schemas/a2a-security/v1/result.schema.json",
+  "scenario_id": "A2A-LAB-001",
+  "scenario_digest": "sha256:607c49ee726c162e68d519e8170d57c6952abddeef91606290e69e1f16214d79",
+  "evidence_digest": "sha256:a973ea143fe43df98caeb937517a1633a0532da593a2798d58578fa49b639cf5",
+  "class": "DISCOVERY_BINDING",
+  "primary_invariant": "DISCOVERY_BINDING_PRESERVED",
+  "property_id": "AGENT.A2A.DISCOVERY_TRUST_BOUNDARY",
+  "mode": "STATIC",
+  "synthetic": false,
+  "verdict": "INCONCLUSIVE",
+  "reason": "no violation was observed, and 3 applicable invariant(s) lacked the evidence needed to decide them; this run does not establish that the exchange was safe",
+  "outcomes": [
+    {
+      "invariant": "DISCOVERY_BINDING_PRESERVED",
+      "verdict": "PASS",
+      "reason": "DISCOVERY_BINDING_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "PEER_IDENTITY_BOUND",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no authentication evidence was collected, so whether the authenticated party is the intended one was never asked (missing: PEER_AUTHENTICATION_CONTEXT)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "MESSAGE_AUTHENTICITY_ESTABLISHED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no message authentication evidence was collected, so a schema-valid message could not be shown to be an authentic one (missing: MESSAGE_AUTHENTICATION_CONTEXT)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "SECURITY_REQUIREMENT_SATISFIED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no security-scheme usage was observed, so whether an approved requirement was satisfied could not be decided (the message `msg-1` remained undecided: the security mechanism used by this exchange was not fully established against card, policy and VALID verification evidence)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "SKILL_AUTHORIZED",
+      "verdict": "PASS",
+      "reason": "SKILL_AUTHORIZED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "MESSAGE_AUTHORITY_BOUNDARY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "MESSAGE_AUTHORITY_BOUNDARY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "TASK_CONTEXT_BINDING_PRESERVED",
+      "verdict": "PASS",
+      "reason": "TASK_CONTEXT_BINDING_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "AUTHORITY_PROPAGATION_BOUNDED",
+      "verdict": "PASS",
+      "reason": "AUTHORITY_PROPAGATION_BOUNDED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "TENANT_BOUNDARY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "TENANT_BOUNDARY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "DATA_SCOPE_BOUNDARY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "DATA_SCOPE_BOUNDARY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "REPLAY_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "REPLAY_BOUNDARY_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "EXTENSION_TRUST_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "EXTENSION_TRUST_BOUNDARY_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "PUSH_NOTIFICATION_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "PUSH_NOTIFICATION_BOUNDARY_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    }
+  ],
+  "violations": [],
+  "documents": [
+    {
+      "document_id": "planner-card.json",
+      "kind": "AGENT_CARD",
+      "bytes": 904,
+      "content_digest": "sha256:2a1cf0939b5f6df6f469ef53d1a9d6a51aeda66d5bb74266593fb18ae493332b"
+    },
+    {
+      "document_id": "peers.json",
+      "kind": "PEERS",
+      "bytes": 332,
+      "content_digest": "sha256:5fda31db2e8611bbe773728fd11ac7aaba4ab530ab59f230ba107391419e11b6"
+    },
+    {
+      "document_id": "trace.json",
+      "kind": "TRACE",
+      "bytes": 794,
+      "content_digest": "sha256:9d746280a408df648d191afa2216183a6e114d46db17991e96276fcb0b9efb63"
+    },
+    {
+      "document_id": "delegation.json",
+      "kind": "DELEGATION",
+      "bytes": 893,
+      "content_digest": "sha256:8a052c91114522bfa14ff370c20e9fae926b3d9334a43fb6c78c7492d16be576"
+    },
+    {
+      "document_id": "policy.json",
+      "kind": "POLICY",
+      "bytes": 1532,
+      "content_digest": "sha256:1c30bf3a578081be84baa88c51d20df7558155feb021f55395f2411330c78eee"
+    }
+  ],
+  "peers": [
+    {
+      "peer_id": "planner",
+      "logical_agent_id": "planner",
+      "card_provider": "acme",
+      "authenticated_principal": "svc-planner",
+      "delegated_subject": "user-alice",
+      "audience": "local-orchestrator",
+      "authorization_subject": "user-alice",
+      "card_digest": "sha256:9b997c724302cb1b36718fda91f47dd04fe20797ab9a582d82eb03fb48feef54"
+    }
+  ],
+  "exchanges": [
+    {
+      "message_id": "msg-1",
+      "peer_id": "planner",
+      "envelope_digest": "sha256:d660e43e5b5f00becb89347617c1e98bf0cd8e45c679acba2c51cadc1e1191f6",
+      "task_id": "task-1",
+      "context_id": "context-1",
+      "initiating_principal": "user-alice",
+      "requested_skill": "summarize",
+      "protocol_version": "1.0.0",
+      "transport": "JSONRPC",
+      "is_repeat": false,
+      "parts": 1
+    }
+  ],
+  "peers_evaluated": 1,
+  "exchanges_evaluated": 1,
+  "observation_digests": [
+    "sha256:698ba34c9928106fb3ed65076e885f300f3790ed2e15b468073db378475d43f4",
+    "sha256:4afcc6b596a9edcc09e6f18f7db4716312cae183b49d9fec0eee76867b848c9f",
+    "sha256:05fad98f72970f7db2e740c8b7200031dadafffb50bb46d465b6ff9d081e0382",
+    "sha256:5185d3f60ee166b732958e7e96148453961200931f33456d5c5928dbb0f432df",
+    "sha256:36796d3dcb80c3702d680c652946df80f61a7ff8899063fb3840ba5f3428eb2e",
+    "sha256:32aa3d608b5f7bddc2a853ad6fdcc037d81e62c2906a569f723542e4bdad1786",
+    "sha256:7b9c6c42b650cc774c6d9fd32eeb1d7099c38c00146eec83c66efc6f04f30e47",
+    "sha256:56643d9a5dae5624b6442c4602aad44631ade33c6bf9ddec5e05b83f0d012e9e",
+    "sha256:63abccb04118fc332ba58fd756e71c65020b4cd0cc9fc0eb259b2852e44cf124",
+    "sha256:4795f2c35f3f71b6d47809afb412a400aa3eb161399c77e8048a89e52147b8e6",
+    "sha256:efc28ef0a4e0b7c4b016d6488fc72964b166d0addeca0faed0cdbe4f5a21b4ef"
+  ],
+  "redaction_state": "REDACTED",
+  "budget": {
+    "input_bytes": 4455,
+    "max_input_bytes": 4194304,
+    "peers_admitted": 1,
+    "max_peers": 256,
+    "exchanges_admitted": 1,
+    "max_exchanges": 2048,
+    "output_bytes_used": 99380,
+    "max_total_output_bytes": 8388608,
+    "output_bytes_per_trial": 1048576,
+    "trials_started": 0,
+    "state_changes": 0,
+    "external_egress_bytes": 0,
+    "exhausted": false
+  }
+}

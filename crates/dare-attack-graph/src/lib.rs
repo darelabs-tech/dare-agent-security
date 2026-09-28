@@ -12,6 +12,7 @@ pub mod node;
 pub mod path;
 pub mod provenance;
 pub mod render;
+pub mod v2;
 pub mod validate;
 
 pub use authority::AuthorityContext;

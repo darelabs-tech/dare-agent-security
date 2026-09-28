@@ -1,0 +1,24 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:credential:index-admin-cred"
+      ],
+      "control_state": "CONTROL_UNDECIDED",
+      "failed_properties": [],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    }
+  ],
+  "artifacts": {
+    "dynamic_authorized": 1,
+    "unprojected": {
+      "MULTI_TURN_RESULT_ONLY": 1
+    }
+  },
+  "summary_contains": [
+    "1 from authorized remote runs"
+  ]
+}

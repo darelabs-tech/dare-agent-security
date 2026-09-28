@@ -1,0 +1,428 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/attack-path/v1/system-model.schema.json",
+  "title": "DARE Attack-Path System Model v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_id",
+    "target_id",
+    "target_version",
+    "entities"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "model_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+    },
+    "target_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "target_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entity_id",
+          "type",
+          "display_name"
+        ],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "type": {
+            "$ref": "#/$defs/nodeType"
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "security": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "privileged": {
+                "type": "boolean"
+              },
+              "sensitive": {
+                "type": "boolean"
+              },
+              "destructive": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "local_id",
+          "entity_id"
+        ],
+        "properties": {
+          "engine": {
+            "enum": [
+              "prompt-injection",
+              "tool",
+              "identity",
+              "memory",
+              "rag",
+              "mcp-auth",
+              "supply-chain",
+              "a2a",
+              "multi-turn",
+              "remote"
+            ]
+          },
+          "local_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "run": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{12}$"
+          },
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          }
+        }
+      }
+    },
+    "entry_points": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "class"
+        ],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "node_id": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          },
+          "class": {
+            "$ref": "#/$defs/entryClass"
+          },
+          "exclude": {
+            "type": "boolean"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "entity_id"
+            ],
+            "not": {
+              "required": [
+                "node_id"
+              ]
+            }
+          },
+          {
+            "required": [
+              "node_id"
+            ],
+            "not": {
+              "required": [
+                "entity_id"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "targets": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "class"
+        ],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "node_id": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          },
+          "class": {
+            "$ref": "#/$defs/targetClass"
+          },
+          "exclude": {
+            "type": "boolean"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "entity_id"
+            ],
+            "not": {
+              "required": [
+                "node_id"
+              ]
+            }
+          },
+          {
+            "required": [
+              "node_id"
+            ],
+            "not": {
+              "required": [
+                "entity_id"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "trust_boundaries": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "boundary_id",
+          "entity_ids"
+        ],
+        "properties": {
+          "boundary_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "entity_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 500,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+            }
+          }
+        }
+      }
+    },
+    "declared_edges": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "source",
+          "target",
+          "status"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/$defs/edgeType"
+          },
+          "source": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "authority": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "principal": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+              },
+              "agent_identity": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "service_identity": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "delegated": {
+                "type": "boolean"
+              },
+              "tenant": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "credential": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+              },
+              "authorization_decision": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "scopes": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              }
+            }
+          },
+          "status": {
+            "enum": [
+              "INFERRED",
+              "NOT_TESTED"
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "INFERRED"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "rationale"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "NOT_TESTED"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "reason"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "nodeType": {
+      "enum": [
+        "HUMAN",
+        "AGENT",
+        "IDENTITY",
+        "DELEGATED_AUTHORITY",
+        "MCP_SERVER",
+        "CAPABILITY",
+        "TOOL",
+        "CREDENTIAL",
+        "DOWNSTREAM_SERVICE",
+        "RESOURCE",
+        "DATA",
+        "TENANT",
+        "POLICY_DECISION_POINT",
+        "POLICY_ENFORCEMENT_POINT"
+      ]
+    },
+    "edgeType": {
+      "enum": [
+        "AUTHENTICATES_AS",
+        "DELEGATES_TO",
+        "CAN_INVOKE",
+        "CALLS",
+        "USES_CREDENTIAL",
+        "AUTHORIZED_BY",
+        "ENFORCED_BY",
+        "READS",
+        "WRITES",
+        "DELETES",
+        "TRANSFERS_TO",
+        "BELONGS_TO_TENANT",
+        "CROSSES_TRUST_BOUNDARY",
+        "CAN_REACH"
+      ]
+    },
+    "entryClass": {
+      "enum": [
+        "UNTRUSTED_INPUT",
+        "EXTERNAL_CONTENT",
+        "RETRIEVED_DOCUMENT",
+        "MEMORY_WRITE",
+        "PEER_AGENT",
+        "SUPPLY_CHAIN_COMPONENT",
+        "LOW_PRIVILEGE_PRINCIPAL"
+      ]
+    },
+    "targetClass": {
+      "enum": [
+        "SENSITIVE_RESOURCE",
+        "PRIVILEGED_CREDENTIAL",
+        "DESTRUCTIVE_CAPABILITY",
+        "CROSS_TENANT_RESOURCE",
+        "EXTERNAL_PUBLICATION"
+      ]
+    }
+  }
+}

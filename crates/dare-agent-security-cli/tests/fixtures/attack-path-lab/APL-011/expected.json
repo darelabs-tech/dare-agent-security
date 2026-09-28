@@ -1,0 +1,11 @@
+{
+  "exit": 0,
+  "absent": [
+    [
+      "node:agent:planner-peer",
+      "node:agent:assistant",
+      "node:identity:index-service",
+      "node:credential:index-admin-cred"
+    ]
+  ]
+}

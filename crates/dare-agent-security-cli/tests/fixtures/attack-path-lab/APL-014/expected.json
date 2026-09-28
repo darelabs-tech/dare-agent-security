@@ -1,0 +1,21 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:capability:left-pad",
+        "node:capability:support-agent",
+        "node:agent:assistant",
+        "node:identity:index-service",
+        "node:credential:index-admin-cred"
+      ],
+      "control_state": "CONTROL_UNDECIDED",
+      "failed_properties": [],
+      "entry_class": "SUPPLY_CHAIN_COMPONENT",
+      "target_class": "PRIVILEGED_CREDENTIAL"
+    }
+  ],
+  "no_failed_property": [
+    "AGENT.SUPPLY_CHAIN.BOM_COMPLETENESS"
+  ]
+}

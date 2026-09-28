@@ -1,0 +1,25 @@
+{
+  "exit": 2,
+  "discontinuous": [
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:agent:assistant",
+        "node:resource:ticket-doc"
+      ],
+      "at": 1
+    }
+  ],
+  "paths": [
+    {
+      "nodes": [
+        "node:human:alice",
+        "node:resource:ticket-doc"
+      ],
+      "control_state": "CONTROLS_HELD",
+      "failed_properties": [],
+      "entry_class": "LOW_PRIVILEGE_PRINCIPAL",
+      "target_class": "SENSITIVE_RESOURCE"
+    }
+  ]
+}

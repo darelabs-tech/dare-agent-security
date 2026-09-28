@@ -28,6 +28,13 @@ point to a sensitive resource, given the facts observed. Use it to prioritize
 remediation: a `FAIL` finding that sits on a short path to a sensitive
 resource matters more than one that is graph-isolated.
 
+## Graphs built from engine evidence
+
+This page describes the Cycle 008 graph, which is built from facts you supply.
+`validate attack-paths` (Cycle 023) builds a v2 graph from the validation engines'
+own artifacts. It carries guards, control states and discontinuous paths. See
+[Evidence-Derived Attack Paths](attack-paths.md).
+
 ## Where it's generated
 
 `validate attack-graph` (power-user) or automatically as part of product

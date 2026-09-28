@@ -1,0 +1,95 @@
+cycle: 023
+name: attack-path-construction
+status: approved-for-execution
+baseline:
+  branch: main
+  commit: 32909ea
+execution_branch: claude/loving-newton-113zme
+approval_file: DARE/cycles/023-attack-path-construction/APPROVAL.md
+execution_authorized: true
+execution_tasks: 46
+safety_boundary:
+  network: prohibited (dare-attack-path has no network dependency; manifest test)
+  execution_of_paths: prohibited (analysis only; no process, socket or scheduler)
+  engine_crate_changes: prohibited (013-022 unchanged)
+  v1_attack_graph_output: byte-identical (golden digests)
+  identity_merging: explicit system-model alias only
+  scores_or_weights: prohibited
+  property_ids_and_profile_denominators: unchanged
+  secrets_in_ci: prohibited
+  llm_or_model_calls: prohibited
+artifacts:
+  required:
+    - BASELINE.md
+    - DESIGN.md
+    - BLUEPRINT.md
+    - TASKS.md
+    - APPROVAL.md
+    - dare-dag.yaml
+    - dare-dag.exec.yaml
+    - REGRESSION.md
+    - PROOF.md
+    - EXECUTION/task-001.md..task-046.md
+completion_gate:
+  - cargo fmt --all --check
+  - cargo clippy --workspace --all-targets -- -D warnings
+  - cargo test --workspace
+  - cargo test -p dare-attack-path --release --test scale
+  - cargo audit
+  - python scripts/run-ci-job-locally.py .github/workflows/ci.yml attack-path-2026
+  - docker build (Action image builder stage)
+  - Cycle 008-022 regressions green
+  - EN mdBook build green
+  - PT mdBook build green
+  - REGRESSION.md complete
+  - PROOF.md complete
+  - final branch head pushed
+  - archive branch agent/cycle-023-attack-path-construction pushed
+
+tasks:
+  task-001: { depends_on: [], complexity: LOW, phase: 0 }
+  task-002: { depends_on: [task-001], complexity: LOW, phase: 1 }
+  task-003: { depends_on: [task-001], complexity: MED, phase: 1 }
+  task-004: { depends_on: [task-003], complexity: MED, phase: 1 }
+  task-005: { depends_on: [task-004], complexity: HIGH, phase: 1 }
+  task-006: { depends_on: [task-004], complexity: LOW, phase: 1 }
+  task-007: { depends_on: [task-001], complexity: LOW, phase: 2 }
+  task-008: { depends_on: [task-007], complexity: LOW, phase: 2 }
+  task-009: { depends_on: [task-008], complexity: MED, phase: 2 }
+  task-010: { depends_on: [task-008], complexity: LOW, phase: 2 }
+  task-011: { depends_on: [task-007], complexity: MED, phase: 3 }
+  task-012: { depends_on: [task-009, task-010, task-011], complexity: MED, phase: 3 }
+  task-013: { depends_on: [task-009], complexity: MED, phase: 4 }
+  task-014: { depends_on: [task-013], complexity: MED, phase: 4 }
+  task-015: { depends_on: [task-013], complexity: HIGH, phase: 4 }
+  task-016: { depends_on: [task-013], complexity: MED, phase: 4 }
+  task-017: { depends_on: [task-009], complexity: MED, phase: 4 }
+  task-018: { depends_on: [task-010, task-017], complexity: HIGH, phase: 5 }
+  task-019: { depends_on: [task-014, task-018], complexity: MED, phase: 5 }
+  task-020: { depends_on: [task-014, task-018], complexity: HIGH, phase: 5 }
+  task-021: { depends_on: [task-014, task-018], complexity: MED, phase: 5 }
+  task-022: { depends_on: [task-014, task-018], complexity: MED, phase: 5 }
+  task-023: { depends_on: [task-014, task-018], complexity: MED, phase: 6 }
+  task-024: { depends_on: [task-015, task-018], complexity: MED, phase: 6 }
+  task-025: { depends_on: [task-015, task-018], complexity: MED, phase: 6 }
+  task-026: { depends_on: [task-016, task-018], complexity: LOW, phase: 7 }
+  task-027: { depends_on: [task-016, task-018], complexity: MED, phase: 7 }
+  task-028: { depends_on: [task-016, task-023, task-025, task-026, task-027], complexity: MED, phase: 7 }
+  task-029: { depends_on: [task-012, task-019, task-020, task-021, task-022, task-024, task-028], complexity: HIGH, phase: 8 }
+  task-030: { depends_on: [task-029], complexity: MED, phase: 8 }
+  task-031: { depends_on: [task-005, task-030], complexity: MED, phase: 8 }
+  task-032: { depends_on: [task-031], complexity: HIGH, phase: 9 }
+  task-033: { depends_on: [task-031], complexity: HIGH, phase: 9 }
+  task-034: { depends_on: [task-005, task-033], complexity: MED, phase: 9 }
+  task-035: { depends_on: [task-032, task-033, task-034], complexity: MED, phase: 9 }
+  task-036: { depends_on: [task-035], complexity: LOW, phase: 9 }
+  task-037: { depends_on: [task-006, task-035], complexity: MED, phase: 10 }
+  task-038: { depends_on: [task-037], complexity: MED, phase: 10 }
+  task-039: { depends_on: [task-037], complexity: HIGH, phase: 10 }
+  task-040: { depends_on: [task-039], complexity: HIGH, phase: 10 }
+  task-041: { depends_on: [task-036, task-038, task-040], complexity: LOW, phase: 11 }
+  task-042: { depends_on: [task-005], complexity: MED, phase: 11 }
+  task-043: { depends_on: [task-037, task-042], complexity: MED, phase: 12 }
+  task-044: { depends_on: [task-041, task-043], complexity: MED, phase: 12 }
+  task-045: { depends_on: [task-037], complexity: LOW, phase: 13 }
+  task-046: { depends_on: [task-044, task-045], complexity: MED, phase: 13 }

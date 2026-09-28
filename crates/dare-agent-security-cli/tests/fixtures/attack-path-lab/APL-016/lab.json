@@ -1,0 +1,16 @@
+{
+  "id": "APL-016",
+  "class": "E",
+  "role": "attack",
+  "title": "E: low-privilege principal -> inbound MCP token -> MCP server -> upstream credential passthrough -> MCP resource",
+  "runs": [
+    {
+      "engine": "mcp-auth-security",
+      "scenario": "MCP-AUTH-LAB-027"
+    },
+    {
+      "engine": "identity-security",
+      "scenario": "IDENTITY-LAB-006"
+    }
+  ]
+}

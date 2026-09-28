@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/attack-graph/v2/attack-paths.schema.json",
+  "title": "DARE Attack Paths v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "graph_id",
+    "paths",
+    "discontinuous_paths",
+    "chokepoints",
+    "enumeration"
+  ],
+  "properties": {
+    "schema_id": {
+      "const": "https://darelabs.tech/schemas/attack-graph/v2/attack-paths.schema.json"
+    },
+    "schema_version": {
+      "const": "2"
+    },
+    "graph_id": {
+      "type": "string",
+      "pattern": "^graph:[0-9a-f]{64}$"
+    },
+    "paths": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "discontinuous_paths": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "chokepoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target",
+          "edge",
+          "properties",
+          "failed_paths",
+          "partial"
+        ],
+        "properties": {
+          "target": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          },
+          "edge": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "failed_paths": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "partial": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "enumeration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_path_edges",
+        "max_paths",
+        "max_paths_per_pair",
+        "max_steps",
+        "steps_used",
+        "truncated",
+        "stopped_by",
+        "pairs_total",
+        "pairs_exhausted",
+        "pairs_truncated_count",
+        "pairs_truncated"
+      ],
+      "properties": {
+        "max_path_edges": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "max_paths": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "max_paths_per_pair": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "max_steps": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000000
+        },
+        "steps_used": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "stopped_by": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "MAX_PATHS_PER_PAIR",
+              "MAX_PATHS",
+              "MAX_STEPS"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "pairs_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pairs_exhausted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pairs_truncated_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pairs_truncated": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "entryClass": {
+      "enum": [
+        "UNTRUSTED_INPUT",
+        "EXTERNAL_CONTENT",
+        "RETRIEVED_DOCUMENT",
+        "MEMORY_WRITE",
+        "PEER_AGENT",
+        "SUPPLY_CHAIN_COMPONENT",
+        "LOW_PRIVILEGE_PRINCIPAL"
+      ]
+    },
+    "targetClass": {
+      "enum": [
+        "SENSITIVE_RESOURCE",
+        "PRIVILEGED_CREDENTIAL",
+        "DESTRUCTIVE_CAPABILITY",
+        "CROSS_TENANT_RESOURCE",
+        "EXTERNAL_PUBLICATION"
+      ]
+    },
+    "guardRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edge",
+        "property",
+        "artifact_index"
+      ],
+      "properties": {
+        "edge": {
+          "type": "string",
+          "pattern": "^edge:[0-9a-f]{64}$"
+        },
+        "property": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63
+        }
+      }
+    },
+    "path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "nodes",
+        "edges",
+        "status",
+        "feasibility",
+        "control_state",
+        "failed_guards",
+        "undecided_edges",
+        "entry",
+        "entry_class",
+        "target",
+        "target_class",
+        "impact_factors"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^path:[0-9a-f]{64}$"
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 13,
+          "items": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          }
+        },
+        "edges": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          }
+        },
+        "status": {
+          "enum": [
+            "NOT_TESTED",
+            "INFERRED",
+            "PROVEN"
+          ]
+        },
+        "feasibility": {
+          "enum": [
+            "FEASIBLE",
+            "DISCONTINUOUS"
+          ]
+        },
+        "discontinuity_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 11
+        },
+        "control_state": {
+          "enum": [
+            "CONTROL_FAILED",
+            "CONTROL_UNDECIDED",
+            "CONTROLS_HELD"
+          ]
+        },
+        "failed_guards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guardRef"
+          }
+        },
+        "undecided_edges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          }
+        },
+        "entry": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "entry_class": {
+          "$ref": "#/$defs/entryClass"
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "target_class": {
+          "$ref": "#/$defs/targetClass"
+        },
+        "impact_factors": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cross_tenant",
+            "uses_privileged_credential",
+            "reaches_sensitive_resource",
+            "contains_destructive_capability",
+            "contains_failed_security_property",
+            "contains_authorization_mutation",
+            "crosses_trust_boundary"
+          ],
+          "properties": {
+            "cross_tenant": {
+              "type": "boolean"
+            },
+            "uses_privileged_credential": {
+              "type": "boolean"
+            },
+            "reaches_sensitive_resource": {
+              "type": "boolean"
+            },
+            "contains_destructive_capability": {
+              "type": "boolean"
+            },
+            "contains_failed_security_property": {
+              "type": "boolean"
+            },
+            "contains_authorization_mutation": {
+              "type": "boolean"
+            },
+            "crosses_trust_boundary": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "feasibility": {
+                "const": "DISCONTINUOUS"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "discontinuity_at"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "discontinuity_at"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry",
+        "target",
+        "target_class"
+      ],
+      "properties": {
+        "entry": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "target_class": {
+          "$ref": "#/$defs/targetClass"
+        }
+      }
+    }
+  }
+}

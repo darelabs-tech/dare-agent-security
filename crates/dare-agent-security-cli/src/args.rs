@@ -96,6 +96,9 @@ pub enum ValidateSubcommand {
     /// Recompute a remote run's verdicts from its capture, offline (Cycle 022).
     #[command(name = "replay-capture")]
     ReplayCapture(crate::remote_validation::ReplayCaptureArgs),
+    /// Construct attack paths from engine artifacts and a system model (Cycle 023).
+    #[command(name = "attack-paths", after_help = crate::attack_paths::ATTACK_PATHS_AFTER_HELP)]
+    AttackPaths(crate::attack_paths::AttackPathsArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

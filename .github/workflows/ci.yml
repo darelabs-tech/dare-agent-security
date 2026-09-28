@@ -3372,6 +3372,95 @@ jobs:
           fi
           test ! -e .dare-agent-security/cycle022-refused
 
+  attack-path-2026:
+    name: Cycle 023 evidence-derived attack-path construction gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: v1 attack-graph output is byte-identical (golden digests)
+        run: cargo test -p dare-attack-graph --test v1_unchanged -- --nocapture
+      - name: v2 contract, control state and validators
+        run: |
+          cargo test -p dare-attack-graph --lib v2 -- --nocapture
+          cargo test -p dare-attack-graph --test v2_contract -- --nocapture
+      - name: Containment, limits, ids and system model
+        run: |
+          cargo test -p dare-attack-path --lib -- --nocapture
+          cargo test -p dare-attack-path --test manifest -- --nocapture
+          cargo test -p dare-attack-path --test error_messages -- --nocapture
+          cargo test -p dare-attack-path --test model -- --nocapture
+      - name: Bundle binding, projectors, merge and path engine
+        run: |
+          cargo test -p dare-attack-path --test binding -- --nocapture
+          cargo test -p dare-attack-path --test generate_static_inputs -- --nocapture
+          cargo test -p dare-attack-path --test projection_tables -- --nocapture
+          cargo test -p dare-attack-path --test graph -- --nocapture
+          cargo test -p dare-attack-path --test paths -- --nocapture
+      - name: Scale - 2000 nodes, 10000 edges, 50x50 pairs in under 10 s (release)
+        run: cargo test -p dare-attack-path --release --test scale -- --nocapture
+      - name: CI job shape (trigger, no secrets, no network target)
+        run: cargo test -p dare-attack-path --test ci_job -- --nocapture
+      - name: CLI exit codes and the refusal corpus
+        run: cargo test -p dare-agent-security --test attack_paths_cli -- --nocapture
+      - name: ATTACK-PATH-LAB - APL-001..026 through the real binary, twins and class contract
+        run: cargo test -p dare-agent-security --test attack_path_lab -- --nocapture
+
+      - name: Compatibility - v1/v2 path eligibility, registries, profiles, engine trees, Docker inputs
+        run: cargo test -p dare-agent-security --test attack_path_compatibility -- --nocapture
+      - name: Earlier consumers run unchanged (Cycle 009 eligibility, Cycle 010 drift, profile denominators)
+        run: |
+          cargo test -p dare-adversarial -- --nocapture
+          cargo test -p dare-continuous -- --nocapture
+          cargo test -p dare-coverage --test a2a_profile no_earlier_profile_denominator_moved -- --nocapture
+          cargo test -p dare-coverage --test multi_turn_profile no_earlier_profile_denominator_moved -- --nocapture
+
+      - name: No real credential or live endpoint anywhere
+        run: python scripts/k23/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k23/verify_proof_citations.py
+
+      - name: Offline CLI - two engine bundles give a validated graph without a system model
+        run: |
+          rm -rf .dare-agent-security/cycle023-paths
+          set +e
+          cargo run -p dare-agent-security -- validate attack-paths \
+            --artifacts crates/dare-attack-path/tests/fixtures/bundles/identity \
+            --artifacts crates/dare-attack-path/tests/fixtures/bundles/rag \
+            --output-dir .dare-agent-security/cycle023-paths
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an undecided path, got $code"
+            exit 1
+          fi
+          for f in attack-graph.json attack-paths.json projection-report.json graph.mmd graph.dot summary.md; do
+            test -f .dare-agent-security/cycle023-paths/$f
+          done
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle023-paths/attack-graph.json \
+            target_id=unmodelled --count sources.artifacts=2
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle023-paths/attack-paths.json \
+            enumeration.truncated=false paths.0.control_state=CONTROL_UNDECIDED --count paths=1
+
+      - name: Offline CLI - the same run given twice is refused and writes nothing
+        run: |
+          rm -rf .dare-agent-security/cycle023-refused
+          set +e
+          cargo run -p dare-agent-security -- validate attack-paths \
+            --artifacts crates/dare-attack-path/tests/fixtures/bundles/identity \
+            --artifacts crates/dare-attack-path/tests/fixtures/bundles/identity \
+            --output-dir .dare-agent-security/cycle023-refused
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for a duplicate run, got $code"
+            exit 1
+          fi
+          test ! -e .dare-agent-security/cycle023-refused
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

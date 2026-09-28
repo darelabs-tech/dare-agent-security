@@ -1,0 +1,18 @@
+{
+  "exit": 2,
+  "paths": [
+    {
+      "nodes": [
+        "node:data:tenant-b-memory",
+        "node:human:alice",
+        "node:data:salary-doc"
+      ],
+      "control_state": "CONTROL_FAILED",
+      "failed_properties": [
+        "AGENT.RAG.TENANT_DOCUMENT_ISOLATION"
+      ],
+      "entry_class": "MEMORY_WRITE",
+      "target_class": "SENSITIVE_RESOURCE"
+    }
+  ]
+}

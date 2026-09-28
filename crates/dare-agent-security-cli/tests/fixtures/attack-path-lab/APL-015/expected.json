@@ -1,0 +1,12 @@
+{
+  "exit": 0,
+  "absent": [
+    [
+      "node:capability:left-pad",
+      "node:capability:support-agent",
+      "node:agent:assistant",
+      "node:identity:index-service",
+      "node:credential:index-admin-cred"
+    ]
+  ]
+}

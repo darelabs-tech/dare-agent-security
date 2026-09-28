@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-f",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "assistant",
+      "type": "AGENT",
+      "display_name": "Support assistant"
+    },
+    {
+      "entity_id": "payments-transfer",
+      "type": "TOOL",
+      "display_name": "payments transfer tool",
+      "security": {
+        "destructive": true
+      }
+    },
+    {
+      "entity_id": "user-channel",
+      "type": "DATA",
+      "display_name": "User prompt channel"
+    },
+    {
+      "entity_id": "conversation-channel",
+      "type": "DATA",
+      "display_name": "Conversation user channel"
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "prompt-injection",
+      "local_id": "sut",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "multi-turn",
+      "local_id": "sut",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "prompt-injection",
+      "local_id": "payment.transfer",
+      "entity_id": "payments-transfer"
+    },
+    {
+      "engine": "multi-turn",
+      "local_id": "transfer",
+      "entity_id": "payments-transfer"
+    },
+    {
+      "engine": "prompt-injection",
+      "local_id": "channel.user_prompt",
+      "entity_id": "user-channel"
+    },
+    {
+      "engine": "multi-turn",
+      "local_id": "channel.user",
+      "entity_id": "conversation-channel"
+    }
+  ]
+}

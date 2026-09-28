@@ -1,0 +1,109 @@
+{
+  "schema_version": "1",
+  "model_id": "apl-class-a",
+  "target_id": "attack-path-lab",
+  "target_version": "023",
+  "entities": [
+    {
+      "entity_id": "alice",
+      "type": "HUMAN",
+      "display_name": "Alice (tenant-a user)",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "assistant",
+      "type": "AGENT",
+      "display_name": "Support assistant"
+    },
+    {
+      "entity_id": "index-admin-cred",
+      "type": "CREDENTIAL",
+      "display_name": "Index admin credential",
+      "security": {
+        "privileged": true
+      }
+    },
+    {
+      "entity_id": "index-service",
+      "type": "IDENTITY",
+      "display_name": "Index service identity",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "uploaded-doc",
+      "type": "DATA",
+      "display_name": "Uploaded document",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "handbook",
+      "type": "DATA",
+      "display_name": "Employee handbook",
+      "security": {
+        "tenant": "tenant-a"
+      }
+    },
+    {
+      "entity_id": "tenant-b-doc",
+      "type": "DATA",
+      "display_name": "Tenant B document",
+      "security": {
+        "tenant": "tenant-b"
+      }
+    }
+  ],
+  "aliases": [
+    {
+      "engine": "identity",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "identity",
+      "local_id": "agent-1",
+      "entity_id": "assistant"
+    },
+    {
+      "engine": "identity",
+      "local_id": "svc-index",
+      "entity_id": "index-service"
+    },
+    {
+      "engine": "identity",
+      "local_id": "cred-index-admin",
+      "entity_id": "index-admin-cred"
+    },
+    {
+      "engine": "rag",
+      "local_id": "user-7",
+      "entity_id": "alice"
+    },
+    {
+      "engine": "rag",
+      "local_id": "doc-upload",
+      "entity_id": "uploaded-doc"
+    },
+    {
+      "engine": "rag",
+      "local_id": "doc-handbook",
+      "entity_id": "handbook"
+    },
+    {
+      "engine": "rag",
+      "local_id": "doc-other-tenant",
+      "entity_id": "tenant-b-doc"
+    }
+  ],
+  "entry_points": [
+    {
+      "entity_id": "handbook",
+      "class": "RETRIEVED_DOCUMENT"
+    }
+  ]
+}

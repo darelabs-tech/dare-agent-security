@@ -4,7 +4,7 @@ use crate::{
     validate::{validate_graph, validate_safe_label},
 };
 
-fn safe_label(label: &str) -> Result<String> {
+pub(crate) fn safe_label(label: &str) -> Result<String> {
     validate_safe_label(label)?;
     let capped: String = label.chars().take(80).collect();
     Ok(capped
