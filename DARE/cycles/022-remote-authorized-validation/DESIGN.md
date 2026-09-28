@@ -1,11 +1,12 @@
 # Cycle 022 — Design: Remote Authorized Validation
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DRAFT — Q1–Q4 decided 2026-09-28; Q5 and final Design approval pending  
+**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DESIGN APPROVED  
 **Base branch:** `main` (`b6f14b9`, Cycles 001–021 merged; see `../ACCEPTANCE.md`)  
 **Proposed crate:** `crates/dare-remote-validation`  
 **Also in scope:** correction of the Cycle 001 evidence bridges in `dare-a2a-security`,
 `dare-mcp-auth-security` and `dare-supply-chain-security` (§4.8). The Product Owner
-moved this into Cycle 022 on 2026-09-27.
+moved this into Cycle 022 on 2026-09-27.  
+**Approval:** APPROVED (Design phase) 2026-09-28 — see `APPROVAL.md`. Execution is not yet authorized.
 
 ---
 
@@ -344,22 +345,18 @@ and defects are recorded in `REGRESSION.md`.
 2. **Conversational HTTP contract — DECIDED (2026-09-28):** (b) one closed, DARE-defined JSON contract (`{conversation_id, turn}` → `{output, actions[]}`). RF-17 is therefore MUST. No OpenAI-compatible or provider shape is supported.
 3. **Production — DECIDED (2026-09-28):** `environment: production` is refused in v1. Only `lab`, `test` and `staging` are accepted.
 4. **`tools/call` and side-effecting methods — DECIDED (2026-09-28):** excluded from v1. Only read and message-exchange operations are allowed.
-5. **Evidence-bridge `observed.result`** for INCONCLUSIVE and ERROR. Choose one:
-   - (a) `None`, the same as the 013–017 bridges;
-   - (b) keep the descriptive string.
-
-   **Recommendation:** (a), so that all eight bridges are uniform.
+5. **Evidence-bridge `observed.result` — DECIDED (2026-09-28):** (a) `None` for INCONCLUSIVE and ERROR, the same as the 013–017 bridges, so all eight bridges are uniform.
 
 ---
 
 ## 14. Approval checklist
 
-- [ ] Functional requirements reviewed and prioritized
-- [ ] "Live capture, offline verdict" architecture accepted (engines stay offline)
-- [ ] Authorization fields (§4.1) and hard maxima (§4.2) accepted
-- [ ] Closed wire protocols and methods (§4.3) accepted
-- [ ] Security requirements RS-03, RS-06 to RS-11 validated by the Tech Lead
-- [ ] Evidence-bridge correction (§4.8) and its artifact change accepted
-- [ ] Out-of-scope boundary with Cycles 023–025 confirmed
-- [ ] Critical risks (R-01, R-02, R-03) have accepted mitigations
-- [ ] Open questions in §13 answered (Q1–Q4 decided 2026-09-28; Q5 open)
+- [x] Functional requirements reviewed and prioritized
+- [x] "Live capture, offline verdict" architecture accepted (engines stay offline)
+- [x] Authorization fields (§4.1) and hard maxima (§4.2) accepted
+- [x] Closed wire protocols and methods (§4.3) accepted
+- [x] Security requirements RS-03, RS-06 to RS-11 validated by the Tech Lead
+- [x] Evidence-bridge correction (§4.8) and its artifact change accepted
+- [x] Out-of-scope boundary with Cycles 023–025 confirmed
+- [x] Critical risks (R-01, R-02, R-03) have accepted mitigations
+- [x] Open questions in §13 answered — 2026-09-28
