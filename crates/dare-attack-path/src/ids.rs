@@ -126,13 +126,22 @@ pub fn entity_node_id(node_type: NodeType, entity_id: &str) -> Option<String> {
     is_entity_id(entity_id).then(|| format!("node:{}:{entity_id}", node_type.slug()))
 }
 
-/// The raw label when it is safe, otherwise `<type-slug> <token>`.
+/// The raw label when it is safe, otherwise `<type-slug> x-<32 hex>`.
+///
+/// The fallback always hashes: the Cycle 008 label check refuses any text
+/// containing `sk-`, `token=` or `password`, and an ordinary identifier such
+/// as `support-desk-tools` can trip it, so reusing the raw token could fail
+/// the same check again.
 pub fn display_name(raw: &str, node_type: NodeType) -> String {
     let trimmed: String = raw.chars().take(160).collect();
     if validate_safe_label(&trimmed).is_ok() && !trimmed.chars().any(char::is_control) {
         trimmed
     } else {
-        format!("{} {}", node_type.slug(), local_token(raw))
+        format!(
+            "{} x-{}",
+            node_type.slug(),
+            &hex(&Sha256::digest(raw.as_bytes()))[..32]
+        )
     }
 }
 
@@ -208,6 +217,11 @@ mod tests {
         assert!(hidden.starts_with("credential x-"), "{hidden}");
         assert!(!hidden.to_ascii_lowercase().contains("bearer"));
         assert!(display_name("line\nbreak", NodeType::Data).starts_with("data x-"));
+        // `sk-` inside an ordinary id trips the Cycle 008 check; the fallback
+        // must pass it.
+        let desk = display_name("support-desk-tools", NodeType::McpServer);
+        assert!(desk.starts_with("mcp-server x-"), "{desk}");
+        assert!(validate_safe_label(&desk).is_ok());
     }
 
     #[test]

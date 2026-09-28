@@ -11,6 +11,10 @@
 //! network capability.
 pub mod admit;
 pub mod bundle;
+pub mod chokepoint;
+pub mod continuity;
+pub mod designate;
+pub mod enumerate;
 pub mod error;
 pub mod evidence_index;
 pub mod facts;
@@ -18,10 +22,14 @@ pub mod guard_table;
 pub mod ids;
 pub mod limits;
 pub mod load;
+pub mod merge;
 pub mod model;
+pub mod paths;
 pub mod project;
+pub mod run;
 pub mod sweep;
 
 pub use error::{AttackPathError, ModelRefusal, Refusal, Result};
 pub use ids::{EngineSlug, RunTag};
 pub use limits::ConstructOptions;
+pub use run::{construct, Construction};

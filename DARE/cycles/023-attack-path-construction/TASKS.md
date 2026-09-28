@@ -48,14 +48,14 @@ Throughout the cycle:
 - [x] task-026 — Implement the prompt-injection projector (§6.8)
 - [x] task-027 — Implement the multi-turn projector (§6.8)
 - [x] task-028 — Implement the remote (022) projector (§6.9)
-- [ ] task-029 — Implement `merge.rs`
-- [ ] task-030 — Implement `designate.rs` default designations and model overrides
-- [ ] task-031 — Implement graph construction in `run.rs` and the determinism test
-- [ ] task-032 — Implement `continuity.rs` rules C1–C6
-- [ ] task-033 — Implement `enumerate.rs` pairwise shortest-first enumeration
-- [ ] task-034 — Implement `chokepoint.rs`
-- [ ] task-035 — Implement path classification, v2 impact factors and `AttackPathsDoc`
-- [ ] task-036 — Add the scale test (O-09)
+- [x] task-029 — Implement `merge.rs`
+- [x] task-030 — Implement `designate.rs` default designations and model overrides
+- [x] task-031 — Implement graph construction in `run.rs` and the determinism test
+- [x] task-032 — Implement `continuity.rs` rules C1–C6
+- [x] task-033 — Implement `enumerate.rs` pairwise shortest-first enumeration
+- [x] task-034 — Implement `chokepoint.rs`
+- [x] task-035 — Implement path classification, v2 impact factors and `AttackPathsDoc`
+- [x] task-036 — Add the scale test (O-09)
 - [ ] task-037 — Add the `validate attack-paths` CLI subcommand
 - [ ] task-038 — Add the refusal corpus (§8.3)
 - [ ] task-039 — Build the ATTACK-PATH-LAB harness and scenarios APL-001..APL-012
