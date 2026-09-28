@@ -134,6 +134,22 @@ impl AuditRecord {
         Ok(())
     }
 
+    /// Admit an audit file's bytes: size, depth and schema. The chain is
+    /// checked against its capture by `verify`.
+    pub fn admit(raw: &[u8]) -> Result<AuditRecord> {
+        if raw.len() > crate::limits::MAX_CAPTURE_BYTES {
+            return Err(RemoteError::Refused(
+                "audit record exceeds its byte ceiling",
+            ));
+        }
+        let value: Value = serde_json::from_slice(raw)
+            .map_err(|_| RemoteError::Refused("audit record is not valid JSON"))?;
+        crate::source::check_depth(&value)?;
+        crate::schema::validate(&value, crate::schema::DocumentKind::Audit)?;
+        serde_json::from_value(value)
+            .map_err(|_| RemoteError::Refused("audit record does not match its model"))
+    }
+
     /// Recompute the chain, and check the totals against the capture.
     pub fn verify(&self, capture: &Capture) -> Result<()> {
         let mut previous = seed(self);

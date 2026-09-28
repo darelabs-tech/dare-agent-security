@@ -26,6 +26,7 @@ use crate::error::{RemoteError, Result};
 use crate::evidence::{retag, ObservedWindow, Provenance};
 use crate::gateway::{EgressGateway, TrustRoots};
 use crate::ledger::OutputLedger;
+use crate::limits::Limits;
 use crate::origin::Origin;
 use crate::plan::{EngineKind, PlannedRun, RemotePlan};
 use crate::protocol::{Method, Protocol};
@@ -331,6 +332,35 @@ pub fn run_remote(
     sources: &Sources,
     work_root: &Path,
 ) -> Result<RemoteRun> {
+    run_remote_lowered(
+        auth,
+        plan,
+        confirm_origin,
+        policy_dir,
+        now,
+        trust,
+        handle,
+        sources,
+        work_root,
+        &Limits::default(),
+    )
+}
+
+/// As `run_remote`, with limits lowered further after verification (the
+/// CLI's `--max-*` flags). The plan is untouched, so replay still binds.
+#[allow(clippy::too_many_arguments)]
+pub fn run_remote_lowered(
+    auth: &Authorization,
+    plan: &RemotePlan,
+    confirm_origin: &str,
+    policy_dir: Option<&Path>,
+    now: OffsetDateTime,
+    trust: TrustRoots,
+    handle: tokio::runtime::Handle,
+    sources: &Sources,
+    work_root: &Path,
+    lower: &Limits,
+) -> Result<RemoteRun> {
     let mut verified = verify(
         auth,
         plan,
@@ -339,6 +369,7 @@ pub fn run_remote(
         &EngineDigests { sources },
         &env_lookup,
     )?;
+    verified.lower_limits(lower)?;
     let loaded = load_all(sources, plan, policy_dir)?;
     let gateway = EgressGateway::new(&mut verified, plan, confirm_origin, trust)?;
     finish_run(auth, plan, loaded, gateway, handle, work_root)

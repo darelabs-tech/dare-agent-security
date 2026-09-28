@@ -173,6 +173,14 @@ impl VerifiedAuthorization {
         &self.methods
     }
     /// The plan's limits resolved within the authorization's.
+    /// Lower the effective limits further (the CLI's `--max-*` flags). Only
+    /// lowering is possible: a raised or zero value is refused. The plan is
+    /// untouched, so its digest, and the capture's binding to it, still hold.
+    pub fn lower_limits(&mut self, extra: &crate::limits::Limits) -> Result<()> {
+        self.limits = extra.resolve_within(&self.limits)?;
+        Ok(())
+    }
+
     pub fn limits(&self) -> EffectiveLimits {
         self.limits
     }

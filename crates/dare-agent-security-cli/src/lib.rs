@@ -16,6 +16,7 @@ pub mod multi_turn_security;
 pub mod product;
 pub mod prompt_injection;
 pub mod rag_security;
+pub mod remote_validation;
 pub mod supply_chain_security;
 pub mod tool_security;
 

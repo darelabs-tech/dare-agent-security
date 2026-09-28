@@ -504,6 +504,7 @@ dependencies = [
  "dare-product",
  "dare-prompt-injection",
  "dare-rag-security",
+ "dare-remote-validation",
  "dare-security-evidence",
  "dare-supply-chain-security",
  "dare-tool-security",

@@ -34,6 +34,8 @@ dare-rag-security = { path = "../dare-rag-security" }
 dare-mcp-auth-security = { path = "../dare-mcp-auth-security" }
 dare-a2a-security = { path = "../dare-a2a-security" }
 dare-multi-turn-security = { path = "../dare-multi-turn-security" }
+# The only network-capable validation crate. Never with its `lab` feature.
+dare-remote-validation = { path = "../dare-remote-validation" }
 dare-supply-chain-security = { path = "../dare-supply-chain-security" }
 dare-tool-security = { path = "../dare-tool-security" }
 jsonschema = { workspace = true }
