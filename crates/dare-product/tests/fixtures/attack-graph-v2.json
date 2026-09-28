@@ -1,0 +1,1191 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/attack-graph/v2/attack-graph.schema.json",
+    "version": "2.0.0"
+  },
+  "id": "graph:c566fe7f4cbe8822a269a436ec7388d38e67e4a06e083161d9c89f632599b39b",
+  "target_id": "unmodelled",
+  "target_version": "03ee203bb554",
+  "sources": {
+    "artifacts": [
+      {
+        "index": 0,
+        "engine": "identity",
+        "run": "569fbf2d8b1f",
+        "mode": "SIMULATED",
+        "synthetic": true,
+        "dynamic_authorized": false,
+        "result_digest": "sha256:569fbf2d8b1f276b5fdbe710875882473ed0ae2192b582cc936e7b8736c8c9fb",
+        "evidence_digest": "sha256:f0f7ee6fe37e38ca3936d130e29b56ee5bba2f65c7625e35a8fc5bfec5a3e79e",
+        "input_digests": [
+          "sha256:268388795b59e3872a0ee1725727344b9231ab16c76a260305a89d5e6150296c",
+          "sha256:886147259bf3461eedbd7c24e5cd58564bc2e412306d1e85d89ca81550385ee9",
+          "sha256:a9d53bec19f90e8ad4acdf4fb56542690699fbad04a5e824039111f18fa792bc",
+          "sha256:ef22b070c9200b7687bbd9a62b15f7baa924a6cceb51d9e72a28dd2a2b3935b6"
+        ]
+      },
+      {
+        "index": 1,
+        "engine": "rag",
+        "run": "a2b143893410",
+        "mode": "SIMULATED",
+        "synthetic": true,
+        "dynamic_authorized": false,
+        "result_digest": "sha256:a2b143893410fdfc3c3bf0bcfe2c3db7d45632c79eaec4478b1e666ec2b5c168",
+        "evidence_digest": "sha256:7dc9511f197473ba2bf7a0ab5837a563f9f95a88579c7a7406e5c796bf87a557",
+        "input_digests": [
+          "sha256:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d",
+          "sha256:b15af670ea1d678901ba26cb87178f8667df2a5188ecdb7867a8a246431536d3"
+        ]
+      }
+    ]
+  },
+  "engine": {
+    "name": "dare-attack-path",
+    "version": "1.0.0-rc1",
+    "commit": "unrecorded"
+  },
+  "nodes": [
+    {
+      "id": "node:agent:identity:569fbf2d8b1f:agent-1",
+      "type": "AGENT",
+      "display_name": "agent-1",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "Principal",
+          "locator": "input:scenario#/principals/principals/1"
+        }
+      ]
+    },
+    {
+      "id": "node:credential:identity:569fbf2d8b1f:cred-index-admin",
+      "type": "CREDENTIAL",
+      "display_name": "cred-index-admin",
+      "security": {
+        "privileged": true,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "CredentialContextSpec",
+          "locator": "input:scenario#/credential_contexts/0"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-external",
+      "type": "DATA",
+      "display_name": "doc-external",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-support)",
+          "locator": "input:scenario#/store/documents/4"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-handbook",
+      "type": "DATA",
+      "display_name": "doc-handbook",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-support)",
+          "locator": "input:scenario#/store/documents/0"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-nofilterfield",
+      "type": "DATA",
+      "display_name": "doc-nofilterfield",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-support)",
+          "locator": "input:scenario#/store/documents/8"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-other-tenant",
+      "type": "DATA",
+      "display_name": "doc-other-tenant",
+      "security": {
+        "tenant": "tenant-b",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-other)",
+          "locator": "input:scenario#/store/documents/3"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-runbook",
+      "type": "DATA",
+      "display_name": "doc-runbook",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-runbooks)",
+          "locator": "input:scenario#/store/documents/6"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-salary",
+      "type": "DATA",
+      "display_name": "doc-salary",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": true,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-hr)",
+          "locator": "input:scenario#/store/documents/2"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-unattributed",
+      "type": "DATA",
+      "display_name": "doc-unattributed",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-support)",
+          "locator": "input:scenario#/store/documents/5"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-unlisted",
+      "type": "DATA",
+      "display_name": "doc-unlisted",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-support)",
+          "locator": "input:scenario#/store/documents/7"
+        }
+      ]
+    },
+    {
+      "id": "node:data:rag:a2b143893410:doc-upload",
+      "type": "DATA",
+      "display_name": "doc-upload",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document (collection col-support)",
+          "locator": "input:scenario#/store/documents/1"
+        }
+      ]
+    },
+    {
+      "id": "node:human:identity:569fbf2d8b1f:user-7",
+      "type": "HUMAN",
+      "display_name": "support operator",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "Principal",
+          "locator": "input:scenario#/principals/principals/0"
+        }
+      ]
+    },
+    {
+      "id": "node:human:identity:569fbf2d8b1f:user-9",
+      "type": "HUMAN",
+      "display_name": "operator in the other tenant",
+      "security": {
+        "tenant": "tenant-b",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "Principal",
+          "locator": "input:scenario#/principals/principals/3"
+        }
+      ]
+    },
+    {
+      "id": "node:human:rag:a2b143893410:user-7",
+      "type": "HUMAN",
+      "display_name": "user-7",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "RetrievalContext.acting_principal_id",
+          "locator": "input:scenario#/context"
+        }
+      ]
+    },
+    {
+      "id": "node:identity:identity:569fbf2d8b1f:svc-index",
+      "type": "IDENTITY",
+      "display_name": "svc-index",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "Principal",
+          "locator": "input:scenario#/principals/principals/2"
+        }
+      ]
+    },
+    {
+      "id": "node:resource:identity:569fbf2d8b1f:document-123",
+      "type": "RESOURCE",
+      "display_name": "document-123",
+      "security": {
+        "tenant": "tenant-a",
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "ResourceContext",
+          "locator": "input:scenario#/resource"
+        }
+      ]
+    },
+    {
+      "id": "node:tenant:identity:569fbf2d8b1f:tenant-a",
+      "type": "TENANT",
+      "display_name": "tenant-a",
+      "security": {
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "ResourceContext.tenant_id",
+          "locator": "input:scenario#/resource"
+        }
+      ]
+    },
+    {
+      "id": "node:tenant:rag:a2b143893410:tenant-a",
+      "type": "TENANT",
+      "display_name": "tenant-a",
+      "security": {
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/0"
+        }
+      ]
+    },
+    {
+      "id": "node:tenant:rag:a2b143893410:tenant-b",
+      "type": "TENANT",
+      "display_name": "tenant-b",
+      "security": {
+        "privileged": false,
+        "sensitive": false,
+        "destructive": false
+      },
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/3"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:0759a5cff73f45f236bd0d1bc51c21be0ca5bd30ea3cde7027e0b37a00b9dafe",
+      "type": "TRANSFERS_TO",
+      "source": "node:data:rag:a2b143893410:doc-upload",
+      "target": "node:human:rag:a2b143893410:user-7",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+          "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+          "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/14"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/15"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/14"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/15"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/14"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/15"
+        }
+      ]
+    },
+    {
+      "id": "edge:09dae5bf547e6978672029b7c207c02b98819c8e5b61f223a34af42d9cfaceca",
+      "type": "READS",
+      "source": "node:human:rag:a2b143893410:user-7",
+      "target": "node:data:rag:a2b143893410:doc-runbook",
+      "authority": {
+        "principal": "node:human:rag:a2b143893410:user-7",
+        "delegated": false,
+        "tenant": "tenant-a"
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+          "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+          "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+        ]
+      },
+      "guards": [
+        {
+          "property": "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+          "verdict": "PASS",
+          "evidence_ids": [
+            "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+            "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+            "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+          ],
+          "scope": "RUN",
+          "artifact_index": 1
+        }
+      ],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/11"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/12"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/11"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/12"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/11"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/12"
+        }
+      ]
+    },
+    {
+      "id": "edge:2112d1b41922c801563a40aa935f55321f41d92a812dbf8a5a880132ca619ffe",
+      "type": "READS",
+      "source": "node:human:rag:a2b143893410:user-7",
+      "target": "node:data:rag:a2b143893410:doc-handbook",
+      "authority": {
+        "principal": "node:human:rag:a2b143893410:user-7",
+        "delegated": false,
+        "tenant": "tenant-a"
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+          "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+          "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+        ]
+      },
+      "guards": [
+        {
+          "property": "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+          "verdict": "PASS",
+          "evidence_ids": [
+            "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+            "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+            "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+          ],
+          "scope": "RUN",
+          "artifact_index": 1
+        }
+      ],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/8"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/9"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/8"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/9"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/8"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/9"
+        }
+      ]
+    },
+    {
+      "id": "edge:3b12add0ab384ef2b9f496054565bd06fcfcba8fd6b9979a282c153705dd52b6",
+      "type": "READS",
+      "source": "node:human:rag:a2b143893410:user-7",
+      "target": "node:data:rag:a2b143893410:doc-upload",
+      "authority": {
+        "principal": "node:human:rag:a2b143893410:user-7",
+        "delegated": false,
+        "tenant": "tenant-a"
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+          "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+          "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+        ]
+      },
+      "guards": [
+        {
+          "property": "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+          "verdict": "PASS",
+          "evidence_ids": [
+            "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+            "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+            "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+          ],
+          "scope": "RUN",
+          "artifact_index": 1
+        }
+      ],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/14"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/15"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/14"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/15"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/14"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/15"
+        }
+      ]
+    },
+    {
+      "id": "edge:3d6b9065b858e8e134685d3049f80719fa383ff383f729e2fac8905dc855e4f8",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-unlisted",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/7"
+        }
+      ]
+    },
+    {
+      "id": "edge:3dd124cf5c044681cdb5f9c27cf028ca1a4ee5b6a322bf049c4ccbbd79590188",
+      "type": "TRANSFERS_TO",
+      "source": "node:data:rag:a2b143893410:doc-runbook",
+      "target": "node:human:rag:a2b143893410:user-7",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+          "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+          "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/11"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/12"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/11"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/12"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/11"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/12"
+        }
+      ]
+    },
+    {
+      "id": "edge:408c06c725d18c4907f6d3b63969a0d3111b1da72777f32e031fe3be1014c278",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-salary",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/2"
+        }
+      ]
+    },
+    {
+      "id": "edge:5465998a671dbba359ba9a6f96a32db57c2e6e0ef633b11906af451c1028b786",
+      "type": "DELEGATES_TO",
+      "source": "node:human:identity:569fbf2d8b1f:user-7",
+      "target": "node:agent:identity:569fbf2d8b1f:agent-1",
+      "authority": {
+        "principal": "node:human:identity:569fbf2d8b1f:user-7",
+        "delegated": true,
+        "scopes": [
+          "api://support",
+          "purpose-summarize"
+        ]
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:identity-security:evidence:ad2c18a170960cffd183bb121f899474bb346435561ef686061bc209d092f26f"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "DelegationEdge",
+          "locator": "input:scenario#/delegation/edges/0"
+        }
+      ]
+    },
+    {
+      "id": "edge:6f7cce4f3ef5a30729d18a2138b678b75130ea91a5301b7d960212ebb5a041ab",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-external",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/4"
+        }
+      ]
+    },
+    {
+      "id": "edge:74fc3729c0da55c950b99b4b478538509a5e89f86343323a4a139f66290e470e",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-other-tenant",
+      "target": "node:tenant:rag:a2b143893410:tenant-b",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/3"
+        }
+      ]
+    },
+    {
+      "id": "edge:9131ec21b6fae00a7fb49ffb603437015f43bcaec4bfc07fa349cb27f33e9856",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:resource:identity:569fbf2d8b1f:document-123",
+      "target": "node:tenant:identity:569fbf2d8b1f:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:identity:ef22b070c9200b7687bbd9a62b15f7baa924a6cceb51d9e72a28dd2a2b3935b6"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "ResourceContext",
+          "locator": "input:scenario#/resource"
+        }
+      ]
+    },
+    {
+      "id": "edge:a96bea65532d74e7277f2fe60b565839f5dfe827993d13fee5a65a51f27b87a2",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-unattributed",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/5"
+        }
+      ]
+    },
+    {
+      "id": "edge:ac6a8aa5be7c7a2d6f45f1b692af39a55255c0c9d497e62c32217350ad53a713",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-handbook",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/0"
+        }
+      ]
+    },
+    {
+      "id": "edge:aee685e316d77d6ffa407e3ce8be24c8d94e4bf34e47707b4e54b5e3565b656e",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-nofilterfield",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/8"
+        }
+      ]
+    },
+    {
+      "id": "edge:b9c4677e2afa9cd643c1fcfa7e694ee327aefde356605b0f2a9dd1dc2a0bf6dd",
+      "type": "AUTHENTICATES_AS",
+      "source": "node:identity:identity:569fbf2d8b1f:svc-index",
+      "target": "node:credential:identity:569fbf2d8b1f:cred-index-admin",
+      "authority": {
+        "principal": "node:identity:identity:569fbf2d8b1f:svc-index",
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:identity:ef22b070c9200b7687bbd9a62b15f7baa924a6cceb51d9e72a28dd2a2b3935b6"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "CredentialContextSpec",
+          "locator": "input:scenario#/credential_contexts/0"
+        }
+      ]
+    },
+    {
+      "id": "edge:ca0542d9c115256b1dc8e71a14f43469aa86ca8041b8c1ed6d9c6aee77d2d552",
+      "type": "CAN_REACH",
+      "source": "node:credential:identity:569fbf2d8b1f:cred-index-admin",
+      "target": "node:resource:identity:569fbf2d8b1f:document-123",
+      "authority": {
+        "delegated": false,
+        "tenant": "tenant-a",
+        "credential": "node:credential:identity:569fbf2d8b1f:cred-index-admin"
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:identity:ef22b070c9200b7687bbd9a62b15f7baa924a6cceb51d9e72a28dd2a2b3935b6"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "CredentialContextSpec.tenant_labels",
+          "locator": "input:scenario#/credential_contexts"
+        }
+      ]
+    },
+    {
+      "id": "edge:d03342bff554c6f4260cdf0cfc27c5bc5339682d6b35b67a62bacad1696cdba8",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-upload",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/1"
+        }
+      ]
+    },
+    {
+      "id": "edge:d1ecf3652e1f4c0215d6605cf8d4cafc1f66703415ec4e9eccf9a315a79c2a62",
+      "type": "TRANSFERS_TO",
+      "source": "node:data:rag:a2b143893410:doc-handbook",
+      "target": "node:human:rag:a2b143893410:user-7",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:rag-security:evidence:01cd872a2cda8203abbcb7a76c2c0245abf5a748243be5fedf9becb27510201c",
+          "urn:dare:rag-security:evidence:609f346ba90939ec4651782430d1c905d0ba507c73c9921ce1654bb5d7cdb5f6",
+          "urn:dare:rag-security:evidence:619ae06d169d2df11c33d4ba0ba3d085f1f1117407f673da3748015727fc1d61"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/8"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/0/events/9"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/8"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/1/events/9"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/8"
+        },
+        {
+          "artifact_index": 1,
+          "original_kind": "retrieval",
+          "locator": "/trials/2/events/9"
+        }
+      ]
+    },
+    {
+      "id": "edge:e215521ebaa0941ccd73de8c9a1025ee4b31cfd2b510a09e9d3f72941e743438",
+      "type": "USES_CREDENTIAL",
+      "source": "node:human:identity:569fbf2d8b1f:user-7",
+      "target": "node:credential:identity:569fbf2d8b1f:cred-index-admin",
+      "authority": {
+        "principal": "node:human:identity:569fbf2d8b1f:user-7",
+        "delegated": false,
+        "credential": "node:credential:identity:569fbf2d8b1f:cred-index-admin"
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:identity-security:evidence:ad2c18a170960cffd183bb121f899474bb346435561ef686061bc209d092f26f",
+          "urn:dare:identity-security:evidence:cecc7f63d00e670bf5c311b9cef88c7ccef4eb7603df02dcfcbba848c28d5de8",
+          "urn:dare:identity-security:evidence:fe933523cbb06917d6e5b5d8bddedcc828a5d45613e4bc76ecc6a6e09e0722d3"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "CredentialContextObserved",
+          "locator": "/trials/0/events/8"
+        },
+        {
+          "artifact_index": 0,
+          "original_kind": "CredentialContextObserved",
+          "locator": "/trials/1/events/8"
+        },
+        {
+          "artifact_index": 0,
+          "original_kind": "CredentialContextObserved",
+          "locator": "/trials/2/events/8"
+        }
+      ]
+    },
+    {
+      "id": "edge:f743d7b0158b4c314e366cccdee6546b4fab4e276a1f5e5ac13665dac5d834f6",
+      "type": "BELONGS_TO_TENANT",
+      "source": "node:data:rag:a2b143893410:doc-runbook",
+      "target": "node:tenant:rag:a2b143893410:tenant-a",
+      "authority": {
+        "delegated": false
+      },
+      "evidence": {
+        "status": "STATICALLY_PROVEN",
+        "evidence_ids": [
+          "input:rag:800ee150f91f54a15a0f98d595fc823078334f98c16a157bbf537256cd40189d"
+        ]
+      },
+      "guards": [],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 1,
+          "original_kind": "Document.tenant_id",
+          "locator": "input:scenario#/store/documents/6"
+        }
+      ]
+    },
+    {
+      "id": "edge:fa87240f6b01882d032ee23068b2aed17304dbccaa629ad4aa55b20e682ef7b9",
+      "type": "CAN_REACH",
+      "source": "node:human:identity:569fbf2d8b1f:user-7",
+      "target": "node:resource:identity:569fbf2d8b1f:document-123",
+      "authority": {
+        "principal": "node:human:identity:569fbf2d8b1f:user-7",
+        "delegated": false,
+        "tenant": "tenant-a"
+      },
+      "evidence": {
+        "status": "OBSERVED",
+        "evidence_ids": [
+          "urn:dare:identity-security:evidence:ad2c18a170960cffd183bb121f899474bb346435561ef686061bc209d092f26f",
+          "urn:dare:identity-security:evidence:cecc7f63d00e670bf5c311b9cef88c7ccef4eb7603df02dcfcbba848c28d5de8",
+          "urn:dare:identity-security:evidence:fe933523cbb06917d6e5b5d8bddedcc828a5d45613e4bc76ecc6a6e09e0722d3"
+        ]
+      },
+      "guards": [
+        {
+          "property": "AGENT.IDENTITY.PRINCIPAL_BINDING",
+          "verdict": "PASS",
+          "evidence_ids": [
+            "urn:dare:identity-security:evidence:ad2c18a170960cffd183bb121f899474bb346435561ef686061bc209d092f26f",
+            "urn:dare:identity-security:evidence:cecc7f63d00e670bf5c311b9cef88c7ccef4eb7603df02dcfcbba848c28d5de8",
+            "urn:dare:identity-security:evidence:fe933523cbb06917d6e5b5d8bddedcc828a5d45613e4bc76ecc6a6e09e0722d3"
+          ],
+          "scope": "RUN",
+          "artifact_index": 0
+        }
+      ],
+      "authority_mutation": false,
+      "crosses_trust_boundary": [],
+      "provenance": [
+        {
+          "artifact_index": 0,
+          "original_kind": "FinalOperation (request, not execution)",
+          "locator": "/trials/0/events/10"
+        },
+        {
+          "artifact_index": 0,
+          "original_kind": "FinalOperation (request, not execution)",
+          "locator": "/trials/1/events/10"
+        },
+        {
+          "artifact_index": 0,
+          "original_kind": "FinalOperation (request, not execution)",
+          "locator": "/trials/2/events/10"
+        }
+      ]
+    }
+  ],
+  "entry_points": [
+    {
+      "node": "node:data:rag:a2b143893410:doc-external",
+      "class": "RETRIEVED_DOCUMENT",
+      "origin": "DEFAULT"
+    },
+    {
+      "node": "node:human:identity:569fbf2d8b1f:user-7",
+      "class": "LOW_PRIVILEGE_PRINCIPAL",
+      "origin": "DEFAULT"
+    }
+  ],
+  "targets": [
+    {
+      "node": "node:credential:identity:569fbf2d8b1f:cred-index-admin",
+      "class": "PRIVILEGED_CREDENTIAL",
+      "origin": "DEFAULT"
+    },
+    {
+      "node": "node:data:rag:a2b143893410:doc-salary",
+      "class": "SENSITIVE_RESOURCE",
+      "origin": "DEFAULT"
+    }
+  ]
+}

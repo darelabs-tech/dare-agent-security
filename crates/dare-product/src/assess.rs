@@ -9,7 +9,9 @@ use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 
 use dare_attack_graph::{
-    build_attack_graph, derive_paths, graph_digest, validate_graph, GraphFactsInput, PathOptions,
+    build_attack_graph, derive_paths, graph_digest,
+    v2::{validate_graph_v2, AttackGraphV2, GRAPH_SCHEMA_ID_V2},
+    validate_graph, GraphFactsInput, PathOptions,
 };
 use dare_continuous::{analyze, load_fixture as load_continuous_fixture, RunMode};
 use dare_coverage::{
@@ -73,6 +75,11 @@ struct ProductFixture {
     pub coverage_executions: Vec<PropertyExecution>,
     #[serde(default)]
     pub attack_graph_facts: Option<GraphFactsInput>,
+    /// A v2 graph written by `validate attack-paths` (Cycle 023, RF-16),
+    /// relative to the target. Read and validated with `dare_attack_graph::v2`
+    /// only; the product never constructs it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attack_graph_v2: Option<PathBuf>,
     #[serde(default)]
     pub continuous_fixture: Option<PathBuf>,
     #[serde(default)]
@@ -135,7 +142,10 @@ pub fn run_assessment(options: &AssessOptions) -> Result<AssessOutcome> {
     paths.prepare()?;
 
     let (coverage_value, overall, required) = build_coverage(&config, &fixture, &policy)?;
-    let attack_graph_value = build_attack_graph_value(&fixture)?;
+    let attack_graph_value = match &fixture.attack_graph_v2 {
+        Some(relative) => read_attack_graph_v2(&target, relative, &fixture)?,
+        None => build_attack_graph_value(&fixture)?,
+    };
     let (validation_value, drift_value, validation_status) = build_continuous(&target, &fixture)?;
 
     write_evidence(&paths, &fixture)?;
@@ -281,6 +291,7 @@ fn load_product_fixture(target: &Path) -> Result<ProductFixture> {
         coverage_facts: None,
         coverage_executions: vec![],
         attack_graph_facts: None,
+        attack_graph_v2: None,
         continuous_fixture: None,
         evidence: vec![],
     })
@@ -344,6 +355,54 @@ fn build_attack_graph_value(fixture: &ProductFixture) -> Result<serde_json::Valu
         graph_digest(&graph).map_err(|e| ProductError::internal(e.to_string()))?
     );
     validate_graph(&graph).map_err(|e| ProductError::internal(e.to_string()))?;
+    Ok(serde_json::to_value(&graph)?)
+}
+
+/// The largest v2 graph file the product reads, as for every other
+/// attack-path artifact.
+const MAX_ATTACK_GRAPH_V2_BYTES: u64 = 16 * 1024 * 1024;
+
+/// Reads and validates a v2 graph named by the fixture. The path must stay
+/// inside the target, and the graph is written unchanged after it validates.
+/// Errors never echo the file's content.
+fn read_attack_graph_v2(
+    target: &Path,
+    relative: &Path,
+    fixture: &ProductFixture,
+) -> Result<serde_json::Value> {
+    if fixture.attack_graph_facts.is_some() {
+        return Err(ProductError::configuration(
+            "attack_graph_v2 and attack_graph_facts are mutually exclusive",
+        ));
+    }
+    let confined = !relative.as_os_str().is_empty()
+        && relative
+            .components()
+            .all(|c| matches!(c, std::path::Component::Normal(_)));
+    if !confined {
+        return Err(ProductError::configuration(
+            "attack_graph_v2 must be a relative path inside the target",
+        ));
+    }
+    let path = target.join(relative);
+    let meta = fs::symlink_metadata(&path)
+        .map_err(|_| ProductError::configuration("attack_graph_v2: file not readable"))?;
+    if !meta.is_file() {
+        return Err(ProductError::configuration(
+            "attack_graph_v2 must name a regular file, not a link or directory",
+        ));
+    }
+    if meta.len() > MAX_ATTACK_GRAPH_V2_BYTES {
+        return Err(ProductError::configuration(
+            "attack_graph_v2: file exceeds 16 MiB",
+        ));
+    }
+    let bytes = fs::read(&path)
+        .map_err(|_| ProductError::configuration("attack_graph_v2: file not readable"))?;
+    let graph: AttackGraphV2 = serde_json::from_slice(&bytes)
+        .map_err(|_| ProductError::configuration("attack_graph_v2: not a v2 attack graph"))?;
+    validate_graph_v2(&graph)
+        .map_err(|_| ProductError::configuration("attack_graph_v2: v2 graph validation failed"))?;
     Ok(serde_json::to_value(&graph)?)
 }
 
@@ -415,6 +474,21 @@ fn derive_gate(findings: &[Finding], overall: f64, required: f64) -> GateResult 
 }
 
 fn summarize_graph(value: &serde_json::Value) -> String {
+    if value.pointer("/schema/id").and_then(|v| v.as_str()) == Some(GRAPH_SCHEMA_ID_V2) {
+        let count = |key: &str| {
+            value
+                .get(key)
+                .and_then(|v| v.as_array())
+                .map_or(0, Vec::len)
+        };
+        return format!(
+            "Attack graph v2: {} node(s), {} edge(s), {} entry point(s), {} target(s); paths and control states are in attack-paths.json; analysis only (not executed).",
+            count("nodes"),
+            count("edges"),
+            count("entry_points"),
+            count("targets")
+        );
+    }
     if let Some(paths) = value.get("paths").and_then(|p| p.as_array()) {
         return format!(
             "{} derived path(s); analysis only (not executed).",
