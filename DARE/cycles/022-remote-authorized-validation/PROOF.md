@@ -121,3 +121,18 @@ image. The in-image `validate remote` refused an expired authorization with netw
 disabled: exit 3, nothing written (task-040).
 
 ## 8. Measured totals
+
+The completion gate was run on the final cycle tree:
+
+| Check | Command | Result |
+|---|---|---|
+| Format | `cargo fmt --all --check` | exit 0 |
+| Lint | `cargo clippy --workspace --all-targets -- -D warnings` | exit 0 |
+| Tests | `cargo test --workspace` | **314 suites, 4 209 passed, 0 failed, 4 ignored** (baseline 3 955 / 0 / 3; +254 tests; the added ignored test is the CLI fixture generator) |
+| Advisories | `cargo audit` | exit 0 |
+| Secrets | `python scripts/k22/assert_no_real_credentials.py` | exit 0 |
+| Citations | `python scripts/k22/verify_proof_citations.py` | 128 names, all verified |
+| Books | `mdbook build book/en`, `mdbook build book/pt` | both built |
+| Canvas | `python scripts/regen-canvas.py --check` | current |
+| Offline CLI | the two `remote-validation-2026` CLI steps | replay exit 2, byte-identical; refusal exit 3, nothing written |
+| Container | builder-stage image, in-image refusal | see §7 |
