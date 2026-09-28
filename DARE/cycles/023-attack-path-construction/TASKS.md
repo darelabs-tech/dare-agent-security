@@ -1,7 +1,7 @@
 # Cycle 023 — Tasks
 
-**Status:** PROPOSED — awaiting task-set approval  
-**Approval:** Design and Blueprint APPROVED 2026-09-28 — see `APPROVAL.md`. Execution is not yet authorized.  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-28 — see `APPROVAL.md`  
 **Baseline:** `main @ 32909ea`  
 **Branch:** `claude/loving-newton-113zme`
 
@@ -20,7 +20,7 @@ Throughout the cycle:
 
 ## Checklist
 
-- [ ] task-001 — Record the post-022 baseline, v1 golden digests and observations O-1..O-4
+- [x] task-001 — Record the post-022 baseline, v1 golden digests and observations O-1..O-4
 - [ ] task-002 — Remove the `unwrap()` from v1 `make_path` and pin v1 output with golden digests
 - [ ] task-003 — Add the three `schemas/attack-graph/v2` JSON schemas
 - [ ] task-004 — Implement the `dare_attack_graph::v2` model types

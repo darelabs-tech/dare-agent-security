@@ -1,7 +1,7 @@
 # Cycle 023 — Approval
 
 **Cycle:** 023 — Attack-Path Construction  
-**Approval:** DESIGN AND BLUEPRINT APPROVED — task set pending  
+**Approval:** APPROVED FOR EXECUTION  
 **Approved at:** 2026-09-28  
 **Approved by:** Product Owner  
 **Base:** `main @ 32909ea`  
@@ -69,7 +69,17 @@ item:
 4. **BQ-4.** `validate attack-paths` exits 2 when any feasible path is
    `CONTROL_FAILED` or `CONTROL_UNDECIDED`, or when enumeration was truncated.
 
-## Next step
+## Authorized execution
 
-`TASKS.md`, `dare-dag.yaml` and `dare-dag.exec.yaml` (46 tasks) are proposed for
-Review. Execution is **not** authorized until that task set is approved.
+The task set (`TASKS.md`, `dare-dag.yaml`, `dare-dag.exec.yaml`, 46 tasks) was approved
+on 2026-09-28. Tasks `task-001` through `task-046` are approved for execution in the
+dependency order of `dare-dag.exec.yaml`. No further human approval is needed between
+tasks as long as execution stays inside the frozen boundaries above.
+
+The executor must stop and record the discrepancy for Review, instead of proceeding, if
+a task would require any of the following:
+- crossing a frozen boundary;
+- changing an engine crate (013–022);
+- adding a third-party dependency;
+- changing v1 attack-graph output;
+- changing a verdict semantic.

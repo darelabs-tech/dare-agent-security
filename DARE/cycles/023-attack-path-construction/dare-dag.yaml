@@ -1,12 +1,12 @@
 cycle: 023
 name: attack-path-construction
-status: proposed
+status: approved-for-execution
 baseline:
   branch: main
   commit: 32909ea
 execution_branch: claude/loving-newton-113zme
 approval_file: DARE/cycles/023-attack-path-construction/APPROVAL.md
-execution_authorized: false
+execution_authorized: true
 execution_tasks: 46
 safety_boundary:
   network: prohibited (dare-attack-path has no network dependency; manifest test)
