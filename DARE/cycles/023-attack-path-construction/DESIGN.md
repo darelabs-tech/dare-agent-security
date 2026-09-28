@@ -1,11 +1,11 @@
 # Cycle 023 — Design: Attack-Path Construction
 
-**Version:** v0.1 | **Date:** 2026-09-28 | **Status:** DRAFT — awaiting DARE Review  
+**Version:** v0.2 | **Date:** 2026-09-28 | **Status:** DESIGN APPROVED  
 **Base branch:** `main` (`32909ea`, Cycles 001–022 merged, including the Cycle 022 hotfix, PR #47)  
 **Proposed crate:** `crates/dare-attack-path`  
 **Also touched:** `crates/dare-attack-graph` (additive v2 contract and the path-engine
-defects in §4.9). Engine crates 013–022 stay unchanged unless Q3 decides otherwise.  
-**Approval:** not approved. The Blueprint does not start before this Design is approved.
+defects in §4.9). Engine crates 013–022 stay unchanged (Q3 decided: no engine change).  
+**Approval:** APPROVED (Design phase) 2026-09-28 — see `APPROVAL.md`. Execution is not yet authorized.
 
 ---
 
@@ -100,7 +100,7 @@ radius (Cycle 024).
 | ID | Requirement | Priority | Acceptance criterion |
 |----|-------------|----------|----------------------|
 | RF-01 | Projectors for engines 014–020 | MUST | One projector per engine turns `<engine>-result.json` plus `<engine>-evidence.json` plus the pinned input documents into graph facts (§4.2). Each projector has a closed mapping table from engine relationship kinds to Cycle 008 edge types. A kind with no mapping is reported as `unprojected` with a count, never dropped silently |
-| RF-02 | Projectors for 013, 021 and 022 | MUST | 013 and 021 contribute **entry-point** facts (untrusted input channels) and property outcomes, not topology. 022 contributes the same facts as the owning engine's projector, tagged `DYNAMIC_AUTHORIZED` |
+| RF-02 | Projectors for 013, 021 and 022 | MUST | 013 and 021 contribute **entry-point** facts (untrusted input channels) and property outcomes, not topology. 022 contributes the same facts as the owning engine's projector, tagged `DYNAMIC_AUTHORIZED`. The 022 projector reads `remote-result.json` as JSON validated against `schemas/remote-validation/v1/result.schema.json` and hands each `engine_result` to the owning engine's projector. It does **not** depend on the `dare-remote-validation` crate (RNF-04) |
 | RF-03 | Input binding | MUST | A projector accepts an input document only if its digest equals the digest the engine result pinned (for example `tool_digests`, `card_digest`, `delegation_chain_digest`, `item_digests`, `document_digests`). A mismatch is a refusal (exit 3). An artifact with no pinned digest for an input contributes result and evidence facts only |
 | RF-04 | System model | MUST | A new schema, `schemas/attack-path/v1/system-model.schema.json` (§4.3), declares entities, aliases from engine-local ids to entities, entry points, targets and trust boundaries. It is admitted like every other input (size, depth, hostile sweep, `additionalProperties: false`) |
 | RF-05 | Entity resolution | MUST | Engine-local ids merge only through an explicit alias in the system model. Without a model, or for an unaliased id, the node id is scoped by engine (`node:<type>:<engine>.<local_id>`) and never merged with another engine's node. Conflicting aliases (one local id mapped to two entities, or incompatible node types) are refused |
@@ -110,7 +110,7 @@ radius (Cycle 024).
 | RF-09 | Path engine v2 | MUST | Bounded enumeration of simple paths from entry to target, in a deterministic order (edge count, then path id). Every bound that stops the search is reported (`truncated`, the bound that fired, and the counts of entries and targets not exhausted). Hard maxima in §4.6 |
 | RF-10 | Authority continuity | MUST | A path is **feasible** only if consecutive edges carry compatible authority, according to a closed rule table in the Blueprint. For example, a delegation edge must hand to the principal the next edge acts as. An authority change that is not explained by a delegation, credential or `AUTHENTICATES_AS` edge makes the path `DISCONTINUOUS`. Discontinuous paths are reported separately, never mixed with feasible ones |
 | RF-11 | Control state per path | MUST | `CONTROL_FAILED` if any guarding property on the path is FAIL. Otherwise `CONTROL_UNDECIDED` if any guarding property is INCONCLUSIVE, ERROR or not assessed, or if an edge has no guarding property at all. Otherwise `CONTROLS_HELD`. This is the Cycle 018 precedence (FAIL > ERROR > INCONCLUSIVE > PASS) applied along a path. It is independent of evidence state and is **not** a verdict |
-| RF-12 | Chokepoints | SHOULD | For each target, the edges (and their guarding properties) that appear on every enumerated `CONTROL_FAILED` path to it. These are reported as counts over the enumerated set, flagged `partial` when truncated. No score and no weighting |
+| RF-12 | Chokepoints | MUST | For each target, the edges (and their guarding properties) that appear on every enumerated `CONTROL_FAILED` path to it. These are reported as counts over the enumerated set, flagged `partial` when truncated. No score and no weighting |
 | RF-13 | Artifacts | MUST | `attack-graph.json` (schema v2, §4.7), `attack-paths.json`, `projection-report.json` (per artifact: facts emitted, unprojected kinds, refused inputs), `graph.mmd` and `graph.dot` (derived views, labels escaped as in Cycle 008), and `summary.md`. Every artifact is admitted through the output ledger and redaction checks before it is written |
 | RF-14 | CLI | MUST | `dare-agent-security validate attack-paths` with `--artifacts <dir>` (repeatable), optional `--system-model <path>`, `--output-dir`, and lower-only bounds. `validate attack-graph --facts` keeps working unchanged |
 | RF-15 | ATTACK-PATH-LAB | MUST | At least 25 synthetic scenarios, each a set of real engine artifacts produced by running the engines on lab inputs, with an expected path list and states (§4.5). Every chain class has a control twin in which one guarding control holds and the path becomes `CONTROLS_HELD` or disappears |
@@ -262,7 +262,7 @@ Cycle 023 inherits if it builds on it:
 | RNF-01 | Determinism | Same inputs → byte-identical outputs; ordering is defined on ids, never on hash-map or file-system order | 10/10 |
 | RNF-02 | Boundedness | §4.6 maxima enforced before the step that would exceed them | 0 overshoot |
 | RNF-03 | Performance | Full ATTACK-PATH-LAB in CI | < 60 s on `ubuntu-latest` |
-| RNF-04 | Containment | Projectors live in `dare-attack-path`. No engine crate depends on the graph crates, and `dare-attack-path` has no network capability (a no-network manifest test) | Enforced by tests |
+| RNF-04 | Containment | Projectors live in `dare-attack-path`. No engine crate depends on it, and it does not depend on `dare-remote-validation` or `dare-mcp-discovery`. A manifest test forbids `reqwest`, `hyper`, `rmcp` and the `tokio` `net` feature in its `[dependencies]` | Enforced by tests |
 | RNF-05 | Explainability | Every node, edge and path traces back to artifact digests and record locators in `projection-report.json` | 100 % |
 | RNF-06 | Quality gate | `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test --workspace`, `cargo audit` | All green |
 
@@ -290,7 +290,7 @@ Cycle 023 inherits if it builds on it:
 | Language | Rust | edition 2021, MSRV 1.88 |
 | Serialization / schema | serde_json, jsonschema | workspace |
 | Digests | sha2 | workspace |
-| Reused crates | `dare-attack-graph` (model, builder, v1), `dare-security-evidence`, `dare-coverage` (registries), and the engines' public result and input types (`dare-tool-security`, `dare-identity-security`, `dare-memory-security`, `dare-rag-security`, `dare-mcp-auth-security`, `dare-supply-chain-security`, `dare-a2a-security`, `dare-prompt-injection`, `dare-multi-turn-security`, `dare-remote-validation`) as **library dependencies of the projector crate only** | workspace |
+| Reused crates | `dare-attack-graph` (model, builder, v1), `dare-security-evidence`, `dare-coverage` (registries), and the engines' public result and input types (`dare-tool-security`, `dare-identity-security`, `dare-memory-security`, `dare-rag-security`, `dare-mcp-auth-security`, `dare-supply-chain-security`, `dare-a2a-security`, `dare-prompt-injection`, `dare-multi-turn-security`) as **library dependencies of the projector crate only**. `dare-remote-validation` is **not** a dependency: its result is read as schema-validated JSON (RF-02) | workspace |
 | New dependencies | None expected | — |
 
 ---
@@ -310,7 +310,7 @@ model provider.
 - **Technical:**
   - an additive crate;
   - no `unwrap()` in production;
-  - engines unchanged (Q3 is the only possible exception);
+  - engines unchanged (Q3);
   - Cycle 008 v1 output unchanged.
 - **Compliance:** lab inputs are synthetic only. Users' system models and artifacts
   stay local; the model can name their real components, so nothing is published.
@@ -342,7 +342,7 @@ model provider.
 | R-02 | `CONTROLS_HELD` read as "secure" | High | High | Unassessed edges force `CONTROL_UNDECIDED` (RF-11); the bounded claim in the summary; O-04 |
 | R-03 | Path explosion on real systems | Medium | Medium | Entry → target enumeration only, per-pair and global bounds, reported truncation, chokepoints |
 | R-04 | Engine artifacts lack the topology needed (for example 019 does not persist its graph) | High | Medium | Projectors read pinned inputs through the engines' own parsers (Q3); unprojected kinds are reported |
-| R-05 | Inconsistent evidence conventions across engines (the property key is `property_id` in five engines and `property` in four; four bridges cite `…/evidence/v1/security-evidence.schema.json`, which does not exist) | Certain | Low | Projectors read both keys through one closed table; the schema-id inconsistency is Q6 |
+| R-05 | Inconsistent evidence conventions across engines (the property key is `property_id` in five engines and `property` in four; four bridges cite `…/evidence/v1/security-evidence.schema.json`, which does not exist) | Certain | Low | Projectors read both keys through one closed table; the schema-id inconsistency is left to a separate hotfix (Q6) |
 | R-06 | v2 changes break Cycle 009/010 consumers | Low | High | v1 kept byte-identical; `Path.status` and `impact_factors` kept (RF-17, O-08) |
 | R-07 | The system model becomes an unreviewable blob | Medium | Medium | Closed schema, maxima, a mandatory rationale for declared edges, and `projection-report.json` listing every alias actually used |
 
@@ -355,8 +355,7 @@ Cycle 023 must prove that it:
 1. preserves all property IDs and the eleven profile denominators;
 2. leaves `validate attack-graph --facts` and every v1 fixture output byte-identical;
 3. leaves `dare-adversarial` path eligibility and `dare-continuous` drift unchanged;
-4. leaves every engine crate unchanged (or changed only as Q3 decides, with
-   byte-identical existing artifacts);
+4. leaves every engine crate and its artifacts unchanged (Q3);
 5. keeps Cycle 001 evidence and redaction contracts and Cycle 018 aggregation;
 6. keeps the PR-open-only CI trigger, with no network access and no secrets.
 
@@ -367,51 +366,41 @@ and defects are recorded in `REGRESSION.md`.
 
 ## 13. Open questions for Review
 
-1. **Crate placement.**
-   - (a) A new crate, `dare-attack-path`, holding the projectors, the system model and
-     path engine v2; `dare-attack-graph` keeps the model and v1. *Recommended:* the
-     projectors depend on ten engine crates, and `dare-attack-graph` stays light for
-     its current dependents (009, 010, product).
-   - (b) Everything inside `dare-attack-graph`.
-2. **Edges from pinned input documents.**
-   - (a) `STATICALLY_PROVEN`, citing the input digest as the evidence id. *Recommended:*
-     the input is what the engine judged, bound by digest.
-   - (b) `INFERRED`, because the input is a declaration, not an observation.
-3. **019 relationship graph.**
-   - (a) The projector re-parses the pinned SBOM and manifest inputs through
-     `dare-supply-chain-security`'s own public normalization API, so the engine is
-     unchanged. *Recommended.*
-   - (b) 019 adds a persisted `supply-chain-relationships.json`, an additive artifact
-     with no change to existing bytes.
-4. **Node and edge taxonomy.** Is the Cycle 008 enum enough? 019's `MODEL`,
-   `DATASET` and `PACKAGE`, and memory items and documents, would map to
-   `DOWNSTREAM_SERVICE`, `DATA` and `RESOURCE`.
-   - (a) Keep the enums and map through a closed table. *Recommended.*
-   - (b) Add node types in v2, such as `MODEL`, `MEMORY_ITEM`, `DOCUMENT` and
-     `PEER_AGENT`.
-5. **Cycle 008 v1 path defects (§4.9 items 2–4).**
-   - (a) Fix them only in v2 and keep v1 output unchanged. *Recommended.*
-   - (b) Also fix v1, which changes `paths.json` bytes for v1 users and the ids of paths
-     that Cycle 009 plans pin.
-6. **Evidence schema id inconsistency.** The a2a, mcp-auth, supply-chain and multi-turn
-   bridges cite a schema id that does not exist.
-   - (a) Correct it in this cycle, as Cycle 022 did with the bridges. This changes
-     evidence bytes for those four engines.
-   - (b) Record it and leave it to a separate hotfix. *Recommended:* it does not block
-     projection.
-7. **Is chokepoint reporting (RF-12) MUST or SHOULD?** Drafted as SHOULD.
+All answered by the Product Owner on 2026-09-28 (the recommended option in each case).
+
+1. **Crate placement — DECIDED:** (a) a new crate, `dare-attack-path`, holding the
+   projectors, the system model and path engine v2. `dare-attack-graph` keeps the model,
+   the builder and v1. Placing the projectors in `dare-attack-graph` is not buildable:
+   the engine crates depend on `dare-adversarial`, which depends on `dare-attack-graph`,
+   so it would be a dependency cycle.
+2. **Edges from pinned input documents — DECIDED:** (a) `STATICALLY_PROVEN`, citing
+   the input digest as the evidence id. Relationships declared only in the system model
+   stay `INFERRED` with a mandatory rationale.
+3. **019 relationship graph — DECIDED:** (a) the projector re-parses the pinned SBOM
+   and manifest inputs through `dare-supply-chain-security`'s public normalization API.
+   The engine and its artifacts are unchanged.
+4. **Node and edge taxonomy — DECIDED:** (a) the Cycle 008 enums are kept and mapped
+   through a closed table. Node provenance records the engine's original kind (for
+   example 019 `MODEL`).
+5. **Cycle 008 v1 path defects — DECIDED:** (a) items 2–4 of §4.9 are fixed in v2
+   only, and v1 output stays byte-identical. Item 1 (`unwrap()`) is fixed in v1 as well,
+   without changing output.
+6. **Evidence schema id inconsistency — DECIDED:** (b) out of this cycle. It is
+   recorded in `BASELINE.md` and handled by a separate hotfix.
+7. **Chokepoints — DECIDED:** MUST (RF-12), reported as counts over the enumerated set
+   and flagged `partial` when enumeration was truncated.
 
 ---
 
 ## 14. Approval checklist
 
-- [ ] Functional requirements reviewed and prioritized
-- [ ] "Projectors plus system model, no re-judging" architecture accepted
-- [ ] Entity resolution by explicit alias only (RF-05) accepted
-- [ ] Path classification axes (§4.4) and control-state rule (RF-11) accepted
-- [ ] Entry and target classes (RF-08) and hard maxima (§4.6) accepted
-- [ ] Schema v2 additive over v1 (§4.7) accepted
-- [ ] Path-engine defect correction (§4.9) accepted
-- [ ] Out-of-scope boundary with Cycles 024–025 confirmed
-- [ ] Critical risks (R-01, R-02) have accepted mitigations
-- [ ] Open questions in §13 answered
+- [x] Functional requirements reviewed and prioritized
+- [x] "Projectors plus system model, no re-judging" architecture accepted
+- [x] Entity resolution by explicit alias only (RF-05) accepted
+- [x] Path classification axes (§4.4) and control-state rule (RF-11) accepted
+- [x] Entry and target classes (RF-08) and hard maxima (§4.6) accepted
+- [x] Schema v2 additive over v1 (§4.7) accepted
+- [x] Path-engine defect correction (§4.9) accepted
+- [x] Out-of-scope boundary with Cycles 024–025 confirmed
+- [x] Critical risks (R-01, R-02) have accepted mitigations
+- [x] Open questions in §13 answered — 2026-09-28
