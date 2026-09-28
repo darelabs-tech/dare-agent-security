@@ -242,6 +242,16 @@ impl EgressGateway {
         })
     }
 
+    /// Record that the plan stops on its first failing scenario.
+    pub fn stop_first_fail(&mut self) {
+        self.halt(StopReason::FirstFail, "FIRST_FAIL");
+    }
+
+    /// The capture so far, for a first-failure check between scenarios.
+    pub fn capture_snapshot(&self) -> Capture {
+        self.capture.clone()
+    }
+
     /// A flag the CLI sets on Ctrl-C. The next send is refused.
     pub fn operator_stop_flag(&self) -> Arc<AtomicBool> {
         self.operator_stop.clone()
@@ -249,6 +259,11 @@ impl EgressGateway {
 
     pub fn stop_reason(&self) -> Option<StopReason> {
         self.stop
+    }
+
+    /// The scrubber for this run, for artifacts written after the run.
+    pub fn scrubber(&self) -> Scrubber {
+        self.scrubber.clone()
     }
 
     pub fn origin(&self) -> &Origin {

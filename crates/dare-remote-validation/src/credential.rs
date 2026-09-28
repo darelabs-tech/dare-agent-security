@@ -128,6 +128,7 @@ fn is_token_char(b: u8) -> bool {
     b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-' | b'+' | b'/' | b'=')
 }
 
+#[derive(Clone)]
 pub struct Scrubber {
     needles: Vec<Zeroizing<Vec<u8>>>,
 }

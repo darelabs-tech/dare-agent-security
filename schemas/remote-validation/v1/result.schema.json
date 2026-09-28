@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/remote-validation/v1/result.schema.json",
+  "title": "DARE Remote Validation Result v1",
+  "description": "The result of one authorized remote validation run. Every verdict is decided offline from the capture by the owning engine; the only wall-clock value is the observed window copied from the capture, so validate replay-capture reproduces this document byte for byte. A PASS relying on a target-reported field lists it in self_reported_fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_id",
+    "authorization_id",
+    "authorization_digest",
+    "plan_id",
+    "plan_digest",
+    "origin",
+    "protocol",
+    "capture_id",
+    "capture_digest",
+    "audit_digest",
+    "observed_window",
+    "stop_reason",
+    "requests",
+    "verdict",
+    "runs",
+    "bounded_claim"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "schema_id": {
+      "const": "https://darelabs.tech/schemas/remote-validation/v1/result.schema.json"
+    },
+    "authorization_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "authorization_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "plan_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^https://",
+      "maxLength": 262
+    },
+    "protocol": {
+      "enum": [
+        "A2A",
+        "MCP",
+        "DARE_CONVERSATION"
+      ]
+    },
+    "capture_id": {
+      "type": "string",
+      "pattern": "^cap-[0-9a-f]{16}$"
+    },
+    "capture_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "audit_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "observed_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "to": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "stop_reason": {
+      "enum": [
+        "COMPLETED",
+        "FIRST_FAIL",
+        "BUDGET_EXHAUSTED",
+        "RATE_LIMITED",
+        "TRANSPORT_ERROR",
+        "KILL_SWITCH",
+        "WINDOW_EXPIRED"
+      ]
+    },
+    "requests": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 500
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE",
+        "ERROR"
+      ]
+    },
+    "runs": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "scenario_id",
+          "scenario_digest",
+          "engine_verdict",
+          "verdict",
+          "self_reported_fields",
+          "not_observable",
+          "exchanges",
+          "engine_result"
+        ],
+        "properties": {
+          "engine": {
+            "enum": [
+              "PROMPT_INJECTION",
+              "MULTI_TURN",
+              "A2A",
+              "MCP_AUTH"
+            ]
+          },
+          "scenario_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "scenario_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "engine_verdict": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "INCONCLUSIVE",
+              "ERROR"
+            ]
+          },
+          "verdict": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "INCONCLUSIVE",
+              "ERROR"
+            ]
+          },
+          "transport": {
+            "enum": [
+              "CONNECT_TIMEOUT",
+              "READ_TIMEOUT",
+              "TLS",
+              "CONNECTION",
+              "OVERSIZE",
+              "RATE_LIMITED",
+              "SERVER_ERROR",
+              "UNEXPECTED_AUTH",
+              "PROTOCOL_VIOLATION",
+              "NOT_FOUND"
+            ]
+          },
+          "unfinished": {
+            "enum": [
+              "COMPLETED",
+              "FIRST_FAIL",
+              "BUDGET_EXHAUSTED",
+              "RATE_LIMITED",
+              "TRANSPORT_ERROR",
+              "KILL_SWITCH",
+              "WINDOW_EXPIRED"
+            ]
+          },
+          "self_reported_fields": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z_]{0,63}$"
+            }
+          },
+          "not_observable": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z_]{0,63}$"
+            }
+          },
+          "exchanges": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "engine_result": {
+            "description": "The owning engine's own result document, decided offline from the capture.",
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "bounded_claim": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

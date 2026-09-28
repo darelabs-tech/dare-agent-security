@@ -32,14 +32,18 @@ pub mod control;
 pub mod credential;
 pub mod engines;
 pub mod error;
+pub mod evidence;
 pub mod gateway;
 pub mod ids;
+pub mod ledger;
 pub mod limits;
 pub mod origin;
 pub mod outcome;
 pub mod plan;
 pub mod protocol;
 pub mod resolver;
+pub mod result;
+pub mod runner;
 pub mod schema;
 pub mod source;
 

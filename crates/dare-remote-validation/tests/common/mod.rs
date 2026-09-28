@@ -3,6 +3,8 @@
 
 #![allow(dead_code)]
 
+pub mod sim;
+
 use dare_remote_validation::authorization::{
     verify, Authorization, ScenarioDigests, VerifiedAuthorization,
 };

@@ -70,6 +70,20 @@ pub enum StopReason {
     WindowExpired,
 }
 
+impl StopReason {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Completed => "COMPLETED",
+            Self::FirstFail => "FIRST_FAIL",
+            Self::BudgetExhausted => "BUDGET_EXHAUSTED",
+            Self::RateLimited => "RATE_LIMITED",
+            Self::TransportError => "TRANSPORT_ERROR",
+            Self::KillSwitch => "KILL_SWITCH",
+            Self::WindowExpired => "WINDOW_EXPIRED",
+        }
+    }
+}
+
 use dare_security_evidence::Verdict;
 
 /// Apply a transport outcome to an engine verdict (BLUEPRINT §4.10).

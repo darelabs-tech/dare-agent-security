@@ -18,7 +18,7 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-007 — Create the `dare-remote-validation` crate skeleton and network-stack manifest guard
 - [x] task-008 — Implement `limits.rs` hard maxima and lower-only `Limits`
 - [x] task-009 — Implement `error.rs`, `ids.rs` and `canonical.rs`
-- [ ] task-010 — Add the seven `schemas/remote-validation/v1` JSON schemas
+- [x] task-010 — Add the seven `schemas/remote-validation/v1` JSON schemas
 - [x] task-011 — Implement `source.rs`/`schema.rs` byte, depth, hostile and schema admission
 - [x] task-012 — Implement `origin.rs` `Origin::parse`
 - [x] task-013 — Implement the `RemotePlan` model
@@ -41,8 +41,8 @@ Source of truth: `BLUEPRINT.md` (section references below). Each task is DONE on
 - [x] task-030 — Add `scenario_with_observed_resource` to `dare-mcp-auth-security` (BQ-1)
 - [x] task-031 — Implement the MCP auth metadata conversion
 - [x] task-032 — Amend the 013 and 021 adapter trait doc comments (BQ-4)
-- [ ] task-033 — Implement `ledger.rs`, `evidence.rs` and `result.rs` (including self-reported marking and `summary.md`)
-- [ ] task-034 — Implement `run_remote` and `replay_capture`
+- [x] task-033 — Implement `ledger.rs`, `evidence.rs` and `result.rs` (including self-reported marking and `summary.md`)
+- [x] task-034 — Implement `run_remote` and `replay_capture`
 - [ ] task-035 — Add the REMOTE-LAB corpus (≥ 30 entries) and class-contract test
 - [ ] task-036 — Add the egress, rate/budget, credential-hygiene, authorization-refusal and replay-equivalence suites
 - [ ] task-037 — Add the `validate remote` and `validate replay-capture` CLI subcommands

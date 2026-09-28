@@ -87,19 +87,17 @@ pub fn first_transport(
     entries_for(capture, engine, scenario_id).find_map(|e| e.transport_error)
 }
 
-/// Whether the run stopped before this scenario could finish: the capture
-/// stopped for a reason other than completion or a first failure, and this
-/// scenario is the one that was running or a later one.
+/// Whether the run stopped before this scenario could finish, derived from
+/// the capture alone. After any stop other than a first failure, the
+/// scenario that was running and every later one are unfinished. After a
+/// first failure, the failing scenario finished; every later one is
+/// unfinished (never sent).
 pub fn unfinished(
     capture: &Capture,
     position: usize,
     planned: &[(EngineKind, String)],
 ) -> Option<StopReason> {
-    let stopped = !matches!(
-        capture.stop_reason,
-        StopReason::Completed | StopReason::FirstFail
-    );
-    if !stopped {
+    if capture.stop_reason == StopReason::Completed {
         return None;
     }
     let running = capture
@@ -111,7 +109,12 @@ pub fn unfinished(
             })
         })
         .unwrap_or(0);
-    (position >= running).then_some(capture.stop_reason)
+    let cut = if capture.stop_reason == StopReason::FirstFail {
+        position > running
+    } else {
+        position >= running
+    };
+    cut.then_some(capture.stop_reason)
 }
 
 /// Combine the engine verdict with the transport overlay and the
@@ -185,6 +188,15 @@ mod tests {
             "a later one"
         );
         c.stop_reason = StopReason::FirstFail;
-        assert_eq!(unfinished(&c, 2, &planned), None);
+        assert_eq!(
+            unfinished(&c, 1, &planned),
+            None,
+            "the failing scenario finished"
+        );
+        assert_eq!(
+            unfinished(&c, 2, &planned),
+            Some(StopReason::FirstFail),
+            "a later one never ran"
+        );
     }
 }

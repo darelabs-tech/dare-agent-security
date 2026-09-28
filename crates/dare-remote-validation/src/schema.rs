@@ -19,6 +19,8 @@ pub const CAPTURE_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/capture.schema.json");
 pub const AUDIT_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/audit.schema.json");
+pub const RESULT_SCHEMA_V1_JSON: &str =
+    include_str!("../../../schemas/remote-validation/v1/result.schema.json");
 pub const CONVERSATION_REQUEST_SCHEMA_V1_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/conversation-request.schema.json");
 pub const CONVERSATION_RESPONSE_SCHEMA_V1_JSON: &str =
@@ -30,16 +32,18 @@ pub enum DocumentKind {
     Plan,
     Capture,
     Audit,
+    Result,
     ConversationRequest,
     ConversationResponse,
 }
 
 impl DocumentKind {
-    pub const ALL: [DocumentKind; 6] = [
+    pub const ALL: [DocumentKind; 7] = [
         Self::Authorization,
         Self::Plan,
         Self::Capture,
         Self::Audit,
+        Self::Result,
         Self::ConversationRequest,
         Self::ConversationResponse,
     ];
@@ -50,6 +54,7 @@ impl DocumentKind {
             Self::Plan => "plan",
             Self::Capture => "capture",
             Self::Audit => "audit record",
+            Self::Result => "result",
             Self::ConversationRequest => "conversation request",
             Self::ConversationResponse => "conversation response",
         }
@@ -61,6 +66,7 @@ impl DocumentKind {
             Self::Plan => "plan.schema.json",
             Self::Capture => "capture.schema.json",
             Self::Audit => "audit.schema.json",
+            Self::Result => "result.schema.json",
             Self::ConversationRequest => "conversation-request.schema.json",
             Self::ConversationResponse => "conversation-response.schema.json",
         }
@@ -72,6 +78,7 @@ impl DocumentKind {
             Self::Plan => PLAN_SCHEMA_V1_JSON,
             Self::Capture => CAPTURE_SCHEMA_V1_JSON,
             Self::Audit => AUDIT_SCHEMA_V1_JSON,
+            Self::Result => RESULT_SCHEMA_V1_JSON,
             Self::ConversationRequest => CONVERSATION_REQUEST_SCHEMA_V1_JSON,
             Self::ConversationResponse => CONVERSATION_RESPONSE_SCHEMA_V1_JSON,
         }
@@ -96,6 +103,7 @@ pub fn assert_supported_version(value: &Value, kind: DocumentKind) -> Result<()>
             DocumentKind::Plan => "plan schema_version must be \"1\"",
             DocumentKind::Capture => "capture schema_version must be \"1\"",
             DocumentKind::Audit => "audit schema_version must be \"1\"",
+            DocumentKind::Result => "result schema_version must be \"1\"",
             DocumentKind::ConversationRequest | DocumentKind::ConversationResponse => {
                 "conversation schema_version must be \"1\""
             }
