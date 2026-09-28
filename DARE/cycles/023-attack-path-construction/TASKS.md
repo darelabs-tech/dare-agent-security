@@ -30,8 +30,8 @@ Throughout the cycle:
 - [x] task-008 — Implement `limits.rs` and `error.rs`
 - [x] task-009 — Implement `admit.rs` file admission and the `sweep.rs` artifact secret sweep
 - [x] task-010 — Implement `ids.rs` run-scoped and entity node ids
-- [ ] task-011 — Add `schemas/attack-path/v1/system-model.schema.json`
-- [ ] task-012 — Implement `model.rs` system-model admission and resolution rules 1–7
+- [x] task-011 — Add `schemas/attack-path/v1/system-model.schema.json`
+- [x] task-012 — Implement `model.rs` system-model admission and resolution rules 1–7
 - [ ] task-013 — Implement `load.rs` scenario loaders over the engines' public validators
 - [ ] task-014 — Implement bundle detection and input binding for tool, identity, memory, rag and mcp-auth
 - [ ] task-015 — Implement input binding for supply-chain and a2a through `StaticAdapter::collect`

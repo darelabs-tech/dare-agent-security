@@ -13,6 +13,7 @@ pub mod admit;
 pub mod error;
 pub mod ids;
 pub mod limits;
+pub mod model;
 pub mod sweep;
 
 pub use error::{AttackPathError, ModelRefusal, Refusal, Result};
