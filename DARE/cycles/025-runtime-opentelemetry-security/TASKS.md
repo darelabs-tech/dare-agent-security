@@ -28,7 +28,7 @@ Throughout the cycle:
 - [x] task-004 — Create the `dare-runtime-telemetry` crate skeleton and the manifest guards
 - [x] task-005 — Implement `limits.rs` and `error.rs`
 - [x] task-006 — Implement `admit.rs`
-- [ ] task-007 — Implement the OTLP/JSON model and the trace-subset schema
+- [x] task-007 — Implement the OTLP/JSON model and the trace-subset schema
 - [ ] task-008 — Implement `normalize.rs` and value fingerprints (AD-07)
 - [ ] task-009 — Implement the semconv classifier
 - [ ] task-010 — Add the runtime-policy schema and loader

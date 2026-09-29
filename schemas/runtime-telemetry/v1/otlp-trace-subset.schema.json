@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/runtime-telemetry/v1/otlp-trace-subset.schema.json",
+  "title": "OTLP/JSON trace export (the subset DARE reads)",
+  "description": "An ExportTraceServiceRequest in the OTLP JSON encoding. Top-level fields other than resourceSpans are refused. Inside it, unknown fields are ignored, as OTLP requires, and counted by the engine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resourceSpans"],
+  "properties": {
+    "resourceSpans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "resource": {"$ref": "#/$defs/resource"},
+          "scopeSpans": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "scope": {"type": "object"},
+                "spans": {"type": "array", "items": {"$ref": "#/$defs/span"}},
+                "schemaUrl": {"type": "string"}
+              }
+            }
+          },
+          "schemaUrl": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "hex16": {"type": "string", "pattern": "^[0-9a-fA-F]{16}$"},
+    "hex32": {"type": "string", "pattern": "^[0-9a-fA-F]{32}$"},
+    "uint64": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9]{1,20}$"},
+        {"type": "integer", "minimum": 0}
+      ]
+    },
+    "keyValueList": {"type": "array", "items": {"type": "object", "required": ["key"], "properties": {"key": {"type": "string"}}}},
+    "resource": {
+      "type": "object",
+      "properties": {
+        "attributes": {"$ref": "#/$defs/keyValueList"},
+        "droppedAttributesCount": {"type": "integer", "minimum": 0}
+      }
+    },
+    "span": {
+      "type": "object",
+      "required": ["traceId", "spanId", "name", "startTimeUnixNano", "endTimeUnixNano"],
+      "properties": {
+        "traceId": {"$ref": "#/$defs/hex32"},
+        "spanId": {"$ref": "#/$defs/hex16"},
+        "parentSpanId": {"oneOf": [{"$ref": "#/$defs/hex16"}, {"const": ""}]},
+        "traceState": {"type": "string"},
+        "flags": {"type": "integer", "minimum": 0},
+        "name": {"type": "string"},
+        "kind": {"type": "integer", "minimum": 0, "maximum": 5},
+        "startTimeUnixNano": {"$ref": "#/$defs/uint64"},
+        "endTimeUnixNano": {"$ref": "#/$defs/uint64"},
+        "attributes": {"$ref": "#/$defs/keyValueList"},
+        "droppedAttributesCount": {"type": "integer", "minimum": 0},
+        "events": {"type": "array"},
+        "droppedEventsCount": {"type": "integer", "minimum": 0},
+        "links": {"type": "array"},
+        "droppedLinksCount": {"type": "integer", "minimum": 0},
+        "status": {"type": "object"}
+      }
+    }
+  }
+}

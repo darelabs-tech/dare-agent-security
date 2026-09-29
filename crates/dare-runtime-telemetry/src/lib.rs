@@ -11,6 +11,8 @@
 pub mod admit;
 pub mod error;
 pub mod limits;
+pub mod otlp;
+pub mod schema;
 
 pub use error::{Input, Refusal, Result, TelemetryError};
 
