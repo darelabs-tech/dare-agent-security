@@ -99,6 +99,9 @@ pub enum ValidateSubcommand {
     /// Construct attack paths from engine artifacts and a system model (Cycle 023).
     #[command(name = "attack-paths", after_help = crate::attack_paths::ATTACK_PATHS_AFTER_HELP)]
     AttackPaths(crate::attack_paths::AttackPathsArgs),
+    /// Analyse what a compromise reaches over an attack graph (Cycle 024).
+    #[command(name = "blast-radius", after_help = crate::blast_radius::BLAST_RADIUS_AFTER_HELP)]
+    BlastRadius(crate::blast_radius::BlastRadiusArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

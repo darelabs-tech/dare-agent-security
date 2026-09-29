@@ -382,3 +382,17 @@ fn order(doc: &BlastRadiusDoc) -> Result<()> {
     }
     ensure(sorted_unique(&doc.stopped_by), "invariant 9: stopped_by")
 }
+
+/// The document against its embedded JSON schema. The engine's own output
+/// failing it is an internal error.
+pub fn check_schema(doc: &BlastRadiusDoc) -> Result<()> {
+    let schema: serde_json::Value = serde_json::from_str(crate::model::BLAST_RADIUS_SCHEMA_JSON)
+        .map_err(|_| BlastError::Internal("embedded document schema"))?;
+    let validator = jsonschema::options()
+        .build(&schema)
+        .map_err(|_| BlastError::Internal("embedded document schema"))?;
+    let value =
+        serde_json::to_value(doc).map_err(|_| BlastError::Internal("document serialization"))?;
+    let valid = validator.iter_errors(&value).next().is_none();
+    ensure(valid, "document fails its schema")
+}

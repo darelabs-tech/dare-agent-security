@@ -9,6 +9,7 @@ use dare_agent_security::args::{Cli, Command, ValidateSubcommand};
 use dare_agent_security::attack_graph::run_attack_graph;
 use dare_agent_security::attack_paths::run_attack_paths;
 use dare_agent_security::benchmark::run_benchmark;
+use dare_agent_security::blast_radius::run_blast_radius;
 use dare_agent_security::ci::run_ci;
 use dare_agent_security::coaz_integrity::run_coaz_integrity;
 use dare_agent_security::continuous::run_continuous;
@@ -81,6 +82,9 @@ async fn main() -> ExitCode {
                 }
                 ValidateSubcommand::AttackPaths(args) => {
                     ExitCode::from(run_attack_paths(args) as u8)
+                }
+                ValidateSubcommand::BlastRadius(args) => {
+                    ExitCode::from(run_blast_radius(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

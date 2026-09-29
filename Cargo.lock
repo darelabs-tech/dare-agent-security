@@ -494,6 +494,7 @@ dependencies = [
  "dare-attack-graph",
  "dare-attack-path",
  "dare-benchmark",
+ "dare-blast-radius",
  "dare-coaz-integrity",
  "dare-continuous",
  "dare-coverage",
