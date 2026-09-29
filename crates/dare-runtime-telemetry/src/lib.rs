@@ -10,6 +10,7 @@
 
 pub mod admit;
 pub mod canonical;
+pub mod complete;
 pub mod error;
 pub mod limits;
 pub mod normalize;
@@ -17,6 +18,7 @@ pub mod otlp;
 pub mod policy;
 pub mod schema;
 pub mod semconv;
+pub mod trace;
 
 pub use error::{Input, Refusal, Result, TelemetryError};
 
