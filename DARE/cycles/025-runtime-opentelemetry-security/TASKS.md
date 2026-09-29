@@ -1,7 +1,7 @@
 # Cycle 025 — Tasks
 
-**Status:** PROPOSED — awaiting approval  
-**Approval:** pending  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-29 — see `APPROVAL.md`  
 **Baseline:** `main @ 00e7aff`  
 **Branch:** `claude/loving-newton-113zme`
 

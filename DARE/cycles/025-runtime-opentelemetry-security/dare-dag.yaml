@@ -1,12 +1,12 @@
 cycle: 025
 name: runtime-opentelemetry-security
-status: proposed
+status: approved-for-execution
 baseline:
   branch: main
   commit: 00e7aff
 execution_branch: claude/loving-newton-113zme
 approval_file: DARE/cycles/025-runtime-opentelemetry-security/APPROVAL.md
-execution_authorized: false
+execution_authorized: true
 execution_tasks: 31
 safety_boundary:
   network: prohibited (no network, OpenTelemetry, protobuf or async dependency; manifest test)

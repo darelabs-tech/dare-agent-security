@@ -1,7 +1,7 @@
 # Cycle 025 — Approval
 
 **Cycle:** 025 — Runtime OpenTelemetry Security  
-**Approval:** DESIGN AND BLUEPRINT APPROVED — task set pending  
+**Approval:** APPROVED FOR EXECUTION  
 **Approved at:** 2026-09-29  
 **Approved by:** Product Owner  
 **Base:** `main @ 00e7aff`  
@@ -61,7 +61,17 @@ each Review item:
    parent.
 5. **BQ-5 (a).** INCONCLUSIVE exits 2.
 
-## Next step
+## Authorized execution
 
-The task set (`TASKS.md`, `dare-dag.yaml`, `dare-dag.exec.yaml`) needs its own approval
-before execution.
+The task set was approved on 2026-09-29: `TASKS.md`, `dare-dag.yaml` and
+`dare-dag.exec.yaml`, 31 tasks. Tasks `task-001` through `task-031` may run in the
+dependency order of `dare-dag.exec.yaml`. No further human approval is needed between
+tasks while execution stays inside the frozen boundaries above and the BQ-1 exception.
+
+Execution must stop, and the discrepancy must be recorded for Review, if a task would
+require any of the following:
+- crossing a frozen boundary, or going beyond the BQ-1 exception;
+- changing an engine crate's `src/`;
+- adding a third-party dependency;
+- changing a Cycle 008, 023 or 024 output for an existing input;
+- changing a pre-existing registry entry or an earlier profile.

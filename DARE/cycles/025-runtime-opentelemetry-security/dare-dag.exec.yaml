@@ -1,6 +1,6 @@
 cycle: 025
 name: runtime-opentelemetry-security
-status: proposed
+status: approved-for-execution
 baseline_branch: main
 baseline_commit: 00e7aff
 branch: claude/loving-newton-113zme
@@ -36,7 +36,7 @@ execution_order:
   - task-029
   - task-030
   - task-031
-execution_authorized: false
+execution_authorized: true
 per_task_human_approval_required: false
 review_required_on_semantic_scope_change: true
 final_pr_after_release_gate_only: true
