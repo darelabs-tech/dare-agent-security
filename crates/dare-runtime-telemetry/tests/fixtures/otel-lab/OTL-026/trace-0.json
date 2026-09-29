@@ -1,0 +1,121 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "assistant"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000003510",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "agent",
+              "spanId": "c629d7df8accf7dd",
+              "startTimeUnixNano": "1750000000000001000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "a20ea04598ebabb7de123402319f89f3"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002500",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "tool",
+              "parentSpanId": "c629d7df8accf7dd",
+              "spanId": "4a53d6d037ff92d7",
+              "startTimeUnixNano": "1750000000000002000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "a20ea04598ebabb7de123402319f89f3"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://kb.docs.example.com/articles?page=2"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000003500",
+              "events": [],
+              "flags": 1,
+              "kind": 3,
+              "name": "egress",
+              "parentSpanId": "c629d7df8accf7dd",
+              "spanId": "a5ed6bec5615c92e",
+              "startTimeUnixNano": "1750000000000003000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "a20ea04598ebabb7de123402319f89f3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

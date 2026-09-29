@@ -1,0 +1,59 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "assistant"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002510",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "agent",
+              "spanId": "4f19f0cc97f08ed5",
+              "startTimeUnixNano": "1750000000000001000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "41bff2497af9b4cfff53783e39f31d9b"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

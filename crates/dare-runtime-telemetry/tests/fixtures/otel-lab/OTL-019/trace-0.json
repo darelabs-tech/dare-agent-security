@@ -1,0 +1,149 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "assistant"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000004510",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "agent",
+              "spanId": "5653c33902a79c86",
+              "startTimeUnixNano": "1750000000000001000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "28468f273db4a04d84a148e12c5e82b3"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002500",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "tool",
+              "parentSpanId": "5653c33902a79c86",
+              "spanId": "0b2068526b9e882a",
+              "startTimeUnixNano": "1750000000000002000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "28468f273db4a04d84a148e12c5e82b3"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "api.example.com"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000003500",
+              "events": [],
+              "flags": 1,
+              "kind": 3,
+              "name": "egress",
+              "parentSpanId": "5653c33902a79c86",
+              "spanId": "2c23ad73aea35b38",
+              "startTimeUnixNano": "1750000000000003000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "28468f273db4a04d84a148e12c5e82b3"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "retrieval"
+                  }
+                },
+                {
+                  "key": "tenant.id",
+                  "value": {
+                    "stringValue": "tenant-a"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000004500",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "store",
+              "parentSpanId": "5653c33902a79c86",
+              "spanId": "c96213be313b464d",
+              "startTimeUnixNano": "1750000000000004000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "28468f273db4a04d84a148e12c5e82b3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

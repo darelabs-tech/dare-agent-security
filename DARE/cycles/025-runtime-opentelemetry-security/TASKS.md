@@ -45,7 +45,7 @@ Throughout the cycle:
 - [x] task-021 — Implement `summary.md`
 - [x] task-022 — Add the `validate runtime-telemetry` CLI subcommand
 - [x] task-023 — Add the CLI refusal corpus and the double-run test
-- [ ] task-024 — Build OTEL-LAB (≥ 40 entries) with the SIMULATED reference writer
+- [x] task-024 — Build OTEL-LAB (≥ 40 entries) with the SIMULATED reference writer
 - [ ] task-025 — Add the no-value-leaves, determinism and hostile tests
 - [ ] task-026 — Add the scale test (O-08)
 - [ ] task-027 — Add the Cycle 023 projector for runtime telemetry (RF-15, SHOULD)

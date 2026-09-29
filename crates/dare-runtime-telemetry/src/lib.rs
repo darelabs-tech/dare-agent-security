@@ -11,6 +11,7 @@
 pub mod admit;
 pub mod canonical;
 pub mod complete;
+pub mod corpus;
 pub mod coverage;
 pub mod error;
 pub mod evaluate;
