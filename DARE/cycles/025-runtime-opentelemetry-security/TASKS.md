@@ -22,7 +22,7 @@ Throughout the cycle:
 
 ## Checklist
 
-- [ ] task-001 — Record the post-024 baseline
+- [x] task-001 — Record the post-024 baseline
 - [ ] task-002 — Convert the registry and profile pins to the prefix rule (BQ-1)
 - [ ] task-003 — Pin the semantic conventions and write the mapping (BQ-2)
 - [ ] task-004 — Create the `dare-runtime-telemetry` crate skeleton and the manifest guards
