@@ -1,0 +1,28 @@
+[package]
+name = "dare-blast-radius"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Blast-radius analysis over a DARE v2 attack graph (Cycle 024)"
+publish = false
+
+[lib]
+name = "dare_blast_radius"
+path = "src/lib.rs"
+
+# Analysis only, over one v2 graph file and one scenario file. The only DARE
+# dependency is the graph contract: no engine crate, not the projector crate,
+# and nothing that can reach a network, spawn a process or schedule work
+# (`tests/manifest.rs`).
+[dependencies]
+dare-attack-graph = { path = "../dare-attack-graph" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+
+[dev-dependencies]
+tempfile = "3.14"

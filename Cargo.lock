@@ -574,6 +574,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-blast-radius"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-attack-graph",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "dare-coaz-integrity"
 version = "1.0.0-rc1"
 dependencies = [

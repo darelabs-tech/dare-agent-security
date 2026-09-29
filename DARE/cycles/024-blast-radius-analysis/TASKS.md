@@ -25,9 +25,9 @@ Throughout the cycle:
 - [x] task-002 — Extract the shared lab runner and pin the ATTACK-PATH-LAB output goldens
 - [x] task-003 — Move the continuity rule to `dare_attack_graph::v2::continuity`
 - [x] task-004 — Move the output sweep and publish the label escaper
-- [ ] task-005 — Create the `dare-blast-radius` crate skeleton and the manifest guard
-- [ ] task-006 — Implement `limits.rs` and `error.rs`
-- [ ] task-007 — Implement `admit.rs`
+- [x] task-005 — Create the `dare-blast-radius` crate skeleton and the manifest guard
+- [x] task-006 — Implement `limits.rs` and `error.rs`
+- [x] task-007 — Implement `admit.rs`
 - [ ] task-008 — Add `schemas/blast-radius/v1/compromise.schema.json`
 - [ ] task-009 — Add `blast-radius.schema.json` and the `model.rs` types
 - [ ] task-010 — Implement `scenario.rs`: seed resolution, the kind table and entry-point seeding
