@@ -1,7 +1,7 @@
 # Cycle 024 — Tasks
 
-**Status:** AWAITING APPROVAL  
-**Blueprint approval:** APPROVED 2026-09-28 — see `APPROVAL.md`  
+**Status:** APPROVED FOR EXECUTION  
+**Approval:** APPROVED 2026-09-29 — see `APPROVAL.md`  
 **Baseline:** `main @ d125081`  
 **Branch:** `claude/loving-newton-113zme`
 
@@ -21,8 +21,8 @@ Throughout the cycle:
 
 ## Checklist
 
-- [ ] task-001 — Record the post-023 baseline and the ATTACK-PATH-LAB output digests
-- [ ] task-002 — Extract the shared lab runner and pin the ATTACK-PATH-LAB output goldens
+- [x] task-001 — Record the post-023 baseline and the ATTACK-PATH-LAB output digests
+- [x] task-002 — Extract the shared lab runner and pin the ATTACK-PATH-LAB output goldens
 - [ ] task-003 — Move the continuity rule to `dare_attack_graph::v2::continuity`
 - [ ] task-004 — Move the output sweep and publish the label escaper
 - [ ] task-005 — Create the `dare-blast-radius` crate skeleton and the manifest guard

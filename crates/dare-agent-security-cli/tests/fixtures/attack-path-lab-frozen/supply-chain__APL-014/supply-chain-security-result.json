@@ -1,0 +1,135 @@
+{
+  "schema_version": "1",
+  "schema_id": "https://darelabs.tech/schemas/supply-chain-security/v1/result.schema.json",
+  "scenario_id": "supply-static-001",
+  "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+  "evidence_digest": "sha256:f4a139985b375b48cf42bab965cbaa3aa1be4b795420723032d7fa8a065b78e5",
+  "class": "COMPONENT_IDENTITY",
+  "primary_invariant": "COMPONENT_IDENTITY_UNAMBIGUOUS",
+  "property_id": "AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY",
+  "mode": "STATIC",
+  "synthetic": false,
+  "verdict": "INCONCLUSIVE",
+  "reason": "no violation was observed, and 8 of 12 invariant(s) lacked the evidence needed to decide them; this run does not establish that the supply chain is intact",
+  "outcomes": [
+    {
+      "invariant": "COMPONENT_PROVENANCE_SUFFICIENT",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no provenance evidence was read, so whether a component has sufficient provenance was never asked (missing: PROVENANCE_CONTEXT)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "COMPONENT_IDENTITY_UNAMBIGUOUS",
+      "verdict": "PASS",
+      "reason": "COMPONENT_IDENTITY_UNAMBIGUOUS held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "ARTIFACT_DIGEST_BOUND_TO_COMPONENT",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no artifact digest was observed, so the artifact could not be bound to the component that was approved (the channel was observed and carried nothing sufficient to decide the comparison, so the question stayed open)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY",
+      "verdict": "PASS",
+      "reason": "MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "COMPONENT_SOURCE_TRUST_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no component origin claim was observed, so source trust had nothing to evaluate (missing: SOURCE_TRUST_CONTEXT)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "PROVENANCE_SUBJECT_AND_BUILDER_BOUND",
+      "verdict": "INCONCLUSIVE",
+      "reason": "PROVENANCE_SUBJECT_AND_BUILDER_BOUND has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "ATTESTATION_SUBJECT_DIGEST_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "ATTESTATION_SUBJECT_DIGEST_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "DEPENDENCY_EDGE_INTEGRITY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "DEPENDENCY_EDGE_INTEGRITY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "MODEL_LINEAGE_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "MODEL_LINEAGE_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "DATASET_PROVENANCE_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "DATASET_PROVENANCE_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "BOM_REQUIRED_EVIDENCE_PRESENT",
+      "verdict": "PASS",
+      "reason": "BOM_REQUIRED_EVIDENCE_PRESENT held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    }
+  ],
+  "violations": [],
+  "documents": [
+    {
+      "document_id": "app.cdx.json",
+      "format": "CYCLONE_DX",
+      "bytes": 808,
+      "content_digest": "sha256:b2630a77c3341a686a1bea416bdbb577a6d9b9fb610590da7c1fd8931eca0204"
+    }
+  ],
+  "components_evaluated": 2,
+  "relationships_evaluated": 1,
+  "observation_digests": [
+    "sha256:2d456f1d5a72adc028fd4289743211dfc1e58a794419d6feebcdd4081f0b1840",
+    "sha256:e3ff026d5b2552bb43c8bb513e25a870926f6f58a3197aa2a9b03daa6cdc1d26",
+    "sha256:a42bf2c67a1ddf8563c64ba54d7258e9e0526dbdd7d136e6aa6d69ffc9bec838",
+    "sha256:d77d5625e31caf18fa1f1f48bd03476838d3e1eb60e21ae52d36c5aeea780246",
+    "sha256:4ab6766961864a40b7697d707fa9da90566c515315adf234013f2b148d401f14",
+    "sha256:331a532de66a0fe1206581c7ec8fe911e5ab8b24edd97b092c85e8b5ccc0ad75",
+    "sha256:804173105a801742410f5b9dfac7e165472ca3a9699175df07e1ddb72fbb0243"
+  ],
+  "redaction_state": "REDACTED",
+  "budget": {
+    "bom_bytes_admitted": 1078,
+    "max_bom_bytes": 16777216,
+    "components_admitted": 4,
+    "max_components": 2048,
+    "relationships_admitted": 2,
+    "max_relationships": 8192,
+    "output_bytes_used": 64086,
+    "max_total_output_bytes": 8388608,
+    "output_bytes_per_trial": 1048576,
+    "state_changes": 0,
+    "external_egress_bytes": 0,
+    "exhausted": false
+  }
+}

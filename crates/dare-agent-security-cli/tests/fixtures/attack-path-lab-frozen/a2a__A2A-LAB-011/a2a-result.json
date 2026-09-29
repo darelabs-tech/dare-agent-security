@@ -1,0 +1,219 @@
+{
+  "schema_version": "1",
+  "schema_id": "https://darelabs.tech/schemas/a2a-security/v1/result.schema.json",
+  "scenario_id": "A2A-LAB-011",
+  "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+  "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+  "class": "SKILL_AUTHORIZATION",
+  "primary_invariant": "SKILL_AUTHORIZED",
+  "property_id": "AGENT.A2A.SKILL_AUTHORIZATION",
+  "mode": "SIMULATED",
+  "synthetic": true,
+  "verdict": "FAIL",
+  "reason": "2 independent inter-agent violation(s) were observed across 10 decided invariant(s); 1 applicable invariant(s) could not be decided from the evidence analysed",
+  "outcomes": [
+    {
+      "invariant": "DISCOVERY_BINDING_PRESERVED",
+      "verdict": "PASS",
+      "reason": "DISCOVERY_BINDING_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "PEER_IDENTITY_BOUND",
+      "verdict": "FAIL",
+      "reason": "authentication for `planner` established the service principal `svc-somebody-else` where policy requires a delegated subject; a service account that authenticated is not the user it acts for",
+      "violations": [
+        {
+          "invariant": "PEER_IDENTITY_BOUND",
+          "reason": "authentication for `planner` established the service principal `svc-somebody-else` where policy requires a delegated subject; a service account that authenticated is not the user it acts for",
+          "deciding_observation_digests": [
+            "sha256:cdb1303443a0d1e88f8bdea37e6463ee43bbac4deeca790e63f750c4d04f45c5"
+          ],
+          "peer_id": "planner"
+        }
+      ],
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "MESSAGE_AUTHENTICITY_ESTABLISHED",
+      "verdict": "PASS",
+      "reason": "MESSAGE_AUTHENTICITY_ESTABLISHED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "SECURITY_REQUIREMENT_SATISFIED",
+      "verdict": "PASS",
+      "reason": "SECURITY_REQUIREMENT_SATISFIED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "SKILL_AUTHORIZED",
+      "verdict": "FAIL",
+      "reason": "`svc-somebody-else` invoked skill `summarize` on `planner`, which local policy does not grant it; authenticating is not being authorized",
+      "violations": [
+        {
+          "invariant": "SKILL_AUTHORIZED",
+          "reason": "`svc-somebody-else` invoked skill `summarize` on `planner`, which local policy does not grant it; authenticating is not being authorized",
+          "deciding_observation_digests": [
+            "sha256:5826013f35939d2a69147052623a39aba3ab9bca687249d394975a5e6a6e87db"
+          ],
+          "message_id": "msg-1"
+        }
+      ],
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "MESSAGE_AUTHORITY_BOUNDARY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "MESSAGE_AUTHORITY_BOUNDARY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "TASK_CONTEXT_BINDING_PRESERVED",
+      "verdict": "PASS",
+      "reason": "TASK_CONTEXT_BINDING_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "AUTHORITY_PROPAGATION_BOUNDED",
+      "verdict": "PASS",
+      "reason": "AUTHORITY_PROPAGATION_BOUNDED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "TENANT_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no tenant evidence was observed, so a routing value could not be compared with what policy says the subject belongs to (the tenant binding for message `msg-1` remained undecided: the claimed tenant was not positively matched to local policy)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "DATA_SCOPE_BOUNDARY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "DATA_SCOPE_BOUNDARY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "REPLAY_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "REPLAY_BOUNDARY_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "EXTENSION_TRUST_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "EXTENSION_TRUST_BOUNDARY_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "PUSH_NOTIFICATION_BOUNDARY_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "PUSH_NOTIFICATION_BOUNDARY_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    }
+  ],
+  "violations": [
+    {
+      "invariant": "PEER_IDENTITY_BOUND",
+      "reason": "authentication for `planner` established the service principal `svc-somebody-else` where policy requires a delegated subject; a service account that authenticated is not the user it acts for",
+      "deciding_observation_digests": [
+        "sha256:cdb1303443a0d1e88f8bdea37e6463ee43bbac4deeca790e63f750c4d04f45c5"
+      ],
+      "peer_id": "planner"
+    },
+    {
+      "invariant": "SKILL_AUTHORIZED",
+      "reason": "`svc-somebody-else` invoked skill `summarize` on `planner`, which local policy does not grant it; authenticating is not being authorized",
+      "deciding_observation_digests": [
+        "sha256:5826013f35939d2a69147052623a39aba3ab9bca687249d394975a5e6a6e87db"
+      ],
+      "message_id": "msg-1"
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "staged-card.json",
+      "kind": "AGENT_CARD",
+      "bytes": 15,
+      "content_digest": "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+    }
+  ],
+  "peers": [
+    {
+      "peer_id": "planner",
+      "logical_agent_id": "planner",
+      "card_provider": "acme",
+      "authenticated_principal": "svc-somebody-else",
+      "audience": "local-orchestrator",
+      "authorization_subject": "svc-somebody-else",
+      "card_digest": "sha256:9b997c724302cb1b36718fda91f47dd04fe20797ab9a582d82eb03fb48feef54"
+    }
+  ],
+  "exchanges": [
+    {
+      "message_id": "msg-1",
+      "peer_id": "planner",
+      "envelope_digest": "sha256:d660e43e5b5f00becb89347617c1e98bf0cd8e45c679acba2c51cadc1e1191f6",
+      "task_id": "task-1",
+      "context_id": "context-1",
+      "initiating_principal": "user-alice",
+      "requested_skill": "summarize",
+      "protocol_version": "1.0.0",
+      "transport": "JSONRPC",
+      "is_repeat": false,
+      "parts": 1
+    }
+  ],
+  "peers_evaluated": 1,
+  "exchanges_evaluated": 1,
+  "observation_digests": [
+    "sha256:698ba34c9928106fb3ed65076e885f300f3790ed2e15b468073db378475d43f4",
+    "sha256:cdb1303443a0d1e88f8bdea37e6463ee43bbac4deeca790e63f750c4d04f45c5",
+    "sha256:58701a8f37bc49c6112777a75c872b8cfc5be36ee8aae73aeed5387c7333dca5",
+    "sha256:05fad98f72970f7db2e740c8b7200031dadafffb50bb46d465b6ff9d081e0382",
+    "sha256:adf67c11b5070a0918f1976307ea11bed68a5374641b7649a0b0ab52affdc569",
+    "sha256:3813c17ce55f116ab4cc595c542d8f14d19ffcf486ab0ae1dc47fb33d63316cb",
+    "sha256:5826013f35939d2a69147052623a39aba3ab9bca687249d394975a5e6a6e87db",
+    "sha256:32aa3d608b5f7bddc2a853ad6fdcc037d81e62c2906a569f723542e4bdad1786",
+    "sha256:176f2d75c889a5d69e815c4bf99f3fa9ee399b5933bb99d27febf992914008b2",
+    "sha256:56643d9a5dae5624b6442c4602aad44631ade33c6bf9ddec5e05b83f0d012e9e",
+    "sha256:63abccb04118fc332ba58fd756e71c65020b4cd0cc9fc0eb259b2852e44cf124",
+    "sha256:4795f2c35f3f71b6d47809afb412a400aa3eb161399c77e8048a89e52147b8e6",
+    "sha256:efc28ef0a4e0b7c4b016d6488fc72964b166d0addeca0faed0cdbe4f5a21b4ef"
+  ],
+  "redaction_state": "REDACTED",
+  "budget": {
+    "input_bytes": 0,
+    "max_input_bytes": 4194304,
+    "peers_admitted": 1,
+    "max_peers": 256,
+    "exchanges_admitted": 1,
+    "max_exchanges": 2048,
+    "output_bytes_used": 89402,
+    "max_total_output_bytes": 8388608,
+    "output_bytes_per_trial": 1048576,
+    "trials_started": 0,
+    "state_changes": 0,
+    "external_egress_bytes": 0,
+    "exhausted": false
+  }
+}
