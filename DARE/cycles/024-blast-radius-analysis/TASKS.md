@@ -31,8 +31,8 @@ Throughout the cycle:
 - [x] task-008 — Add `schemas/blast-radius/v1/compromise.schema.json`
 - [x] task-009 — Add `blast-radius.schema.json` and the `model.rs` types
 - [x] task-010 — Implement `scenario.rs`: seed resolution, the kind table and entry-point seeding
-- [ ] task-011 — Implement the reach index and the structural search
-- [ ] task-012 — Add the uncontained view, the excluded edge and the total budget
+- [x] task-011 — Implement the reach index and the structural search
+- [x] task-012 — Add the uncontained view, the excluded edge and the total budget
 - [ ] task-013 — Implement `classify.rs`: targets, exposure, routes and frontier
 - [ ] task-014 — Implement `impact.rs`, the top-level frontier and totals
 - [ ] task-015 — Implement the remediation delta (RF-10, SHOULD)

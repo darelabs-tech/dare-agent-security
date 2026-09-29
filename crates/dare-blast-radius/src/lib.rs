@@ -10,6 +10,7 @@ pub mod admit;
 pub mod error;
 pub mod limits;
 pub mod model;
+pub mod reach;
 pub mod scenario;
 
 pub use error::{BlastError, Refusal, Result};
