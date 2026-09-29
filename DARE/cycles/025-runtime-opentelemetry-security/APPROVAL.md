@@ -82,5 +82,5 @@ require any of the following:
 |---|---|
 | R-9, CI trigger | Option (b): add only `workflow_dispatch` to `ci.yml` and `action-e2e.yml`. `types: [opened]` stays, so no frozen test changes. Applied |
 | R-10, RF-15 projection | Accepted: the projector declares the pinned policy's relationships (`STATICALLY_PROVEN`) and the trace verdicts guard them, because RS-02 keeps observed names inside the engine |
-| R-11, Cycle 022 timing test | Acknowledged; no action (a frozen, load-sensitive test that passes in isolation) |
+| R-11, Cycle 022 timing test | First acknowledged. After it failed in CI on PR #50, the Product Owner authorized the fix (option (a)): the test only (`dare-remote-validation/tests/rate_and_budget.rs`) becomes jitter-aware, and the Cycle 022 tree digest is re-pinned. No engine `src/` changes |
 

@@ -47,3 +47,17 @@ listed only violation spans. Each deciding trace in `listed_traces` now carries
 
 `agent/cycle-025-runtime-opentelemetry-security` is pushed at the head of
 `claude/loving-newton-113zme`.
+
+## Follow-up (2026-09-29): R-11 fixed
+
+CI on PR #50 failed the same Cycle 022 test (494.2 ms). With the Product Owner's
+authorization, the test was fixed:
+
+- `rate_and_budget.rs` now allows 25 ms of arrival jitter per gap and checks the span
+  of the whole run.
+- **Results:** under CPU load it fails 0/30, against 3/12 before, on `main` and on this
+  PR alike. A 480 ms mutant limiter is caught by the span check.
+- The `dare-remote-validation` digest in `ENGINE_TREES` is re-pinned to `21099e0b…`.
+- `dare-remote-validation` (all suites) and `attack_path_compatibility` pass.
+- No `src/` file changed.
+

@@ -288,7 +288,7 @@ const ENGINE_TREES: [(&str, &str, usize); 10] = [
     ),
     (
         "dare-remote-validation",
-        "e13f3c63a086dc4c772ca746beccdadb586ac13985f07c252b3b1b3d0c07b098",
+        "21099e0b8ee4a31d44b9e0b228741b2b2a2d0459eab26d59c3bb60a907e02ddc",
         52,
     ),
 ];

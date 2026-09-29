@@ -1,7 +1,7 @@
 # Cycle 025 — Proof
 
-**Cycle status:** COMPLETE. Review of 2026-09-29: R-9 applied as option (b), R-10 accepted and R-11
-acknowledged. The merge to `main` awaits human approval.  
+**Cycle status:** COMPLETE. Review of 2026-09-29: R-9 applied as option (b), R-10 accepted, and R-11
+fixed (a jitter-aware Cycle 022 test, with its tree re-pinned). The merge to `main` awaits human approval.  
 **Baseline:** `main @ 00e7aff` (347 suites, 4 433 passed, 9 ignored). The Cycle 025
 head totals are in §7.
 
@@ -53,7 +53,7 @@ exists.
 | RNF-03 Performance | O-08. The full OTEL-LAB (`otel_lab`, 8 tests including the replay of all 56 recorded copies) runs in about 1.4 s in debug (bound 60 s) |
 | RNF-04 Containment | `the_dependencies_are_exactly_the_blueprint_list`, `the_source_reaches_no_socket_process_thread_or_environment`, `only_the_cli_depends_on_this_crate`, `this_crate_declares_no_telemetry_network_or_generation_dependency`, `the_check_catches_a_forbidden_dependency_when_one_is_added` |
 | RNF-05 Explainability | FAIL and INCONCLUSIVE: `every_entry_meets_its_class_contract` (the deciding span cited) and the findings file (trace id, span ids, rule, reason codes). PASS: `every_pass_cites_the_spans_that_prove_it`, where the evidence lists the observed span ids per deciding trace (added in task-031) |
-| RNF-06 Quality gate | §7. fmt, clippy `-D warnings` and `cargo audit` are clean. `cargo test --workspace` gave 4 585 passed and 1 failed; the failure is a frozen, load-sensitive Cycle 022 timing test that passes 5 of 5 isolated runs (R-11) |
+| RNF-06 Quality gate | §7. fmt, clippy `-D warnings` and `cargo audit` are clean. `cargo test --workspace` gave 4 585 passed and 1 failed; the failure was a load-sensitive Cycle 022 timing test, fixed as R-11 (test only, tree re-pinned; 0/30 failures under load) |
 
 ## 4. Security requirements (DESIGN §6)
 
@@ -97,7 +97,7 @@ exists.
 |---|---|
 | `cargo fmt --all -- --check` | clean |
 | `cargo clippy --workspace --all-targets --all-features -- -D warnings` | clean |
-| `cargo test --workspace --no-fail-fast` | **363 suites, 4 585 passed, 1 failed, 12 ignored**. The failure is R-11 (frozen Cycle 022 timing test; passes 5 of 5 alone). The baseline was 347 / 4 433 / 0 / 9 |
+| `cargo test --workspace --no-fail-fast` | **363 suites, 4 585 passed, 1 failed, 12 ignored**. The failure is R-11, since fixed: the test is jitter-aware and fails 0/30 under load. The baseline was 347 / 4 433 / 0 / 9 |
 | Release scale tests | runtime telemetry 2.57 s (bound 10 s); blast radius 11.8 s (target 10 s, ceiling 20 s); attack paths 0.85 s |
 | `cargo audit` | clean |
 | `python scripts/k25/assert_no_real_credentials.py` | clean |
