@@ -1,14 +1,13 @@
 # Cycle 025 — Design: Runtime OpenTelemetry Security
 
-**Version:** v0.1 | **Date:** 2026-09-29 | **Status:** DESIGN DRAFT — awaiting Review  
+**Version:** v0.2 | **Date:** 2026-09-29 | **Status:** DESIGN APPROVED  
 **Base branch:** `main` (`00e7aff`, Cycles 001–024 merged, PR #49)  
 **Proposed crate:** `crates/dare-runtime-telemetry` (Q1)  
 **Also touched:** the CLI gains one subcommand. The coverage registry and the profiles
 gain additive entries only (Q4). `dare-attack-path` gains one projector if Q6 (a) is
 chosen. Engine crates 013–022 and the Cycle 023/024 outputs for existing inputs stay
 unchanged.  
-**Approval:** not yet approved. Nothing is executed before the Design, the Blueprint and
-the task set are approved.
+**Approval:** APPROVED (Design phase) 2026-09-29 — see `APPROVAL.md`. Execution is not yet authorized.
 
 ---
 
@@ -277,6 +276,10 @@ and defects are recorded in `REGRESSION.md`.
 
 ## 13. Open questions for Review
 
+All answered by the Product Owner on 2026-09-29 (the recommended option in each case):
+Q1 (a), Q2 (a), Q3 (a), Q4 (a), Q5 (a), Q6 (a), Q7 (b). RF-15 therefore stays SHOULD, and
+RF-17 is out of scope for v1.
+
 1. **Crate.**
    - **(a) Recommended:** a new engine crate, `dare-runtime-telemetry`, with the same
      result/evidence shape as engines 013–022.
@@ -314,12 +317,12 @@ and defects are recorded in `REGRESSION.md`.
 
 ## 14. Approval checklist
 
-- [ ] Functional requirements reviewed and prioritized
-- [ ] "Files only, analysis only, no telemetry emitted" architecture accepted
-- [ ] The no-PASS-from-absence rule (RS-06) and the completeness signals (RF-05) accepted
-- [ ] "No attribute value ever leaves" (RS-02) accepted
-- [ ] Behaviour evaluators B-1..B-6 and their existing properties accepted
-- [ ] Hard maxima (§4.3) accepted
-- [ ] OTEL-LAB classes (§4.4) accepted
-- [ ] Open questions Q1–Q7 answered
-- [ ] Critical risks (R-01, R-02) have accepted mitigations
+- [x] Functional requirements reviewed and prioritized
+- [x] "Files only, analysis only, no telemetry emitted" architecture accepted
+- [x] The no-PASS-from-absence rule (RS-06) and the completeness signals (RF-05) accepted
+- [x] "No attribute value ever leaves" (RS-02) accepted
+- [x] Behaviour evaluators B-1..B-6 and their existing properties accepted
+- [x] Hard maxima (§4.3) accepted
+- [x] OTEL-LAB classes (§4.4) accepted
+- [x] Open questions Q1–Q7 answered
+- [x] Critical risks (R-01, R-02) have accepted mitigations
