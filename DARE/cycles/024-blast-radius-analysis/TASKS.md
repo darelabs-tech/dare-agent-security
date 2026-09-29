@@ -28,9 +28,9 @@ Throughout the cycle:
 - [x] task-005 — Create the `dare-blast-radius` crate skeleton and the manifest guard
 - [x] task-006 — Implement `limits.rs` and `error.rs`
 - [x] task-007 — Implement `admit.rs`
-- [ ] task-008 — Add `schemas/blast-radius/v1/compromise.schema.json`
-- [ ] task-009 — Add `blast-radius.schema.json` and the `model.rs` types
-- [ ] task-010 — Implement `scenario.rs`: seed resolution, the kind table and entry-point seeding
+- [x] task-008 — Add `schemas/blast-radius/v1/compromise.schema.json`
+- [x] task-009 — Add `blast-radius.schema.json` and the `model.rs` types
+- [x] task-010 — Implement `scenario.rs`: seed resolution, the kind table and entry-point seeding
 - [ ] task-011 — Implement the reach index and the structural search
 - [ ] task-012 — Add the uncontained view, the excluded edge and the total budget
 - [ ] task-013 — Implement `classify.rs`: targets, exposure, routes and frontier

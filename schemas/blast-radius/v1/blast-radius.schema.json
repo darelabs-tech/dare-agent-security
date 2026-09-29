@@ -1,0 +1,509 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/blast-radius/v1/blast-radius.schema.json",
+  "title": "DARE Blast-Radius Result v1",
+  "description": "Reach from compromised seeds over a DARE v2 attack graph. Counts and routes only: no score, probability or weight.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "graph_id",
+    "scenario_id",
+    "bounds",
+    "seeds",
+    "seeds_skipped",
+    "seeds_omitted",
+    "totals",
+    "frontier",
+    "remediation_delta",
+    "truncated",
+    "stopped_by"
+  ],
+  "properties": {
+    "schema_id": {
+      "const": "https://darelabs.tech/schemas/blast-radius/v1/blast-radius.schema.json"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "graph_id": {
+      "type": "string",
+      "pattern": "^graph:[0-9a-f]{64}$"
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+    },
+    "scenario_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_depth",
+        "max_states",
+        "max_states_total",
+        "max_delta_edges"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "max_states": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "max_states_total": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000000
+        },
+        "max_delta_edges": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        }
+      }
+    },
+    "seeds": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/seed"
+      }
+    },
+    "seeds_skipped": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "seeds_omitted": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exposed",
+        "contained",
+        "containment_unknown",
+        "exposed_by_class"
+      ],
+      "properties": {
+        "exposed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "contained": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "containment_unknown": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "exposed_by_class": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "propertyNames": {
+            "enum": [
+              "SENSITIVE_RESOURCE",
+              "PRIVILEGED_CREDENTIAL",
+              "DESTRUCTIVE_CAPABILITY",
+              "CROSS_TENANT_RESOURCE",
+              "EXTERNAL_PUBLICATION"
+            ]
+          }
+        }
+      }
+    },
+    "frontier": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edge",
+          "properties",
+          "evidence_ids",
+          "contained_targets"
+        ],
+        "properties": {
+          "edge": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "contained_targets": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          }
+        }
+      }
+    },
+    "remediation_delta": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edge",
+          "properties",
+          "targets_contained_if_held",
+          "partial"
+        ],
+        "properties": {
+          "edge": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "targets_contained_if_held": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "partial": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "stopped_by": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stopBound"
+      }
+    }
+  },
+  "$defs": {
+    "kind": {
+      "enum": [
+        "PRINCIPAL_TAKEOVER",
+        "CREDENTIAL_LEAK",
+        "CONTENT_INJECTION",
+        "COMPONENT_COMPROMISE"
+      ]
+    },
+    "targetClass": {
+      "enum": [
+        "SENSITIVE_RESOURCE",
+        "PRIVILEGED_CREDENTIAL",
+        "DESTRUCTIVE_CAPABILITY",
+        "CROSS_TENANT_RESOURCE",
+        "EXTERNAL_PUBLICATION"
+      ]
+    },
+    "exposure": {
+      "enum": [
+        "EXPOSED",
+        "CONTAINED",
+        "CONTAINMENT_UNKNOWN"
+      ]
+    },
+    "controlState": {
+      "enum": [
+        "CONTROL_FAILED",
+        "CONTROL_UNDECIDED",
+        "CONTROLS_HELD"
+      ]
+    },
+    "stopBound": {
+      "enum": [
+        "MAX_STATES",
+        "MAX_STATES_TOTAL"
+      ]
+    },
+    "guardRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edge",
+        "property",
+        "artifact_index"
+      ],
+      "properties": {
+        "edge": {
+          "type": "string",
+          "pattern": "^edge:[0-9a-f]{64}$"
+        },
+        "property": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodes",
+        "edges",
+        "control_state",
+        "failed_guards",
+        "undecided_edges"
+      ],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          }
+        },
+        "edges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          }
+        },
+        "control_state": {
+          "$ref": "#/$defs/controlState"
+        },
+        "failed_guards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guardRef"
+          }
+        },
+        "undecided_edges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "search": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "states_explored",
+        "nodes_reached",
+        "refused_steps",
+        "held_edges_skipped",
+        "depth_cut",
+        "truncated"
+      ],
+      "properties": {
+        "states_explored": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nodes_reached": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "refused_steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "held_edges_skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "depth_cut": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "stopped_by": {
+          "$ref": "#/$defs/stopBound"
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targets_by_class",
+        "tenants_reached",
+        "trust_boundaries_crossed",
+        "privileged_credentials_acquired"
+      ],
+      "properties": {
+        "targets_by_class": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "propertyNames": {
+            "enum": [
+              "SENSITIVE_RESOURCE",
+              "PRIVILEGED_CREDENTIAL",
+              "DESTRUCTIVE_CAPABILITY",
+              "CROSS_TENANT_RESOURCE",
+              "EXTERNAL_PUBLICATION"
+            ]
+          }
+        },
+        "tenants_reached": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "trust_boundaries_crossed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "privileged_credentials_acquired": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "class",
+        "exposure",
+        "structural_route",
+        "frontier"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "class": {
+          "$ref": "#/$defs/targetClass"
+        },
+        "exposure": {
+          "$ref": "#/$defs/exposure"
+        },
+        "structural_route": {
+          "$ref": "#/$defs/route"
+        },
+        "uncontained_route": {
+          "$ref": "#/$defs/route"
+        },
+        "frontier": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^edge:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "kind",
+        "structural",
+        "uncontained",
+        "targets",
+        "impact"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+          "maxLength": 400
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "tenant": {
+          "type": "string",
+          "minLength": 1
+        },
+        "structural": {
+          "$ref": "#/$defs/search"
+        },
+        "uncontained": {
+          "$ref": "#/$defs/search"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/target"
+          }
+        },
+        "impact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "structural",
+            "uncontained"
+          ],
+          "properties": {
+            "structural": {
+              "$ref": "#/$defs/impact"
+            },
+            "uncontained": {
+              "$ref": "#/$defs/impact"
+            }
+          }
+        }
+      }
+    }
+  }
+}
