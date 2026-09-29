@@ -95,8 +95,6 @@ pub fn fingerprint(value: &AnyValue) -> Fingerprint {
     }
 }
 
-// The value accessors are read by the evaluators (tasks 013-016).
-#[allow(dead_code)]
 impl NValue {
     pub fn new(value: AnyValue) -> Self {
         let fingerprint = fingerprint(&value);

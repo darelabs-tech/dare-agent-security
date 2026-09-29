@@ -38,7 +38,7 @@ Throughout the cycle:
 - [x] task-014 — Implement evaluators B-3 (principal) and B-4 (tenant)
 - [x] task-015 — Implement evaluators B-5 (egress) and B-6 (retry bound, BQ-4)
 - [x] task-016 — Implement T-1 (confidentiality, BQ-3) and T-2 (completeness)
-- [ ] task-017 — Implement aggregation, the result type and the result schema
+- [x] task-017 — Implement aggregation, the result type and the result schema
 - [ ] task-018 — Implement the evidence bridge and the coverage module
 - [ ] task-019 — Append the two `AGENT.TELEMETRY` properties and the `runtime_trace_present` predicate
 - [ ] task-020 — Add the `runtime-telemetry-baseline-2026` profile

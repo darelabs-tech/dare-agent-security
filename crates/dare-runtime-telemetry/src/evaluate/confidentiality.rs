@@ -4,7 +4,8 @@
 //!
 //! This rule judges the exported bytes, not the run, so structural gaps do not
 //! matter to it: what is in the file is what leaked. Only a value too long to
-//! scan leaves it undecided.
+//! scan, or spans the span bound cut before they were scanned, leave it
+//! undecided.
 use std::collections::{BTreeMap, BTreeSet};
 
 use super::{outcome, Context, Rule, TraceOutcome, Violation};
@@ -114,6 +115,10 @@ pub fn evaluate(ctx: &Context<'_>) -> TraceOutcome {
         .map(String::as_str)
         .collect();
     let mut gaps = BTreeSet::new();
+    // Spans cut by the span bound were never scanned.
+    if ctx.stopped {
+        gaps.insert(Gap::SpanBound);
+    }
     // One violation per (reason, key, value): a resource attribute repeated on
     // every span is reported once, at its first span.
     let mut found: BTreeMap<(&'static str, String, String), Violation> = BTreeMap::new();
