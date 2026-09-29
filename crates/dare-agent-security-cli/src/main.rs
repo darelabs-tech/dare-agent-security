@@ -24,6 +24,7 @@ use dare_agent_security::product::{run_assess, run_doctor_cmd, run_init, run_rep
 use dare_agent_security::prompt_injection::run_prompt_injection;
 use dare_agent_security::rag_security::run_rag_security;
 use dare_agent_security::remote_validation::{run_remote_validation, run_replay_capture};
+use dare_agent_security::runtime_telemetry::run_runtime_telemetry;
 use dare_agent_security::supply_chain_security::run_supply_chain_security;
 use dare_agent_security::tool_security::run_tool_security;
 
@@ -85,6 +86,9 @@ async fn main() -> ExitCode {
                 }
                 ValidateSubcommand::BlastRadius(args) => {
                     ExitCode::from(run_blast_radius(args) as u8)
+                }
+                ValidateSubcommand::RuntimeTelemetry(args) => {
+                    ExitCode::from(run_runtime_telemetry(args) as u8)
                 }
             },
             Command::Ci { command } => ExitCode::from(run_ci(command) as u8),

@@ -19,6 +19,7 @@ pub mod limits;
 pub mod normalize;
 pub mod otlp;
 pub mod policy;
+pub mod render;
 pub mod result;
 pub mod schema;
 pub mod semconv;
