@@ -44,7 +44,7 @@ Throughout the cycle:
 - [x] task-020 — Add the `runtime-telemetry-baseline-2026` profile
 - [x] task-021 — Implement `summary.md`
 - [x] task-022 — Add the `validate runtime-telemetry` CLI subcommand
-- [ ] task-023 — Add the CLI refusal corpus and the double-run test
+- [x] task-023 — Add the CLI refusal corpus and the double-run test
 - [ ] task-024 — Build OTEL-LAB (≥ 40 entries) with the SIMULATED reference writer
 - [ ] task-025 — Add the no-value-leaves, determinism and hostile tests
 - [ ] task-026 — Add the scale test (O-08)
