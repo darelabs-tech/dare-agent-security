@@ -33,9 +33,9 @@ Throughout the cycle:
 - [x] task-010 — Implement `scenario.rs`: seed resolution, the kind table and entry-point seeding
 - [x] task-011 — Implement the reach index and the structural search
 - [x] task-012 — Add the uncontained view, the excluded edge and the total budget
-- [ ] task-013 — Implement `classify.rs`: targets, exposure, routes and frontier
-- [ ] task-014 — Implement `impact.rs`, the top-level frontier and totals
-- [ ] task-015 — Implement the remediation delta (RF-10, SHOULD)
+- [x] task-013 — Implement `classify.rs`: targets, exposure, routes and frontier
+- [x] task-014 — Implement `impact.rs`, the top-level frontier and totals
+- [x] task-015 — Implement the remediation delta (RF-10, SHOULD)
 - [ ] task-016 — Implement `validate_blast_radius` (invariants 1–9)
 - [ ] task-017 — Implement `analyze` end to end, with the determinism test
 - [ ] task-018 — Add the scale test (O-08)

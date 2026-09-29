@@ -7,7 +7,10 @@
 //! counts, never as a score, and it never executes, sends or schedules
 //! anything.
 pub mod admit;
+pub mod classify;
+pub mod delta;
 pub mod error;
+pub mod impact;
 pub mod limits;
 pub mod model;
 pub mod reach;
