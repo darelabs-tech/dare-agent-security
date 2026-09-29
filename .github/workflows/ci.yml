@@ -3461,6 +3461,96 @@ jobs:
           fi
           test ! -e .dare-agent-security/cycle023-refused
 
+  blast-radius-2026:
+    name: Cycle 024 blast-radius analysis gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cycle 023 output is byte-identical (156 golden digests over frozen runs)
+        run: cargo test -p dare-agent-security --test attack_path_goldens -- --nocapture
+      - name: Shared continuity and sweep rules (moved, not modified)
+        run: cargo test -p dare-attack-graph --lib v2 -- --nocapture
+      - name: Containment, limits, errors and scenarios
+        run: |
+          cargo test -p dare-blast-radius --lib -- --nocapture
+          cargo test -p dare-blast-radius --test manifest -- --nocapture
+          cargo test -p dare-blast-radius --test scenario -- --nocapture
+      - name: Reach search, classification (0 false CONTAINED), impact, delta, invariants
+        run: |
+          cargo test -p dare-blast-radius --test reach -- --nocapture
+          cargo test -p dare-blast-radius --test classify -- --nocapture
+          cargo test -p dare-blast-radius --test impact_delta -- --nocapture
+          cargo test -p dare-blast-radius --test validate -- --nocapture
+          cargo test -p dare-blast-radius --test analyze -- --nocapture
+          cargo test -p dare-blast-radius --test views -- --nocapture
+      - name: Scale - 2000 nodes, 10000 edges, 64 seeds, both views (release)
+        run: cargo test -p dare-blast-radius --release --test scale -- --nocapture
+      - name: CI job shape (trigger, no secrets, no network target)
+        run: cargo test -p dare-blast-radius --test ci_job -- --nocapture
+      - name: CLI exit codes and the refusal corpus
+        run: cargo test -p dare-agent-security --test blast_radius_cli -- --nocapture
+      - name: BLAST-RADIUS-LAB - BRL-001..020 through the real binary, twins and class contract
+        run: cargo test -p dare-agent-security --test blast_radius_lab -- --nocapture
+      - name: Cycle 023 lab and CLI run unchanged
+        run: |
+          cargo test -p dare-agent-security --test attack_path_lab -- --nocapture
+          cargo test -p dare-agent-security --test attack_paths_cli -- --nocapture
+          cargo test -p dare-agent-security --test attack_path_compatibility -- --nocapture
+
+      - name: No real credential or live endpoint anywhere
+        run: python scripts/k24/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k24/verify_proof_citations.py
+
+      - name: Offline CLI - an attack-paths graph, every entry point seeded
+        run: |
+          rm -rf .dare-agent-security/cycle024-graph .dare-agent-security/cycle024-blast
+          cargo run -p dare-agent-security -- validate attack-paths \
+            --artifacts crates/dare-attack-path/tests/fixtures/bundles/identity \
+            --output-dir .dare-agent-security/cycle024-graph || test $? -eq 2
+          set +e
+          cargo run -p dare-agent-security -- validate blast-radius \
+            --graph .dare-agent-security/cycle024-graph/attack-graph.json \
+            --seed-entry-points \
+            --output-dir .dare-agent-security/cycle024-blast
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an exposed credential, got $code"
+            exit 1
+          fi
+          for f in blast-radius.json summary.md graph.mmd graph.dot; do
+            test -f .dare-agent-security/cycle024-blast/$f
+          done
+          python scripts/assert-json.py \
+            .dare-agent-security/cycle024-blast/blast-radius.json \
+            truncated=false totals.exposed=1 seeds.0.targets.0.exposure=EXPOSED --count seeds=1
+
+      - name: Offline CLI - a graph edited after sealing is refused and nothing is written
+        run: |
+          rm -rf .dare-agent-security/cycle024-refused
+          python - <<'PY'
+          import json
+          path = ".dare-agent-security/cycle024-graph/attack-graph.json"
+          graph = json.load(open(path))
+          graph["nodes"][0]["display_name"] = "edited"
+          json.dump(graph, open(".dare-agent-security/cycle024-edited.json", "w"))
+          PY
+          set +e
+          cargo run -p dare-agent-security -- validate blast-radius \
+            --graph .dare-agent-security/cycle024-edited.json \
+            --seed-entry-points \
+            --output-dir .dare-agent-security/cycle024-refused
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for an edited graph, got $code"
+            exit 1
+          fi
+          test ! -e .dare-agent-security/cycle024-refused
+
   docs-build:
     name: mdBook documentation gate
     runs-on: ubuntu-latest

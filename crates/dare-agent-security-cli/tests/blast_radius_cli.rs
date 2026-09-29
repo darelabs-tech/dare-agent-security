@@ -428,7 +428,7 @@ fn a_credential_shaped_value_is_never_written() {
     let root = tempfile::tempdir().unwrap();
     let path = graph_of(root.path(), "identity");
     let mut graph = read_graph(&path);
-    let leaked = "node:resource:ghp_CANARYTOKEN0000000000";
+    let leaked = "node:resource:ghp_CANARY-VALUE-1234";
     let mut copy = graph
         .nodes
         .iter()
@@ -498,4 +498,45 @@ fn hostile_display_names_are_escaped_in_the_views() {
         );
         assert!(!view.contains("<script>"));
     }
+}
+
+/// The image builds from the directories the Dockerfile copies: every
+/// `include_str!` in `dare-blast-radius` (the two schemas) resolves under one
+/// of them.
+#[test]
+fn every_blast_radius_include_str_lies_under_a_docker_copied_directory() {
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let copied: Vec<String> = fs::read_to_string(repo.join("Dockerfile"))
+        .unwrap()
+        .lines()
+        .filter_map(|l| l.strip_prefix("COPY "))
+        .filter(|l| !l.starts_with("--from"))
+        .filter_map(|l| l.split_whitespace().next())
+        .map(|s| s.trim_end_matches('/').to_owned())
+        .collect();
+    let src = repo.join("crates/dare-blast-radius/src");
+    let mut found = 0;
+    for entry in fs::read_dir(&src).unwrap() {
+        let file = entry.unwrap().path();
+        let text = fs::read_to_string(&file).unwrap();
+        for part in text.split("include_str!(\"").skip(1) {
+            let target = part.split('"').next().unwrap();
+            let resolved = file.parent().unwrap().join(target).canonicalize().unwrap();
+            let top = resolved
+                .strip_prefix(&repo)
+                .unwrap()
+                .components()
+                .next()
+                .unwrap()
+                .as_os_str()
+                .to_string_lossy()
+                .into_owned();
+            assert!(copied.contains(&top), "{target} is under `{top}`");
+            found += 1;
+        }
+    }
+    assert_eq!(found, 2, "the two blast-radius schemas");
 }

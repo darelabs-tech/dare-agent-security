@@ -15,6 +15,7 @@
 - [Agentic Security Registry 2026](concepts/agentic-security-registry.md)
 - [Attack Graph](concepts/attack-graph.md)
 - [Evidence-Derived Attack Paths](concepts/attack-paths.md)
+- [Blast Radius](concepts/blast-radius.md)
 - [Validation Modes](concepts/validation.md)
 - [Prompt Injection Validation](concepts/prompt-injection.md)
 - [Tool Security Validation](concepts/tool-security.md)

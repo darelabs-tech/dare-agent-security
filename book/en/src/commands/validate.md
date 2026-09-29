@@ -94,6 +94,28 @@ endpoint, token or remote flag, and no path is executed. See
 [Evidence-Derived Attack Paths](../concepts/attack-paths.md) and the
 [system model reference](../reference/attack-path-system-model.md).
 
+## `validate blast-radius`
+
+Report what a compromise reaches over an attack graph, and where observed controls
+contain it (Cycle 024).
+
+```bash
+dare-agent-security validate blast-radius \
+  --graph .dare-agent-security/attack-paths/attack-graph.json \
+  --compromise compromise.json \
+  --output-dir .dare-agent-security/blast-radius
+```
+
+`--graph` is the v2 graph written by `validate attack-paths`. `--compromise` names the
+seeds, or `--seed-entry-points` seeds every entry point; exactly one is required.
+`--max-depth` (default 8, maximum 12) and `--max-states` (per search, maximum 1000000)
+bound the search, and a value above its maximum is refused. `--json` also prints
+`blast-radius.json`.
+
+The command writes `blast-radius.json`, `summary.md`, `graph.mmd` and `graph.dot`. It
+reads local files only. There is no URL, endpoint, token or remote flag, and no reach is
+executed. See [Blast Radius](../concepts/blast-radius.md).
+
 ## `validate adversarial`
 
 Controlled, offline-first adversarial validation (Cycle 009).
