@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "scenario_id": "inbound-token-leak",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:credential:inbound-token",
+      "kind": "CREDENTIAL_LEAK"
+    }
+  ]
+}

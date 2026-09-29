@@ -1,0 +1,8 @@
+{
+  "id": "BRL-019",
+  "class": "I",
+  "role": "control",
+  "title": "I: --seed-entry-points seeds every entry of the APL-001 graph",
+  "graph_from": "APL-001",
+  "seed_entry_points": true
+}

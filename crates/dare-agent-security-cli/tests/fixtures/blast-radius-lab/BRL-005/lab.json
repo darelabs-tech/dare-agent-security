@@ -1,0 +1,7 @@
+{
+  "id": "BRL-005",
+  "class": "C",
+  "role": "attack",
+  "title": "C: planner peer taken over -> assistant -> index service -> index-admin credential",
+  "graph_from": "APL-009"
+}

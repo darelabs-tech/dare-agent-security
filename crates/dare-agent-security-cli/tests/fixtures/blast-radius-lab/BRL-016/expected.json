@@ -1,0 +1,43 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:credential:inbound-token",
+      "kind": "CREDENTIAL_LEAK",
+      "targets": [
+        {
+          "node": "node:credential:mcp-auth:${run:0}:cred-upstream",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "CONTAINED",
+          "route": [
+            "node:credential:inbound-token",
+            "node:mcp-server:mcp-auth:${run:0}:mcp-invoices",
+            "node:credential:mcp-auth:${run:0}:cred-upstream"
+          ],
+          "control_state": "CONTROL_UNDECIDED",
+          "frontier_properties": [
+            "MCP.AUTH.CREDENTIAL_SEPARATION"
+          ]
+        },
+        {
+          "node": "node:resource:mcp-auth:${run:0}:mcp-invoices",
+          "class": "SENSITIVE_RESOURCE",
+          "exposure": "CONTAINED",
+          "route": [
+            "node:credential:inbound-token",
+            "node:mcp-server:mcp-auth:${run:0}:mcp-invoices",
+            "node:credential:mcp-auth:${run:0}:cred-upstream",
+            "node:resource:mcp-auth:${run:0}:mcp-invoices"
+          ],
+          "control_state": "CONTROL_UNDECIDED",
+          "frontier_properties": [
+            "MCP.AUTH.CREDENTIAL_SEPARATION"
+          ]
+        }
+      ],
+      "absent": [
+        "node:credential:index-admin-cred"
+      ]
+    }
+  ]
+}

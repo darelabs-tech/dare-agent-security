@@ -1,0 +1,7 @@
+{
+  "id": "BRL-003",
+  "class": "B",
+  "role": "attack",
+  "title": "B: alice taken over -> index-admin credential and a tenant-B document; the leaked credential reaches no target",
+  "graph_from": "APL-001"
+}

@@ -1,0 +1,33 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:data:user-channel",
+      "kind": "CONTENT_INJECTION",
+      "targets": [
+        {
+          "node": "node:tool:payments-transfer",
+          "class": "DESTRUCTIVE_CAPABILITY",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:data:user-channel",
+            "node:agent:assistant",
+            "node:tool:payments-transfer"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY"
+          ]
+        }
+      ]
+    }
+  ],
+  "delta": [
+    {
+      "properties": [
+        "AGENT.GOAL.USER_INPUT_INSTRUCTION_BOUNDARY"
+      ],
+      "targets_contained_if_held": 1
+    }
+  ]
+}

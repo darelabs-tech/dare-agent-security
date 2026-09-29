@@ -1,0 +1,24 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:capability:left-pad",
+      "kind": "COMPONENT_COMPROMISE",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:capability:left-pad",
+            "node:capability:support-agent",
+            "node:agent:assistant",
+            "node:identity:index-service",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_UNDECIDED"
+        }
+      ]
+    }
+  ]
+}

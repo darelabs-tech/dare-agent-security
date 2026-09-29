@@ -1,0 +1,12 @@
+{
+  "schema_version": "1",
+  "scenario_id": "peer-takeover-short",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:agent:planner-peer",
+      "kind": "PRINCIPAL_TAKEOVER"
+    }
+  ],
+  "max_depth": 2
+}

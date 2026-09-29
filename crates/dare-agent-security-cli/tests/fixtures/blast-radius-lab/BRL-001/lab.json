@@ -1,0 +1,7 @@
+{
+  "id": "BRL-001",
+  "class": "A",
+  "role": "attack",
+  "title": "A: inbound MCP token leaked -> MCP server -> upstream credential -> MCP resource; alice taken over",
+  "graph_from": "APL-016"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "BRL-018",
+  "class": "H",
+  "role": "control",
+  "title": "H: the peer reaches the assistant, whose declared access runs under the index service it never acquired: refused within two steps",
+  "graph_from": "APL-023"
+}

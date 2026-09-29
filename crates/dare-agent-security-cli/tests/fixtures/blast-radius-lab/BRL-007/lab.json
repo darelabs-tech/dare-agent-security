@@ -1,0 +1,7 @@
+{
+  "id": "BRL-007",
+  "class": "D",
+  "role": "attack",
+  "title": "D: alice taken over -> tenant-B memory and the index-admin credential",
+  "graph_from": "APL-005"
+}

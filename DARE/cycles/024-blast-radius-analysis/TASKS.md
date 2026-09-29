@@ -43,8 +43,8 @@ Throughout the cycle:
 - [x] task-020 — Implement `summary.md`
 - [x] task-021 — Add the `validate blast-radius` CLI subcommand
 - [x] task-022 — Add the CLI refusal corpus, hostile labels and double-run test
-- [ ] task-023 — Build the BLAST-RADIUS-LAB harness and BRL-001..BRL-010
-- [ ] task-024 — Add BRL-011..BRL-020 and the class contract
+- [x] task-023 — Build the BLAST-RADIUS-LAB harness and BRL-001..BRL-010
+- [x] task-024 — Add BRL-011..BRL-020 and the class contract
 - [ ] task-025 — Add the `blast-radius-2026` CI job
 - [ ] task-026 — Security, dependency, container and compatibility audit
 - [ ] task-027 — Write the EN/PT blast-radius pages

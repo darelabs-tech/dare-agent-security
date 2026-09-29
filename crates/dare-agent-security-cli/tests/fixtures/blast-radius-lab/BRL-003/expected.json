@@ -1,0 +1,45 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:credential:index-admin-cred",
+      "kind": "CREDENTIAL_LEAK",
+      "targets": [],
+      "absent": [
+        "node:resource:identity:${run:2}:document-123"
+      ]
+    },
+    {
+      "node": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION"
+          ]
+        },
+        {
+          "node": "node:data:tenant-b-doc",
+          "class": "CROSS_TENANT_RESOURCE",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:human:alice",
+            "node:data:tenant-b-doc"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.RAG.TENANT_DOCUMENT_ISOLATION"
+          ]
+        }
+      ]
+    }
+  ]
+}

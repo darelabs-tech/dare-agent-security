@@ -1,0 +1,17 @@
+{
+  "exit": 2,
+  "truncated": true,
+  "seeds": [
+    {
+      "node": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "CONTAINMENT_UNKNOWN"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "BRL-013",
+  "class": "F",
+  "role": "control",
+  "title": "F control: BOM completeness no longer fails; the route stays, undecided",
+  "graph_from": "APL-014"
+}

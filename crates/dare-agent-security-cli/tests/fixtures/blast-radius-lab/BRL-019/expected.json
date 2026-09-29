@@ -1,0 +1,50 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION"
+          ]
+        }
+      ]
+    },
+    {
+      "node": "node:data:uploaded-doc",
+      "kind": "CONTENT_INJECTION",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:data:uploaded-doc",
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+            "AGENT.RAG.CONTENT_TRUST_BOUNDARY"
+          ]
+        }
+      ]
+    },
+    {
+      "node": "node:data:rag:${run:0}:doc-external",
+      "kind": "CONTENT_INJECTION",
+      "targets": []
+    }
+  ]
+}

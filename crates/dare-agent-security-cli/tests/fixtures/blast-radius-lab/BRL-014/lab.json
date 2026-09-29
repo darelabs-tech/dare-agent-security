@@ -1,0 +1,7 @@
+{
+  "id": "BRL-014",
+  "class": "G",
+  "role": "attack",
+  "title": "G: user channel injected -> assistant -> payments transfer",
+  "graph_from": "APL-019"
+}

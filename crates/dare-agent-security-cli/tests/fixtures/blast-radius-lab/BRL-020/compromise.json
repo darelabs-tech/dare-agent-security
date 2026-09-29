@@ -1,0 +1,12 @@
+{
+  "schema_version": "1",
+  "scenario_id": "alice-takeover-bounded",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER"
+    }
+  ],
+  "max_states": 3
+}

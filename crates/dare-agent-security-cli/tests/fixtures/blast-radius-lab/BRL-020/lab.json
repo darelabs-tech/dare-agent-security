@@ -1,0 +1,7 @@
+{
+  "id": "BRL-020",
+  "class": "J",
+  "role": "control",
+  "title": "J: max_states 3 truncates the search: the credential is CONTAINMENT_UNKNOWN, exit 2",
+  "graph_from": "APL-006"
+}

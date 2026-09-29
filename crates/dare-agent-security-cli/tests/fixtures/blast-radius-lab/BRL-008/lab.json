@@ -1,0 +1,7 @@
+{
+  "id": "BRL-008",
+  "class": "D",
+  "role": "control",
+  "title": "D control: privilege amplification holds; tenant-B memory is not reachable",
+  "graph_from": "APL-006"
+}

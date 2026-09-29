@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "scenario_id": "tool-output-injection",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:data:tool:${run:1}:output.ticket_search",
+      "kind": "CONTENT_INJECTION"
+    }
+  ]
+}

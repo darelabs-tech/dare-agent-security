@@ -1,0 +1,34 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:agent:planner-peer",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:agent:planner-peer",
+            "node:agent:assistant",
+            "node:identity:index-service",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.A2A.SKILL_AUTHORIZATION"
+          ]
+        }
+      ]
+    }
+  ],
+  "delta": [
+    {
+      "properties": [
+        "AGENT.A2A.SKILL_AUTHORIZATION"
+      ],
+      "targets_contained_if_held": 1
+    }
+  ]
+}

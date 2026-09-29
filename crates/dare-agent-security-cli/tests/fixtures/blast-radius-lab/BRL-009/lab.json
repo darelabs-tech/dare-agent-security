@@ -1,0 +1,7 @@
+{
+  "id": "BRL-009",
+  "class": "E",
+  "role": "attack",
+  "title": "E: uploaded document injected -> alice -> index-admin credential and a tenant-B document",
+  "graph_from": "APL-001"
+}

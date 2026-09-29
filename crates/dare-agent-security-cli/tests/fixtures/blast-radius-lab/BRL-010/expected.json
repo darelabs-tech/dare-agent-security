@@ -1,0 +1,29 @@
+{
+  "exit": 0,
+  "seeds": [
+    {
+      "node": "node:data:uploaded-doc",
+      "kind": "CONTENT_INJECTION",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "CONTAINED",
+          "route": [
+            "node:data:uploaded-doc",
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROLS_HELD",
+          "frontier_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+            "AGENT.RAG.CONTENT_TRUST_BOUNDARY"
+          ]
+        }
+      ],
+      "absent": [
+        "node:data:tenant-b-doc"
+      ]
+    }
+  ]
+}

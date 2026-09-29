@@ -1,0 +1,15 @@
+{
+  "schema_version": "1",
+  "scenario_id": "alice-takeover-rag",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:credential:index-admin-cred",
+      "kind": "CREDENTIAL_LEAK"
+    },
+    {
+      "node_id": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER"
+    }
+  ]
+}

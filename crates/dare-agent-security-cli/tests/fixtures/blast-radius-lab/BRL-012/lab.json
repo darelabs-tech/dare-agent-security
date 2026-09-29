@@ -1,0 +1,7 @@
+{
+  "id": "BRL-012",
+  "class": "F",
+  "role": "attack",
+  "title": "F: left-pad compromised -> support agent build -> assistant -> index service -> credential",
+  "graph_from": "APL-013"
+}
