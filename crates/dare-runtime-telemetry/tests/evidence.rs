@@ -244,7 +244,8 @@ fn coverage_rows_restate_the_engine_states_without_promotion() {
 #[test]
 fn the_facts_name_only_what_the_policy_says() {
     let facts = assessment_facts(None);
-    assert!(facts.agent_present && !facts.human_approval_present);
+    assert!(facts.agent_present && facts.runtime_trace_present);
+    assert!(!facts.human_approval_present);
     assert!(!facts.dynamic_authorization_allowed);
     assert_eq!(
         assessment_facts(Some(&policy())).human_approval_present,

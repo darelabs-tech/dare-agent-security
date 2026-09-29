@@ -7,6 +7,7 @@
 //! the same bytes (REGRESSION R-6).
 use std::collections::BTreeMap;
 
+use dare_coverage::{agentic_registry, PropertyRegistry};
 use dare_security_evidence::{
     validate_secret_safety, Decision, EvidenceTimestamps, ExpectedOutcome, HashRef,
     ObservationSource, ObservedOutcome, Precondition, RedactionMetadata, RedactionStrategy,
@@ -31,35 +32,23 @@ pub const MAX_LISTED_TRACES: usize = 64;
 
 const PROPERTY_HOLDS: &str = "property-holds";
 
-fn asi_for(rule: Rule) -> Option<&'static str> {
-    match rule {
-        Rule::ToolAuthorization => Some("ASI02"),
-        Rule::Principal => Some("ASI03"),
-        Rule::Egress => Some("ASI05"),
-        Rule::RetrievalTenant | Rule::MemoryTenant => Some("ASI06"),
-        Rule::Retry => Some("ASI08"),
-        Rule::Approval => Some("ASI09"),
-        Rule::Confidentiality | Rule::Completeness => None,
-    }
-}
-
-fn standard(rule: Rule, result: &RuntimeTelemetryResult) -> StandardMapping {
-    match asi_for(rule) {
-        Some(asi) => StandardMapping {
-            organization: "OWASP".to_owned(),
-            standard: format!("Agentic Top 10 (2026) {asi}"),
-            version: Some("2026".to_owned()),
-            control: "NORMATIVE".to_owned(),
+/// The standards of the rule's registry entry, restated in Cycle 001 form,
+/// so the evidence and the coverage registry cannot drift apart.
+fn standards(registry: &PropertyRegistry, rule: Rule) -> Result<Vec<StandardMapping>> {
+    let entry = registry
+        .get(rule.property_id())
+        .ok_or(TelemetryError::Internal("property not registered"))?;
+    Ok(entry
+        .standards
+        .iter()
+        .map(|s| StandardMapping {
+            organization: s.source.clone(),
+            standard: s.reference.clone(),
+            version: None,
+            control: s.status.clone(),
             url: None,
-        },
-        None => StandardMapping {
-            organization: "OpenTelemetry".to_owned(),
-            standard: "Semantic Conventions".to_owned(),
-            version: Some(result.semconv.core_release.clone()),
-            control: "gen-ai".to_owned(),
-            url: None,
-        },
-    }
+        })
+        .collect())
 }
 
 fn bare_hash(digest: &str) -> HashRef {
@@ -182,7 +171,12 @@ fn listed(outcomes: &[&TraceOutcome]) -> Vec<Value> {
         .collect()
 }
 
-fn build_one(run: &Run, property: &PropertyResult, verdict: Verdict) -> Result<SecurityEvidence> {
+fn build_one(
+    run: &Run,
+    registry: &PropertyRegistry,
+    property: &PropertyResult,
+    verdict: Verdict,
+) -> Result<SecurityEvidence> {
     let result = &run.result;
     let rule = property.rule;
     let wanted = match verdict {
@@ -315,7 +309,7 @@ fn build_one(run: &Run, property: &PropertyResult, verdict: Verdict) -> Result<S
         },
         verdict,
         severity: None,
-        standards: vec![standard(rule, result)],
+        standards: standards(registry, rule)?,
         artifacts: Vec::new(),
         hashes,
         redaction: RedactionMetadata {
@@ -343,11 +337,12 @@ fn build_one(run: &Run, property: &PropertyResult, verdict: Verdict) -> Result<S
 
 /// One record per judged property, in `Rule::ALL` order.
 pub fn build_evidence(run: &Run) -> Result<Vec<SecurityEvidence>> {
+    let registry = agentic_registry().map_err(|_| TelemetryError::Internal("coverage registry"))?;
     run.result
         .properties
         .iter()
         .filter_map(|p| p.verdict.map(|v| (p, v)))
-        .map(|(p, v)| build_one(run, p, v))
+        .map(|(p, v)| build_one(run, &registry, p, v))
         .collect()
 }
 
@@ -395,9 +390,10 @@ mod tests {
     }
 
     #[test]
-    fn every_behaviour_rule_maps_to_an_asi_and_telemetry_to_the_conventions() {
+    fn every_rule_is_registered_with_at_least_one_standard() {
+        let registry = agentic_registry().expect("registry");
         for rule in Rule::ALL {
-            assert_eq!(asi_for(rule).is_some(), rule.needs_policy(), "{rule:?}");
+            assert!(!standards(&registry, rule).expect("registered").is_empty());
         }
     }
 }

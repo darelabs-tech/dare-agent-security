@@ -16,11 +16,13 @@ use crate::{
     result::{CoverageState, RuntimeTelemetryResult},
 };
 
-/// What a trace export shows about the system: an agent ran. The policy
-/// adds only what it names; nothing is inferred from span content.
+/// What a trace export shows about the system: an agent ran and its traces
+/// were supplied. The policy adds only what it names; nothing is inferred
+/// from span content.
 pub fn assessment_facts(policy: Option<&Policy>) -> AssessmentFacts {
     AssessmentFacts {
         agent_present: true,
+        runtime_trace_present: true,
         human_approval_present: policy.is_some_and(|p| p.approval.is_some()),
         ..Default::default()
     }

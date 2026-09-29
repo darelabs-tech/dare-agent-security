@@ -187,6 +187,7 @@ fn evaluate_predicate(predicate: Predicate, facts: &AssessmentFacts) -> bool {
         Predicate::DataScopePolicyPresent => facts.data_scope_policy_present,
         Predicate::ReplayPolicyPresent => facts.replay_policy_present,
         Predicate::ProtocolPolicyPresent => facts.protocol_policy_present,
+        Predicate::RuntimeTracePresent => facts.runtime_trace_present,
     }
 }
 

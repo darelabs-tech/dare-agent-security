@@ -208,6 +208,9 @@ pub struct AssessmentFacts {
     /// Cycle 020: whether a local protocol/interface policy exists.
     #[serde(default)]
     pub protocol_policy_present: bool,
+    /// Cycle 025: recorded runtime traces of the system were supplied.
+    #[serde(default)]
+    pub runtime_trace_present: bool,
     #[serde(default)]
     pub out_of_scope_property_ids: Vec<String>,
 }

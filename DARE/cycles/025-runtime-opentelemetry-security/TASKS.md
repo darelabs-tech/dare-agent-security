@@ -40,7 +40,7 @@ Throughout the cycle:
 - [x] task-016 — Implement T-1 (confidentiality, BQ-3) and T-2 (completeness)
 - [x] task-017 — Implement aggregation, the result type and the result schema
 - [x] task-018 — Implement the evidence bridge and the coverage module
-- [ ] task-019 — Append the two `AGENT.TELEMETRY` properties and the `runtime_trace_present` predicate
+- [x] task-019 — Append the two `AGENT.TELEMETRY` properties and the `runtime_trace_present` predicate
 - [ ] task-020 — Add the `runtime-telemetry-baseline-2026` profile
 - [ ] task-021 — Implement `summary.md`
 - [ ] task-022 — Add the `validate runtime-telemetry` CLI subcommand

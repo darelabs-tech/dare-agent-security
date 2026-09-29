@@ -53,6 +53,18 @@ const ADDED: [(&str, RiskFamily, &str); 7] = [
 /// The registry size measured at the Cycle 021 baseline (`BASELINE.md`).
 const BASELINE_PROPERTY_COUNT: usize = 58;
 
+/// Properties a later cycle appended after these seven, by name.
+///
+/// Cycle 025 (runtime OpenTelemetry security) appends two telemetry
+/// properties (its BLUEPRINT AD-12). This file keeps pinning the seven at
+/// their positions and tolerates only these named additions after them,
+/// never an anonymous one. See
+/// `DARE/cycles/025-runtime-opentelemetry-security/REGRESSION.md` (R-7).
+const LATER_ADDITIONS: [&str; 2] = [
+    "AGENT.TELEMETRY.CONFIDENTIALITY",
+    "AGENT.TELEMETRY.COMPLETENESS",
+];
+
 fn raw_registry() -> serde_json::Value {
     serde_json::from_str(dare_coverage::AGENTIC_REGISTRY_JSON).expect("registry parses")
 }
@@ -62,18 +74,24 @@ fn exactly_the_seven_approved_properties_were_added() {
     let registry = agentic_registry().expect("registry loads");
     assert_eq!(
         registry.properties.len(),
-        BASELINE_PROPERTY_COUNT + ADDED.len()
+        BASELINE_PROPERTY_COUNT + ADDED.len() + LATER_ADDITIONS.len()
     );
     let ids: BTreeSet<&str> = registry.properties.iter().map(|p| p.id.as_str()).collect();
     for (id, _, _) in ADDED {
         assert!(ids.contains(id), "{id} is missing");
     }
     // Appended after every pre-existing entry, so no earlier position moved.
-    let tail: Vec<&str> = registry.properties[BASELINE_PROPERTY_COUNT..]
+    let end = BASELINE_PROPERTY_COUNT + ADDED.len();
+    let added: Vec<&str> = registry.properties[BASELINE_PROPERTY_COUNT..end]
         .iter()
         .map(|p| p.id.as_str())
         .collect();
-    assert_eq!(tail, ADDED.map(|(id, _, _)| id));
+    assert_eq!(added, ADDED.map(|(id, _, _)| id));
+    let later: Vec<&str> = registry.properties[end..]
+        .iter()
+        .map(|p| p.id.as_str())
+        .collect();
+    assert_eq!(later, LATER_ADDITIONS);
 }
 
 #[test]
