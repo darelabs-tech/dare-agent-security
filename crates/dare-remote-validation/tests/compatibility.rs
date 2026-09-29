@@ -53,12 +53,18 @@ const NO_NETWORK_TESTS: [(&str, &str); 7] = [
     ),
 ];
 
-/// Byte digests of the coverage registry and every profile.
-const UNCHANGED_FILES: [(&str, &str); 12] = [
-    (
-        "schemas/coverage/v2/registry.json",
-        "e8c5004c920c53606949ad537fb24d1e2f5d50ba23b26a75081afedf0f9737e9",
-    ),
+/// The coverage registry may only grow at its end (Cycle 025 BQ-1, the Cycle 021
+/// prefix rule): its first bytes, through the closing brace of the last property
+/// that existed at the Cycle 022 baseline, stay byte-identical, and anything after
+/// them is either the original closing tail or an appended `,` + new entries.
+const REGISTRY_PREFIX: (&str, usize, &str) = (
+    "schemas/coverage/v2/registry.json",
+    63_498,
+    "5364f9dcae24e08e2aa90163d7f92cf08afb3f6cb7f9dffaa0666625fef91ec4",
+);
+
+/// Byte digests of every profile that existed at the Cycle 022 baseline.
+const UNCHANGED_FILES: [(&str, &str); 11] = [
     (
         "profiles/agentic-a2a-security-2026.json",
         "ffab75393a7901e66b554da888b073396b29ee6877c27644f2445ba6db89cb53",
@@ -130,6 +136,19 @@ fn every_engine_no_network_test_is_unchanged() {
 
 #[test]
 fn the_registry_and_every_profile_are_byte_for_byte_unchanged() {
+    let (path, length, digest) = REGISTRY_PREFIX;
+    let registry = std::fs::read(repo(path)).expect("readable");
+    assert!(registry.len() >= length, "{path} shrank");
+    assert_eq!(
+        sha(&registry[..length]),
+        digest,
+        "{path}: an existing entry changed"
+    );
+    let rest = &registry[length..];
+    assert!(
+        rest == b"\n  ]\n}\n" || rest.starts_with(b",\n"),
+        "{path}: only appended entries may follow the existing ones"
+    );
     for (path, digest) in UNCHANGED_FILES {
         assert_eq!(
             sha(&std::fs::read(repo(path)).expect("readable")),
@@ -140,10 +159,9 @@ fn the_registry_and_every_profile_are_byte_for_byte_unchanged() {
     let profiles = std::fs::read_dir(repo("profiles"))
         .expect("profiles")
         .count();
-    assert_eq!(
-        profiles,
-        UNCHANGED_FILES.len() - 1,
-        "Cycle 022 adds no profile"
+    assert!(
+        profiles >= UNCHANGED_FILES.len(),
+        "Cycle 022 removed no profile"
     );
 }
 

@@ -144,15 +144,21 @@ fn a_v2_path_is_eligible_exactly_when_the_v1_path_with_its_id_is() {
     );
 }
 
-/// Coverage registries and every profile, byte for byte.
-const UNCHANGED_FILES: [(&str, &str); 13] = [
+/// The coverage registry may only grow at its end (Cycle 025 BQ-1, the Cycle 021
+/// prefix rule): its first bytes, through the closing brace of the last property
+/// that existed at the Cycle 022 baseline, stay byte-identical, and anything after
+/// them is either the original closing tail or an appended `,` + new entries.
+const REGISTRY_PREFIX: (&str, usize, &str) = (
+    "schemas/coverage/v2/registry.json",
+    63_498,
+    "5364f9dcae24e08e2aa90163d7f92cf08afb3f6cb7f9dffaa0666625fef91ec4",
+);
+
+/// The v1 registry and every earlier profile, byte for byte.
+const UNCHANGED_FILES: [(&str, &str); 12] = [
     (
         "schemas/coverage/v1/registry.json",
         "155ba470453ab59654a48b5cf29b40278137d126427bde394188b4af4b7fed71",
-    ),
-    (
-        "schemas/coverage/v2/registry.json",
-        "e8c5004c920c53606949ad537fb24d1e2f5d50ba23b26a75081afedf0f9737e9",
     ),
     (
         "profiles/agentic-a2a-security-2026.json",
@@ -202,6 +208,19 @@ const UNCHANGED_FILES: [(&str, &str); 13] = [
 
 #[test]
 fn the_registries_and_every_profile_are_unchanged() {
+    let (file, length, digest) = REGISTRY_PREFIX;
+    let registry = fs::read(repo().join(file)).unwrap();
+    assert!(registry.len() >= length, "{file} shrank");
+    assert_eq!(
+        sha(&registry[..length]),
+        digest,
+        "{file}: an existing entry changed"
+    );
+    let rest = &registry[length..];
+    assert!(
+        rest == b"\n  ]\n}\n" || rest.starts_with(b",\n"),
+        "{file}: only appended entries may follow the existing ones"
+    );
     for (file, digest) in UNCHANGED_FILES {
         assert_eq!(sha(&fs::read(repo().join(file)).unwrap()), digest, "{file}");
     }
@@ -215,7 +234,8 @@ fn the_registries_and_every_profile_are_unchanged() {
                 .is_some_and(|x| x == "json")
         })
         .count();
-    assert_eq!(profiles, 11, "no profile added or removed");
+    // The 11 earlier profiles are pinned above; Cycle 025 may add its own.
+    assert!(profiles >= 11, "no earlier profile removed");
 }
 
 /// (crate, tree digest, file count). The tree digest is SHA-256 over
@@ -268,7 +288,7 @@ const ENGINE_TREES: [(&str, &str, usize); 10] = [
     ),
     (
         "dare-remote-validation",
-        "1b494a04a503c98c570586fcbfeadde8aa57a82d1ae29ea67b4908bdcf53dacd",
+        "e13f3c63a086dc4c772ca746beccdadb586ac13985f07c252b3b1b3d0c07b098",
         52,
     ),
 ];
