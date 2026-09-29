@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/runtime-telemetry/v1/runtime-policy.schema.json",
+  "title": "DARE runtime policy",
+  "description": "What a deployment allows at runtime, per agent. Closed: every unknown field is refused.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "content_capture_allowed", "agents"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "policy_id": {"$ref": "#/$defs/id"},
+    "content_capture_allowed": {"type": "boolean"},
+    "principal_keys": {"$ref": "#/$defs/keys"},
+    "tenant_keys": {"$ref": "#/$defs/keys"},
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_name", "tool_key"],
+      "properties": {
+        "event_name": {"$ref": "#/$defs/name"},
+        "tool_key": {"$ref": "#/$defs/key"}
+      }
+    },
+    "required_operations": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {"enum": ["AGENT_INVOKE", "MODEL_CALL", "TOOL_EXEC", "RETRIEVAL", "MEMORY", "MCP_CALL", "HTTP_CLIENT"]}
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "allowed_tools"],
+        "properties": {
+          "name": {"$ref": "#/$defs/name"},
+          "allowed_tools": {"$ref": "#/$defs/names"},
+          "destructive_tools": {"$ref": "#/$defs/names"},
+          "principal": {"$ref": "#/$defs/name"},
+          "tenant": {"$ref": "#/$defs/name"},
+          "egress_hosts": {
+            "type": "array",
+            "maxItems": 128,
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^(\\*\\.)?[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?)*$", "maxLength": 253}
+          },
+          "max_retries": {"type": "integer", "minimum": 0, "maximum": 16}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[^\\u0000-\\u001f\\u007f]+$"},
+    "names": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"$ref": "#/$defs/name"}},
+    "key": {"type": "string", "pattern": "^[a-z][a-z0-9_.]{0,127}$"},
+    "keys": {"type": "array", "maxItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/key"}}
+  }
+}

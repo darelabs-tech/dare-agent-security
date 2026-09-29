@@ -31,7 +31,7 @@ Throughout the cycle:
 - [x] task-007 — Implement the OTLP/JSON model and the trace-subset schema
 - [x] task-008 — Implement `normalize.rs` and value fingerprints (AD-07)
 - [x] task-009 — Implement the semconv classifier
-- [ ] task-010 — Add the runtime-policy schema and loader
+- [x] task-010 — Add the runtime-policy schema and loader
 - [ ] task-011 — Implement trace reconstruction
 - [ ] task-012 — Implement completeness
 - [ ] task-013 — Implement evaluators B-1 (tool authorization) and B-2 (approval)
