@@ -1,0 +1,1678 @@
+[
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-discovery_binding_preserved-05676dcc259d3f0f",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant DISCOVERY_BINDING_PRESERVED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of DISCOVERY_BINDING_PRESERVED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I01",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "DISCOVERY_BINDING_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.DISCOVERY_TRUST_BOUNDARY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-peer_identity_bound-7040c91645bcc615",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant PEER_IDENTITY_BOUND holds"
+    },
+    "observed": {
+      "decision": "ALLOW",
+      "result": "invariant-violated",
+      "description": "a deterministic violation of PEER_IDENTITY_BOUND was observed",
+      "source": "FIXTURE"
+    },
+    "verdict": "FAIL",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [
+          "sha256:cdb1303443a0d1e88f8bdea37e6463ee43bbac4deeca790e63f750c4d04f45c5"
+        ],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I02",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "PEER_IDENTITY_BOUND",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.PEER_IDENTITY_BINDING",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 1
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-message_authenticity_established-149a07309faff95d",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant MESSAGE_AUTHENTICITY_ESTABLISHED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of MESSAGE_AUTHENTICITY_ESTABLISHED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I03",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "MESSAGE_AUTHENTICITY_ESTABLISHED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.MESSAGE_AUTHENTICITY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-security_requirement_satisfied-f9548734037a4ceb",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant SECURITY_REQUIREMENT_SATISFIED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of SECURITY_REQUIREMENT_SATISFIED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I04",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "SECURITY_REQUIREMENT_SATISFIED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.MESSAGE_AUTHENTICITY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-skill_authorized-ba6713a24107d983",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant SKILL_AUTHORIZED holds"
+    },
+    "observed": {
+      "decision": "ALLOW",
+      "result": "invariant-violated",
+      "description": "a deterministic violation of SKILL_AUTHORIZED was observed",
+      "source": "FIXTURE"
+    },
+    "verdict": "FAIL",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [
+          "sha256:5826013f35939d2a69147052623a39aba3ab9bca687249d394975a5e6a6e87db"
+        ],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I05",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "SKILL_AUTHORIZED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.SKILL_AUTHORIZATION",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 1
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-message_authority_boundary_preserved-9661b4c213546a41",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant MESSAGE_AUTHORITY_BOUNDARY_PRESERVED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of MESSAGE_AUTHORITY_BOUNDARY_PRESERVED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I06",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "MESSAGE_AUTHORITY_BOUNDARY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.AUTHORITY_PROPAGATION",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-task_context_binding_preserved-c17ed3709ad3b8ea",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant TASK_CONTEXT_BINDING_PRESERVED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of TASK_CONTEXT_BINDING_PRESERVED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I07",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "TASK_CONTEXT_BINDING_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.MESSAGE_CONTEXT_BINDING",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-authority_propagation_bounded-fec261aa3cc18d1c",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant AUTHORITY_PROPAGATION_BOUNDED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of AUTHORITY_PROPAGATION_BOUNDED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I08",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "AUTHORITY_PROPAGATION_BOUNDED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.AUTHORITY_PROPAGATION",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-tenant_boundary_preserved-1e193f3b7f4eaf99",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant TENANT_BOUNDARY_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide TENANT_BOUNDARY_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I09",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "TENANT_BOUNDARY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.TENANT_BOUNDARY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-data_scope_boundary_preserved-301ad190719237e3",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant DATA_SCOPE_BOUNDARY_PRESERVED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of DATA_SCOPE_BOUNDARY_PRESERVED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I10",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "DATA_SCOPE_BOUNDARY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.DATA_SCOPE_BOUNDARY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-replay_boundary_preserved-0c5952577bd2afcb",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": false
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant REPLAY_BOUNDARY_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide REPLAY_BOUNDARY_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": false,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I11",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "REPLAY_BOUNDARY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.REPLAY_BOUNDARY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-protocol_negotiation_integrity_preserved-d476569538bed78c",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": true,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I12",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "PROTOCOL_NEGOTIATION_INTEGRITY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.PROTOCOL_NEGOTIATION_INTEGRITY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-extension_trust_boundary_preserved-e8e0689581e1fe38",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": false
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant EXTENSION_TRUST_BOUNDARY_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide EXTENSION_TRUST_BOUNDARY_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": false,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I13",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "EXTENSION_TRUST_BOUNDARY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.EXTENSION_TRUST_BOUNDARY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "a2a-push_notification_boundary_preserved-3343c95facc64145",
+    "vector": {
+      "id": "A2A-LAB-011",
+      "version": "1",
+      "name": "a peer authenticates as itself, with no delegated subject, and acts on a user's task"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-a2a-inter-agent-lab",
+      "name": "DARE synthetic A2A inter-agent lab",
+      "protocol": "A2A",
+      "protocol_version": "1.0.0"
+    },
+    "preconditions": [
+      {
+        "id": "local_a2a_evidence_present",
+        "description": "local A2A evidence was read for this run",
+        "satisfied": true
+      },
+      {
+        "id": "invariant_has_a_subject",
+        "description": "this invariant had a subject in the evidence analysed",
+        "satisfied": false
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant PUSH_NOTIFICATION_BOUNDARY_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide PUSH_NOTIFICATION_BOUNDARY_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI07",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.message_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.405385096Z",
+      "observed_at": "2026-09-29T01:44:16.405385096Z",
+      "recorded_at": "2026-09-29T01:44:16.405385096Z"
+    },
+    "extensions": {
+      "dare.a2a-security.v1": {
+        "applicable": false,
+        "authentication_rule": "successful authentication != skill authorization",
+        "authenticity_rule": "authentic message != authorized instruction",
+        "bounded_claim_note": "A PASS means the applicable invariants remained satisfied under the local evidence analysed. It is not a statement that a remote agent is secure, that a peer is trustworthy, or that an exchange nobody captured was safe.",
+        "callback_rule": "webhook URL != permission to connect",
+        "content_rule": "peer content != privileged instruction",
+        "correlation_rule": "taskId match != principal/context match",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "delegation_rule": "delegation != privilege amplification",
+        "design_id": "I14",
+        "discovery_rule": "discovered Agent Card != authenticated identity",
+        "document_digests": [
+          "sha256:df960f1859767863426e448a88d58252a1fc1e80d6d308f94c291179b4f6ec0c"
+        ],
+        "evidence_digest": "sha256:5942af929dae0e28ea3658ed5ec3c14672e9aab97c8d3631e50d1a4be16988a7",
+        "exchanges_evaluated": 1,
+        "execution_note": "Evidence is read from local Agent Cards, captured exchanges, recorded verification results, delegation records and local policy. No A2A agent is contacted; no Agent Card is downloaded; no .well-known path or registry is queried; no JWK, JWKS or jku is resolved; no OAuth, OIDC or bearer credential is obtained or used; no TLS handshake is performed; no message is sent; no remote task is created or cancelled; no webhook or push endpoint is called; nothing from the evidence is executed; no external state changes.",
+        "extension_rule": "extension declaration != extension authority",
+        "external_egress_bytes": 0,
+        "invariant": "PUSH_NOTIFICATION_BOUNDARY_PRESERVED",
+        "listing_rule": "external agent listed != trusted peer",
+        "mode": "SIMULATED",
+        "negotiation_rule": "protocol compatibility != permission to downgrade",
+        "peers_evaluated": 1,
+        "property": "AGENT.A2A.PUSH_NOTIFICATION_BOUNDARY",
+        "retry_rule": "message retry != safe replay",
+        "scenario_digest": "sha256:e18fd9760cd0389098bb4046550fda55d31c4dc55024e043453383e14aede021",
+        "schema_rule": "schema-valid message != authentic message",
+        "scheme_rule": "declared security scheme != successful authentication",
+        "separation_note": "Cycle 013 owns generic prompt injection; Cycle 014 owns tool-invocation authorization; Cycle 015 owns identity, principal, delegation, privilege and tenant semantics; Cycle 018 owns concrete-failure aggregation; Cycle 019 owns supply-chain and external-agent inventory. This record carries only the A2A projection of those relations and takes verdict authority over none of them.",
+        "signature_rule": "signed Agent Card != authorized provider",
+        "state_changes": 0,
+        "surface": "SKILL_AUTHORIZATION",
+        "synthetic": true,
+        "tenant_rule": "tenant routing value != proof of tenant authorization",
+        "transport_rule": "TLS server identity != agent-level authorization",
+        "violations": 0
+      }
+    }
+  }
+]

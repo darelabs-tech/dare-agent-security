@@ -1,0 +1,7 @@
+{
+  "id": "BRL-006",
+  "class": "C",
+  "role": "control",
+  "title": "C control: skill authorization no longer fails; the route stays, undecided",
+  "graph_from": "APL-010"
+}

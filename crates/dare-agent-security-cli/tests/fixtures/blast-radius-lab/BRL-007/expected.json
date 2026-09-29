@@ -1,0 +1,37 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION"
+          ]
+        },
+        {
+          "node": "node:data:tenant-b-memory",
+          "class": "CROSS_TENANT_RESOURCE",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:human:alice",
+            "node:data:tenant-b-memory"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.MEMORY.TENANT_BOUNDARY"
+          ]
+        }
+      ]
+    }
+  ]
+}

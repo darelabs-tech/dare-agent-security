@@ -494,6 +494,7 @@ dependencies = [
  "dare-attack-graph",
  "dare-attack-path",
  "dare-benchmark",
+ "dare-blast-radius",
  "dare-coaz-integrity",
  "dare-continuous",
  "dare-coverage",
@@ -571,6 +572,19 @@ dependencies = [
  "tempfile",
  "thiserror",
  "time",
+]
+
+[[package]]
+name = "dare-blast-radius"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-attack-graph",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
 ]
 
 [[package]]

@@ -1,0 +1,7 @@
+{
+  "id": "BRL-016",
+  "class": "A",
+  "role": "control",
+  "title": "A control twin of BRL-001: the two targets its credential-separation delta counts for the token are CONTAINED",
+  "graph_from": "APL-017"
+}

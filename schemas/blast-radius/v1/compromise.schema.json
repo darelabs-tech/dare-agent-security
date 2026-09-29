@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darelabs.tech/schemas/blast-radius/v1/compromise.schema.json",
+  "title": "DARE Blast-Radius Compromise Scenario v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "graph_id",
+    "seeds"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+    },
+    "graph_id": {
+      "type": "string",
+      "pattern": "^graph:[0-9a-f]{64}$"
+    },
+    "seeds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "node_id": {
+            "type": "string",
+            "pattern": "^node:[a-z-]+:[A-Za-z0-9._:-]+$",
+            "maxLength": 400
+          },
+          "entity_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,95}$"
+          },
+          "kind": {
+            "enum": [
+              "PRINCIPAL_TAKEOVER",
+              "CREDENTIAL_LEAK",
+              "CONTENT_INJECTION",
+              "COMPONENT_COMPROMISE"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "node_id"
+            ],
+            "not": {
+              "required": [
+                "entity_id"
+              ]
+            }
+          },
+          {
+            "required": [
+              "entity_id"
+            ],
+            "not": {
+              "required": [
+                "node_id"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "max_depth": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "max_states": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    }
+  }
+}

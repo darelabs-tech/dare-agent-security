@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "scenario_id": "alice-takeover-memory",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER"
+    }
+  ]
+}

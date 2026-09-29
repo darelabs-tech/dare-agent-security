@@ -1,0 +1,383 @@
+[
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "mcp-auth-inbound_credential_not_reused_as_upstream_authority-5e8ce07280c222a6",
+    "vector": {
+      "id": "MCP-AUTH-LAB-026",
+      "version": "1",
+      "name": "the inbound credential stayed distinct from the upstream one"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-mcp-auth-security-lab",
+      "name": "DARE synthetic MCP auth-security lab",
+      "protocol": "mcp",
+      "protocol_version": "2026-07-28"
+    },
+    "preconditions": [
+      {
+        "id": "mcp_current_protocol_present",
+        "description": "the target speaks the current MCP protocol revision",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY was observed in this trial",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "MCP",
+        "standard": "2026-07-28 authorization",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "7cf064124d893b9a1278510ae118b4fb7643c7f60124bdb9d098e0459a60645b"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "517b7f7b39e5dc17c013993894840251865eb32cb0d8e50ba257510830950eab"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "bb090f1d6a1d56421eb0cefd1615ac646e3812a692a8d5af2a9296edaf0509a9"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.credential_material",
+        "observed.evidence_text"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.881277885Z",
+      "observed_at": "2026-09-29T01:44:16.881277885Z",
+      "recorded_at": "2026-09-29T01:44:16.881277885Z"
+    },
+    "extensions": {
+      "dare.mcp-auth-security.v1": {
+        "audience_rule": "valid_token != correct_audience",
+        "authorization_digest": "sha256:517b7f7b39e5dc17c013993894840251865eb32cb0d8e50ba257510830950eab",
+        "bounded_claim_note": "Verdicts are scoped to the tested vectors under the recorded conditions and never assert that MCP authentication is secure or that token misuse is impossible.",
+        "core_relation": "protocol_metadata != authenticated_identity",
+        "corpus_id": null,
+        "coverage_satisfied": true,
+        "credential_digest": "sha256:3c79219bba5f48287fd291ef1940a666307482ac6fee77ad7491252c74c67231",
+        "credential_rule": "inbound_mcp_token != upstream_service_token",
+        "event_digests": [
+          "sha256:f132ded5c8629415c49c6315956243eb7357c1a3a936aacbe86d1a2350f5f3c2",
+          "sha256:13c8a09e0059b905ab9e6162917232327db2a906324170e1c54382f528ac0121",
+          "sha256:2b0e397e317f7031c060b858944fd395283edac1030066a85e967160997002b7",
+          "sha256:10fa1cb2a874d94ec4249961b32e67402a8465d647582e49697e816f15229bf6",
+          "sha256:8c9b1fbcdea49e0329ae7fea4df5a083ea634c47a97d920bec9bda519d65efdb",
+          "sha256:40030367e83478d5261d328a11fd93141ec3406232b467a7f044d5a141d29a66",
+          "sha256:95516bb653604cf7b9e94e8771657d0941a786342065a652cf9dc5d42e8a6b89",
+          "sha256:5d47ffd4a3b1eaa2d2837904e15c76a1776933a29335cbc391b0a2fb11a6b576",
+          "sha256:e08581906620692a194027e30ea6f1afba883e6a20c63008819ea49f4b2036ab",
+          "sha256:ac8fa9b4169fbe7108a7e3f649eb5c41d08726db1a299c652229b65b1c97c0e6",
+          "sha256:af39695bee334239396881f851121b2ed3a223fc5143b22dcd46051b1d4299d1",
+          "sha256:84252f6b598333ca7a3146ad737ad66ebc0008dd0346931138232fddccaaf2f7",
+          "sha256:bf99b964235ca8ed32f2ccebe3374f7d8e88987c531502420225fffe41199280",
+          "sha256:26a26ee5347fa59975ef01cc0bbd44dab86d00f8f6cf18bb5e6c923de4cff74e",
+          "sha256:59fea0b786d51775cc9a1e9fa5e0bcfaba9c39f3974d818ee0f2a6991e0dedf2",
+          "sha256:2710d1211655c872e41c87b31b245e2fba35d3195269aa893f92056056410f71"
+        ],
+        "execution_note": "Evidence is read from local synthetic fixtures. No authorization server, token endpoint, introspection endpoint, JWKS endpoint, metadata URL, registration endpoint, identity provider, browser, MCP server or upstream API is contacted; no signature is verified; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "final_operation_digest": "sha256:e8fbb14ca938ed92aaaa3813239ad90097d1179051d2757ad953a1be73ae5778",
+        "flow_digest": "sha256:093b2a85ab692876843929fecd3d6085044d347cd40e8c1a1ac57b652a229274",
+        "identity_digest": "sha256:7f99d74c1665b8c358d8d93188e9c1c53719732b0e48813580477fea81d4fdf1",
+        "invariant": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+        "mode": "SIMULATED",
+        "operation_rule": "correct_audience != authorization_for_final_operation",
+        "presence_rule": "token_presence != token_validity",
+        "property": "MCP.AUTH.CREDENTIAL_SEPARATION",
+        "protocol_digest": "sha256:fec97907621714e82ba47437392acd3f97a83f9738dbbdc25b4f37c920fce57e",
+        "protocol_revision": "2026-07-28",
+        "registration_digest": "sha256:95441bfda74c96944c41031f9d4f0759fa30e6c1a68c9570915839f5e753ce12",
+        "replay_rule": "same scenario_id != same authorization semantics",
+        "resource_digest": "sha256:7d95c4ba2fd720b28c86838312a00d99f24edec244a3d5dc7429f3487ee6f402",
+        "scenario_digest": "sha256:7cf064124d893b9a1278510ae118b4fb7643c7f60124bdb9d098e0459a60645b",
+        "scope_digest": "sha256:d8721ba68212db9d7ee8d88732cd88b274342faef2b45187a28d8d1407d63c54",
+        "separation_note": "Cycle 002 owns the MCP revision and discovery lifecycle; Cycle 003 remains the engine for authorization-to-execution binding; Cycle 015 owns principal, tenant and delegation semantics. This record composes with them and replaces none of them.",
+        "state_changes": 0,
+        "surface": "CREDENTIAL_AND_IDENTITY",
+        "synthetic": true,
+        "token_digest": "sha256:bb090f1d6a1d56421eb0cefd1615ac646e3812a692a8d5af2a9296edaf0509a9",
+        "trial_index": 0,
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "mcp-auth-inbound_credential_not_reused_as_upstream_authority-cdc583c31aa6ff5b",
+    "vector": {
+      "id": "MCP-AUTH-LAB-026",
+      "version": "1",
+      "name": "the inbound credential stayed distinct from the upstream one"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-mcp-auth-security-lab",
+      "name": "DARE synthetic MCP auth-security lab",
+      "protocol": "mcp",
+      "protocol_version": "2026-07-28"
+    },
+    "preconditions": [
+      {
+        "id": "mcp_current_protocol_present",
+        "description": "the target speaks the current MCP protocol revision",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY was observed in this trial",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "MCP",
+        "standard": "2026-07-28 authorization",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "7cf064124d893b9a1278510ae118b4fb7643c7f60124bdb9d098e0459a60645b"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "517b7f7b39e5dc17c013993894840251865eb32cb0d8e50ba257510830950eab"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "bb090f1d6a1d56421eb0cefd1615ac646e3812a692a8d5af2a9296edaf0509a9"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.credential_material",
+        "observed.evidence_text"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.881277885Z",
+      "observed_at": "2026-09-29T01:44:16.881277885Z",
+      "recorded_at": "2026-09-29T01:44:16.881277885Z"
+    },
+    "extensions": {
+      "dare.mcp-auth-security.v1": {
+        "audience_rule": "valid_token != correct_audience",
+        "authorization_digest": "sha256:517b7f7b39e5dc17c013993894840251865eb32cb0d8e50ba257510830950eab",
+        "bounded_claim_note": "Verdicts are scoped to the tested vectors under the recorded conditions and never assert that MCP authentication is secure or that token misuse is impossible.",
+        "core_relation": "protocol_metadata != authenticated_identity",
+        "corpus_id": null,
+        "coverage_satisfied": true,
+        "credential_digest": "sha256:3c79219bba5f48287fd291ef1940a666307482ac6fee77ad7491252c74c67231",
+        "credential_rule": "inbound_mcp_token != upstream_service_token",
+        "event_digests": [
+          "sha256:f132ded5c8629415c49c6315956243eb7357c1a3a936aacbe86d1a2350f5f3c2",
+          "sha256:13c8a09e0059b905ab9e6162917232327db2a906324170e1c54382f528ac0121",
+          "sha256:2b0e397e317f7031c060b858944fd395283edac1030066a85e967160997002b7",
+          "sha256:10fa1cb2a874d94ec4249961b32e67402a8465d647582e49697e816f15229bf6",
+          "sha256:8c9b1fbcdea49e0329ae7fea4df5a083ea634c47a97d920bec9bda519d65efdb",
+          "sha256:40030367e83478d5261d328a11fd93141ec3406232b467a7f044d5a141d29a66",
+          "sha256:95516bb653604cf7b9e94e8771657d0941a786342065a652cf9dc5d42e8a6b89",
+          "sha256:5d47ffd4a3b1eaa2d2837904e15c76a1776933a29335cbc391b0a2fb11a6b576",
+          "sha256:e08581906620692a194027e30ea6f1afba883e6a20c63008819ea49f4b2036ab",
+          "sha256:ac8fa9b4169fbe7108a7e3f649eb5c41d08726db1a299c652229b65b1c97c0e6",
+          "sha256:af39695bee334239396881f851121b2ed3a223fc5143b22dcd46051b1d4299d1",
+          "sha256:84252f6b598333ca7a3146ad737ad66ebc0008dd0346931138232fddccaaf2f7",
+          "sha256:bf99b964235ca8ed32f2ccebe3374f7d8e88987c531502420225fffe41199280",
+          "sha256:26a26ee5347fa59975ef01cc0bbd44dab86d00f8f6cf18bb5e6c923de4cff74e",
+          "sha256:59fea0b786d51775cc9a1e9fa5e0bcfaba9c39f3974d818ee0f2a6991e0dedf2",
+          "sha256:2710d1211655c872e41c87b31b245e2fba35d3195269aa893f92056056410f71"
+        ],
+        "execution_note": "Evidence is read from local synthetic fixtures. No authorization server, token endpoint, introspection endpoint, JWKS endpoint, metadata URL, registration endpoint, identity provider, browser, MCP server or upstream API is contacted; no signature is verified; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "final_operation_digest": "sha256:e8fbb14ca938ed92aaaa3813239ad90097d1179051d2757ad953a1be73ae5778",
+        "flow_digest": "sha256:093b2a85ab692876843929fecd3d6085044d347cd40e8c1a1ac57b652a229274",
+        "identity_digest": "sha256:7f99d74c1665b8c358d8d93188e9c1c53719732b0e48813580477fea81d4fdf1",
+        "invariant": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+        "mode": "SIMULATED",
+        "operation_rule": "correct_audience != authorization_for_final_operation",
+        "presence_rule": "token_presence != token_validity",
+        "property": "MCP.AUTH.CREDENTIAL_SEPARATION",
+        "protocol_digest": "sha256:fec97907621714e82ba47437392acd3f97a83f9738dbbdc25b4f37c920fce57e",
+        "protocol_revision": "2026-07-28",
+        "registration_digest": "sha256:95441bfda74c96944c41031f9d4f0759fa30e6c1a68c9570915839f5e753ce12",
+        "replay_rule": "same scenario_id != same authorization semantics",
+        "resource_digest": "sha256:7d95c4ba2fd720b28c86838312a00d99f24edec244a3d5dc7429f3487ee6f402",
+        "scenario_digest": "sha256:7cf064124d893b9a1278510ae118b4fb7643c7f60124bdb9d098e0459a60645b",
+        "scope_digest": "sha256:d8721ba68212db9d7ee8d88732cd88b274342faef2b45187a28d8d1407d63c54",
+        "separation_note": "Cycle 002 owns the MCP revision and discovery lifecycle; Cycle 003 remains the engine for authorization-to-execution binding; Cycle 015 owns principal, tenant and delegation semantics. This record composes with them and replaces none of them.",
+        "state_changes": 0,
+        "surface": "CREDENTIAL_AND_IDENTITY",
+        "synthetic": true,
+        "token_digest": "sha256:bb090f1d6a1d56421eb0cefd1615ac646e3812a692a8d5af2a9296edaf0509a9",
+        "trial_index": 1,
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "mcp-auth-inbound_credential_not_reused_as_upstream_authority-569d99bbd3293e7a",
+    "vector": {
+      "id": "MCP-AUTH-LAB-026",
+      "version": "1",
+      "name": "the inbound credential stayed distinct from the upstream one"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-mcp-auth-security-lab",
+      "name": "DARE synthetic MCP auth-security lab",
+      "protocol": "mcp",
+      "protocol_version": "2026-07-28"
+    },
+    "preconditions": [
+      {
+        "id": "mcp_current_protocol_present",
+        "description": "the target speaks the current MCP protocol revision",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY was observed in this trial",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "MCP",
+        "standard": "2026-07-28 authorization",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "7cf064124d893b9a1278510ae118b4fb7643c7f60124bdb9d098e0459a60645b"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "517b7f7b39e5dc17c013993894840251865eb32cb0d8e50ba257510830950eab"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "bb090f1d6a1d56421eb0cefd1615ac646e3812a692a8d5af2a9296edaf0509a9"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.credential_material",
+        "observed.evidence_text"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.881277885Z",
+      "observed_at": "2026-09-29T01:44:16.881277885Z",
+      "recorded_at": "2026-09-29T01:44:16.881277885Z"
+    },
+    "extensions": {
+      "dare.mcp-auth-security.v1": {
+        "audience_rule": "valid_token != correct_audience",
+        "authorization_digest": "sha256:517b7f7b39e5dc17c013993894840251865eb32cb0d8e50ba257510830950eab",
+        "bounded_claim_note": "Verdicts are scoped to the tested vectors under the recorded conditions and never assert that MCP authentication is secure or that token misuse is impossible.",
+        "core_relation": "protocol_metadata != authenticated_identity",
+        "corpus_id": null,
+        "coverage_satisfied": true,
+        "credential_digest": "sha256:3c79219bba5f48287fd291ef1940a666307482ac6fee77ad7491252c74c67231",
+        "credential_rule": "inbound_mcp_token != upstream_service_token",
+        "event_digests": [
+          "sha256:f132ded5c8629415c49c6315956243eb7357c1a3a936aacbe86d1a2350f5f3c2",
+          "sha256:13c8a09e0059b905ab9e6162917232327db2a906324170e1c54382f528ac0121",
+          "sha256:2b0e397e317f7031c060b858944fd395283edac1030066a85e967160997002b7",
+          "sha256:10fa1cb2a874d94ec4249961b32e67402a8465d647582e49697e816f15229bf6",
+          "sha256:8c9b1fbcdea49e0329ae7fea4df5a083ea634c47a97d920bec9bda519d65efdb",
+          "sha256:40030367e83478d5261d328a11fd93141ec3406232b467a7f044d5a141d29a66",
+          "sha256:95516bb653604cf7b9e94e8771657d0941a786342065a652cf9dc5d42e8a6b89",
+          "sha256:5d47ffd4a3b1eaa2d2837904e15c76a1776933a29335cbc391b0a2fb11a6b576",
+          "sha256:e08581906620692a194027e30ea6f1afba883e6a20c63008819ea49f4b2036ab",
+          "sha256:ac8fa9b4169fbe7108a7e3f649eb5c41d08726db1a299c652229b65b1c97c0e6",
+          "sha256:af39695bee334239396881f851121b2ed3a223fc5143b22dcd46051b1d4299d1",
+          "sha256:84252f6b598333ca7a3146ad737ad66ebc0008dd0346931138232fddccaaf2f7",
+          "sha256:bf99b964235ca8ed32f2ccebe3374f7d8e88987c531502420225fffe41199280",
+          "sha256:26a26ee5347fa59975ef01cc0bbd44dab86d00f8f6cf18bb5e6c923de4cff74e",
+          "sha256:59fea0b786d51775cc9a1e9fa5e0bcfaba9c39f3974d818ee0f2a6991e0dedf2",
+          "sha256:2710d1211655c872e41c87b31b245e2fba35d3195269aa893f92056056410f71"
+        ],
+        "execution_note": "Evidence is read from local synthetic fixtures. No authorization server, token endpoint, introspection endpoint, JWKS endpoint, metadata URL, registration endpoint, identity provider, browser, MCP server or upstream API is contacted; no signature is verified; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "final_operation_digest": "sha256:e8fbb14ca938ed92aaaa3813239ad90097d1179051d2757ad953a1be73ae5778",
+        "flow_digest": "sha256:093b2a85ab692876843929fecd3d6085044d347cd40e8c1a1ac57b652a229274",
+        "identity_digest": "sha256:7f99d74c1665b8c358d8d93188e9c1c53719732b0e48813580477fea81d4fdf1",
+        "invariant": "INBOUND_CREDENTIAL_NOT_REUSED_AS_UPSTREAM_AUTHORITY",
+        "mode": "SIMULATED",
+        "operation_rule": "correct_audience != authorization_for_final_operation",
+        "presence_rule": "token_presence != token_validity",
+        "property": "MCP.AUTH.CREDENTIAL_SEPARATION",
+        "protocol_digest": "sha256:fec97907621714e82ba47437392acd3f97a83f9738dbbdc25b4f37c920fce57e",
+        "protocol_revision": "2026-07-28",
+        "registration_digest": "sha256:95441bfda74c96944c41031f9d4f0759fa30e6c1a68c9570915839f5e753ce12",
+        "replay_rule": "same scenario_id != same authorization semantics",
+        "resource_digest": "sha256:7d95c4ba2fd720b28c86838312a00d99f24edec244a3d5dc7429f3487ee6f402",
+        "scenario_digest": "sha256:7cf064124d893b9a1278510ae118b4fb7643c7f60124bdb9d098e0459a60645b",
+        "scope_digest": "sha256:d8721ba68212db9d7ee8d88732cd88b274342faef2b45187a28d8d1407d63c54",
+        "separation_note": "Cycle 002 owns the MCP revision and discovery lifecycle; Cycle 003 remains the engine for authorization-to-execution binding; Cycle 015 owns principal, tenant and delegation semantics. This record composes with them and replaces none of them.",
+        "state_changes": 0,
+        "surface": "CREDENTIAL_AND_IDENTITY",
+        "synthetic": true,
+        "token_digest": "sha256:bb090f1d6a1d56421eb0cefd1615ac646e3812a692a8d5af2a9296edaf0509a9",
+        "trial_index": 2,
+        "violations": 0
+      }
+    }
+  }
+]

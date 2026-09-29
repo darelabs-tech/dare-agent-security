@@ -1,0 +1,7 @@
+{
+  "id": "BRL-002",
+  "class": "A",
+  "role": "control",
+  "title": "A control: alice taken over; privilege amplification, metadata boundary and final-operation binding hold",
+  "graph_from": "APL-017"
+}

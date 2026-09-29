@@ -1,0 +1,15 @@
+{
+  "declared_component_ids": [
+    "left-pad",
+    "support-agent"
+  ],
+  "expected_edges": [
+    {
+      "relation": "DEPENDS_ON",
+      "source_id": "support-agent",
+      "target_id": "left-pad"
+    }
+  ],
+  "manifest_id": "support-agent",
+  "schema_version": "1"
+}

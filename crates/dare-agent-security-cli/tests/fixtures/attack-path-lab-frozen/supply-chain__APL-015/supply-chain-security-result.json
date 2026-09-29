@@ -1,0 +1,153 @@
+{
+  "schema_version": "1",
+  "schema_id": "https://darelabs.tech/schemas/supply-chain-security/v1/result.schema.json",
+  "scenario_id": "supply-static-001",
+  "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+  "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+  "class": "COMPONENT_IDENTITY",
+  "primary_invariant": "COMPONENT_IDENTITY_UNAMBIGUOUS",
+  "property_id": "AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY",
+  "mode": "STATIC",
+  "synthetic": false,
+  "verdict": "FAIL",
+  "reason": "1 independent supply-chain violation(s) were observed across 4 decided invariant(s); 8 could not be decided from the evidence read",
+  "outcomes": [
+    {
+      "invariant": "COMPONENT_PROVENANCE_SUFFICIENT",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no provenance evidence was read, so whether a component has sufficient provenance was never asked (missing: PROVENANCE_CONTEXT)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "COMPONENT_IDENTITY_UNAMBIGUOUS",
+      "verdict": "PASS",
+      "reason": "COMPONENT_IDENTITY_UNAMBIGUOUS held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "ARTIFACT_DIGEST_BOUND_TO_COMPONENT",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no artifact digest was observed, so the artifact could not be bound to the component that was approved (the channel was observed and carried nothing sufficient to decide the comparison, so the question stayed open)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY",
+      "verdict": "PASS",
+      "reason": "MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "COMPONENT_SOURCE_TRUST_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "no component origin claim was observed, so source trust had nothing to evaluate (missing: SOURCE_TRUST_CONTEXT)",
+      "coverage_satisfied": false,
+      "applicable": true
+    },
+    {
+      "invariant": "PROVENANCE_SUBJECT_AND_BUILDER_BOUND",
+      "verdict": "INCONCLUSIVE",
+      "reason": "PROVENANCE_SUBJECT_AND_BUILDER_BOUND has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "ATTESTATION_SUBJECT_DIGEST_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "ATTESTATION_SUBJECT_DIGEST_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "DEPENDENCY_EDGE_INTEGRITY_PRESERVED",
+      "verdict": "PASS",
+      "reason": "DEPENDENCY_EDGE_INTEGRITY_PRESERVED held, and the evidence needed to decide it was present",
+      "coverage_satisfied": true,
+      "applicable": true
+    },
+    {
+      "invariant": "MODEL_LINEAGE_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "MODEL_LINEAGE_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "DATASET_PROVENANCE_PRESERVED",
+      "verdict": "INCONCLUSIVE",
+      "reason": "DATASET_PROVENANCE_PRESERVED has no subject in this evidence, so the question does not arise",
+      "coverage_satisfied": false,
+      "applicable": false
+    },
+    {
+      "invariant": "BOM_REQUIRED_EVIDENCE_PRESENT",
+      "verdict": "FAIL",
+      "reason": "the bill of materials describes `support-agent` as a PACKAGE without an artifact digest",
+      "violations": [
+        {
+          "invariant": "BOM_REQUIRED_EVIDENCE_PRESENT",
+          "reason": "the bill of materials describes `support-agent` as a PACKAGE without an artifact digest",
+          "deciding_observation_digests": [
+            "sha256:f7f153e121cb7069324743dd71418a83879d08d9c22a1bf4335b8c3dc2e9becf"
+          ],
+          "component_id": "support-agent"
+        }
+      ],
+      "coverage_satisfied": true,
+      "applicable": true
+    }
+  ],
+  "violations": [
+    {
+      "invariant": "BOM_REQUIRED_EVIDENCE_PRESENT",
+      "reason": "the bill of materials describes `support-agent` as a PACKAGE without an artifact digest",
+      "deciding_observation_digests": [
+        "sha256:f7f153e121cb7069324743dd71418a83879d08d9c22a1bf4335b8c3dc2e9becf"
+      ],
+      "component_id": "support-agent"
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "app.cdx.json",
+      "format": "CYCLONE_DX",
+      "bytes": 645,
+      "content_digest": "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+    }
+  ],
+  "components_evaluated": 2,
+  "relationships_evaluated": 1,
+  "observation_digests": [
+    "sha256:d8709146d4ea3ab1ae9905804b02a11e410302b2b3c6388f87c76614171eb8c5",
+    "sha256:e3ff026d5b2552bb43c8bb513e25a870926f6f58a3197aa2a9b03daa6cdc1d26",
+    "sha256:a42bf2c67a1ddf8563c64ba54d7258e9e0526dbdd7d136e6aa6d69ffc9bec838",
+    "sha256:f7f153e121cb7069324743dd71418a83879d08d9c22a1bf4335b8c3dc2e9becf",
+    "sha256:331a532de66a0fe1206581c7ec8fe911e5ab8b24edd97b092c85e8b5ccc0ad75",
+    "sha256:804173105a801742410f5b9dfac7e165472ca3a9699175df07e1ddb72fbb0243"
+  ],
+  "redaction_state": "REDACTED",
+  "budget": {
+    "bom_bytes_admitted": 915,
+    "max_bom_bytes": 16777216,
+    "components_admitted": 4,
+    "max_components": 2048,
+    "relationships_admitted": 2,
+    "max_relationships": 8192,
+    "output_bytes_used": 65170,
+    "max_total_output_bytes": 8388608,
+    "output_bytes_per_trial": 1048576,
+    "state_changes": 0,
+    "external_egress_bytes": 0,
+    "exhausted": false
+  }
+}

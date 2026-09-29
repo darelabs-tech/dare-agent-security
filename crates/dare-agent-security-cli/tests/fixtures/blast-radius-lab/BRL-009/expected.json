@@ -1,0 +1,49 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:data:uploaded-doc",
+      "kind": "CONTENT_INJECTION",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:data:uploaded-doc",
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION",
+            "AGENT.RAG.CONTENT_TRUST_BOUNDARY"
+          ]
+        },
+        {
+          "node": "node:data:tenant-b-doc",
+          "class": "CROSS_TENANT_RESOURCE",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:data:uploaded-doc",
+            "node:human:alice",
+            "node:data:tenant-b-doc"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.RAG.CONTENT_TRUST_BOUNDARY",
+            "AGENT.RAG.TENANT_DOCUMENT_ISOLATION"
+          ]
+        }
+      ]
+    }
+  ],
+  "delta": [
+    {
+      "properties": [
+        "AGENT.RAG.CONTENT_TRUST_BOUNDARY"
+      ],
+      "targets_contained_if_held": 2
+    }
+  ]
+}

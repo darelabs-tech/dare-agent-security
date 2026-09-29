@@ -1,0 +1,27 @@
+{
+  "exit": 0,
+  "seeds": [
+    {
+      "node": "node:human:alice",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "CONTAINED",
+          "route": [
+            "node:human:alice",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROLS_HELD",
+          "frontier_properties": [
+            "AGENT.IDENTITY.PRIVILEGE_AMPLIFICATION"
+          ]
+        }
+      ],
+      "absent": [
+        "node:data:tenant-b-memory"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "BRL-010",
+  "class": "E",
+  "role": "control",
+  "title": "E control: the content trust boundary and privilege amplification hold",
+  "graph_from": "APL-002"
+}

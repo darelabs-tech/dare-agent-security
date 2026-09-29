@@ -1,0 +1,11 @@
+{
+  "schema_version": "1",
+  "scenario_id": "uploaded-doc-injection",
+  "graph_id": "${graph_id}",
+  "seeds": [
+    {
+      "node_id": "node:data:uploaded-doc",
+      "kind": "CONTENT_INJECTION"
+    }
+  ]
+}

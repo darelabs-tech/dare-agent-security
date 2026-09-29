@@ -1,0 +1,7 @@
+{
+  "id": "BRL-015",
+  "class": "G",
+  "role": "control",
+  "title": "G control twin of BRL-014: the one target its delta counts is CONTAINED",
+  "graph_from": "APL-020"
+}

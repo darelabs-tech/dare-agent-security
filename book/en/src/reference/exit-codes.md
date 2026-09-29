@@ -70,6 +70,15 @@ Categorized errors print as `[category] message`, where category is one of:
 | 2 | A feasible path is `CONTROL_FAILED` or `CONTROL_UNDECIDED`, or enumeration was truncated. |
 | 3 | Refusal: an invalid, unbound or duplicate artifact, an invalid system model, or a bound above its maximum. Nothing is written. |
 
+## `validate blast-radius`
+
+| Code | Meaning |
+|---|---|
+| 0 | No target is `EXPOSED`, and nothing was truncated. `CONTAINED` is not a claim that the system is safe. |
+| 1 | Internal error. |
+| 2 | A target is `EXPOSED`, or a search was truncated (`CONTAINMENT_UNKNOWN` is not a pass). |
+| 3 | Refusal: an invalid graph or scenario, an unknown, ambiguous, duplicate or unfitting seed, a bound out of range, or an output that would carry a credential-shaped value. Nothing is written. |
+
 ## `validate adversarial`
 
 | Code | Meaning |

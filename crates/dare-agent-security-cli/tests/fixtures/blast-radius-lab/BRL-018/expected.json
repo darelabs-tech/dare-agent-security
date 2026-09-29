@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "seeds": [
+    {
+      "node": "node:agent:planner-peer",
+      "kind": "PRINCIPAL_TAKEOVER",
+      "targets": [],
+      "absent": [
+        "node:resource:ticket-doc",
+        "node:credential:index-admin-cred"
+      ],
+      "refused_steps_min": 1
+    }
+  ]
+}

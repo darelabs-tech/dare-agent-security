@@ -1,0 +1,7 @@
+{
+  "id": "BRL-004",
+  "class": "B",
+  "role": "control",
+  "title": "B control: privilege amplification holds; no tenant-B document is reachable",
+  "graph_from": "APL-002"
+}

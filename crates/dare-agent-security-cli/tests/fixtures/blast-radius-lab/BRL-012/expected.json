@@ -1,0 +1,35 @@
+{
+  "exit": 2,
+  "seeds": [
+    {
+      "node": "node:capability:left-pad",
+      "kind": "COMPONENT_COMPROMISE",
+      "targets": [
+        {
+          "node": "node:credential:index-admin-cred",
+          "class": "PRIVILEGED_CREDENTIAL",
+          "exposure": "EXPOSED",
+          "route": [
+            "node:capability:left-pad",
+            "node:capability:support-agent",
+            "node:agent:assistant",
+            "node:identity:index-service",
+            "node:credential:index-admin-cred"
+          ],
+          "control_state": "CONTROL_FAILED",
+          "failed_properties": [
+            "AGENT.SUPPLY_CHAIN.BOM_COMPLETENESS"
+          ]
+        }
+      ]
+    }
+  ],
+  "delta": [
+    {
+      "properties": [
+        "AGENT.SUPPLY_CHAIN.BOM_COMPLETENESS"
+      ],
+      "targets_contained_if_held": 1
+    }
+  ]
+}

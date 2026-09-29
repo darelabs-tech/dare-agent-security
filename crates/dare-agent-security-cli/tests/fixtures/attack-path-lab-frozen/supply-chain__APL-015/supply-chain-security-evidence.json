@@ -1,0 +1,1260 @@
+[
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-component_provenance_sufficient-2e9d78049fed5392",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant COMPONENT_PROVENANCE_SUFFICIENT holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide COMPONENT_PROVENANCE_SUFFICIENT was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "COMPONENT_PROVENANCE_SUFFICIENT",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.COMPONENT_PROVENANCE",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-external_capability_drift_not_observed-4d18b4dad62837aa",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "EXTERNAL_CAPABILITY_DRIFT_NOT_OBSERVED",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.CAPABILITY_DRIFT",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-component_identity_unambiguous-753910eb7c7f47c6",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant COMPONENT_IDENTITY_UNAMBIGUOUS holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of COMPONENT_IDENTITY_UNAMBIGUOUS was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "COMPONENT_IDENTITY_UNAMBIGUOUS",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-artifact_digest_bound_to_component-7994ae4f4f469747",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant ARTIFACT_DIGEST_BOUND_TO_COMPONENT holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide ARTIFACT_DIGEST_BOUND_TO_COMPONENT was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "ARTIFACT_DIGEST_BOUND_TO_COMPONENT",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.ARTIFACT_INTEGRITY",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-mutable_reference_not_used_as_immutable_identity-edb67e5b1956d4ce",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "MUTABLE_REFERENCE_NOT_USED_AS_IMMUTABLE_IDENTITY",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.COMPONENT_IDENTITY",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-component_source_trust_preserved-2da31b06c7765002",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant COMPONENT_SOURCE_TRUST_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide COMPONENT_SOURCE_TRUST_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "COMPONENT_SOURCE_TRUST_PRESERVED",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.SOURCE_TRUST",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-provenance_subject_and_builder_bound-83ee9da987dc35ee",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant PROVENANCE_SUBJECT_AND_BUILDER_BOUND holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide PROVENANCE_SUBJECT_AND_BUILDER_BOUND was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "PROVENANCE_SUBJECT_AND_BUILDER_BOUND",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.COMPONENT_PROVENANCE",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-attestation_subject_digest_preserved-ac7a6bff6b9b47e3",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant ATTESTATION_SUBJECT_DIGEST_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide ATTESTATION_SUBJECT_DIGEST_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "ATTESTATION_SUBJECT_DIGEST_PRESERVED",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.ATTESTATION_BINDING",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-dependency_edge_integrity_preserved-6d2621957183b78f",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant DEPENDENCY_EDGE_INTEGRITY_PRESERVED holds"
+    },
+    "observed": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "no violation of DEPENDENCY_EDGE_INTEGRITY_PRESERVED was observed in this evidence",
+      "source": "FIXTURE"
+    },
+    "verdict": "PASS",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "DEPENDENCY_EDGE_INTEGRITY_PRESERVED",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.DEPENDENCY_INTEGRITY",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-model_lineage_preserved-d29e51c0b42e4cc3",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant MODEL_LINEAGE_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide MODEL_LINEAGE_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "MODEL_LINEAGE_PRESERVED",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.MODEL_LINEAGE",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-dataset_provenance_preserved-44c73fc675995387",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant DATASET_PROVENANCE_PRESERVED holds"
+    },
+    "observed": {
+      "description": "the evidence required to decide DATASET_PROVENANCE_PRESERVED was not present",
+      "source": "FIXTURE"
+    },
+    "verdict": "INCONCLUSIVE",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": false,
+        "deciding_observation_digests": [],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "DATASET_PROVENANCE_PRESERVED",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.DATASET_PROVENANCE",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 0
+      }
+    }
+  },
+  {
+    "schema": {
+      "id": "https://darelabs.tech/schemas/evidence/v1/security-evidence.schema.json",
+      "version": "1.0.0"
+    },
+    "id": "supply-chain-bom_required_evidence_present-d65a673b77254fe7",
+    "vector": {
+      "id": "supply-static-001",
+      "version": "1",
+      "name": "every component resolves to one canonical identity"
+    },
+    "target": {
+      "type": "synthetic-agent",
+      "id": "synthetic-agentic-supply-chain-lab",
+      "name": "DARE synthetic agentic supply-chain lab"
+    },
+    "preconditions": [
+      {
+        "id": "local_bill_of_materials_present",
+        "description": "a local bill of materials was read for this run",
+        "satisfied": true
+      }
+    ],
+    "expected": {
+      "decision": "DENY",
+      "result": "invariant-holds",
+      "description": "security invariant BOM_REQUIRED_EVIDENCE_PRESENT holds"
+    },
+    "observed": {
+      "decision": "ALLOW",
+      "result": "invariant-violated",
+      "description": "a deterministic violation of BOM_REQUIRED_EVIDENCE_PRESENT was observed",
+      "source": "FIXTURE"
+    },
+    "verdict": "FAIL",
+    "standards": [
+      {
+        "organization": "OWASP",
+        "standard": "Agentic Top 10 (2026) ASI04",
+        "version": "2026",
+        "control": "NORMATIVE"
+      }
+    ],
+    "artifacts": [],
+    "hashes": [
+      {
+        "algorithm": "sha256",
+        "value": "ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9"
+      },
+      {
+        "algorithm": "sha256",
+        "value": "e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+      }
+    ],
+    "redaction": {
+      "applied": true,
+      "strategy": "MASK",
+      "fields": [
+        "observed.document_content"
+      ]
+    },
+    "timestamps": {
+      "started_at": "2026-09-29T01:44:16.688759285Z",
+      "observed_at": "2026-09-29T01:44:16.688759285Z",
+      "recorded_at": "2026-09-29T01:44:16.688759285Z"
+    },
+    "extensions": {
+      "dare.supply-chain-security.v1": {
+        "a2a_rule": "external agent inventory != A2A authorization",
+        "artifact_rule": "same name and version != same artifact",
+        "bounded_claim_note": "Verdicts are scoped to the invariants decided from the documents actually read, and never assert that a supply chain is secure or that component substitution is impossible.",
+        "completeness_rule": "complete AI-BOM != secure supply chain",
+        "components_evaluated": 2,
+        "coordinate_rule": "component URL != authorization to fetch",
+        "coverage_satisfied": true,
+        "deciding_observation_digests": [
+          "sha256:f7f153e121cb7069324743dd71418a83879d08d9c22a1bf4335b8c3dc2e9becf"
+        ],
+        "dependency_rule": "declared dependency != observed dependency",
+        "document_digests": [
+          "sha256:e96b801fd9583915fec4a0707d5f995c6dafb30f005634824af4bd6dd96a904b"
+        ],
+        "evidence_digest": "sha256:7b2f8bed8134a75c55fec7f4ce2f17568d22161f9e1dfb5e54c43bae300ad4f9",
+        "execution_note": "Evidence is read from local bill-of-materials, provenance and attestation documents. No package registry, model hub, container registry, Git host, transparency log, signing service or vulnerability database is contacted; no signature is issued; no artifact, model or archive is executed or extracted; no state change or external egress occurs.",
+        "external_egress_bytes": 0,
+        "identity_rule": "component name != component identity",
+        "invariant": "BOM_REQUIRED_EVIDENCE_PRESENT",
+        "inventory_rule": "inventory != trust",
+        "mode": "STATIC",
+        "property": "AGENT.SUPPLY_CHAIN.BOM_COMPLETENESS",
+        "provenance_rule": "digest presence != provenance",
+        "relationships_evaluated": 1,
+        "scenario_digest": "sha256:ab3d2e818fea3125a7c85af064550d66b8e1b518ba3e64ed2448df90641d5658",
+        "separation_note": "Cycle 012 owns the agentic risk registry and the capability-drift property; Cycle 014 owns tool-invocation authorization; Cycle 020 owns agent-to-agent security. This record composes with them and replaces none of them.",
+        "signature_rule": "valid signature evidence != authorized signer",
+        "state_changes": 0,
+        "surface": "COMPONENT_IDENTITY",
+        "synthetic": false,
+        "trust_rule": "provenance presence != trusted provenance",
+        "version_rule": "version string != immutable artifact",
+        "violations": 1
+      }
+    }
+  }
+]
