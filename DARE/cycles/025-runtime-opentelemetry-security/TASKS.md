@@ -42,7 +42,7 @@ Throughout the cycle:
 - [x] task-018 — Implement the evidence bridge and the coverage module
 - [x] task-019 — Append the two `AGENT.TELEMETRY` properties and the `runtime_trace_present` predicate
 - [x] task-020 — Add the `runtime-telemetry-baseline-2026` profile
-- [ ] task-021 — Implement `summary.md`
+- [x] task-021 — Implement `summary.md`
 - [ ] task-022 — Add the `validate runtime-telemetry` CLI subcommand
 - [ ] task-023 — Add the CLI refusal corpus and the double-run test
 - [ ] task-024 — Build OTEL-LAB (≥ 40 entries) with the SIMULATED reference writer

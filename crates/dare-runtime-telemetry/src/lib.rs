@@ -22,6 +22,7 @@ pub mod policy;
 pub mod result;
 pub mod schema;
 pub mod semconv;
+pub mod summary;
 pub mod trace;
 
 pub use error::{Input, Refusal, Result, TelemetryError};
