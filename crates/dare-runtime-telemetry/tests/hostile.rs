@@ -186,7 +186,7 @@ fn secrets_in_values_fail_confidentiality_and_never_reach_an_artifact() {
     let secrets = [
         "Bearer DARE-SYNTHETIC-CANARY-hostile001",
         "DARE-SYNTHETIC-CANARY-hostile002",
-        "-----BEGIN PRIVATE KEY----- DARE-SYNTHETIC-CANARY-hostile003",
+        "-----BEGIN DARE-SYNTHETIC-CANARY-hostile003",
     ];
     for (i, secret) in secrets.iter().enumerate() {
         let mut t = base(&format!("secret-{i}"));

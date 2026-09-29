@@ -66,11 +66,11 @@ fn no_value_and_no_time_stamp_appear() {
     t[0] = t[0]
         .clone()
         .s("note", "CANARY-SUMMARY-TEXT-7d1e")
-        .s("auth", "Bearer CANARY-SUMMARY-TOKEN-99");
+        .s("auth", "Bearer DARE-SYNTHETIC-CANARY-summary99");
     let md = render(&[t, failing("2")], true);
     for planted in [
         "CANARY-SUMMARY-TEXT-7d1e",
-        "CANARY-SUMMARY-TOKEN-99",
+        "DARE-SYNTHETIC-CANARY-summary99",
         "user-7",
         "delete_all",
         "search",

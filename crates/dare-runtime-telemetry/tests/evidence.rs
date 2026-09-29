@@ -153,7 +153,7 @@ fn records_carry_no_attribute_value_and_neutralize_hostile_keys() {
     let mut t = good_trace("1");
     t[0] = t[0]
         .clone()
-        .s(jwt_key, "Bearer CANARY-VALUE-9f3b2a7c41d0")
+        .s(jwt_key, "Bearer DARE-SYNTHETIC-CANARY-9f3b2a7c41d0")
         .s("note", "CANARY-TOOL-TEXT-51e7");
     let (r, records) = bound(&[t], true);
     let t1 = r
@@ -165,7 +165,7 @@ fn records_carry_no_attribute_value_and_neutralize_hostile_keys() {
     assert_eq!(t1.verdict, Some(Verdict::Fail));
     let json = serde_json::to_string(&records).unwrap();
     for planted in [
-        "CANARY-VALUE-9f3b2a7c41d0",
+        "DARE-SYNTHETIC-CANARY-9f3b2a7c41d0",
         "CANARY-TOOL-TEXT-51e7",
         jwt_key,
         "user-7",

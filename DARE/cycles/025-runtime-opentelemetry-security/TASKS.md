@@ -49,7 +49,7 @@ Throughout the cycle:
 - [x] task-025 — Add the no-value-leaves, determinism and hostile tests
 - [x] task-026 — Add the scale test (O-08)
 - [x] task-027 — Add the Cycle 023 projector for runtime telemetry (RF-15, SHOULD)
-- [ ] task-028 — Add the `runtime-telemetry-2026` CI job and the k25 scripts
+- [x] task-028 — Add the `runtime-telemetry-2026` CI job and the k25 scripts
 - [ ] task-029 — Security, dependency, container and compatibility audit
 - [ ] task-030 — Write the EN/PT documentation
 - [ ] task-031 — Write REGRESSION.md and PROOF.md, run the completion gate and create the archive branch
