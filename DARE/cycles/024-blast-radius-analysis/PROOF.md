@@ -97,7 +97,12 @@ exists.
 
 ## 7. Container
 
-CONTAINER-PLACEHOLDER
+The builder-stage `docker build` of the repository `Dockerfile` compiled the whole
+workspace with Rust 1.88 inside the image, `dare-blast-radius` included. The in-image
+binary ran with networking disabled (`--network none`) and the graph mounted read-only:
+- on a graph edited after sealing, it refused with exit 3 and created no output
+  directory;
+- on the unedited graph (control), it exited 2 and wrote the four files (task-026).
 
 ## 8. Measured totals
 
