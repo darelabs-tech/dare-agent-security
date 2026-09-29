@@ -36,8 +36,8 @@ Throughout the cycle:
 - [x] task-013 — Implement `classify.rs`: targets, exposure, routes and frontier
 - [x] task-014 — Implement `impact.rs`, the top-level frontier and totals
 - [x] task-015 — Implement the remediation delta (RF-10, SHOULD)
-- [ ] task-016 — Implement `validate_blast_radius` (invariants 1–9)
-- [ ] task-017 — Implement `analyze` end to end, with the determinism test
+- [x] task-016 — Implement `validate_blast_radius` (invariants 1–9)
+- [x] task-017 — Implement `analyze` end to end, with the determinism test
 - [ ] task-018 — Add the scale test (O-08)
 - [ ] task-019 — Implement the reach views (`render.rs`)
 - [ ] task-020 — Implement `summary.md`

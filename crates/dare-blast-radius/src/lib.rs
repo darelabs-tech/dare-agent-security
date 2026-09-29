@@ -7,6 +7,7 @@
 //! counts, never as a score, and it never executes, sends or schedules
 //! anything.
 pub mod admit;
+pub mod analyze;
 pub mod classify;
 pub mod delta;
 pub mod error;
@@ -15,5 +16,8 @@ pub mod limits;
 pub mod model;
 pub mod reach;
 pub mod scenario;
+pub mod validate;
 
+pub use analyze::{analyze, Analysis, Options, Seeding};
 pub use error::{BlastError, Refusal, Result};
+pub use validate::validate_blast_radius;

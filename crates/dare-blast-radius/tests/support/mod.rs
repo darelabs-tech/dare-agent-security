@@ -1,6 +1,8 @@
 //! Small, valid v2 graphs for the blast-radius tests.
 #![allow(dead_code)]
 
+pub mod lab;
+
 use dare_attack_graph::{
     build_edge_id,
     model::{GraphEngine, SchemaRef},
