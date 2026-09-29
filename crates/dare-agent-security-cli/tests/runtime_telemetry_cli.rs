@@ -313,3 +313,55 @@ fn no_attribute_value_reaches_any_file_or_stdout() {
         assert!(!all.contains(planted), "{planted} leaked");
     }
 }
+
+#[test]
+fn every_runtime_telemetry_include_str_lies_under_a_docker_copied_directory() {
+    // The builder stage compiles from the directories the Dockerfile copies.
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let copied: Vec<String> = fs::read_to_string(repo.join("Dockerfile"))
+        .unwrap()
+        .lines()
+        .filter_map(|l| l.strip_prefix("COPY "))
+        .filter(|l| !l.starts_with("--from"))
+        .filter_map(|l| l.split_whitespace().next())
+        .map(|s| s.trim_end_matches('/').to_owned())
+        .collect();
+    let mut files = vec![repo.join("crates/dare-attack-path/src/bundle.rs")];
+    let mut stack = vec![repo.join("crates/dare-runtime-telemetry/src")];
+    while let Some(dir) = stack.pop() {
+        for entry in fs::read_dir(dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                stack.push(path);
+            } else {
+                files.push(path);
+            }
+        }
+    }
+    let mut found = 0;
+    for file in files {
+        let text = fs::read_to_string(&file).unwrap();
+        for part in text.split("include_str!(\"").skip(1) {
+            let target = part.split('"').next().unwrap();
+            let resolved = file.parent().unwrap().join(target).canonicalize().unwrap();
+            let rel = resolved.strip_prefix(&repo).unwrap().to_path_buf();
+            if !rel.to_string_lossy().contains("runtime-telemetry") {
+                continue;
+            }
+            let top = rel
+                .components()
+                .next()
+                .unwrap()
+                .as_os_str()
+                .to_string_lossy()
+                .into_owned();
+            assert!(copied.contains(&top), "{target} is under `{top}`");
+            found += 1;
+        }
+    }
+    // Three schemas, the mapping, and the two schemas the projector binds.
+    assert!(found >= 5, "{found}");
+}
