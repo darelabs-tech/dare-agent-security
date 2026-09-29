@@ -1,0 +1,866 @@
+diff --git a/crates/dare-blast-radius/src/analyze.rs b/crates/dare-blast-radius/src/analyze.rs
+index 1709e74..c206d07 100644
+--- a/crates/dare-blast-radius/src/analyze.rs
++++ b/crates/dare-blast-radius/src/analyze.rs
+@@ -1,13 +1,20 @@
+ //! End to end (BLUEPRINT §5.2): admit, validate, resolve, search, classify,
+ //! count, validate the document. Nothing is written.
+-use std::path::Path;
++use std::{
++    collections::BTreeMap,
++    path::Path,
++    sync::{
++        atomic::{AtomicU64, AtomicUsize, Ordering},
++        mpsc,
++    },
++};
+ 
+ use dare_attack_graph::v2::{validate_graph_v2, AttackGraphV2, ATTACK_GRAPH_SCHEMA_V2_JSON};
+ use serde_json::Value;
+ 
+ use crate::{
+     admit::read_admitted,
+-    classify::classify,
++    classify::{candidates, classify},
+     delta::remediation_delta,
+     error::{BlastError, Refusal, Result},
+     impact::{frontier, totals, view_impact},
+@@ -16,14 +23,17 @@ use crate::{
+         MAX_STATES_TOTAL,
+     },
+     model::{
+-        BlastRadiusDoc, DocBounds, SeedReport, StopBound, BLAST_RADIUS_SCHEMA_ID,
++        BlastRadiusDoc, DocBounds, SearchReport, SeedReport, StopBound, BLAST_RADIUS_SCHEMA_ID,
+         BLAST_RADIUS_SCHEMA_VERSION,
+     },
+-    reach::{initial_authority, search, Indexed, View},
++    reach::{initial_authority, search, Indexed, Summary, View},
+     scenario::{self, ResolvedSeed},
+     validate::validate_blast_radius,
+ };
+ 
++/// Threads that run seeds ahead of the budget (R-6).
++const MAX_WORKERS: usize = 8;
++
+ /// Where the seeds come from.
+ #[derive(Debug, Clone, Copy)]
+ pub enum Seeding<'a> {
+@@ -102,33 +112,7 @@ pub fn analyze_graph(
+     seeds.sort();
+     seeds.dedup();
+     let mut budget = MAX_STATES_TOTAL;
+-    let mut reports = Vec::with_capacity(seeds.len());
+-    for seed in &seeds {
+-        let run = |view, budget: &mut u64| {
+-            search(
+-                &index,
+-                &seed.node,
+-                initial_authority(seed.kind, &seed.node),
+-                view,
+-                bounds,
+-                budget,
+-                None,
+-            )
+-        };
+-        let structural = run(View::Structural, &mut budget);
+-        let uncontained = run(View::Uncontained, &mut budget);
+-        let targets = classify(&index, seed, &structural, &uncontained);
+-        let impact = view_impact(&index, seed, &structural, &uncontained, &targets);
+-        reports.push(SeedReport {
+-            node: seed.node.clone(),
+-            kind: seed.kind,
+-            tenant: seed.tenant.clone(),
+-            structural: structural.report,
+-            uncontained: uncontained.report,
+-            targets,
+-            impact,
+-        });
+-    }
++    let reports = seed_reports(&index, &seeds, bounds, &mut budget);
+     let search_truncated = reports
+         .iter()
+         .any(|r| r.structural.truncated || r.uncontained.truncated);
+@@ -171,3 +155,164 @@ pub fn analyze_graph(
+     validate_blast_radius(graph, &doc)?;
+     Ok(doc)
+ }
++
++/// One search of one seed, reduced to its summary for that seed's
++/// candidate targets.
++fn view_summary<'g>(
++    index: &Indexed<'g>,
++    seed: &ResolvedSeed,
++    view: View,
++    bounds: Bounds,
++    budget: &mut u64,
++) -> Summary<'g> {
++    let found = search(
++        index,
++        &seed.node,
++        initial_authority(seed.kind, &seed.node),
++        view,
++        bounds,
++        budget,
++        None,
++    );
++    let wanted = candidates(index, seed);
++    found.summarise(wanted.iter().map(|(node, _)| node.as_str()))
++}
++
++fn seed_report(
++    index: &Indexed<'_>,
++    seed: &ResolvedSeed,
++    structural: &Summary<'_>,
++    uncontained: &Summary<'_>,
++) -> SeedReport {
++    let targets = classify(index, seed, structural, uncontained);
++    let impact = view_impact(index, seed, structural, uncontained, &targets);
++    SeedReport {
++        node: seed.node.clone(),
++        kind: seed.kind,
++        tenant: seed.tenant.clone(),
++        structural: structural.report.clone(),
++        uncontained: uncontained.report.clone(),
++        targets,
++        impact,
++    }
++}
++
++const VIEWS: [View; 2] = [View::Structural, View::Uncontained];
++
++/// The reports of every seed, in seed order, exactly as if every search ran
++/// in turn against the shared budget: each seed's structural view, then its
++/// uncontained view (REGRESSION R-6).
++fn seed_reports(
++    index: &Indexed<'_>,
++    seeds: &[ResolvedSeed],
++    bounds: Bounds,
++    budget: &mut u64,
++) -> Vec<SeedReport> {
++    let workers = std::thread::available_parallelism().map_or(1, |n| n.get());
++    seed_reports_with(index, seeds, bounds, budget, workers)
++}
++
++/// `seed_reports` with an explicit worker count; exposed so a test can
++/// compare every count against the sequential run.
++///
++/// Worker threads run searches ahead of their turn, each against the budget
++/// left when it starts, which is never less than what will be left when its
++/// turn comes. The calling thread takes the searches in turn and keeps one
++/// only when it fits the budget actually left: a search that never needed
++/// more states than remained never reached the budget check, so it is the
++/// same search. Otherwise it runs that search again here, against the real
++/// budget. No outcome depends on thread timing. Each worker frees its own
++/// search arena; only the summary crosses threads.
++#[doc(hidden)]
++pub fn seed_reports_with<'g>(
++    index: &Indexed<'g>,
++    seeds: &[ResolvedSeed],
++    bounds: Bounds,
++    budget: &mut u64,
++    workers: usize,
++) -> Vec<SeedReport> {
++    let units = seeds.len() * VIEWS.len();
++    let workers = workers.min(units).min(MAX_WORKERS);
++    let unit = |i: usize| (&seeds[i / VIEWS.len()], VIEWS[i % VIEWS.len()]);
++    let mut summaries: Vec<Summary<'g>> = Vec::with_capacity(units);
++    if workers <= 1 {
++        for i in 0..units {
++            let (seed, view) = unit(i);
++            summaries.push(view_summary(index, seed, view, bounds, budget));
++        }
++    } else {
++        let next = AtomicUsize::new(0);
++        let left = AtomicU64::new(*budget);
++        std::thread::scope(|scope| {
++            let (done, results) = mpsc::channel();
++            for _ in 0..workers {
++                let done = done.clone();
++                let (next, left) = (&next, &left);
++                scope.spawn(move || loop {
++                    if left.load(Ordering::Acquire) == 0 {
++                        // Every later search runs against an empty budget,
++                        // which the calling thread does in no time.
++                        break;
++                    }
++                    let i = next.fetch_add(1, Ordering::AcqRel);
++                    if i >= units {
++                        break;
++                    }
++                    let (seed, view) = unit(i);
++                    let mut ahead = left.load(Ordering::Acquire);
++                    let summary = view_summary(index, seed, view, bounds, &mut ahead);
++                    if done.send((i, summary)).is_err() {
++                        break;
++                    }
++                });
++            }
++            drop(done);
++            let mut ahead: BTreeMap<usize, Summary<'g>> = BTreeMap::new();
++            let mut settle = |summaries: &mut Vec<Summary<'g>>, run: Option<Summary<'g>>| {
++                let (seed, view) = unit(summaries.len());
++                let kept = run.filter(|s| fits(&s.report, *budget));
++                let summary = match kept {
++                    Some(summary) => {
++                        *budget -= summary.report.states_explored;
++                        summary
++                    }
++                    None => {
++                        // A search that does not fit empties the budget.
++                        left.store(0, Ordering::Release);
++                        view_summary(index, seed, view, bounds, budget)
++                    }
++                };
++                left.store(*budget, Ordering::Release);
++                summaries.push(summary);
++            };
++            for (i, summary) in results {
++                ahead.insert(i, summary);
++                while let Some(run) = ahead.remove(&summaries.len()) {
++                    settle(&mut summaries, Some(run));
++                }
++            }
++            // Searches no worker took.
++            while summaries.len() < units {
++                let run = ahead.remove(&summaries.len());
++                settle(&mut summaries, run);
++            }
++        });
++    }
++    summaries
++        .chunks(VIEWS.len())
++        .zip(seeds)
++        .map(|(views, seed)| seed_report(index, seed, &views[0], &views[1]))
++        .collect()
++}
++
++/// A search run ahead of its turn is the search its turn would run when it
++/// needed no more states than `budget`. One stopped by its own smaller
++/// budget is kept only when that budget was exactly `budget`.
++fn fits(report: &SearchReport, budget: u64) -> bool {
++    let used = report.states_explored;
++    if report.stopped_by == Some(StopBound::MaxStatesTotal) {
++        used == budget
++    } else {
++        used <= budget
++    }
++}
+diff --git a/crates/dare-blast-radius/src/classify.rs b/crates/dare-blast-radius/src/classify.rs
+index debd359..022171d 100644
+--- a/crates/dare-blast-radius/src/classify.rs
++++ b/crates/dare-blast-radius/src/classify.rs
+@@ -8,7 +8,7 @@ use dare_attack_graph::{
+ 
+ use crate::{
+     model::{Exposure, Route, TargetReach},
+-    reach::{is_held, Found, Indexed, Walk},
++    reach::{is_held, Indexed, Reach, Walk},
+     scenario::ResolvedSeed,
+ };
+ 
+@@ -69,8 +69,8 @@ pub fn frontier_of(index: &Indexed<'_>, route: &Route) -> Vec<String> {
+ pub fn classify(
+     index: &Indexed<'_>,
+     seed: &ResolvedSeed,
+-    structural: &Found<'_>,
+-    uncontained: &Found<'_>,
++    structural: &impl Reach,
++    uncontained: &impl Reach,
+ ) -> Vec<TargetReach> {
+     let mut out = Vec::new();
+     for (node, class) in candidates(index, seed) {
+@@ -80,7 +80,7 @@ pub fn classify(
+         let structural_route = from_walk(index, walk);
+         let (exposure, uncontained_route, frontier) = match uncontained.walk_to(&node) {
+             Some(walk) => (Exposure::Exposed, Some(from_walk(index, walk)), vec![]),
+-            None if uncontained.report.truncated => (Exposure::ContainmentUnknown, None, vec![]),
++            None if uncontained.report().truncated => (Exposure::ContainmentUnknown, None, vec![]),
+             None => (
+                 Exposure::Contained,
+                 None,
+diff --git a/crates/dare-blast-radius/src/impact.rs b/crates/dare-blast-radius/src/impact.rs
+index 2d7b3cb..a8c5727 100644
+--- a/crates/dare-blast-radius/src/impact.rs
++++ b/crates/dare-blast-radius/src/impact.rs
+@@ -5,7 +5,7 @@ use dare_attack_graph::NodeType;
+ 
+ use crate::{
+     model::{Exposure, FrontierEdge, ImpactCounts, SeedReport, TargetReach, Totals, ViewImpact},
+-    reach::{Found, Indexed},
++    reach::{Indexed, Reach},
+     scenario::ResolvedSeed,
+ };
+ 
+@@ -14,7 +14,7 @@ use crate::{
+ pub fn impact(
+     index: &Indexed<'_>,
+     seed: &ResolvedSeed,
+-    found: &Found<'_>,
++    found: &impl Reach,
+     targets: &[&TargetReach],
+ ) -> ImpactCounts {
+     let mut targets_by_class = BTreeMap::new();
+@@ -44,8 +44,8 @@ pub fn impact(
+         }
+     }
+     let tenants: BTreeSet<String> = found
+-        .reached
+-        .keys()
++        .reached_nodes()
++        .into_iter()
+         .filter_map(|id| index.node(id))
+         .filter_map(|n| n.security.tenant.clone())
+         .filter(|t| seed.tenant.as_deref() != Some(t.as_str()))
+@@ -63,8 +63,8 @@ pub fn impact(
+ pub fn view_impact(
+     index: &Indexed<'_>,
+     seed: &ResolvedSeed,
+-    structural: &Found<'_>,
+-    uncontained: &Found<'_>,
++    structural: &impl Reach,
++    uncontained: &impl Reach,
+     targets: &[TargetReach],
+ ) -> ViewImpact {
+     let all: Vec<&TargetReach> = targets.iter().collect();
+diff --git a/crates/dare-blast-radius/src/reach.rs b/crates/dare-blast-radius/src/reach.rs
+index 54f671c..695baca 100644
+--- a/crates/dare-blast-radius/src/reach.rs
++++ b/crates/dare-blast-radius/src/reach.rs
+@@ -6,7 +6,10 @@
+ //! node may be entered again under a different authority, so every state
+ //! reachable within `max_depth` is found, and a target the uncontained view
+ //! does not reach truly has no uncontained walk within the bounds.
+-use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
++use std::{
++    collections::{BTreeMap, HashMap, VecDeque},
++    hash::{BuildHasherDefault, Hash, Hasher},
++};
+ 
+ use dare_attack_graph::{
+     v2::{edge_control, AttackGraphV2, Authority, EdgeControl, EdgeV2, GuardVerdict, NodeV2},
+@@ -139,6 +142,139 @@ impl Found<'_> {
+     }
+ }
+ 
++/// What classification and impact read from one search (BLUEPRINT
++/// §6.4-§6.6): its report, the witness walk to a node, and the nodes it
++/// reached. Implemented by the full search and by its summary.
++pub trait Reach {
++    fn report(&self) -> &SearchReport;
++    fn walk_to(&self, node: &str) -> Option<Walk>;
++    fn reached_nodes(&self) -> Vec<&str>;
++}
++
++impl Reach for Found<'_> {
++    fn report(&self) -> &SearchReport {
++        &self.report
++    }
++
++    fn walk_to(&self, node: &str) -> Option<Walk> {
++        Found::walk_to(self, node)
++    }
++
++    fn reached_nodes(&self) -> Vec<&str> {
++        self.reached.keys().copied().collect()
++    }
++}
++
++/// A search reduced to what `Reach` needs for a known set of nodes, so its
++/// arena can be freed where it was built.
++#[derive(Debug, Clone)]
++pub struct Summary<'g> {
++    pub report: SearchReport,
++    pub reached: Vec<&'g str>,
++    pub walks: BTreeMap<String, Walk>,
++}
++
++impl<'g> Found<'g> {
++    /// Keeps the witness walks to `wanted` nodes and the reached node ids.
++    pub fn summarise<'a>(&self, wanted: impl IntoIterator<Item = &'a str>) -> Summary<'g> {
++        let walks = wanted
++            .into_iter()
++            .filter_map(|node| Some((node.to_owned(), self.walk_to(node)?)))
++            .collect();
++        Summary {
++            report: self.report.clone(),
++            reached: self.reached.keys().copied().collect(),
++            walks,
++        }
++    }
++}
++
++impl Reach for Summary<'_> {
++    fn report(&self) -> &SearchReport {
++        &self.report
++    }
++
++    fn walk_to(&self, node: &str) -> Option<Walk> {
++        self.walks.get(node).cloned()
++    }
++
++    fn reached_nodes(&self) -> Vec<&str> {
++        self.reached.clone()
++    }
++}
++
++/// FxHash (rustc's hasher): fast, not DoS-resistant, which does not matter
++/// here since a bucket is always confirmed by full equality.
++#[derive(Default)]
++struct Fx(u64);
++
++impl Hasher for Fx {
++    fn finish(&self) -> u64 {
++        self.0
++    }
++
++    fn write(&mut self, bytes: &[u8]) {
++        let mut chunks = bytes.chunks_exact(8);
++        for chunk in &mut chunks {
++            let mut word = [0u8; 8];
++            word.copy_from_slice(chunk);
++            self.add(u64::from_le_bytes(word));
++        }
++        for &byte in chunks.remainder() {
++            self.add(u64::from(byte));
++        }
++    }
++
++    fn write_u8(&mut self, i: u8) {
++        self.add(u64::from(i));
++    }
++
++    fn write_usize(&mut self, i: usize) {
++        self.add(i as u64);
++    }
++}
++
++impl Fx {
++    fn add(&mut self, word: u64) {
++        self.0 = (self.0.rotate_left(5) ^ word).wrapping_mul(0x51_7c_c1_b7_27_22_0a_95);
++    }
++}
++
++fn fingerprint(node: &str, authority: &Authority) -> u64 {
++    let mut hasher = Fx::default();
++    node.hash(&mut hasher);
++    authority.hash(&mut hasher);
++    hasher.finish()
++}
++
++/// States already seen: the first state per fingerprint, then a chain
++/// through the arena, each confirmed by equality. Each authority is stored
++/// once, in the arena, and a state costs no allocation here.
++#[derive(Default)]
++struct Visited {
++    head: HashMap<u64, usize, BuildHasherDefault<Fx>>,
++    next: Vec<Option<usize>>,
++}
++
++impl Visited {
++    fn contains(&self, states: &[StateRec<'_>], print: u64, node: &str, authority: &Authority) -> bool {
++        let mut at = self.head.get(&print).copied();
++        while let Some(i) = at {
++            if states[i].node == node && states[i].authority == *authority {
++                return true;
++            }
++            at = self.next[i];
++        }
++        false
++    }
++
++    /// `state` must be the next arena index.
++    fn insert(&mut self, print: u64, state: usize) {
++        let previous = self.head.insert(print, state);
++        self.next.push(previous);
++    }
++}
++
+ /// One search from `seed`. `budget` is the run-wide state budget, shared by
+ /// every search including the remediation delta; `excluded` is an edge to
+ /// treat as held (the delta's recount).
+@@ -160,9 +296,11 @@ pub fn search<'g>(
+         return found;
+     };
+     let seed_id = seed_node.id.as_str();
+-    let mut visited: HashSet<(&'g str, Authority)> = HashSet::new();
++    let mut visited = Visited::default();
++    // The first state per node, collected unordered and sorted once.
++    let mut first: HashMap<&'g str, usize, BuildHasherDefault<Fx>> = HashMap::default();
+     let mut queue = VecDeque::new();
+-    visited.insert((seed_id, init.clone()));
++    visited.insert(fingerprint(seed_id, &init), 0);
+     found.states.push(StateRec {
+         node: seed_id,
+         authority: init,
+@@ -172,9 +310,10 @@ pub fn search<'g>(
+     });
+     queue.push_back(0usize);
+     let report = &mut found.report;
++    let states = &mut found.states;
+     'search: while let Some(current) = queue.pop_front() {
+-        let node = found.states[current].node;
+-        let depth = found.states[current].depth;
++        let node = states[current].node;
++        let depth = states[current].depth;
+         let outs = index.out(node);
+         if depth >= bounds.max_depth {
+             if !outs.is_empty() {
+@@ -182,6 +321,9 @@ pub fn search<'g>(
+             }
+             continue;
+         }
++        // A refused step leaves the authority unchanged, so one copy serves
++        // every edge until a step succeeds.
++        let mut scratch: Option<Authority> = None;
+         for &edge in outs {
+             if excluded == Some(edge.id.as_str()) {
+                 continue;
+@@ -190,14 +332,18 @@ pub fn search<'g>(
+                 report.held_edges_skipped += 1;
+                 continue;
+             }
+-            let mut authority = found.states[current].authority.clone();
++            let mut authority = match scratch.take() {
++                Some(authority) => authority,
++                None => states[current].authority.clone(),
++            };
+             if !authority.step(edge, |id| index.node_type(id)) {
+                 report.refused_steps += 1;
++                scratch = Some(authority);
+                 continue;
+             }
+             let target = edge.target.as_str();
+-            let key = (target, authority);
+-            if visited.contains(&key) {
++            let print = fingerprint(target, &authority);
++            if visited.contains(states, print, target, &authority) {
+                 continue;
+             }
+             if report.states_explored >= bounds.max_states {
+@@ -212,10 +358,9 @@ pub fn search<'g>(
+             }
+             report.states_explored += 1;
+             *budget -= 1;
+-            let (target, authority) = key;
+-            visited.insert((target, authority.clone()));
+-            let id = found.states.len();
+-            found.states.push(StateRec {
++            let id = states.len();
++            visited.insert(print, id);
++            states.push(StateRec {
+                 node: target,
+                 authority,
+                 depth: depth + 1,
+@@ -223,11 +368,12 @@ pub fn search<'g>(
+                 via: Some(edge.id.as_str()),
+             });
+             if target != seed_id {
+-                found.reached.entry(target).or_insert(id);
++                first.entry(target).or_insert(id);
+             }
+             queue.push_back(id);
+         }
+     }
++    found.reached = first.into_iter().collect();
+     found.report.nodes_reached = found.reached.len() as u32;
+     found
+ }
+diff --git a/crates/dare-blast-radius/tests/analyze.rs b/crates/dare-blast-radius/tests/analyze.rs
+index 43a69b3..cff7b8d 100644
+--- a/crates/dare-blast-radius/tests/analyze.rs
++++ b/crates/dare-blast-radius/tests/analyze.rs
+@@ -192,3 +192,80 @@ fn ten_shuffles_give_identical_documents() {
+         assert_eq!(doc, baseline, "round {round}");
+     }
+ }
++
++/// R-6: seeds run ahead on worker threads give the same reports, and leave
++/// the same budget, as running them in turn, at every budget from none to
++/// plenty.
++#[test]
++fn running_seeds_ahead_matches_running_them_in_turn() {
++    use dare_attack_graph::{v2::EntryClass, EdgeType, NodeType};
++    use dare_blast_radius::{
++        analyze::seed_reports_with, limits::Bounds, reach::Indexed, scenario::ResolvedSeed,
++    };
++    use support::{Gd, G};
++
++    let mut state = 0x9E37_79B9_7F4A_7C15u64;
++    let mut next = |n: usize| {
++        state ^= state << 13;
++        state ^= state >> 7;
++        state ^= state << 17;
++        (state % n as u64) as usize
++    };
++    let types = [NodeType::Human, NodeType::Agent, NodeType::Tool, NodeType::Resource];
++    let edges = [
++        EdgeType::DelegatesTo,
++        EdgeType::CanInvoke,
++        EdgeType::Reads,
++        EdgeType::Calls,
++        EdgeType::UsesCredential,
++    ];
++    let guards = [Gd::None, Gd::Pass, Gd::Fail];
++    let mut g = G::new();
++    let ids: Vec<String> = (0..60)
++        .map(|i| g.node(types[i % types.len()], &format!("n{i:02}")))
++        .collect();
++    let mut seen = std::collections::HashSet::new();
++    while seen.len() < 240 {
++        let (s, t, d) = (next(60), next(edges.len()), next(60));
++        let guard = guards[next(guards.len())];
++        if seen.insert((s, t, d)) {
++            g.edge(&ids[s], edges[t], &ids[d], guard);
++        }
++    }
++    for id in ids.iter().step_by(4) {
++        g.entry(id, EntryClass::LowPrivilegePrincipal);
++    }
++    let graph = g.build();
++    let index = Indexed::new(&graph);
++    let seeds: Vec<ResolvedSeed> = entry_point_seeds(&graph).unwrap().seeds;
++    assert_eq!(seeds.len(), 15);
++    let bounds = Bounds {
++        max_depth: 6,
++        max_states: 400,
++    };
++    let mut in_turn_total = 0;
++    let mut stops = std::collections::BTreeSet::new();
++    for budget in [0u64, 1, 7, 100, 900, 2_500, 6_000, 1_000_000] {
++        let mut left = budget;
++        let in_turn = seed_reports_with(&index, &seeds, bounds, &mut left, 1);
++        in_turn_total += in_turn.len();
++        stops.extend(
++            in_turn
++                .iter()
++                .flat_map(|r| [r.structural.stopped_by, r.uncontained.stopped_by])
++                .map(|s| format!("{s:?}")),
++        );
++        for workers in [2, 3, 4, 8] {
++            let mut ahead_left = budget;
++            let ahead = seed_reports_with(&index, &seeds, bounds, &mut ahead_left, workers);
++            assert_eq!(ahead, in_turn, "budget {budget}, {workers} workers");
++            assert_eq!(ahead_left, left, "budget {budget}, {workers} workers");
++        }
++    }
++    assert_eq!(in_turn_total, 8 * 15);
++    // Both bounds and complete searches occur across the budgets.
++    assert_eq!(
++        stops.into_iter().collect::<Vec<_>>(),
++        ["None", "Some(MaxStates)", "Some(MaxStatesTotal)"]
++    );
++}
+diff --git a/crates/dare-blast-radius/tests/scale.rs b/crates/dare-blast-radius/tests/scale.rs
+new file mode 100644
+index 0000000..fd52632
+--- /dev/null
++++ b/crates/dare-blast-radius/tests/scale.rs
+@@ -0,0 +1,208 @@
++//! Scale (task-018, O-08): 2 000 nodes, 10 000 edges and 64 seeds, both views
++//! and the delta. Two fixed-seed graphs (REGRESSION R-6):
++//!
++//! - a **layered** graph shaped like the lab graphs (principals delegate to
++//!   agents, agents invoke tools and use credentials, credentials and tools
++//!   reach resources and data), which must finish in under 10 s in release;
++//! - a **uniform** graph whose random edges make almost every authority state
++//!   distinct, so it runs into the 5 000 000-state total budget. It checks
++//!   that no bound is overshot and the truncation is reported; its time is
++//!   printed, not asserted, since it measures the budget ceiling itself.
++//!
++//! Debug builds skip both: CI runs this file with `--release`.
++mod support;
++
++use std::time::{Duration, Instant};
++
++use dare_attack_graph::{
++    v2::{AttackGraphV2, EntryClass, TargetClass},
++    EdgeType, NodeSecurity, NodeType,
++};
++use dare_blast_radius::{
++    analyze::analyze_graph,
++    limits::{MAX_DELTA_EDGES, MAX_STATES_PER_SEARCH, MAX_STATES_TOTAL},
++    model::BlastRadiusDoc,
++    scenario::entry_point_seeds,
++    Options,
++};
++use support::{Gd, G};
++
++struct Rng(u64);
++
++impl Rng {
++    fn below(&mut self, n: usize) -> usize {
++        self.0 ^= self.0 << 13;
++        self.0 ^= self.0 >> 7;
++        self.0 ^= self.0 << 17;
++        (self.0 % n as u64) as usize
++    }
++}
++
++const GUARDS: [Gd; 4] = [Gd::None, Gd::Pass, Gd::Fail, Gd::Inconclusive];
++
++fn run(graph: &AttackGraphV2) -> (BlastRadiusDoc, Duration) {
++    assert_eq!((graph.nodes.len(), graph.edges.len()), (2000, 10_000));
++    let seeding = entry_point_seeds(graph).unwrap();
++    assert_eq!(seeding.seeds.len(), 64);
++    let start = Instant::now();
++    let doc = analyze_graph(graph, &seeding, &Options::default()).unwrap();
++    let elapsed = start.elapsed();
++    assert_eq!(doc.seeds.len(), 64);
++    let mut states = 0;
++    for seed in &doc.seeds {
++        for report in [&seed.structural, &seed.uncontained] {
++            assert!(report.states_explored <= MAX_STATES_PER_SEARCH);
++            states += report.states_explored;
++        }
++    }
++    assert!(states <= MAX_STATES_TOTAL);
++    assert!(doc.remediation_delta.len() <= MAX_DELTA_EDGES);
++    eprintln!(
++        "scale: {states} states, {} exposed, {} contained, {} unknown, {} delta, truncated {}, {elapsed:?}",
++        doc.totals.exposed,
++        doc.totals.contained,
++        doc.totals.containment_unknown,
++        doc.remediation_delta.len(),
++        doc.truncated,
++    );
++    (doc, elapsed)
++}
++
++/// Adds `count` distinct edges; `pick` returns `(source, type, target)`.
++fn edges(
++    g: &mut G,
++    rng: &mut Rng,
++    count: usize,
++    mut pick: impl FnMut(&mut Rng) -> (String, EdgeType, String, Option<String>),
++) {
++    let mut seen = std::collections::HashSet::new();
++    while seen.len() < count {
++        let (s, t, d, principal) = pick(rng);
++        let guard = GUARDS[rng.below(GUARDS.len())];
++        if seen.insert((s.clone(), t as u8, d.clone(), principal.clone())) {
++            g.edge_full(&s, t, &d, guard, principal.as_deref(), &[]);
++        }
++    }
++}
++
++fn layered() -> AttackGraphV2 {
++    let mut rng = Rng(0x0DDB_1A5E_5BAD_5EED);
++    let mut g = G::new();
++    let tenant = |i: usize| G::tenant(["a", "b", "c"][i % 3]);
++    let layer = |g: &mut G, t: NodeType, n: usize, name: &str, privileged: bool| {
++        (0..n)
++            .map(|i| {
++                let security = NodeSecurity {
++                    privileged: privileged && i % 5 == 0,
++                    ..tenant(i)
++                };
++                g.node_with(t, &format!("{name}{i:04}"), security)
++            })
++            .collect::<Vec<_>>()
++    };
++    let humans = layer(&mut g, NodeType::Human, 64, "h", false);
++    let agents = layer(&mut g, NodeType::Agent, 300, "a", false);
++    let identities = layer(&mut g, NodeType::Identity, 136, "i", false);
++    let credentials = layer(&mut g, NodeType::Credential, 300, "c", true);
++    let tools = layer(&mut g, NodeType::Tool, 400, "t", false);
++    let resources = layer(&mut g, NodeType::Resource, 400, "r", false);
++    let data = layer(&mut g, NodeType::Data, 400, "d", false);
++    let pick = |rng: &mut Rng, from: &[String]| from[rng.below(from.len())].clone();
++    edges(&mut g, &mut rng, 10_000, |rng| {
++        let (s, t, d) = match rng.below(10) {
++            0 => (pick(rng, &humans), EdgeType::DelegatesTo, pick(rng, &agents)),
++            1 => (pick(rng, &agents), EdgeType::AuthenticatesAs, pick(rng, &identities)),
++            2 => (pick(rng, &agents), EdgeType::UsesCredential, pick(rng, &credentials)),
++            3 | 4 => (pick(rng, &agents), EdgeType::CanInvoke, pick(rng, &tools)),
++            5 => (pick(rng, &credentials), EdgeType::CanReach, pick(rng, &resources)),
++            6 => (pick(rng, &tools), EdgeType::Reads, pick(rng, &data)),
++            7 => (pick(rng, &tools), EdgeType::Writes, pick(rng, &resources)),
++            8 => (pick(rng, &data), EdgeType::TransfersTo, pick(rng, &agents)),
++            _ => (pick(rng, &agents), EdgeType::Calls, pick(rng, &agents)),
++        };
++        (s, t, d, None)
++    });
++    for h in &humans {
++        g.entry(h, EntryClass::LowPrivilegePrincipal);
++    }
++    for r in &resources {
++        g.target(r, TargetClass::SensitiveResource);
++    }
++    for (i, c) in credentials.iter().enumerate() {
++        if i % 5 == 0 {
++            g.target(c, TargetClass::PrivilegedCredential);
++        }
++    }
++    g.build()
++}
++
++fn uniform() -> AttackGraphV2 {
++    const TYPES: [NodeType; 7] = [
++        NodeType::Human,
++        NodeType::Agent,
++        NodeType::Credential,
++        NodeType::Tool,
++        NodeType::Resource,
++        NodeType::Data,
++        NodeType::Identity,
++    ];
++    const EDGES: [EdgeType; 8] = [
++        EdgeType::DelegatesTo,
++        EdgeType::UsesCredential,
++        EdgeType::CanInvoke,
++        EdgeType::Calls,
++        EdgeType::Reads,
++        EdgeType::Writes,
++        EdgeType::TransfersTo,
++        EdgeType::CanReach,
++    ];
++    let mut rng = Rng(0x5DEE_CE66_D1CE_4E5B);
++    let mut g = G::new();
++    let ids: Vec<(NodeType, String)> = (0..2000)
++        .map(|i| {
++            let t = TYPES[i % TYPES.len()];
++            let security = if t == NodeType::Resource || t == NodeType::Data {
++                G::tenant(["a", "b", "c"][i % 3])
++            } else {
++                G::tenant("a")
++            };
++            (t, g.node_with(t, &format!("n{i:04}"), security))
++        })
++        .collect();
++    edges(&mut g, &mut rng, 10_000, |rng| {
++        let s = ids[rng.below(ids.len())].1.clone();
++        let t = EDGES[rng.below(EDGES.len())];
++        let d = ids[rng.below(ids.len())].1.clone();
++        (s, t, d, None)
++    });
++    let mut seeds = 0;
++    for (t, id) in &ids {
++        match t {
++            NodeType::Human if seeds < 64 => {
++                g.entry(id, EntryClass::LowPrivilegePrincipal);
++                seeds += 1;
++            }
++            NodeType::Resource => g.target(id, TargetClass::SensitiveResource),
++            NodeType::Credential => g.target(id, TargetClass::PrivilegedCredential),
++            _ => {}
++        }
++    }
++    g.build()
++}
++
++#[test]
++#[cfg_attr(debug_assertions, ignore = "release only: cargo test --release --test scale")]
++fn a_lab_shaped_graph_is_analysed_in_under_ten_seconds() {
++    let (doc, elapsed) = run(&layered());
++    assert!(doc.totals.exposed > 0 && doc.totals.contained > 0);
++    assert!(elapsed < Duration::from_secs(10), "{elapsed:?}");
++}
++
++#[test]
++#[cfg_attr(debug_assertions, ignore = "release only: cargo test --release --test scale")]
++fn a_state_explosion_stops_at_the_total_budget_and_says_so() {
++    let (doc, _) = run(&uniform());
++    assert!(doc.truncated);
++    assert!(doc.totals.containment_unknown > 0);
++    assert!(doc.remediation_delta.iter().all(|d| d.partial));
++}

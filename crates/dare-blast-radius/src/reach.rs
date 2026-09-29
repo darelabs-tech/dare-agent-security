@@ -6,7 +6,10 @@
 //! node may be entered again under a different authority, so every state
 //! reachable within `max_depth` is found, and a target the uncontained view
 //! does not reach truly has no uncontained walk within the bounds.
-use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
+use std::{
+    collections::{BTreeMap, HashMap, VecDeque},
+    hash::{BuildHasherDefault, Hash, Hasher},
+};
 
 use dare_attack_graph::{
     v2::{edge_control, AttackGraphV2, Authority, EdgeControl, EdgeV2, GuardVerdict, NodeV2},
@@ -139,6 +142,84 @@ impl Found<'_> {
     }
 }
 
+/// FxHash (rustc's hasher): fast, not DoS-resistant, which does not matter
+/// here since a bucket is always confirmed by full equality.
+#[derive(Default)]
+struct Fx(u64);
+
+impl Hasher for Fx {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        let mut chunks = bytes.chunks_exact(8);
+        for chunk in &mut chunks {
+            let mut word = [0u8; 8];
+            word.copy_from_slice(chunk);
+            self.add(u64::from_le_bytes(word));
+        }
+        for &byte in chunks.remainder() {
+            self.add(u64::from(byte));
+        }
+    }
+
+    fn write_u8(&mut self, i: u8) {
+        self.add(u64::from(i));
+    }
+
+    fn write_usize(&mut self, i: usize) {
+        self.add(i as u64);
+    }
+}
+
+impl Fx {
+    fn add(&mut self, word: u64) {
+        self.0 = (self.0.rotate_left(5) ^ word).wrapping_mul(0x51_7c_c1_b7_27_22_0a_95);
+    }
+}
+
+fn fingerprint(node: &str, authority: &Authority) -> u64 {
+    let mut hasher = Fx::default();
+    node.hash(&mut hasher);
+    authority.hash(&mut hasher);
+    hasher.finish()
+}
+
+/// States already seen: the first state per fingerprint, then a chain
+/// through the arena, each confirmed by equality. Each authority is stored
+/// once, in the arena, and a state costs no allocation here.
+#[derive(Default)]
+struct Visited {
+    head: HashMap<u64, usize, BuildHasherDefault<Fx>>,
+    next: Vec<Option<usize>>,
+}
+
+impl Visited {
+    fn contains(
+        &self,
+        states: &[StateRec<'_>],
+        print: u64,
+        node: &str,
+        authority: &Authority,
+    ) -> bool {
+        let mut at = self.head.get(&print).copied();
+        while let Some(i) = at {
+            if states[i].node == node && states[i].authority == *authority {
+                return true;
+            }
+            at = self.next[i];
+        }
+        false
+    }
+
+    /// `state` must be the next arena index.
+    fn insert(&mut self, print: u64, state: usize) {
+        let previous = self.head.insert(print, state);
+        self.next.push(previous);
+    }
+}
+
 /// One search from `seed`. `budget` is the run-wide state budget, shared by
 /// every search including the remediation delta; `excluded` is an edge to
 /// treat as held (the delta's recount).
@@ -160,9 +241,11 @@ pub fn search<'g>(
         return found;
     };
     let seed_id = seed_node.id.as_str();
-    let mut visited: HashSet<(&'g str, Authority)> = HashSet::new();
+    let mut visited = Visited::default();
+    // The first state per node, collected unordered and sorted once.
+    let mut first: HashMap<&'g str, usize, BuildHasherDefault<Fx>> = HashMap::default();
     let mut queue = VecDeque::new();
-    visited.insert((seed_id, init.clone()));
+    visited.insert(fingerprint(seed_id, &init), 0);
     found.states.push(StateRec {
         node: seed_id,
         authority: init,
@@ -172,9 +255,10 @@ pub fn search<'g>(
     });
     queue.push_back(0usize);
     let report = &mut found.report;
+    let states = &mut found.states;
     'search: while let Some(current) = queue.pop_front() {
-        let node = found.states[current].node;
-        let depth = found.states[current].depth;
+        let node = states[current].node;
+        let depth = states[current].depth;
         let outs = index.out(node);
         if depth >= bounds.max_depth {
             if !outs.is_empty() {
@@ -182,6 +266,9 @@ pub fn search<'g>(
             }
             continue;
         }
+        // A refused step leaves the authority unchanged, so one copy serves
+        // every edge until a step succeeds.
+        let mut scratch: Option<Authority> = None;
         for &edge in outs {
             if excluded == Some(edge.id.as_str()) {
                 continue;
@@ -190,14 +277,18 @@ pub fn search<'g>(
                 report.held_edges_skipped += 1;
                 continue;
             }
-            let mut authority = found.states[current].authority.clone();
+            let mut authority = match scratch.take() {
+                Some(authority) => authority,
+                None => states[current].authority.clone(),
+            };
             if !authority.step(edge, |id| index.node_type(id)) {
                 report.refused_steps += 1;
+                scratch = Some(authority);
                 continue;
             }
             let target = edge.target.as_str();
-            let key = (target, authority);
-            if visited.contains(&key) {
+            let print = fingerprint(target, &authority);
+            if visited.contains(states, print, target, &authority) {
                 continue;
             }
             if report.states_explored >= bounds.max_states {
@@ -212,10 +303,9 @@ pub fn search<'g>(
             }
             report.states_explored += 1;
             *budget -= 1;
-            let (target, authority) = key;
-            visited.insert((target, authority.clone()));
-            let id = found.states.len();
-            found.states.push(StateRec {
+            let id = states.len();
+            visited.insert(print, id);
+            states.push(StateRec {
                 node: target,
                 authority,
                 depth: depth + 1,
@@ -223,11 +313,12 @@ pub fn search<'g>(
                 via: Some(edge.id.as_str()),
             });
             if target != seed_id {
-                found.reached.entry(target).or_insert(id);
+                first.entry(target).or_insert(id);
             }
             queue.push_back(id);
         }
     }
+    found.reached = first.into_iter().collect();
     found.report.nodes_reached = found.reached.len() as u32;
     found
 }
