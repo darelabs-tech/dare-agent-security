@@ -2142,6 +2142,66 @@
         }
       ],
       "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.TELEMETRY.CONFIDENTIALITY",
+      "title": "Telemetry confidentiality",
+      "risk_family": "IDENTITY_PRIVILEGE_ABUSE",
+      "category": "CREDENTIAL_BOUNDARIES",
+      "description": "Runtime telemetry exported by the agent system carries no credential, bearer token or secret in any attribute or event, and carries no prompt, completion or tool-argument content unless content capture is explicitly allowed.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "runtime_trace_present"
+        ]
+      },
+      "supported_modes": [
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI03 Identity and Privilege Abuse",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
+    },
+    {
+      "id": "AGENT.TELEMETRY.COMPLETENESS",
+      "title": "Telemetry completeness",
+      "risk_family": "ROGUE_AGENTS",
+      "category": "EVIDENCE",
+      "description": "Every security-relevant operation the runtime policy requires is observable in the exported traces, with the attributes needed to judge it, in traces that are structurally complete, sampled and not truncated.",
+      "applicability": {
+        "predicates": [
+          "agent_present",
+          "runtime_trace_present"
+        ]
+      },
+      "supported_modes": [
+        "passive"
+      ],
+      "evidence": {
+        "required_for_confirmed_verdict": true,
+        "accepted_classes": [
+          "TRACE"
+        ]
+      },
+      "standards": [
+        {
+          "source": "OWASP_AGENTIC_TOP10_2026",
+          "reference": "ASI10 Rogue Agents",
+          "status": "NORMATIVE"
+        }
+      ],
+      "maturity": "EXPERIMENTAL"
     }
   ]
 }

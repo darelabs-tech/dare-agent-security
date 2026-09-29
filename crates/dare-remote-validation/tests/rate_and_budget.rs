@@ -57,6 +57,13 @@ async fn gateway(limits: serde_json::Value) -> (LabServer, EgressGateway) {
     (server, gw)
 }
 
+/// Arrival-time jitter the lab server may add to one request: TLS handshake
+/// and scheduling on a loaded CI runner. The limiter spaces the *sends*; the
+/// server sees *arrivals*, so a late arrival shortens one gap and lengthens
+/// the next by the same amount (Cycle 025 R-11: observed up to ~12 ms under
+/// load, on `main` as on the PR). A burst would put gaps near zero.
+const ARRIVAL_JITTER: Duration = Duration::from_millis(25);
+
 #[tokio::test(flavor = "multi_thread")]
 async fn at_two_per_second_consecutive_requests_are_at_least_500_ms_apart() {
     let (server, mut gw) = gateway(json!({"max_rps": 2})).await;
@@ -65,13 +72,20 @@ async fn at_two_per_second_consecutive_requests_are_at_least_500_ms_apart() {
     }
     let hits = server.hits();
     assert_eq!(hits.len(), 5);
+    let interval = Duration::from_millis(500);
+    // No burst: every gap is the interval, less at most one arrival's jitter.
     for pair in hits.windows(2) {
         assert!(
-            pair[1].at - pair[0].at >= Duration::from_millis(495),
+            pair[1].at - pair[0].at >= interval - ARRIVAL_JITTER,
             "{:?}",
             pair[1].at - pair[0].at
         );
     }
+    // No drift: jitter cancels between neighbours, so the whole run spans
+    // four intervals, less at most one arrival's jitter. A limiter that is
+    // systematically fast by more than ~6 ms per request fails here.
+    let span = hits[4].at - hits[0].at;
+    assert!(span >= interval * 4 - ARRIVAL_JITTER, "{span:?}");
 }
 
 #[test]

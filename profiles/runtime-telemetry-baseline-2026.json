@@ -1,0 +1,47 @@
+{
+  "schema": {
+    "id": "https://darelabs.tech/schemas/coverage/v1/profile.schema.json",
+    "version": "1.0.0"
+  },
+  "id": "runtime-telemetry-baseline-2026",
+  "version": "1.0.0",
+  "title": "DARE Runtime Telemetry Security Baseline 2026",
+  "properties": [
+    {
+      "id": "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.HUMAN_APPROVAL.INTENT_BINDING",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.IDENTITY.PRINCIPAL_BINDING",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.RAG.TENANT_DOCUMENT_ISOLATION",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.MEMORY.TENANT_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.CODE_EXECUTION.EGRESS_BOUNDARY",
+      "requirement": "CONDITIONAL"
+    },
+    {
+      "id": "AGENT.FAILURE.RETRY_AMPLIFICATION",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.TELEMETRY.CONFIDENTIALITY",
+      "requirement": "REQUIRED"
+    },
+    {
+      "id": "AGENT.TELEMETRY.COMPLETENESS",
+      "requirement": "REQUIRED"
+    }
+  ]
+}

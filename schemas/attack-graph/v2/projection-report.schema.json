@@ -64,7 +64,8 @@
               "supply-chain",
               "a2a",
               "multi-turn",
-              "remote"
+              "remote",
+              "runtime-telemetry"
             ]
           },
           "run": {

@@ -102,6 +102,12 @@ pub enum ValidateSubcommand {
     /// Analyse what a compromise reaches over an attack graph (Cycle 024).
     #[command(name = "blast-radius", after_help = crate::blast_radius::BLAST_RADIUS_AFTER_HELP)]
     BlastRadius(crate::blast_radius::BlastRadiusArgs),
+    /// Judge recorded OpenTelemetry traces against a runtime policy, offline (Cycle 025).
+    #[command(
+        name = "runtime-telemetry",
+        after_help = crate::runtime_telemetry::RUNTIME_TELEMETRY_AFTER_HELP
+    )]
+    RuntimeTelemetry(crate::runtime_telemetry::RuntimeTelemetryArgs),
 }
 
 /// `dare-agent-security validate coaz-integrity` options.

@@ -36,6 +36,7 @@ dare-agent-security validate attack-paths \
   | supply chain, A2A | nothing for a built-in scenario id; otherwise `scenario.json` plus the `evidence/` directory (static mode) or the capture (replay) |
   | prompt injection, multi-turn | nothing: the result and evidence are enough |
   | remote (`validate replay-capture`) | nothing |
+  | runtime telemetry | `policy.json`, the runtime policy the result pins by digest; without it the run is counted as result-only and projects nothing |
 
   Every input is re-bound to the digest its result pins, using the owning engine's
   own digest function. Several things are refused: an edited scenario, a changed

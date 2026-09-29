@@ -1,0 +1,94 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "assistant"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002510",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "agent",
+              "parentSpanId": "089f6dd2c6531831",
+              "spanId": "df89d39e32638379",
+              "startTimeUnixNano": "1750000000000001000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "714ee939090b614fbf6399e4728f2098"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002500",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "tool",
+              "parentSpanId": "df89d39e32638379",
+              "spanId": "089f6dd2c6531831",
+              "startTimeUnixNano": "1750000000000002000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "714ee939090b614fbf6399e4728f2098"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

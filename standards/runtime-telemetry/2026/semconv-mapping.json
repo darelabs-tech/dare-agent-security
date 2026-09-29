@@ -1,0 +1,112 @@
+{
+  "schema_version": "1",
+  "mapping_id": "dare-runtime-telemetry-semconv-2026.1",
+  "conventions": {
+    "core": {
+      "release": "v1.44.0",
+      "schema_url": "https://opentelemetry.io/schemas/1.44.0"
+    },
+    "genai": {
+      "release": "unreleased@e57c543b4889619eb2a05702471937db5119165d",
+      "schema_url": "https://opentelemetry.io/schemas/gen-ai-dev/1.42.0-dev"
+    }
+  },
+  "operation_key": "gen_ai.operation.name",
+  "span_kinds": {
+    "AGENT_INVOKE": {
+      "operation_names": [
+        "invoke_agent"
+      ],
+      "required_keys": [
+        "gen_ai.agent.name"
+      ]
+    },
+    "MODEL_CALL": {
+      "operation_names": [
+        "chat",
+        "text_completion",
+        "generate_content",
+        "embeddings"
+      ],
+      "required_keys": []
+    },
+    "TOOL_EXEC": {
+      "operation_names": [
+        "execute_tool"
+      ],
+      "required_keys": [
+        "gen_ai.tool.name"
+      ]
+    },
+    "RETRIEVAL": {
+      "operation_names": [
+        "retrieval"
+      ],
+      "required_keys": []
+    },
+    "MEMORY": {
+      "operation_names": [
+        "search_memory",
+        "upsert_memory",
+        "update_memory",
+        "create_memory",
+        "delete_memory"
+      ],
+      "required_keys": []
+    },
+    "MCP_CALL": {
+      "method_key": "mcp.method.name",
+      "required_keys": [
+        "mcp.method.name"
+      ]
+    },
+    "HTTP_CLIENT": {
+      "span_kind": "SPAN_KIND_CLIENT",
+      "method_key": "http.request.method",
+      "required_keys": [
+        "http.request.method"
+      ]
+    }
+  },
+  "keys": {
+    "agent_name": "gen_ai.agent.name",
+    "agent_id": "gen_ai.agent.id",
+    "tool_name": "gen_ai.tool.name",
+    "tool_call_id": "gen_ai.tool.call.id",
+    "server_address": "server.address",
+    "url_full": "url.full",
+    "http_method": "http.request.method",
+    "http_resend_count": "http.request.resend_count",
+    "mcp_method": "mcp.method.name",
+    "mcp_tools_call": "tools/call"
+  },
+  "content_keys": [
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.system_instructions",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.retrieval.query.text",
+    "gen_ai.retrieval.documents",
+    "gen_ai.memory.query.text",
+    "gen_ai.memory.records",
+    "gen_ai.prompt.variable"
+  ],
+  "principal_key_allowlist": [
+    "user.id",
+    "enduser.id",
+    "enduser.pseudo.id",
+    "user.name"
+  ],
+  "tenant_key_allowlist": [
+    "tenant.id",
+    "gen_ai.data_source.id",
+    "gen_ai.memory.store.id"
+  ],
+  "notes": [
+    "APPROVAL and DELEGATION span kinds have no OpenTelemetry convention; the runtime policy names them (BLUEPRINT AD-09).",
+    "A key this mapping does not list is counted as unrecognized and never interpreted.",
+    "tenant.id is not an OpenTelemetry convention; it is accepted only when the runtime policy names it as a tenant key.",
+    "RETRIEVAL and MEMORY kinds come from the GenAI operation names retrieval and *_memory; they scope evaluator B-4."
+  ]
+}

@@ -24,6 +24,7 @@ members = [
     "crates/dare-remote-validation",
     "crates/dare-attack-path",
     "crates/dare-blast-radius",
+    "crates/dare-runtime-telemetry",
     "labs/synthetic-mcp",
 ]
 

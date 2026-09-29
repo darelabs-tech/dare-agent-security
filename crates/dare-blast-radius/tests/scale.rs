@@ -3,7 +3,10 @@
 //!
 //! - a **layered** graph shaped like the lab graphs (principals delegate to
 //!   agents, agents invoke tools and use credentials, credentials and tools
-//!   reach resources and data), which must finish in under 10 s in release;
+//!   reach resources and data), whose O-08 target is under 10 s in release.
+//!   A run over the target is reported; the test fails only above the 20 s
+//!   ceiling, so a slow runner is not a defect but a real regression (the
+//!   37 s of the pre-optimisation search) still is (REGRESSION R-6);
 //! - a **uniform** graph whose random edges make almost every authority state
 //!   distinct, so it runs into the 5 000 000-state total budget. It checks
 //!   that no bound is overshot and the truncation is reported; its time is
@@ -13,6 +16,11 @@
 mod support;
 
 use std::time::{Duration, Instant};
+
+/// O-08: the time the layered graph is meant to take.
+const TARGET: Duration = Duration::from_secs(10);
+/// The failing bound: twice the target (REGRESSION R-6, decided at Review).
+const CEILING: Duration = Duration::from_secs(20);
 
 use dare_attack_graph::{
     v2::{AttackGraphV2, EntryClass, TargetClass},
@@ -214,7 +222,10 @@ fn uniform() -> AttackGraphV2 {
 fn a_lab_shaped_graph_is_analysed_in_under_ten_seconds() {
     let (doc, elapsed) = run(&layered());
     assert!(doc.totals.exposed > 0 && doc.totals.contained > 0);
-    assert!(elapsed < Duration::from_secs(10), "{elapsed:?}");
+    if elapsed >= TARGET {
+        eprintln!("scale: {elapsed:?} is over the {TARGET:?} target (ceiling {CEILING:?})");
+    }
+    assert!(elapsed < CEILING, "{elapsed:?}");
 }
 
 #[test]

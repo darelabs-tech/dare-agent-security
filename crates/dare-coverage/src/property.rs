@@ -126,6 +126,11 @@ pub enum Predicate {
     DataScopePolicyPresent,
     ReplayPolicyPresent,
     ProtocolPolicyPresent,
+
+    // Cycle 025 target-shape predicate: the assessment was given recorded
+    // runtime traces of the system. With no trace there is no telemetry to
+    // judge, so the telemetry properties are genuinely not applicable.
+    RuntimeTracePresent,
 }
 
 impl Predicate {
@@ -199,6 +204,7 @@ impl Predicate {
             Self::DataScopePolicyPresent => "data_scope_policy_present",
             Self::ReplayPolicyPresent => "replay_policy_present",
             Self::ProtocolPolicyPresent => "protocol_policy_present",
+            Self::RuntimeTracePresent => "runtime_trace_present",
         }
     }
 
@@ -253,6 +259,7 @@ impl Predicate {
                 | Self::AgentCardPresent
                 | Self::A2aExtensionPresent
                 | Self::PushNotificationConfigPresent
+                | Self::RuntimeTracePresent
         )
     }
 

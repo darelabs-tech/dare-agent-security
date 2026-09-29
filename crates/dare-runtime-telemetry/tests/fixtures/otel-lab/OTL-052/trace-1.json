@@ -1,0 +1,60 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "lookup_order"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002500",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "tool",
+              "parentSpanId": "fce87821dfc603eb",
+              "spanId": "c9bfd234c5aaec1b",
+              "startTimeUnixNano": "1750000000000002000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "89955b22bbf08d2b6016c23bf6774612"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -27,6 +27,7 @@
 - [A2A and Inter-Agent Communication Security](concepts/a2a-security.md)
 - [Adaptive Multi-Turn Adversarial Validation](concepts/multi-turn-security.md)
 - [Authorized Remote Validation](concepts/remote-validation.md)
+- [Runtime Telemetry Security](concepts/runtime-telemetry.md)
 
 # Commands
 

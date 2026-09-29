@@ -140,7 +140,8 @@
               "a2a_tenant_policy_present",
               "data_scope_policy_present",
               "replay_policy_present",
-              "protocol_policy_present"
+              "protocol_policy_present",
+              "runtime_trace_present"
             ]
           }
         }

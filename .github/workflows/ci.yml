@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [main]
     types: [opened]
+  # Manual re-run for pushes after the PR opened (Cycle 025 R-9, Review 2026-09-29).
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -3550,6 +3552,86 @@ jobs:
             exit 1
           fi
           test ! -e .dare-agent-security/cycle024-refused
+
+  runtime-telemetry-2026:
+    name: Cycle 025 runtime OpenTelemetry security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Containment, limits, OTLP model, evaluators, result, evidence and summary
+        run: |
+          cargo test -p dare-runtime-telemetry --lib -- --nocapture
+          cargo test -p dare-runtime-telemetry --test manifest -- --nocapture
+          cargo test -p dare-runtime-telemetry --test result -- --nocapture
+          cargo test -p dare-runtime-telemetry --test evidence -- --nocapture
+          cargo test -p dare-runtime-telemetry --test summary -- --nocapture
+      - name: OTEL-LAB - class contracts, twins, recorded copies replay to the simulated result
+        run: cargo test -p dare-runtime-telemetry --test otel_lab -- --nocapture
+      - name: No value leaves, determinism, hostile corpus
+        run: |
+          cargo test -p dare-runtime-telemetry --test no_value_leaves -- --nocapture
+          cargo test -p dare-runtime-telemetry --test determinism -- --nocapture
+          cargo test -p dare-runtime-telemetry --test hostile -- --nocapture
+      - name: Scale - 100000 spans in 64 files (release)
+        run: cargo test -p dare-runtime-telemetry --release --test scale -- --nocapture
+      - name: CI job shape (trigger, no secrets, no network target)
+        run: cargo test -p dare-runtime-telemetry --test ci_job -- --nocapture
+      - name: CLI exit codes, the refusal corpus and the double run
+        run: |
+          cargo test -p dare-agent-security --test runtime_telemetry_cli -- --nocapture
+          cargo test -p dare-agent-security --test runtime_telemetry_refusals -- --nocapture
+      - name: Coverage - two appended properties, the predicate and the profile
+        run: |
+          cargo test -p dare-coverage --test runtime_telemetry_properties -- --nocapture
+          cargo test -p dare-coverage --test runtime_telemetry_profile -- --nocapture
+          cargo test -p dare-coverage --test multi_turn_properties -- --nocapture
+      - name: BQ-1 pins - every pre-existing registry entry and the 11 profiles unchanged
+        run: |
+          cargo test -p dare-remote-validation --test compatibility -- --nocapture
+          cargo test -p dare-agent-security --test attack_path_compatibility -- --nocapture
+      - name: Cycle 023 projector, goldens and lab; Cycle 024 lab unchanged
+        run: |
+          cargo test -p dare-attack-path --test projection_tables -- --nocapture
+          cargo test -p dare-attack-path --test binding -- --nocapture
+          cargo test -p dare-agent-security --test attack_path_goldens -- --nocapture
+          cargo test -p dare-agent-security --test attack_path_lab -- --nocapture
+          cargo test -p dare-agent-security --test blast_radius_lab -- --nocapture
+
+      - name: No real credential or live endpoint anywhere
+        run: python scripts/k25/assert_no_real_credentials.py
+      - name: Every test PROOF.md cites actually exists
+        run: python scripts/k25/verify_proof_citations.py
+
+      - name: Offline CLI - a recorded attack export fails, a doctored one is refused
+        run: |
+          L=crates/dare-runtime-telemetry/tests/fixtures/otel-lab
+          rm -rf .dare-agent-security/cycle025-run .dare-agent-security/cycle025-refused
+          set +e
+          cargo run -p dare-agent-security -- validate runtime-telemetry \
+            --traces $L/OTL-001/trace-0.json --policy $L/OTL-001/policy.json \
+            --output-dir .dare-agent-security/cycle025-run
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "expected exit 2 for an unlisted tool, got $code"
+            exit 1
+          fi
+          for f in runtime-telemetry-result.json runtime-telemetry-evidence.json runtime-telemetry-findings.json summary.md; do
+            test -s ".dare-agent-security/cycle025-run/$f"
+          done
+          set +e
+          cargo run -p dare-agent-security -- validate runtime-telemetry \
+            --traces $L/OTL-055/trace-0.json \
+            --output-dir .dare-agent-security/cycle025-refused
+          code=$?
+          set -e
+          if [ "$code" -ne 3 ]; then
+            echo "expected exit 3 for a doctored export, got $code"
+            exit 1
+          fi
+          test ! -e .dare-agent-security/cycle025-refused
 
   docs-build:
     name: mdBook documentation gate

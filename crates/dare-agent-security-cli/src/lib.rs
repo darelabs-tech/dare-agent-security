@@ -19,6 +19,7 @@ pub mod product;
 pub mod prompt_injection;
 pub mod rag_security;
 pub mod remote_validation;
+pub mod runtime_telemetry;
 pub mod supply_chain_security;
 pub mod tool_security;
 

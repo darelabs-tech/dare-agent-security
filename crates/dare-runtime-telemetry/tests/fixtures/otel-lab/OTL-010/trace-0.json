@@ -1,0 +1,106 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "assistant"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002510",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "agent",
+              "spanId": "8e425175527ec2fc",
+              "startTimeUnixNano": "1750000000000001000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "15321c07d457217da5eabad5d35f62c8"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "refund"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002500",
+              "events": [
+                {
+                  "attributes": [
+                    {
+                      "key": "gen_ai.tool.name",
+                      "value": {
+                        "stringValue": "refund"
+                      }
+                    }
+                  ],
+                  "name": "dare.approval",
+                  "timeUnixNano": "1750000000000002200"
+                }
+              ],
+              "flags": 1,
+              "kind": 1,
+              "name": "tool",
+              "parentSpanId": "8e425175527ec2fc",
+              "spanId": "7b728548c26c4f13",
+              "startTimeUnixNano": "1750000000000002000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "15321c07d457217da5eabad5d35f62c8"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

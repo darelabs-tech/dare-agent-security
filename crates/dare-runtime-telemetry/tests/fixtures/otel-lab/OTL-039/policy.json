@@ -1,0 +1,52 @@
+{
+  "agents": [
+    {
+      "allowed_tools": [
+        "search",
+        "lookup_order",
+        "refund",
+        "delete_account"
+      ],
+      "destructive_tools": [
+        "refund",
+        "delete_account"
+      ],
+      "egress_hosts": [
+        "api.example.com",
+        "*.docs.example.com"
+      ],
+      "max_retries": 1,
+      "name": "assistant",
+      "principal": "user-7",
+      "tenant": "tenant-a"
+    },
+    {
+      "allowed_tools": [
+        "fetch_paper"
+      ],
+      "egress_hosts": [
+        "api.example.com"
+      ],
+      "max_retries": 1,
+      "name": "researcher",
+      "principal": "svc-research",
+      "tenant": "tenant-a"
+    }
+  ],
+  "approval": {
+    "event_name": "dare.approval",
+    "tool_key": "gen_ai.tool.name"
+  },
+  "content_capture_allowed": true,
+  "policy_id": "otel-lab",
+  "principal_keys": [
+    "user.id"
+  ],
+  "required_operations": [
+    "TOOL_EXEC"
+  ],
+  "schema_version": "1",
+  "tenant_keys": [
+    "tenant.id"
+  ]
+}

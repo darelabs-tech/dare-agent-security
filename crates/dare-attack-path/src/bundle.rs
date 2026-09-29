@@ -31,9 +31,13 @@ use crate::{
 
 pub const REMOTE_RESULT_SCHEMA_JSON: &str =
     include_str!("../../../schemas/remote-validation/v1/result.schema.json");
+pub const RUNTIME_TELEMETRY_RESULT_SCHEMA_JSON: &str =
+    include_str!("../../../schemas/runtime-telemetry/v1/result.schema.json");
+pub const RUNTIME_POLICY_SCHEMA_JSON: &str =
+    include_str!("../../../schemas/runtime-telemetry/v1/runtime-policy.schema.json");
 
 /// (result file, engine, evidence file)
-pub const BUNDLES: [(&str, EngineSlug, &str); 10] = [
+pub const BUNDLES: [(&str, EngineSlug, &str); 11] = [
     (
         "prompt-injection-result.json",
         EngineSlug::PromptInjection,
@@ -79,6 +83,11 @@ pub const BUNDLES: [(&str, EngineSlug, &str); 10] = [
         "remote-result.json",
         EngineSlug::Remote,
         "remote-evidence.json",
+    ),
+    (
+        "runtime-telemetry-result.json",
+        EngineSlug::RuntimeTelemetry,
+        "runtime-telemetry-evidence.json",
     ),
 ];
 
@@ -132,6 +141,13 @@ pub enum RunData {
     },
     Remote {
         runs: Vec<RemoteRun>,
+    },
+    /// Cycle 025. The result is read as the JSON its schema admits (the
+    /// engine crate is a dependency of the CLI only); the runtime policy is
+    /// bound when `inputs/policy.json` is present and its digest matches.
+    RuntimeTelemetry {
+        result: Value,
+        policy: Option<Value>,
     },
 }
 
@@ -246,6 +262,7 @@ pub fn load_bundle(index: usize, path: &Path) -> Result<LoadedBundle> {
         EngineSlug::PromptInjection => bind_prompt_injection(&result_value, &mut bundle)?,
         EngineSlug::MultiTurn => bind_multi_turn(&dir, &result_value, &mut bundle)?,
         EngineSlug::Remote => bind_remote(&dir, &result_value, &mut bundle)?,
+        EngineSlug::RuntimeTelemetry => bind_runtime_telemetry(&dir, &result_value, &mut bundle)?,
     };
     bundle.input_digests.sort();
     bundle.input_digests.dedup();
@@ -649,6 +666,87 @@ fn bind_multi_turn(dir: &AdmittedDir, value: &Value, bundle: &mut LoadedBundle) 
     Ok(RunData::MultiTurn {
         result,
         conversations: runs,
+    })
+}
+
+fn conforms(schema_json: &'static str, value: &Value) -> Result<bool> {
+    let internal = || crate::AttackPathError::Internal("embedded runtime telemetry schema");
+    let schema: Value = serde_json::from_str(schema_json).map_err(|_| internal())?;
+    let validator = jsonschema::options()
+        .build(&schema)
+        .map_err(|_| internal())?;
+    let valid = validator.iter_errors(value).next().is_none();
+    Ok(valid)
+}
+
+/// Canonical JSON (sorted keys, compact), as the runtime telemetry engine
+/// digests its policy.
+fn canonical(value: &Value, out: &mut String) {
+    match value {
+        Value::Object(map) => {
+            out.push('{');
+            let mut keys: Vec<&String> = map.keys().collect();
+            keys.sort();
+            for (i, key) in keys.into_iter().enumerate() {
+                if i > 0 {
+                    out.push(',');
+                }
+                out.push_str(&Value::String(key.clone()).to_string());
+                out.push(':');
+                canonical(&map[key], out);
+            }
+            out.push('}');
+        }
+        Value::Array(items) => {
+            out.push('[');
+            for (i, item) in items.iter().enumerate() {
+                if i > 0 {
+                    out.push(',');
+                }
+                canonical(item, out);
+            }
+            out.push(']');
+        }
+        other => out.push_str(&other.to_string()),
+    }
+}
+
+fn bind_runtime_telemetry(
+    dir: &AdmittedDir,
+    value: &Value,
+    bundle: &mut LoadedBundle,
+) -> Result<RunData> {
+    let index = dir.index;
+    if !conforms(RUNTIME_TELEMETRY_RESULT_SCHEMA_JSON, value)? {
+        return Err(invalid(
+            index,
+            "result",
+            "does not match the runtime telemetry result schema",
+        )
+        .into());
+    }
+    let pinned = value["inputs"]["policy_digest"].as_str();
+    let policy = if dir.has(POLICY_FILE) {
+        let (_, policy) = dir.read_json(POLICY_FILE, "policy")?;
+        if !conforms(RUNTIME_POLICY_SCHEMA_JSON, &policy)? {
+            return Err(
+                invalid(index, "policy", "does not match the runtime policy schema").into(),
+            );
+        }
+        let mut text = String::new();
+        canonical(&policy, &mut text);
+        let digest = sha256_prefixed(text.as_bytes());
+        match pinned {
+            Some(p) if p == digest => pin(bundle, "runtime policy", &digest),
+            _ => return Err(mismatch(index, "runtime policy").into()),
+        }
+        Some(policy)
+    } else {
+        None
+    };
+    Ok(RunData::RuntimeTelemetry {
+        result: value.clone(),
+        policy,
     })
 }
 

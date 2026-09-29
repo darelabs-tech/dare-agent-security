@@ -35,6 +35,8 @@ pub const AGENTIC_A2A_PROFILE_JSON: &str =
     include_str!("../../../profiles/agentic-a2a-security-2026.json");
 pub const MULTI_TURN_SECURITY_PROFILE_JSON: &str =
     include_str!("../../../profiles/multi-turn-security-baseline-2026.json");
+pub const RUNTIME_TELEMETRY_PROFILE_JSON: &str =
+    include_str!("../../../profiles/runtime-telemetry-baseline-2026.json");
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -312,6 +314,20 @@ pub fn multi_turn_security_profile() -> Result<AssessmentProfile, CoverageError>
     load_profile(MULTI_TURN_SECURITY_PROFILE_JSON)
 }
 
+/// The Cycle 025 runtime telemetry profile.
+///
+/// Additive: it selects the seven behaviour properties the runtime rules
+/// judge and the two telemetry properties Cycle 025 appended, and touches no
+/// earlier profile, so no earlier denominator moves. A property is REQUIRED
+/// when every traced agent has its surface (its registry predicates are only
+/// `agent_present` and `runtime_trace_present`): telemetry confidentiality,
+/// telemetry completeness and retry amplification. The rest are CONDITIONAL,
+/// because their surface (tools, approvals, principals, retrieval, memory,
+/// egress) may not exist in the traced system.
+pub fn runtime_telemetry_profile() -> Result<AssessmentProfile, CoverageError> {
+    load_profile(RUNTIME_TELEMETRY_PROFILE_JSON)
+}
+
 pub fn load_profile_file(path: impl AsRef<Path>) -> Result<AssessmentProfile, CoverageError> {
     let path = path.as_ref();
     let raw = std::fs::read_to_string(path).map_err(|err| CoverageError::Io {
@@ -334,6 +350,7 @@ pub fn resolve_profile(spec: &str) -> Result<AssessmentProfile, CoverageError> {
         "agentic-supply-chain-security-2026" => agentic_supply_chain_profile(),
         "agentic-a2a-security-2026" => agentic_a2a_profile(),
         "multi-turn-security-baseline-2026" => multi_turn_security_profile(),
+        "runtime-telemetry-baseline-2026" => runtime_telemetry_profile(),
         _ => {
             let path = PathBuf::from(spec);
             if path.extension().is_some() || path.components().count() > 1 {

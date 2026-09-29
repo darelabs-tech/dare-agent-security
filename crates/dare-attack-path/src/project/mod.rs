@@ -27,6 +27,7 @@ pub mod multi_turn;
 pub mod prompt_injection;
 pub mod rag;
 pub mod remote;
+pub mod runtime_telemetry;
 pub mod supply_chain;
 pub mod tool;
 
@@ -77,6 +78,9 @@ pub fn project(bundle: &LoadedBundle) -> Result<RunFacts> {
             &mut sink,
         ),
         RunData::Remote { runs } => remote::project(bundle, runs, &mut verdicts, &mut sink),
+        RunData::RuntimeTelemetry { result, policy } => {
+            runtime_telemetry::project(bundle, result, policy.as_ref(), &verdicts, &mut sink)
+        }
     }
     Ok(sink.finish())
 }

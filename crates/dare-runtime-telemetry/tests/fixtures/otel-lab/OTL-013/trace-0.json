@@ -1,0 +1,93 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "sim-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "dare.simulated",
+            "version": "1"
+          },
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "assistant"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-7"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002510",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "agent",
+              "spanId": "4998e2d8e8c57abf",
+              "startTimeUnixNano": "1750000000000001000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "b71456b2d560ee99b8447b3bfec9870c"
+            },
+            {
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search"
+                  }
+                },
+                {
+                  "key": "user.id",
+                  "value": {
+                    "stringValue": "user-9"
+                  }
+                }
+              ],
+              "endTimeUnixNano": "1750000000000002500",
+              "events": [],
+              "flags": 1,
+              "kind": 1,
+              "name": "tool",
+              "parentSpanId": "4998e2d8e8c57abf",
+              "spanId": "9a85c665857c1d5d",
+              "startTimeUnixNano": "1750000000000002000",
+              "status": {
+                "code": 0
+              },
+              "traceId": "b71456b2d560ee99b8447b3bfec9870c"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

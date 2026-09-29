@@ -46,6 +46,15 @@ pub enum Role {
     PromptChannel,
     MultiTurnChannel,
     MultiTurnCalls,
+    // Cycle 025 runtime telemetry: edges the runtime policy declares, guarded
+    // by the verdicts the traces gave.
+    RuntimeToolCalls,
+    RuntimeDestructiveCalls,
+    RuntimeActsAs,
+    RuntimeRetrieves,
+    RuntimeMemory,
+    RuntimeEgress,
+    RuntimeTelemetryExport,
 }
 
 const TOOL_CALLS: &[&str] = &[
@@ -183,10 +192,30 @@ pub fn properties(role: Role) -> &'static [&'static str] {
         ],
         Role::MultiTurnChannel => MULTI_TURN_CHANNEL,
         Role::MultiTurnCalls => &["AGENT.HUMAN_APPROVAL.CROSS_TURN_CONTINUITY"],
+        Role::RuntimeToolCalls => &[
+            "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+            "AGENT.FAILURE.RETRY_AMPLIFICATION",
+        ],
+        Role::RuntimeDestructiveCalls => &[
+            "AGENT.TOOL.AUTHORIZATION_BOUNDARY",
+            "AGENT.HUMAN_APPROVAL.INTENT_BINDING",
+            "AGENT.FAILURE.RETRY_AMPLIFICATION",
+        ],
+        Role::RuntimeActsAs => &["AGENT.IDENTITY.PRINCIPAL_BINDING"],
+        Role::RuntimeRetrieves => &["AGENT.RAG.TENANT_DOCUMENT_ISOLATION"],
+        Role::RuntimeMemory => &["AGENT.MEMORY.TENANT_BOUNDARY"],
+        Role::RuntimeEgress => &[
+            "AGENT.CODE_EXECUTION.EGRESS_BOUNDARY",
+            "AGENT.FAILURE.RETRY_AMPLIFICATION",
+        ],
+        Role::RuntimeTelemetryExport => &[
+            "AGENT.TELEMETRY.CONFIDENTIALITY",
+            "AGENT.TELEMETRY.COMPLETENESS",
+        ],
     }
 }
 
-pub const ALL_ROLES: [Role; 28] = [
+pub const ALL_ROLES: [Role; 35] = [
     Role::ToolCalls,
     Role::ToolCanInvoke,
     Role::ToolOutputToSut,
@@ -215,6 +244,13 @@ pub const ALL_ROLES: [Role; 28] = [
     Role::PromptChannel,
     Role::MultiTurnChannel,
     Role::MultiTurnCalls,
+    Role::RuntimeToolCalls,
+    Role::RuntimeDestructiveCalls,
+    Role::RuntimeActsAs,
+    Role::RuntimeRetrieves,
+    Role::RuntimeMemory,
+    Role::RuntimeEgress,
+    Role::RuntimeTelemetryExport,
 ];
 
 /// What one run decided, per property (§6.11).

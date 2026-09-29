@@ -1,6 +1,6 @@
 # Cycle 024 — Regression and refinement record
 
-**Status:** COMPLETE. Seven refinements (R-1..R-7). None crosses a frozen boundary. R-6 leaves one decision open for Review.
+**Status:** COMPLETE. Seven refinements (R-1..R-7). None crosses a frozen boundary. R-6's open decision was resolved at Review (2026-09-29).
 
 ## Blueprint refinements made during execution
 
@@ -25,3 +25,13 @@ could not satisfy. None crosses a frozen boundary in `APPROVAL.md`.
   green.
 - No engine crate changed, and no registry or profile changed.
 - The full workspace passes: 347 suites, 4 433 passed, 0 failed, 9 ignored (PROOF §8).
+
+## R-6 decision (Review, 2026-09-29)
+
+The Product Owner chose option (c). O-08's 10 s stays the target for the layered graph
+and is measured on every run. The test reports a run above the target and fails only
+above a 20 s ceiling: twice the target, and still below the 37 s of the search before
+the R-6 optimisations. So a slow or loaded runner is no longer read as a defect, but a
+real regression still fails. Option (a) (threads, needs an RS-08 amendment) is
+declined. Option (b) (a compact `Authority`) is deferred to a later performance cycle.
+The change is confined to `tests/scale.rs`; no `src/` file changes. Measured after the change on the same container, in release: layered 14.6 s (reported over the target, passes), uniform 12.6 s. The old assertion would have failed that run with no code defect.
