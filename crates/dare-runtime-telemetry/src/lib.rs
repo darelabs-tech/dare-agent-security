@@ -11,8 +11,10 @@
 pub mod admit;
 pub mod canonical;
 pub mod complete;
+pub mod coverage;
 pub mod error;
 pub mod evaluate;
+pub mod evidence_bridge;
 pub mod limits;
 pub mod normalize;
 pub mod otlp;

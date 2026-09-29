@@ -35,7 +35,8 @@ fn the_dependencies_are_exactly_the_blueprint_list() {
             "serde",
             "serde_json",
             "sha2",
-            "thiserror"
+            "thiserror",
+            "time"
         ]
     );
     assert_eq!(

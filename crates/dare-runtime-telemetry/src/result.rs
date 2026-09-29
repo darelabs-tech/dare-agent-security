@@ -74,9 +74,9 @@ pub struct Semconv {
     pub genai_release: String,
 }
 
+/// One admitted trace file. Records are in content-digest order (AD-10).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct TraceFileRecord {
-    pub index: usize,
     pub digest: String,
     pub spans: u64,
     pub unknown_fields: u64,
@@ -273,8 +273,8 @@ pub fn analyze(
     if files.len() > MAX_TRACE_FILES {
         return Err(Refusal::TooManyTraceFiles.into());
     }
-    let mut spans: Vec<NSpan> = Vec::new();
-    let mut records = Vec::with_capacity(files.len());
+    // Parse in input order, so a refusal names the first bad position.
+    let mut parsed = Vec::with_capacity(files.len());
     for (index, file) in files.iter().enumerate() {
         let input = Input::Trace(index);
         if !conforms(OTLP_TRACE_SUBSET_SCHEMA_JSON, &file.value)? {
@@ -284,17 +284,20 @@ pub fn analyze(
             }
             .into());
         }
-        let parsed = read_trace_file(&file.value, input)?;
-        records.push(TraceFileRecord {
-            index,
-            digest: file.digest.clone(),
-            spans: parsed.spans.len() as u64,
-            unknown_fields: parsed.unknown_fields,
-        });
-        spans.extend(parsed.spans.iter().map(|s| normalize(s, index)));
+        parsed.push((file.digest.as_str(), read_trace_file(&file.value, input)?));
     }
-    // The span bound: a deterministic cut, and every property of every trace
-    // becomes INCONCLUSIVE (`SpanBound`).
+    // Then analyse in content-digest order: file order never matters (AD-10).
+    parsed.sort_by(|a, b| a.0.cmp(b.0));
+    let mut spans: Vec<NSpan> = Vec::new();
+    let mut records = Vec::with_capacity(parsed.len());
+    for (position, (digest, file)) in parsed.iter().enumerate() {
+        records.push(TraceFileRecord {
+            digest: (*digest).to_owned(),
+            spans: file.spans.len() as u64,
+            unknown_fields: file.unknown_fields,
+        });
+        spans.extend(file.spans.iter().map(|s| normalize(s, position)));
+    }
     let mut stop_reason = None;
     if spans.len() as u64 > bounds.max_spans {
         spans.sort_by(|a, b| {

@@ -24,6 +24,8 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
 thiserror = "2.0"
+# `time` only types the evidence timestamps, taken from span times (R-6).
+time = { workspace = true }
 
 # The graph crate is used only by a test that keeps the local copy of the
 # credential markers equal to the product's (BLUEPRINT BQ-3).

@@ -35,9 +35,8 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["index", "digest", "spans", "unknown_fields"],
+            "required": ["digest", "spans", "unknown_fields"],
             "properties": {
-              "index": {"type": "integer", "minimum": 0},
               "digest": {"$ref": "#/$defs/digest"},
               "spans": {"type": "integer", "minimum": 0},
               "unknown_fields": {"type": "integer", "minimum": 0}
@@ -104,7 +103,7 @@
             }
           },
           "gaps": {"type": "array", "items": {"$ref": "#/$defs/gap"}},
-          "evidence_ids": {"type": "array", "items": {"type": "string"}}
+          "evidence_ids": {"type": "array", "maxItems": 1, "items": {"type": "string", "pattern": "^runtime-telemetry-[a-z0-9-]+-[0-9a-f]{16}$"}}
         }
       }
     },
