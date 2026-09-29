@@ -1,7 +1,7 @@
 # Cycle 025 — Approval
 
 **Cycle:** 025 — Runtime OpenTelemetry Security  
-**Approval:** DESIGN APPROVED — Blueprint pending  
+**Approval:** DESIGN AND BLUEPRINT APPROVED — task set pending  
 **Approved at:** 2026-09-29  
 **Approved by:** Product Owner  
 **Base:** `main @ 00e7aff`  
@@ -39,6 +39,29 @@ Neither the Blueprint nor execution may, without a new Review:
 - emit telemetry, open a port, contact a collector, or call the system under test (RS-08);
 - add a third-party dependency, including any OpenTelemetry SDK or protobuf crate.
 
+## Blueprint approval (2026-09-29)
+
+`BLUEPRINT.md` is approved, including AD-01 to AD-12, with the recommended option for
+each Review item:
+
+1. **BQ-1 (a) — a test-only exception to the frozen engine boundary.** Two pin tests may
+   change from whole-file digests to the prefix rule of Cycle 021:
+   - `crates/dare-remote-validation/tests/compatibility.rs`;
+   - `the_registries_and_every_profile_are_unchanged` in
+     `crates/dare-agent-security-cli/tests/attack_path_compatibility.rs`.
+
+   Under the new rule, every pre-existing registry entry and the 11 earlier profiles must
+   stay byte-identical. After that change, the Cycle 022 tree digest in `ENGINE_TREES` is
+   re-pinned. No engine source, verdict or artifact may change.
+2. **BQ-2 (a).** Pin the latest released OpenTelemetry semantic-conventions version at
+   execution time, recorded with its provenance.
+3. **BQ-3 (a).** A local copy of the secret markers, with a test that keeps it equal to
+   `dare_attack_graph::v2::sweep`.
+4. **BQ-4 (a).** Retries are counted only as error-then-retry sibling groups under one
+   parent.
+5. **BQ-5 (a).** INCONCLUSIVE exits 2.
+
 ## Next step
 
-Blueprint (`BLUEPRINT.md`), then a task set. Execution needs a separate approval.
+The task set (`TASKS.md`, `dare-dag.yaml`, `dare-dag.exec.yaml`) needs its own approval
+before execution.

@@ -1,0 +1,42 @@
+cycle: 025
+name: runtime-opentelemetry-security
+status: proposed
+baseline_branch: main
+baseline_commit: 00e7aff
+branch: claude/loving-newton-113zme
+execution_order:
+  - task-001
+  - task-002
+  - task-003
+  - task-004
+  - task-005
+  - task-006
+  - task-007
+  - task-008
+  - task-009
+  - task-010
+  - task-011
+  - task-012
+  - task-013
+  - task-014
+  - task-015
+  - task-016
+  - task-017
+  - task-018
+  - task-019
+  - task-020
+  - task-021
+  - task-022
+  - task-023
+  - task-024
+  - task-025
+  - task-026
+  - task-027
+  - task-028
+  - task-029
+  - task-030
+  - task-031
+execution_authorized: false
+per_task_human_approval_required: false
+review_required_on_semantic_scope_change: true
+final_pr_after_release_gate_only: true

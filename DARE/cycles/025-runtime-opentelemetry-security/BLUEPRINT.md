@@ -1,6 +1,6 @@
 # Cycle 025 — Blueprint: Runtime OpenTelemetry Security
 
-**Version:** v0.1 | **Date:** 2026-09-29 | **Status:** ARCHITECTURE PROPOSED — awaiting Review  
+**Version:** v0.1 | **Date:** 2026-09-29 | **Status:** ARCHITECTURE APPROVED (BQ-1..BQ-5 (a), 2026-09-29)  
 **Design:** `DESIGN.md` v0.2 (approved: Q1–Q6 (a), Q7 (b))  
 **Base:** `main @ 00e7aff`
 
