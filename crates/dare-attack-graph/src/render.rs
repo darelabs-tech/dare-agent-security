@@ -4,7 +4,9 @@ use crate::{
     validate::{validate_graph, validate_safe_label},
 };
 
-pub(crate) fn safe_label(label: &str) -> Result<String> {
+/// Validates a label (Cycle 008 `validate_safe_label`), caps it at 80
+/// characters and escapes it for Mermaid and DOT.
+pub fn escape_label(label: &str) -> Result<String> {
     validate_safe_label(label)?;
     let capped: String = label.chars().take(80).collect();
     Ok(capped
@@ -30,7 +32,7 @@ pub fn to_mermaid(graph: &AttackGraph) -> Result<String> {
         output.push_str(&format!(
             "  {}[\"{}\"]\n",
             symbol(&node.id),
-            safe_label(&node.display_name)?
+            escape_label(&node.display_name)?
         ));
     }
     for edge in &graph.edges {
@@ -52,7 +54,7 @@ pub fn to_dot(graph: &AttackGraph) -> Result<String> {
         output.push_str(&format!(
             "  {} [label=\"{}\"];\n",
             symbol(&node.id),
-            safe_label(&node.display_name)?
+            escape_label(&node.display_name)?
         ));
     }
     for edge in &graph.edges {

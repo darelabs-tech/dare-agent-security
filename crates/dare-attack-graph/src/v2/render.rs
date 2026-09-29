@@ -6,7 +6,7 @@
 //! state are written as text, never conveyed by colour alone.
 use std::collections::BTreeMap;
 
-use crate::{error::Result, render::safe_label};
+use crate::{error::Result, render::escape_label};
 
 use super::{
     control::{edge_control, EdgeControl},
@@ -42,7 +42,7 @@ fn edge_label(graph: &AttackGraphV2, index: usize) -> Result<String> {
         edge.evidence.status,
         control_label(edge_control(edge))
     );
-    safe_label(&text)
+    escape_label(&text)
 }
 
 pub fn to_mermaid_v2(graph: &AttackGraphV2) -> Result<String> {
@@ -53,7 +53,7 @@ pub fn to_mermaid_v2(graph: &AttackGraphV2) -> Result<String> {
         output.push_str(&format!(
             "  {}[\"{} ({:?})\"]\n",
             symbol[node.id.as_str()],
-            safe_label(&node.display_name)?,
+            escape_label(&node.display_name)?,
             node.node_type
         ));
     }
@@ -76,7 +76,7 @@ pub fn to_dot_v2(graph: &AttackGraphV2) -> Result<String> {
         output.push_str(&format!(
             "  {} [label=\"{} ({:?})\"];\n",
             symbol[node.id.as_str()],
-            safe_label(&node.display_name)?,
+            escape_label(&node.display_name)?,
             node.node_type
         ));
     }

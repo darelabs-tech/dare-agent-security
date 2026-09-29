@@ -28,5 +28,5 @@ pub use model::{
 pub use node::{build_node_id, NodeType};
 pub use path::{derive_paths, PathOptions};
 pub use provenance::graph_digest;
-pub use render::{to_dot, to_mermaid};
+pub use render::{escape_label, to_dot, to_mermaid};
 pub use validate::{validate_graph, validate_safe_label, ATTACK_GRAPH_SCHEMA_V1_JSON};

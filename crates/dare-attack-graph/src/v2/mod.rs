@@ -3,6 +3,7 @@ pub mod continuity;
 pub mod control;
 pub mod model;
 pub mod render;
+pub mod sweep;
 pub mod validate;
 
 pub use continuity::{discontinuity, Authority, MUTATION_PROPERTIES};

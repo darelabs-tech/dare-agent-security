@@ -1,46 +1,16 @@
-//! Artifact secret sweep (BLUEPRINT AD-12).
+//! Artifact secret sweep (BLUEPRINT AD-12). The markers and the check live
+//! in `dare_attack_graph::v2::sweep` since Cycle 024 (AD-03).
 //!
 //! The same markers the engine CLIs refuse to write, plus a bearer
 //! credential. Every artifact's bytes pass this check before they are
 //! written, so a credential that reached an identifier or label cannot leave
 //! through `attack-paths`.
+pub use dare_attack_graph::v2::sweep::{contains_bearer_credential, is_sensitive, MARKERS};
+
 use crate::error::{Refusal, Result};
 
-pub const MARKERS: [&str; 6] = [
-    "DARE-SYNTHETIC-CANARY-",
-    "sk-live-",
-    "-----BEGIN",
-    "ghp_",
-    "xoxb-",
-    "eyJhbGci",
-];
-
-fn is_token_char(byte: u8) -> bool {
-    byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'.' | b'_' | b'~' | b'+' | b'/' | b'=')
-}
-
-/// `bearer ` followed by at least eight token characters.
-pub fn contains_bearer_credential(text: &str) -> bool {
-    let lower = text.to_ascii_lowercase();
-    let bytes = lower.as_bytes();
-    let mut from = 0;
-    while let Some(offset) = lower[from..].find("bearer ") {
-        let start = from + offset + "bearer ".len();
-        let run = bytes[start..]
-            .iter()
-            .take_while(|b| is_token_char(**b))
-            .count();
-        if run >= 8 {
-            return true;
-        }
-        from = start;
-    }
-    false
-}
-
 pub fn sweep(file: &'static str, bytes: &[u8]) -> Result<()> {
-    let text = String::from_utf8_lossy(bytes);
-    if MARKERS.iter().any(|marker| text.contains(marker)) || contains_bearer_credential(&text) {
+    if is_sensitive(bytes) {
         return Err(Refusal::SensitiveOutput { file }.into());
     }
     Ok(())
