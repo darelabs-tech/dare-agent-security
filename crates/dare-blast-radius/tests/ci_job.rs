@@ -31,7 +31,11 @@ fn the_workflow_keeps_its_pull_request_opened_trigger() {
     let head: Vec<&str> = ci.lines().take(8).collect();
     let head = head.join("\n");
     assert!(head.contains("pull_request:"), "{head}");
-    assert!(head.contains("types: [opened]"), "{head}");
+    // Pull-request events only (Cycle 025 follow-up: re-run on push to an open PR).
+    assert!(
+        head.contains("types: [opened, synchronize, reopened]"),
+        "{head}"
+    );
     assert!(
         ci.contains("  remote-validation-2026:") && ci.contains("  attack-path-2026:"),
         "earlier gates are kept"

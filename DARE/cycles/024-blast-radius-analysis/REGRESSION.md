@@ -35,3 +35,12 @@ the R-6 optimisations. So a slow or loaded runner is no longer read as a defect,
 real regression still fails. Option (a) (threads, needs an RS-08 amendment) is
 declined. Option (b) (a compact `Authority`) is deferred to a later performance cycle.
 The change is confined to `tests/scale.rs`; no `src/` file changes. Measured after the change on the same container, in release: layered 14.6 s (reported over the target, passes), uniform 12.6 s. The old assertion would have failed that run with no code defect.
+
+## R-6 follow-up (2026-09-29): option (b) done
+
+The deferred option (b), a compact `Authority`, was implemented as Cycle 025 R-13.
+The continuity rule is generic over its node key and written once, and the search
+carries interned `u32` states. The layered graph now runs in 6.4 s and the uniform
+graph in 5.9 s, both well under the 10 s target, with identical results. The 20 s
+ceiling of decision (c) stays as the failing bound.
+

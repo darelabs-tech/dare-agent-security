@@ -31,11 +31,15 @@ fn the_workflow_keeps_its_pull_request_opened_trigger_and_earlier_gates() {
     let ci = workflow();
     let head = ci.lines().take(8).collect::<Vec<_>>().join("\n");
     assert!(head.contains("pull_request:"), "{head}");
-    assert!(head.contains("types: [opened]"), "{head}");
-    // R-9 (b): a manual re-run, and no other trigger.
+    assert!(
+        head.contains("types: [opened, synchronize, reopened]"),
+        "{head}"
+    );
+    // R-9 (b) and the follow-up: pull-request events plus a manual run, and
+    // no other trigger.
     let on = &ci[ci.find("\non:").expect("on:")..ci.find("\npermissions:").expect("permissions:")];
     assert!(on.contains("  workflow_dispatch:"), "{on}");
-    for other in ["push:", "synchronize", "schedule:", "pull_request_target"] {
+    for other in ["push:", "schedule:", "pull_request_target", "release:"] {
         assert!(!on.contains(other), "{other} in {on}");
     }
     for earlier in [
