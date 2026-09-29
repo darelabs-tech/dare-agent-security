@@ -20,6 +20,7 @@
 - [Segurança A2A e de Comunicação Entre Agentes](concepts/a2a-security.md)
 - [Validação Adversarial Adaptativa em Múltiplos Turnos](concepts/multi-turn-security.md)
 - [Validação Remota Autorizada](concepts/remote-validation.md)
+- [Segurança de Telemetria em Tempo de Execução](concepts/runtime-telemetry.md)
 
 # Comandos
 

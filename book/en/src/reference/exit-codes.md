@@ -79,6 +79,15 @@ Categorized errors print as `[category] message`, where category is one of:
 | 2 | A target is `EXPOSED`, or a search was truncated (`CONTAINMENT_UNKNOWN` is not a pass). |
 | 3 | Refusal: an invalid graph or scenario, an unknown, ambiguous, duplicate or unfitting seed, a bound out of range, or an output that would carry a credential-shaped value. Nothing is written. |
 
+## `validate runtime-telemetry`
+
+| Code | Meaning |
+|---|---|
+| 0 | Every judged property is PASS; the rest are `NOT_APPLICABLE` or `NOT_TESTED`. The traces are self-reported and unsigned, so this is not a claim of authenticity. |
+| 1 | Internal error. |
+| 2 | A property is FAIL or INCONCLUSIVE (an incomplete trace never passes), or nothing could be judged. |
+| 3 | Refusal: admission (symlink, size, depth, count), a trace outside the OTLP/JSON subset or a policy outside its schema (named by position), a bound out of range, an unsafe output directory, or an output that would carry a credential-shaped value. Nothing is written. |
+
 ## `validate adversarial`
 
 | Code | Meaning |

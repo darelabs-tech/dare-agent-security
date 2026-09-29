@@ -116,6 +116,28 @@ The command writes `blast-radius.json`, `summary.md`, `graph.mmd` and `graph.dot
 reads local files only. There is no URL, endpoint, token or remote flag, and no reach is
 executed. See [Blast Radius](../concepts/blast-radius.md).
 
+## `validate runtime-telemetry`
+
+Judge recorded OpenTelemetry traces against a runtime policy, offline (Cycle 025).
+
+```bash
+dare-agent-security validate runtime-telemetry \
+  --traces export.json \
+  --policy runtime-policy.json \
+  --output-dir .dare-agent-security/runtime-telemetry
+```
+
+`--traces` takes an OTLP/JSON export and can be repeated (1 to 64 files). `--policy` is
+optional; without it only the telemetry rules (confidentiality, completeness) are
+judged. `--max-spans` (default and maximum 1000000) can only lower the span bound, and
+`--json` also prints `runtime-telemetry-result.json`.
+
+The command writes `runtime-telemetry-result.json`, `runtime-telemetry-evidence.json`,
+`runtime-telemetry-findings.json` and `summary.md`. None of them carries an attribute
+value. It reads local files only. There is no endpoint, listener, port, collector,
+header, token or exec flag, and it emits no telemetry. See
+[Runtime Telemetry Security](../concepts/runtime-telemetry.md).
+
 ## `validate adversarial`
 
 Controlled, offline-first adversarial validation (Cycle 009).

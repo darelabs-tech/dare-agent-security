@@ -37,6 +37,7 @@ dare-agent-security validate attack-paths \
   | supply chain, A2A | nada para um id de cenário embutido; caso contrário `scenario.json` mais o diretório `evidence/` (modo static) ou a captura (replay) |
   | prompt injection, multi-turn | nada: resultado e evidência bastam |
   | remote (`validate replay-capture`) | nada |
+  | runtime telemetry | `policy.json`, a política de tempo de execução que o resultado fixa por digest; sem ela a execução é contada como só-resultado e não projeta nada |
 
   Cada entrada é revinculada ao digest que seu resultado fixa, com a própria função de
   digest do motor responsável. Várias coisas são recusadas: um cenário editado, um
