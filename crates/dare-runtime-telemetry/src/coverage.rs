@@ -5,9 +5,9 @@
 //! and only a judged property is APPLICABLE with a verdict. The rows restate
 //! that against a profile; they never promote a state.
 use dare_coverage::{
-    build_report, AssessmentFacts, AssessmentProfile, CorrelatedRow, CoveragePolicy,
-    CoverageReport, CoverageStatus, EvidenceClass, ExecutionsDocument, PropertyExecution,
-    SupportedMode,
+    build_report, runtime_telemetry_profile, AssessmentFacts, AssessmentProfile, CorrelatedRow,
+    CoveragePolicy, CoverageReport, CoverageStatus, EvidenceClass, ExecutionsDocument,
+    PropertyExecution, SupportedMode,
 };
 
 use crate::{
@@ -89,6 +89,14 @@ pub fn coverage_report(
         CoveragePolicy::default(),
     )
     .map_err(|_| TelemetryError::Internal("coverage report"))
+}
+
+/// The report over `runtime-telemetry-baseline-2026`, the profile a CLI run
+/// writes.
+pub fn baseline_report(result: &RuntimeTelemetryResult) -> Result<CoverageReport> {
+    let profile =
+        runtime_telemetry_profile().map_err(|_| TelemetryError::Internal("coverage profile"))?;
+    coverage_report(result, &profile)
 }
 
 /// The run's executions: passive observation of recorded traces. Built after

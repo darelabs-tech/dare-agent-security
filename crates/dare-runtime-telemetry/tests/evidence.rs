@@ -6,7 +6,9 @@ use dare_coverage::{
     RequirementLevel, SupportedMode,
 };
 use dare_runtime_telemetry::{
-    coverage::{assessment_facts, coverage_report, coverage_rows, executions_document},
+    coverage::{
+        assessment_facts, baseline_report, coverage_report, coverage_rows, executions_document,
+    },
     evaluate::Rule,
     evidence_bridge::{bind_evidence, build_evidence, EXTENSION_NAMESPACE},
     limits::Bounds,
@@ -259,4 +261,29 @@ fn build_and_bind_agree() {
     let built = build_evidence(&r).unwrap();
     let mut r2 = r.clone();
     assert_eq!(bind_evidence(&mut r2).unwrap(), built);
+}
+
+#[test]
+fn the_baseline_report_covers_the_nine_properties_of_the_profile() {
+    let (r, _) = bound(&[good_trace("1"), failing("2")], true);
+    let report = baseline_report(&r.result).unwrap();
+    assert_eq!(report.properties.len(), Rule::ALL.len());
+    for rule in Rule::ALL {
+        let row = report
+            .properties
+            .iter()
+            .find(|p| p.property_id == rule.property_id())
+            .unwrap();
+        let property = r.result.properties.iter().find(|p| p.rule == rule).unwrap();
+        assert_eq!(row.verdict, property.verdict, "{rule:?}");
+    }
+    // Without a policy the behaviour rows leave the denominator, never pass.
+    let (r, _) = bound(&[good_trace("1")], false);
+    let report = baseline_report(&r.result).unwrap();
+    assert!(report.eligible >= report.tested);
+    assert!(report
+        .properties
+        .iter()
+        .filter(|p| p.verdict.is_some())
+        .all(|p| p.property_id.starts_with("AGENT.TELEMETRY.")));
 }
