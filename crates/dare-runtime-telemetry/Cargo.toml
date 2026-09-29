@@ -1,0 +1,32 @@
+[package]
+name = "dare-runtime-telemetry"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Offline security analysis of OpenTelemetry trace exports against a runtime policy (Cycle 025)"
+publish = false
+
+[lib]
+name = "dare_runtime_telemetry"
+path = "src/lib.rs"
+
+# Files in, files out. OTLP/JSON is parsed with serde: no OpenTelemetry SDK,
+# no protobuf, no async runtime, no HTTP client and no listener is declared
+# here, so the crate can neither emit telemetry nor receive it. `lib.rs` and
+# `tests/manifest.rs` check the manifest rather than trusting this comment.
+[dependencies]
+dare-coverage = { path = "../dare-coverage" }
+dare-security-evidence = { path = "../dare-security-evidence" }
+jsonschema = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = "2.0"
+
+# The graph crate is used only by a test that keeps the local copy of the
+# credential markers equal to the product's (BLUEPRINT BQ-3).
+[dev-dependencies]
+dare-attack-graph = { path = "../dare-attack-graph" }
+tempfile = "3.14"

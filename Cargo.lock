@@ -817,6 +817,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dare-runtime-telemetry"
+version = "1.0.0-rc1"
+dependencies = [
+ "dare-attack-graph",
+ "dare-coverage",
+ "dare-security-evidence",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "dare-security-evidence"
 version = "1.0.0-rc1"
 dependencies = [

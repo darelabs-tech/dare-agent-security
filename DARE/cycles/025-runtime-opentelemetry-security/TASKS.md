@@ -25,9 +25,9 @@ Throughout the cycle:
 - [x] task-001 — Record the post-024 baseline
 - [x] task-002 — Convert the registry and profile pins to the prefix rule (BQ-1)
 - [x] task-003 — Pin the semantic conventions and write the mapping (BQ-2)
-- [ ] task-004 — Create the `dare-runtime-telemetry` crate skeleton and the manifest guards
-- [ ] task-005 — Implement `limits.rs` and `error.rs`
-- [ ] task-006 — Implement `admit.rs`
+- [x] task-004 — Create the `dare-runtime-telemetry` crate skeleton and the manifest guards
+- [x] task-005 — Implement `limits.rs` and `error.rs`
+- [x] task-006 — Implement `admit.rs`
 - [ ] task-007 — Implement the OTLP/JSON model and the trace-subset schema
 - [ ] task-008 — Implement `normalize.rs` and value fingerprints (AD-07)
 - [ ] task-009 — Implement the semconv classifier
