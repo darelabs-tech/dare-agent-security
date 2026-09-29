@@ -3,8 +3,9 @@ name: action-e2e
 on:
   pull_request:
     branches: [main]
-    types: [opened]
-  # Manual re-run for pushes after the PR opened (Cycle 025 R-9, Review 2026-09-29).
+    # Re-run on every push to an open PR and on reopen (Cycle 025 follow-up).
+    types: [opened, synchronize, reopened]
+  # Manual run on any branch (Cycle 025 R-9).
   workflow_dispatch:
 
 permissions:

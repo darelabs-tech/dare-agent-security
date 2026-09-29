@@ -305,7 +305,11 @@ fn the_ci_trigger_is_still_pull_request_opened_only() {
     let ci = std::fs::read_to_string(repo(".github/workflows/ci.yml")).expect("ci.yml");
     let head: String = ci.lines().take(8).collect::<Vec<_>>().join("\n");
     assert!(
-        head.contains("pull_request:") && head.contains("types: [opened]"),
+        // Still pull-request events only, never a push to main or a schedule;
+        // since Cycle 025 they include pushes to an open PR and reopen.
+        head.contains("pull_request:")
+            && head.contains("types: [opened, synchronize, reopened]")
+            && !ci.contains("\n  push:"),
         "{head}"
     );
     assert!(ci.contains("  remote-validation-2026:"));

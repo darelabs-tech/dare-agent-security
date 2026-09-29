@@ -283,12 +283,12 @@ const ENGINE_TREES: [(&str, &str, usize); 10] = [
     ),
     (
         "dare-multi-turn-security",
-        "60ad42d8b675e0d94c2b211757e61e740f782ad4b38bde3c306b1a1a3ba73add",
+        "60cd72f0a803d757d60bafce252b98c330b14e22396afebdcd06a15497349a35",
         27,
     ),
     (
         "dare-remote-validation",
-        "21099e0b8ee4a31d44b9e0b228741b2b2a2d0459eab26d59c3bb60a907e02ddc",
+        "24570aec2f3b0f54b7003be7a9a5e6ab7f51964129fc32c115cd4118bd0f7868",
         52,
     ),
 ];
