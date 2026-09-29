@@ -33,6 +33,8 @@ pub enum Gap {
     MissingKey(String),
     /// The run stopped at the span bound before this trace was complete.
     SpanBound,
+    /// A value longer than the scan bound was fingerprinted, not scanned.
+    OversizeValue,
 }
 
 /// A key need: all of them, or at least one of a set.

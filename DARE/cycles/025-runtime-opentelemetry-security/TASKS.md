@@ -34,10 +34,10 @@ Throughout the cycle:
 - [x] task-010 — Add the runtime-policy schema and loader
 - [x] task-011 — Implement trace reconstruction
 - [x] task-012 — Implement completeness
-- [ ] task-013 — Implement evaluators B-1 (tool authorization) and B-2 (approval)
-- [ ] task-014 — Implement evaluators B-3 (principal) and B-4 (tenant)
-- [ ] task-015 — Implement evaluators B-5 (egress) and B-6 (retry bound, BQ-4)
-- [ ] task-016 — Implement T-1 (confidentiality, BQ-3) and T-2 (completeness)
+- [x] task-013 — Implement evaluators B-1 (tool authorization) and B-2 (approval)
+- [x] task-014 — Implement evaluators B-3 (principal) and B-4 (tenant)
+- [x] task-015 — Implement evaluators B-5 (egress) and B-6 (retry bound, BQ-4)
+- [x] task-016 — Implement T-1 (confidentiality, BQ-3) and T-2 (completeness)
 - [ ] task-017 — Implement aggregation, the result type and the result schema
 - [ ] task-018 — Implement the evidence bridge and the coverage module
 - [ ] task-019 — Append the two `AGENT.TELEMETRY` properties and the `runtime_trace_present` predicate
