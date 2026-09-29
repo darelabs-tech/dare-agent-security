@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "cycle": "025",
+  "recorded_on": "2026-09-29",
+  "decision": "BQ-2 (a): pin the latest released semantic conventions at execution time",
+  "sources": [
+    {
+      "repository": "https://github.com/open-telemetry/semantic-conventions",
+      "ref": "v1.44.0",
+      "commit": "e10a930844c6951757a43b849d364f7d056ac32b",
+      "commit_date": "2026-08-04",
+      "used_for": ["server.address", "url.full", "http.request.method", "http.request.resend_count", "user.id", "user.name", "enduser.id", "enduser.pseudo.id"],
+      "note": "Latest release tag on 2026-09-29. Its CHANGELOG (#3696) moves every gen_ai.* and mcp.* convention to a dedicated repository; model/gen-ai and model/mcp here hold only deprecated definitions."
+    },
+    {
+      "repository": "https://github.com/open-telemetry/semantic-conventions-genai",
+      "ref": "main",
+      "commit": "e57c543b4889619eb2a05702471937db5119165d",
+      "commit_date": "2026-09-24",
+      "schema_url": "https://opentelemetry.io/schemas/gen-ai-dev/1.42.0-dev",
+      "used_for": ["gen_ai.operation.name", "gen_ai.agent.name", "gen_ai.agent.id", "gen_ai.tool.name", "gen_ai.tool.call.id", "gen_ai.tool.call.arguments", "gen_ai.tool.call.result", "gen_ai.input.messages", "gen_ai.output.messages", "gen_ai.system_instructions", "gen_ai.retrieval.query.text", "gen_ai.retrieval.documents", "gen_ai.memory.query.text", "gen_ai.memory.records", "gen_ai.memory.store.id", "gen_ai.data_source.id", "gen_ai.prompt.variable", "mcp.method.name"],
+      "note": "The repository has no release tag yet, so the pin is a commit. Every gen_ai.* convention it defines is stability: development."
+    }
+  ],
+  "operation_name_values": ["invoke_agent", "execute_tool", "chat", "text_completion", "generate_content", "embeddings", "retrieval", "search_memory", "upsert_memory", "update_memory", "create_memory", "delete_memory"],
+  "mcp_method_values_used": ["tools/call"]
+}
