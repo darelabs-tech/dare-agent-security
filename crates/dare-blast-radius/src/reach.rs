@@ -153,13 +153,11 @@ impl Hasher for Fx {
     }
 
     fn write(&mut self, bytes: &[u8]) {
-        let mut chunks = bytes.chunks_exact(8);
-        for chunk in &mut chunks {
-            let mut word = [0u8; 8];
-            word.copy_from_slice(chunk);
-            self.add(u64::from_le_bytes(word));
+        let (words, rest) = bytes.as_chunks::<8>();
+        for word in words {
+            self.add(u64::from_le_bytes(*word));
         }
-        for &byte in chunks.remainder() {
+        for &byte in rest {
             self.add(u64::from(byte));
         }
     }
