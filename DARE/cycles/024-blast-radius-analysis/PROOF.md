@@ -106,4 +106,25 @@ binary ran with networking disabled (`--network none`) and the graph mounted rea
 
 ## 8. Measured totals
 
-TOTALS-PLACEHOLDER
+The completion gate was run on the final cycle tree:
+
+| Check | Command | Result |
+|---|---|---|
+| Format | `cargo fmt --all --check` | exit 0 |
+| Lint | `cargo clippy --workspace --all-targets -- -D warnings` | exit 0 |
+| Tests | `cargo test --workspace` | **347 suites, 4 433 passed, 0 failed, 9 ignored**. Against the baseline (332 / 4 351 / 0 / 5): +15 suites, +82 tests. The added ignored tests are the two release-only scale tests in debug builds, the goldens regenerator and the lab `dump` tool |
+| Release scale | `cargo test -p dare-blast-radius --release --test scale` | both pass (O-08, R-6) |
+| Advisories | `cargo audit` | exit 0 |
+| Secrets | `python scripts/k24/assert_no_real_credentials.py` | exit 0 (17 shipping files, 17 test files, 166 artifacts) |
+| Citations | `python scripts/k24/verify_proof_citations.py` | every cited name verified (69) |
+| Books | `mdbook build book/en`, `mdbook build book/pt` | both built |
+| Canvas | `python scripts/regen-canvas.py --check` | current |
+| Cycle job | `python scripts/run-ci-job-locally.py .github/workflows/ci.yml blast-radius-2026` | 13 of 13 steps PASS |
+| Container | builder-stage image, in-image refusal | see §7 |
+
+## 9. Open for Review
+
+- **R-6.** O-08 is met (8.4–9.2 s against 10 s), but the margin is thin. A deterministic
+  threaded variant, which measured 7.3 s / 3.4 s, needs an amendment to the Blueprint's
+  RS-08 source scan, which forbids `std::thread`. It is kept in
+  `EXECUTION/task-018-parallel-option.patch` and was not applied.
