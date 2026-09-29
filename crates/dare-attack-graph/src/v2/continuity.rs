@@ -33,10 +33,15 @@ fn actor_like(node_type: NodeType) -> bool {
 }
 
 /// The authority a walk carries: `P` and `A`.
+///
+/// Generic over the node key so that a search may carry interned ids while
+/// the rule itself exists once, in [`Authority::step_by`]. Every caller that
+/// works on node-id strings uses the default `String` form and
+/// [`Authority::step`].
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Authority {
-    pub principal: Option<String>,
-    pub actors: BTreeSet<String>,
+pub struct Authority<T = String> {
+    pub principal: Option<T>,
+    pub actors: BTreeSet<T>,
 }
 
 impl Authority {
@@ -52,35 +57,63 @@ impl Authority {
 
     /// `P = node`, `A = {node}`.
     pub fn acting(node: &str) -> Self {
-        Self {
-            principal: Some(node.to_owned()),
-            actors: BTreeSet::from([node.to_owned()]),
-        }
+        Self::acting_as(node.to_owned())
     }
 
     /// `P` unset, `A = {}`.
     pub fn unset() -> Self {
+        Self::empty()
+    }
+
+    /// `P` unset, `A = {node}`: a component that acts under whatever
+    /// authority its edges carry.
+    pub fn component(node: &str) -> Self {
+        Self::component_of(node.to_owned())
+    }
+
+    /// Applies C1–C6 to `edge`. Returns false, leaving the state unchanged,
+    /// when no rule explains the step.
+    pub fn step(&mut self, edge: &EdgeV2, node_type: impl Fn(&str) -> Option<NodeType>) -> bool {
+        self.step_by(edge, str::to_owned, node_type)
+    }
+}
+
+impl<T: Ord + Clone> Authority<T> {
+    /// `P = node`, `A = {node}`.
+    pub fn acting_as(node: T) -> Self {
+        Self {
+            principal: Some(node.clone()),
+            actors: BTreeSet::from([node]),
+        }
+    }
+
+    /// `P` unset, `A = {}`.
+    pub fn empty() -> Self {
         Self {
             principal: None,
             actors: BTreeSet::new(),
         }
     }
 
-    /// `P` unset, `A = {node}`: a component that acts under whatever
-    /// authority its edges carry.
-    pub fn component(node: &str) -> Self {
+    /// `P` unset, `A = {node}`.
+    pub fn component_of(node: T) -> Self {
         Self {
             principal: None,
-            actors: BTreeSet::from([node.to_owned()]),
+            actors: BTreeSet::from([node]),
         }
     }
 
-    /// Applies C1–C6 to `edge`. Returns false, leaving the state unchanged,
-    /// when no rule explains the step.
-    pub fn step(&mut self, edge: &EdgeV2, node_type: impl Fn(&str) -> Option<NodeType>) -> bool {
-        let x = &edge.source;
-        let y = &edge.target;
-        let source_acts = self.principal.is_none() || self.actors.contains(x);
+    /// Applies C1–C6 to `edge`, with `key` mapping each node id the edge
+    /// names to `T`. `key` must be injective over the ids it is given.
+    /// Returns false, leaving the state unchanged, when no rule explains the
+    /// step.
+    pub fn step_by(
+        &mut self,
+        edge: &EdgeV2,
+        key: impl Fn(&str) -> T,
+        node_type: impl Fn(&str) -> Option<NodeType>,
+    ) -> bool {
+        let source_acts = self.principal.is_none() || self.actors.contains(&key(&edge.source));
         // Only a principal that is a graph node can be checked; an `ext:`
         // subject is opaque and never contradicts the path (Cycle 023 R-12).
         let named = edge
@@ -94,16 +127,19 @@ impl Authority {
                 if !source_acts {
                     return false;
                 }
+                let y = key(&edge.target);
                 self.principal = Some(y.clone());
-                self.actors = BTreeSet::from([y.clone()]);
+                self.actors = BTreeSet::from([y]);
             }
             // C2
             EdgeType::UsesCredential => {
-                if !(source_acts || named.is_some_and(|p| Some(p) == self.principal.as_deref())) {
+                if !(source_acts || named.is_some_and(|p| self.principal.as_ref() == Some(&key(p))))
+                {
                     return false;
                 }
+                let y = key(&edge.target);
                 self.principal = Some(y.clone());
-                self.actors.insert(y.clone());
+                self.actors.insert(y);
             }
             // C3, then C4
             EdgeType::Calls
@@ -114,28 +150,30 @@ impl Authority {
             | EdgeType::Deletes
             | EdgeType::AuthorizedBy => {
                 let principal_ok = named.is_none_or(|p| {
-                    self.actors.contains(p) || self.principal.as_deref() == Some(p)
+                    let p = key(p);
+                    self.actors.contains(&p) || self.principal.as_ref() == Some(&p)
                 });
                 if source_acts && principal_ok {
-                    self.actors.insert(y.clone());
+                    self.actors.insert(key(&edge.target));
                 } else if edge.authority_mutation
                     && edge.guards.iter().any(|g| {
                         g.verdict == GuardVerdict::Fail
                             && MUTATION_PROPERTIES.contains(&g.property.as_str())
                     })
                 {
-                    let acting = named.map(str::to_owned).unwrap_or_else(|| x.clone());
+                    let acting = named.map_or_else(|| key(&edge.source), &key);
                     self.principal = Some(acting.clone());
-                    self.actors = BTreeSet::from([acting, y.clone()]);
+                    self.actors = BTreeSet::from([acting, key(&edge.target)]);
                 } else {
                     return false;
                 }
             }
             // C5
             EdgeType::TransfersTo => {
-                if node_type(y).is_some_and(actor_like) {
+                if node_type(&edge.target).is_some_and(actor_like) {
+                    let y = key(&edge.target);
                     self.principal = Some(y.clone());
-                    self.actors = BTreeSet::from([y.clone()]);
+                    self.actors = BTreeSet::from([y]);
                 }
             }
             // C6
@@ -461,5 +499,104 @@ mod tests {
             &mut c,
             &edge(OTHER, EdgeType::Calls, RES, None)
         ));
+    }
+
+    /// The interned form used by the blast-radius search applies the same
+    /// rule: over random edge sequences, `step_by` with `u32` keys and `step`
+    /// on strings accept and refuse the same edges and end in the same state.
+    #[test]
+    fn interned_and_string_authorities_take_the_same_steps() {
+        let ids = [
+            "node:human:h",
+            "node:agent:a",
+            "node:agent:b",
+            "node:identity:i",
+            "node:credential:c",
+            "node:tool:t",
+            "node:resource:r",
+            "node:data:d",
+        ];
+        let kinds = [
+            EdgeType::AuthenticatesAs,
+            EdgeType::DelegatesTo,
+            EdgeType::CanInvoke,
+            EdgeType::Calls,
+            EdgeType::UsesCredential,
+            EdgeType::AuthorizedBy,
+            EdgeType::EnforcedBy,
+            EdgeType::Reads,
+            EdgeType::Writes,
+            EdgeType::Deletes,
+            EdgeType::TransfersTo,
+            EdgeType::BelongsToTenant,
+            EdgeType::CrossesTrustBoundary,
+            EdgeType::CanReach,
+        ];
+        let key = |id: &str| -> u32 {
+            ids.iter()
+                .position(|n| *n == id)
+                .map_or(100 + id.len() as u32, |i| i as u32)
+        };
+        let expand = |a: &Authority<u32>| Authority {
+            principal: a.principal.map(|k| ids[k as usize].to_owned()),
+            actors: a
+                .actors
+                .iter()
+                .map(|k| ids[*k as usize].to_owned())
+                .collect(),
+        };
+        let mut seed = 0x0025_u64;
+        let mut next = |n: usize| {
+            seed = seed
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            ((seed >> 33) % n as u64) as usize
+        };
+        let (mut taken, mut refused) = (0, 0);
+        for _ in 0..2_000 {
+            let start = ids[next(ids.len())];
+            let (mut text, mut compact) = match next(3) {
+                0 => (Authority::acting(start), Authority::acting_as(key(start))),
+                1 => (Authority::unset(), Authority::<u32>::empty()),
+                _ => (
+                    Authority::component(start),
+                    Authority::component_of(key(start)),
+                ),
+            };
+            for _ in 0..8 {
+                let principal = match next(4) {
+                    0 => Some(ids[next(ids.len())]),
+                    1 => Some("ext:issuer:sub"),
+                    _ => None,
+                };
+                let mut e = edge(
+                    ids[next(ids.len())],
+                    kinds[next(kinds.len())],
+                    ids[next(ids.len())],
+                    principal,
+                );
+                if next(4) == 0 {
+                    e.authority_mutation = true;
+                    e.guards.push(Guard {
+                        property: MUTATION_PROPERTIES[next(3)].into(),
+                        verdict: GuardVerdict::Fail,
+                        evidence_ids: vec!["e".into()],
+                        scope: GuardScope::Run,
+                        artifact_index: 0,
+                    });
+                }
+                let a = text.step(&e, types);
+                let b = compact.step_by(&e, key, types);
+                assert_eq!(a, b, "{e:?}");
+                assert_eq!(text, expand(&compact), "{e:?}");
+                if a {
+                    taken += 1;
+                } else {
+                    refused += 1;
+                }
+            }
+        }
+        // Both outcomes were exercised, many times.
+        assert!(taken > 1_000 && refused > 1_000, "{taken} {refused}");
     }
 }

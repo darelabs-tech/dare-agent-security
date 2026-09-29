@@ -9,6 +9,7 @@
 use std::{
     collections::{BTreeMap, HashMap, VecDeque},
     hash::{BuildHasherDefault, Hash, Hasher},
+    rc::Rc,
 };
 
 use dare_attack_graph::{
@@ -23,12 +24,26 @@ use crate::{
 
 /// Lookups built once per graph. Out-edges are sorted by `(target, edge id)`
 /// (AD-07), so the order never depends on the input arrays.
+///
+/// Every id an edge can name (its source, its target and its authority's
+/// principal) is interned to a `u32`, so the search carries compact
+/// authority states. The mapping is injective, and the continuity rule is
+/// the same one, applied through `Authority::step_by` (Cycle 025 follow-up).
 pub struct Indexed<'g> {
     pub graph: &'g AttackGraphV2,
     nodes: HashMap<&'g str, &'g NodeV2>,
     edges: HashMap<&'g str, &'g EdgeV2>,
     out: HashMap<&'g str, Vec<&'g EdgeV2>>,
+    ids: HashMap<&'g str, u32, BuildHasherDefault<Fx>>,
+    names: Rc<[&'g str]>,
 }
+
+/// The compact authority the search carries: interned node ids.
+pub type Compact = Authority<u32>;
+
+/// Never produced for an id of the graph: every id `key` is asked for was
+/// interned when the index was built.
+const UNINTERNED: u32 = u32::MAX;
 
 impl<'g> Indexed<'g> {
     pub fn new(graph: &'g AttackGraphV2) -> Self {
@@ -41,11 +56,43 @@ impl<'g> Indexed<'g> {
         for list in out.values_mut() {
             list.sort_by(|a, b| (&a.target, &a.id).cmp(&(&b.target, &b.id)));
         }
+        let mut ids: HashMap<&str, u32, BuildHasherDefault<Fx>> = HashMap::default();
+        let mut names = Vec::new();
+        let mut intern = |id: &'g str| {
+            ids.entry(id).or_insert_with(|| {
+                names.push(id);
+                (names.len() - 1) as u32
+            });
+        };
+        for node in &graph.nodes {
+            intern(&node.id);
+        }
+        for edge in &graph.edges {
+            intern(&edge.source);
+            intern(&edge.target);
+            if let Some(principal) = edge.authority.principal.as_deref() {
+                intern(principal);
+            }
+        }
         Self {
             graph,
             nodes,
             edges,
             out,
+            ids,
+            names: names.into(),
+        }
+    }
+
+    /// The interned key of a node id the graph names.
+    pub fn key(&self, id: &str) -> u32 {
+        self.ids.get(id).copied().unwrap_or(UNINTERNED)
+    }
+
+    fn compact(&self, authority: &Authority) -> Compact {
+        Compact {
+            principal: authority.principal.as_deref().map(|p| self.key(p)),
+            actors: authority.actors.iter().map(|a| self.key(a)).collect(),
         }
     }
 
@@ -63,6 +110,20 @@ impl<'g> Indexed<'g> {
 
     pub fn out(&self, id: &str) -> &[&'g EdgeV2] {
         self.out.get(id).map_or(&[], Vec::as_slice)
+    }
+}
+
+/// The id of each interned key, for turning a compact state back into the
+/// `String` authority the outputs and the validator use.
+fn expand(names: &[&str], authority: &Compact) -> Authority {
+    let name = |k: &u32| {
+        names
+            .get(*k as usize)
+            .map_or_else(String::new, |n| (*n).to_owned())
+    };
+    Authority {
+        principal: authority.principal.as_ref().map(name),
+        actors: authority.actors.iter().map(name).collect(),
     }
 }
 
@@ -91,7 +152,7 @@ pub fn is_held(edge: &EdgeV2) -> bool {
 #[derive(Debug, Clone)]
 pub struct StateRec<'g> {
     pub node: &'g str,
-    pub authority: Authority,
+    pub authority: Compact,
     pub depth: u32,
     pub parent: Option<usize>,
     pub via: Option<&'g str>,
@@ -107,6 +168,7 @@ pub struct Walk {
 }
 
 pub struct Found<'g> {
+    names: Rc<[&'g str]>,
     pub states: Vec<StateRec<'g>>,
     /// The first state that reached each node: its witness (AD-07).
     pub reached: BTreeMap<&'g str, usize>,
@@ -122,7 +184,7 @@ impl Found<'_> {
         loop {
             let state = &self.states[index];
             nodes.push(state.node.to_owned());
-            authorities.push(state.authority.clone());
+            authorities.push(expand(&self.names, &state.authority));
             match (state.parent, state.via) {
                 (Some(parent), Some(via)) => {
                     edges.push(via.to_owned());
@@ -177,7 +239,7 @@ impl Fx {
     }
 }
 
-fn fingerprint(node: &str, authority: &Authority) -> u64 {
+fn fingerprint(node: &str, authority: &Compact) -> u64 {
     let mut hasher = Fx::default();
     node.hash(&mut hasher);
     authority.hash(&mut hasher);
@@ -199,7 +261,7 @@ impl Visited {
         states: &[StateRec<'_>],
         print: u64,
         node: &str,
-        authority: &Authority,
+        authority: &Compact,
     ) -> bool {
         let mut at = self.head.get(&print).copied();
         while let Some(i) = at {
@@ -230,7 +292,9 @@ pub fn search<'g>(
     budget: &mut u64,
     excluded: Option<&str>,
 ) -> Found<'g> {
+    let init = index.compact(&init);
     let mut found = Found {
+        names: Rc::clone(&index.names),
         states: Vec::new(),
         reached: BTreeMap::new(),
         report: SearchReport::default(),
@@ -266,7 +330,7 @@ pub fn search<'g>(
         }
         // A refused step leaves the authority unchanged, so one copy serves
         // every edge until a step succeeds.
-        let mut scratch: Option<Authority> = None;
+        let mut scratch: Option<Compact> = None;
         for &edge in outs {
             if excluded == Some(edge.id.as_str()) {
                 continue;
@@ -279,7 +343,7 @@ pub fn search<'g>(
                 Some(authority) => authority,
                 None => states[current].authority.clone(),
             };
-            if !authority.step(edge, |id| index.node_type(id)) {
+            if !authority.step_by(edge, |id| index.key(id), |id| index.node_type(id)) {
                 report.refused_steps += 1;
                 scratch = Some(authority);
                 continue;
