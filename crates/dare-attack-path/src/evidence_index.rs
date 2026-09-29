@@ -15,7 +15,7 @@ use crate::{
 };
 
 /// Engine namespace and the key under which it records the property.
-pub const PROPERTY_KEYS: [(&str, &str); 9] = [
+pub const PROPERTY_KEYS: [(&str, &str); 10] = [
     ("dare.prompt-injection.v1", "property_id"),
     ("dare.tool-security.v1", "property_id"),
     ("dare.identity-security.v1", "property_id"),
@@ -25,6 +25,7 @@ pub const PROPERTY_KEYS: [(&str, &str); 9] = [
     ("dare.supply-chain-security.v1", "property"),
     ("dare.a2a-security.v1", "property"),
     ("dare.multi-turn-security.v1", "property"),
+    ("dare.runtime-telemetry.v1", "property"),
 ];
 
 pub fn namespace(engine: EngineSlug) -> Option<&'static str> {
@@ -38,6 +39,7 @@ pub fn namespace(engine: EngineSlug) -> Option<&'static str> {
         EngineSlug::SupplyChain => "dare.supply-chain-security.v1",
         EngineSlug::A2a => "dare.a2a-security.v1",
         EngineSlug::MultiTurn => "dare.multi-turn-security.v1",
+        EngineSlug::RuntimeTelemetry => "dare.runtime-telemetry.v1",
         EngineSlug::Remote => return None,
     };
     Some(ns)
@@ -70,11 +72,11 @@ pub struct EvidenceIndex {
 
 impl EvidenceIndex {
     /// Decodes and validates every record of an evidence file. Every engine
-    /// writes a bare array except multi-turn, which writes
+    /// writes a bare array except multi-turn and runtime telemetry, which write
     /// `{schema_version, records, coverage}`.
     pub fn build(index: usize, engine: EngineSlug, value: &serde_json::Value) -> Result<Self> {
         let records = match engine {
-            EngineSlug::MultiTurn => &value["records"],
+            EngineSlug::MultiTurn | EngineSlug::RuntimeTelemetry => &value["records"],
             _ => value,
         };
         let items = records.as_array().ok_or(Refusal::InvalidDocument {

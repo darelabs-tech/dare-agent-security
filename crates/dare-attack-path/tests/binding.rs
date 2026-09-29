@@ -481,3 +481,57 @@ fn the_loaders_match_the_engines_on_every_shipped_scenario() {
     }
     assert!(accepted >= 90, "{accepted} accepted, {refused} refused");
 }
+
+#[test]
+fn a_runtime_telemetry_bundle_binds_its_policy_by_digest() {
+    // Cycle 025: the policy is bound only when its canonical digest is the one
+    // the result recorded.
+    let bundle = load_bundle(0, &fixture("rt")).unwrap();
+    assert_eq!(bundle.engine, EngineSlug::RuntimeTelemetry);
+    assert_eq!(bundle.verified_inputs, ["runtime policy"]);
+    assert!(matches!(
+        bundle.data,
+        RunData::RuntimeTelemetry {
+            policy: Some(_),
+            ..
+        }
+    ));
+    // Key order does not change the canonical digest.
+    let (_tmp, path) = staged("rt");
+    let policy = path.join("inputs/policy.json");
+    let value: Value = serde_json::from_slice(&fs::read(&policy).unwrap()).unwrap();
+    fs::write(&policy, serde_json::to_vec(&value).unwrap()).unwrap();
+    assert!(load_bundle(0, &path).is_ok());
+    // An edited policy is refused.
+    edit_json(&policy, |p| {
+        p["agents"][0]["allowed_tools"][0] = "anything".into()
+    });
+    assert!(matches!(
+        refusal(load_bundle(0, &path)),
+        Refusal::DigestMismatch { .. }
+    ));
+    // A policy outside its schema is refused before its digest is compared.
+    edit_json(&policy, |p| p["extra"] = true.into());
+    assert!(matches!(
+        refusal(load_bundle(0, &path)),
+        Refusal::InvalidDocument { .. }
+    ));
+    // Without the policy the run binds result-only and projects nothing.
+    fs::remove_file(&policy).unwrap();
+    let bundle = load_bundle(0, &path).unwrap();
+    let facts = dare_attack_path::project::project(&bundle).unwrap();
+    assert!(facts.edges.is_empty());
+    assert_eq!(
+        facts.unprojected.get("RUNTIME_TELEMETRY_RESULT_ONLY"),
+        Some(&1)
+    );
+    // A result outside its schema is refused.
+    let (_tmp2, path) = staged("rt");
+    edit_json(&path.join("runtime-telemetry-result.json"), |r| {
+        r["verdict"] = "MAYBE".into()
+    });
+    assert!(matches!(
+        refusal(load_bundle(0, &path)),
+        Refusal::InvalidDocument { .. }
+    ));
+}

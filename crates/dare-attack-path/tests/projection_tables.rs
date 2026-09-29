@@ -524,3 +524,82 @@ fn remote_multi_turn_runs_are_counted_not_guessed() {
     assert_eq!(f.unprojected.get("MULTI_TURN_RESULT_ONLY"), Some(&1));
     assert!(f.dynamic_authorized);
 }
+
+#[test]
+fn runtime_telemetry_rows() {
+    let f = facts("rt");
+    all_have_evidence(&f);
+    // Every relationship comes from the pinned runtime policy.
+    assert!(f
+        .edges
+        .iter()
+        .all(|e| e.evidence.status == EdgeEvidenceStatus::StaticallyProven));
+    assert_eq!(f.verified_inputs, ["runtime policy"]);
+    for node_type in [
+        NodeType::Agent,
+        NodeType::Tool,
+        NodeType::Identity,
+        NodeType::Resource,
+        NodeType::Data,
+    ] {
+        assert!(has_node(&f, node_type), "{node_type:?}");
+    }
+    assert_eq!(
+        designated(&f, Designation::Entry(EntryClass::UntrustedInput)).len(),
+        1
+    );
+    // Destructive tools are targets, and their calls carry the approval guard.
+    let destructive = designated(&f, Designation::Target(TargetClass::DestructiveCapability));
+    assert_eq!(destructive.len(), 2);
+    let guard_of = |e: &FactEdge, property: &str| {
+        e.guards
+            .iter()
+            .find(|g| g.property == property)
+            .map(|g| g.verdict)
+    };
+    for e in edges(&f, EdgeType::CanInvoke) {
+        let is_destructive = destructive.contains(&&e.target);
+        assert_eq!(
+            guard_of(e, "AGENT.HUMAN_APPROVAL.INTENT_BINDING").is_some(),
+            is_destructive,
+            "{:?}",
+            e.target
+        );
+        // The traces' B-1 verdict guards every declared tool call.
+        assert_eq!(
+            guard_of(e, "AGENT.TOOL.AUTHORIZATION_BOUNDARY"),
+            Some(GuardVerdict::Fail)
+        );
+        assert!(e.guards.iter().all(|g| g.scope == GuardScope::Run));
+    }
+    for e in edges(&f, EdgeType::CanReach) {
+        assert_eq!(
+            guard_of(e, "AGENT.CODE_EXECUTION.EGRESS_BOUNDARY"),
+            Some(GuardVerdict::Fail)
+        );
+    }
+    for e in edges(&f, EdgeType::AuthenticatesAs) {
+        assert_eq!(
+            guard_of(e, "AGENT.IDENTITY.PRINCIPAL_BINDING"),
+            Some(GuardVerdict::Pass)
+        );
+    }
+    // Retrieval was observed; memory was not, so no memory store is declared.
+    let reads = edges(&f, EdgeType::Reads);
+    assert!(!reads.is_empty());
+    assert!(reads
+        .iter()
+        .all(|e| e.target.local_id.starts_with("retrieval.")
+            && guard_of(e, "AGENT.RAG.TENANT_DOCUMENT_ISOLATION") == Some(GuardVerdict::Fail)));
+    // The telemetry export is guarded by T-1 and T-2.
+    let export: Vec<_> = edges(&f, EdgeType::TransfersTo)
+        .into_iter()
+        .filter(|e| e.target.local_id == "telemetry.export")
+        .collect();
+    assert_eq!(export.len(), 2, "one per declared agent");
+    for e in export {
+        assert!(guard_of(e, "AGENT.TELEMETRY.CONFIDENTIALITY").is_some());
+        assert!(guard_of(e, "AGENT.TELEMETRY.COMPLETENESS").is_some());
+    }
+    assert!(f.unprojected.is_empty(), "{:?}", f.unprojected);
+}

@@ -21,3 +21,15 @@ The other bundles are the CLI's simulated-mode output for `TOOL-LAB-001`,
 `SUPPLY-LAB-001`, `A2A-LAB-001` and `multiturn-lab-001`, with the scenario file copied
 to `inputs/scenario.json` where the engine needs it. `remote/` is the output of
 `validate replay-capture` over `crates/dare-agent-security-cli/tests/fixtures/remote-replay/`.
+
+`rt/` (Cycle 025) is the output of `validate runtime-telemetry` over five recorded
+OTEL-LAB exports and the lab policy, with the policy copied to `inputs/policy.json`
+(only the result and evidence files are kept):
+
+```bash
+L=crates/dare-runtime-telemetry/tests/fixtures/otel-lab
+dare-agent-security validate runtime-telemetry \
+  --traces $L/OTL-001/trace-0.json --traces $L/OTL-007/trace-0.json \
+  --traces $L/OTL-014/trace-0.json --traces $L/OTL-018/trace-0.json \
+  --traces $L/OTL-023/trace-0.json --policy $L/OTL-001/policy.json --output-dir <out>
+```

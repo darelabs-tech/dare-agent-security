@@ -24,10 +24,12 @@ pub enum EngineSlug {
     A2a,
     MultiTurn,
     Remote,
+    /// Cycle 025: offline analysis of OpenTelemetry trace exports.
+    RuntimeTelemetry,
 }
 
 impl EngineSlug {
-    pub const ALL: [EngineSlug; 10] = [
+    pub const ALL: [EngineSlug; 11] = [
         Self::PromptInjection,
         Self::Tool,
         Self::Identity,
@@ -38,6 +40,7 @@ impl EngineSlug {
         Self::A2a,
         Self::MultiTurn,
         Self::Remote,
+        Self::RuntimeTelemetry,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -52,6 +55,7 @@ impl EngineSlug {
             Self::A2a => "a2a",
             Self::MultiTurn => "multi-turn",
             Self::Remote => "remote",
+            Self::RuntimeTelemetry => "runtime-telemetry",
         }
     }
 }
