@@ -52,7 +52,7 @@ Throughout the cycle:
 - [x] task-028 — Add the `runtime-telemetry-2026` CI job and the k25 scripts
 - [x] task-029 — Security, dependency, container and compatibility audit
 - [x] task-030 — Write the EN/PT documentation
-- [ ] task-031 — Write REGRESSION.md and PROOF.md, run the completion gate and create the archive branch
+- [x] task-031 — Write REGRESSION.md and PROOF.md, run the completion gate and create the archive branch
 
 ## Tasks
 

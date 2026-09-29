@@ -287,3 +287,26 @@ fn the_baseline_report_covers_the_nine_properties_of_the_profile() {
         .filter(|p| p.verdict.is_some())
         .all(|p| p.property_id.starts_with("AGENT.TELEMETRY.")));
 }
+
+#[test]
+fn every_pass_cites_the_spans_that_prove_it() {
+    // RNF-05: a PASS record lists, per deciding trace, the spans it observed.
+    let (_, records) = bound(&[good_trace("1")], true);
+    let passes: Vec<_> = records
+        .iter()
+        .filter(|e| e.verdict == Verdict::Pass)
+        .collect();
+    assert!(!passes.is_empty());
+    for e in passes {
+        let listed = &e.extensions.as_ref().unwrap()[EXTENSION_NAMESPACE]["listed_traces"];
+        let listed = listed.as_array().unwrap();
+        assert!(!listed.is_empty(), "{}", e.id);
+        for trace in listed {
+            let spans = trace["observed_span_ids"].as_array().unwrap();
+            assert!(!spans.is_empty(), "{}: {trace}", e.id);
+            assert!(spans
+                .iter()
+                .all(|s| s.as_str().is_some_and(|s| s.len() == 16)));
+        }
+    }
+}

@@ -164,6 +164,8 @@ fn listed(outcomes: &[&TraceOutcome]) -> Vec<Value> {
                 "verdict": o.verdict,
                 "reasons": reasons,
                 "span_ids": span_ids,
+                // RNF-05: the spans that prove a PASS (or were judged at all).
+                "observed_span_ids": o.observed_spans,
                 "keys": keys,
                 "gaps": gaps,
             })

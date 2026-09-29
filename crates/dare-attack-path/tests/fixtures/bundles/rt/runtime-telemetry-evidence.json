@@ -210,6 +210,7 @@
               "keys": [
                 "gen_ai.tool.name"
               ],
+              "observed_span_ids": [],
               "reasons": [
                 "tool_not_allowed"
               ],
@@ -348,6 +349,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "e652ff32ad7f434d"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "597629e2e4861819eb5aeaeffccda208",
@@ -481,6 +485,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "d7ddcfd9c7741ab1",
+                "d8d98f4aaa2e440f"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58112d2b29808b83512010cc58e4f5f3",
@@ -489,6 +497,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "7335c440a87f4a5f",
+                "b28370a53afe54f1"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58c7311c58a37d8bb0af496d12ef95b8",
@@ -497,6 +509,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "473a69ba695443ee",
+                "e652ff32ad7f434d"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "597629e2e4861819eb5aeaeffccda208",
@@ -505,6 +521,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "11c78ac52e151623",
+                "8f69809fcab1a49b"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "630adecebfea6a4004bf7504d4d75720",
@@ -513,6 +533,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "3c4c6e69282a15ee",
+                "a76ede920a468c47"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "7e484091185efe8df54aa3a7adf18fd5",
@@ -648,6 +672,7 @@
               "keys": [
                 "tenant.id"
               ],
+              "observed_span_ids": [],
               "reasons": [
                 "tenant_mismatch"
               ],
@@ -787,6 +812,7 @@
               "keys": [
                 "server.address"
               ],
+              "observed_span_ids": [],
               "reasons": [
                 "egress_not_allowed"
               ],
@@ -925,6 +951,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "9868dc6d105ace53",
+                "d7ddcfd9c7741ab1"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58112d2b29808b83512010cc58e4f5f3",
@@ -933,6 +963,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "9af20c193dd5f627",
+                "b28370a53afe54f1"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58c7311c58a37d8bb0af496d12ef95b8",
@@ -941,6 +975,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "e652ff32ad7f434d"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "597629e2e4861819eb5aeaeffccda208",
@@ -949,6 +986,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "11c78ac52e151623",
+                "620e2afb657237ef"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "630adecebfea6a4004bf7504d4d75720",
@@ -957,6 +998,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "a76ede920a468c47"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "7e484091185efe8df54aa3a7adf18fd5",
@@ -1090,6 +1134,11 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "9868dc6d105ace53",
+                "d7ddcfd9c7741ab1",
+                "d8d98f4aaa2e440f"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58112d2b29808b83512010cc58e4f5f3",
@@ -1098,6 +1147,11 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "7335c440a87f4a5f",
+                "9af20c193dd5f627",
+                "b28370a53afe54f1"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58c7311c58a37d8bb0af496d12ef95b8",
@@ -1106,6 +1160,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "473a69ba695443ee",
+                "e652ff32ad7f434d"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "597629e2e4861819eb5aeaeffccda208",
@@ -1114,6 +1172,12 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "11c78ac52e151623",
+                "24acf0f6a70f73c8",
+                "620e2afb657237ef",
+                "8f69809fcab1a49b"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "630adecebfea6a4004bf7504d4d75720",
@@ -1122,6 +1186,10 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "3c4c6e69282a15ee",
+                "a76ede920a468c47"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "7e484091185efe8df54aa3a7adf18fd5",
@@ -1255,6 +1323,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "d7ddcfd9c7741ab1"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58112d2b29808b83512010cc58e4f5f3",
@@ -1263,6 +1334,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "b28370a53afe54f1"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "58c7311c58a37d8bb0af496d12ef95b8",
@@ -1271,6 +1345,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "e652ff32ad7f434d"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "597629e2e4861819eb5aeaeffccda208",
@@ -1279,6 +1356,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "11c78ac52e151623"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "630adecebfea6a4004bf7504d4d75720",
@@ -1287,6 +1367,9 @@
             {
               "gaps": [],
               "keys": [],
+              "observed_span_ids": [
+                "a76ede920a468c47"
+              ],
               "reasons": [],
               "span_ids": [],
               "trace_id": "7e484091185efe8df54aa3a7adf18fd5",
