@@ -23,7 +23,7 @@ Throughout the cycle:
 
 - [x] task-001 — Record the post-023 baseline and the ATTACK-PATH-LAB output digests
 - [x] task-002 — Extract the shared lab runner and pin the ATTACK-PATH-LAB output goldens
-- [ ] task-003 — Move the continuity rule to `dare_attack_graph::v2::continuity`
+- [x] task-003 — Move the continuity rule to `dare_attack_graph::v2::continuity`
 - [ ] task-004 — Move the output sweep and publish the label escaper
 - [ ] task-005 — Create the `dare-blast-radius` crate skeleton and the manifest guard
 - [ ] task-006 — Implement `limits.rs` and `error.rs`
