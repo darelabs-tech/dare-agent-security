@@ -29,8 +29,8 @@ Throughout the cycle:
 - [x] task-005 — Implement `limits.rs` and `error.rs`
 - [x] task-006 — Implement `admit.rs`
 - [x] task-007 — Implement the OTLP/JSON model and the trace-subset schema
-- [ ] task-008 — Implement `normalize.rs` and value fingerprints (AD-07)
-- [ ] task-009 — Implement the semconv classifier
+- [x] task-008 — Implement `normalize.rs` and value fingerprints (AD-07)
+- [x] task-009 — Implement the semconv classifier
 - [ ] task-010 — Add the runtime-policy schema and loader
 - [ ] task-011 — Implement trace reconstruction
 - [ ] task-012 — Implement completeness

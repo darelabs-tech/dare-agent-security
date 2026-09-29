@@ -9,10 +9,13 @@
 //! values.
 
 pub mod admit;
+pub mod canonical;
 pub mod error;
 pub mod limits;
+pub mod normalize;
 pub mod otlp;
 pub mod schema;
+pub mod semconv;
 
 pub use error::{Input, Refusal, Result, TelemetryError};
 
