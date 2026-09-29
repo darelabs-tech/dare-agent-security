@@ -39,8 +39,8 @@ Throughout the cycle:
 - [x] task-016 — Implement `validate_blast_radius` (invariants 1–9)
 - [x] task-017 — Implement `analyze` end to end, with the determinism test
 - [x] task-018 — Add the scale test (O-08)
-- [ ] task-019 — Implement the reach views (`render.rs`)
-- [ ] task-020 — Implement `summary.md`
+- [x] task-019 — Implement the reach views (`render.rs`)
+- [x] task-020 — Implement `summary.md`
 - [ ] task-021 — Add the `validate blast-radius` CLI subcommand
 - [ ] task-022 — Add the CLI refusal corpus, hostile labels and double-run test
 - [ ] task-023 — Build the BLAST-RADIUS-LAB harness and BRL-001..BRL-010

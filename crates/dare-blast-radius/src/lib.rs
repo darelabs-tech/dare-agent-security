@@ -15,7 +15,9 @@ pub mod impact;
 pub mod limits;
 pub mod model;
 pub mod reach;
+pub mod render;
 pub mod scenario;
+pub mod summary;
 pub mod validate;
 
 pub use analyze::{analyze, Analysis, Options, Seeding};
