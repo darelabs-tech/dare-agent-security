@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [main]
     types: [opened]
+  # Manual re-run for pushes after the PR opened (Cycle 025 R-9, Review 2026-09-29).
+  workflow_dispatch:
 
 permissions:
   contents: read

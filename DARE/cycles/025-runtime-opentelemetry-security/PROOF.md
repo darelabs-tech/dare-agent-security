@@ -1,7 +1,7 @@
 # Cycle 025 — Proof
 
-**Cycle status:** COMPLETE, pending human final review. Two items are open for Review:
-R-9 (the CI trigger) and R-10 (the RF-15 refinement).  
+**Cycle status:** COMPLETE. Review of 2026-09-29: R-9 applied as option (b), R-10 accepted and R-11
+acknowledged. The merge to `main` awaits human approval.  
 **Baseline:** `main @ 00e7aff` (347 suites, 4 433 passed, 9 ignored). The Cycle 025
 head totals are in §7.
 
@@ -40,7 +40,7 @@ exists.
 | RF-12 | Hostile corpus | `an_oversize_file_and_deep_nesting_are_refused_before_parsing`, `a_span_flood_stops_at_the_bound_without_overshoot_or_pass`, `id_collisions_are_deduplicated_or_marked_never_merged`, `parent_cycles_and_overdeep_trees_terminate_as_gaps`, `hostile_names_never_reach_the_summary_raw`, `secrets_in_values_fail_confidentiality_and_never_reach_an_artifact`, `a_value_too_long_to_scan_is_never_a_confidentiality_pass`, `a_url_in_a_trace_is_never_dereferenced_or_echoed` |
 | RF-13 | CLI | `help_names_every_flag_and_offers_no_network_or_exec_flag`, `exit_0_writes_the_four_files_when_every_judged_property_passes`, `exit_2_on_a_violation_or_when_nothing_can_be_judged`, `exit_3_on_a_refusal_writes_nothing`, `exit_1_on_an_internal_write_failure`; the refusal corpus `every_trace_admission_refusal_exits_3_and_writes_nothing`, `the_total_size_limit_is_enforced_across_files`, `every_trace_content_refusal_exits_3`, `bound_and_output_directory_refusals_exit_3` |
 | RF-14 | Artifacts | `every_verdict_gives_a_valid_runtime_event_record`, `ids_are_unique_bound_into_the_result_and_stable_across_runs`, `timestamps_are_the_deciding_traces_span_times` (R-6), `the_executions_document_is_passive_trace_evidence`, `counts_verdicts_reasons_and_incomplete_traces_are_reported`, `it_ends_with_the_not_claimed_statements`, `a_conformant_run_passes_and_validates` (result schema), `an_artifact_that_fails_the_output_sweep_is_never_written` |
-| RF-15 | Attack-graph projection (SHOULD) | `runtime_telemetry_rows`, `a_runtime_telemetry_bundle_binds_its_policy_by_digest`; the Cycle 023 outputs are unchanged (O-07). **Refined as R-10, for Review:** the relationships come from the pinned policy (`STATICALLY_PROVEN`) and are guarded by the trace verdicts, because RS-02 keeps observed names inside the engine |
+| RF-15 | Attack-graph projection (SHOULD) | `runtime_telemetry_rows`, `a_runtime_telemetry_bundle_binds_its_policy_by_digest`; the Cycle 023 outputs are unchanged (O-07). **Refined as R-10, accepted at Review:** the relationships come from the pinned policy (`STATICALLY_PROVEN`) and are guarded by the trace verdicts, because RS-02 keeps observed names inside the engine |
 | RF-16 | Coverage and profile (SHOULD) | `the_profile_matches_the_approval_exactly`, `every_selected_property_is_registered`, `required_means_every_traced_agent_has_the_surface`, `a_traced_agent_makes_every_required_property_applicable`, `no_earlier_profile_denominator_moved`, `no_earlier_profile_selects_a_cycle_025_property`, `coverage_rows_restate_the_engine_states_without_promotion`, `the_baseline_report_covers_the_nine_properties_of_the_profile` |
 | RF-17 | Product integration (COULD) | out of scope for v1 (Q7 (b)) |
 
@@ -79,7 +79,7 @@ exists.
 | BQ-4 (a): retry groups by sibling | `repeated_successful_calls_and_different_targets_are_not_retries` |
 | BQ-5 (a): exit codes 0/1/2/3 | RF-13 |
 | Cycle 024 R-6 decision (c) | `a_lab_shaped_graph_is_analysed_in_under_ten_seconds` now uses a 10 s target and a 20 s ceiling. In the gate run it measured 11.8 s: reported over the target, and passing |
-| Cycle 024 CI-trigger decision | **stopped for Review (R-9)**: frozen tests of Cycles 021 and 022 pin the trigger |
+| Cycle 024 CI-trigger decision | R-9 (b): `workflow_dispatch` added to `ci.yml` and `action-e2e.yml`; `types: [opened]` is kept, so the frozen 021/022 trigger tests pass unchanged; `the_workflow_keeps_its_pull_request_opened_trigger_and_earlier_gates` |
 
 ## 6. Boundaries
 

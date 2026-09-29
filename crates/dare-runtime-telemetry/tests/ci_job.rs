@@ -32,6 +32,12 @@ fn the_workflow_keeps_its_pull_request_opened_trigger_and_earlier_gates() {
     let head = ci.lines().take(8).collect::<Vec<_>>().join("\n");
     assert!(head.contains("pull_request:"), "{head}");
     assert!(head.contains("types: [opened]"), "{head}");
+    // R-9 (b): a manual re-run, and no other trigger.
+    let on = &ci[ci.find("\non:").expect("on:")..ci.find("\npermissions:").expect("permissions:")];
+    assert!(on.contains("  workflow_dispatch:"), "{on}");
+    for other in ["push:", "synchronize", "schedule:", "pull_request_target"] {
+        assert!(!on.contains(other), "{other} in {on}");
+    }
     for earlier in [
         "  remote-validation-2026:",
         "  attack-path-2026:",

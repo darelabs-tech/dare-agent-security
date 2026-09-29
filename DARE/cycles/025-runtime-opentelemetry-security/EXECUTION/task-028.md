@@ -78,3 +78,18 @@ Options for the Product Owner:
 | Test | `ci_job` 3/3 (025), 3/3 (024), 3/3 (023); 021/022 compatibility 5/5 and 8/8; CLI reconcile and discover suites that read `ci.yml` pass; evidence, hostile and summary pass after the synthetic-marker change |
 | Lint | fmt; YAML parses |
 | Audit | No dependency change; k25 sweep clean |
+
+## Review follow-up (2026-09-29)
+
+The Product Owner chose option **(b)**, and it is applied: `workflow_dispatch` is added
+to `ci.yml` and `action-e2e.yml`, and `types: [opened]` is unchanged.
+
+The following pass unchanged:
+- the trigger tests of Cycles 021, 022, 023 and 024;
+- `attack_path_compatibility`;
+- the CLI reconcile and discover suites that read `ci.yml`.
+
+The Cycle 025 `ci_job` test also asserts that `workflow_dispatch` is present and that
+no `push`, `synchronize`, `schedule` or `pull_request_target` trigger was added. Both
+workflows still parse as YAML.
+

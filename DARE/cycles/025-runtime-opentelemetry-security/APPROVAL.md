@@ -75,3 +75,12 @@ require any of the following:
 - adding a third-party dependency;
 - changing a Cycle 008, 023 or 024 output for an existing input;
 - changing a pre-existing registry entry or an earlier profile.
+
+## Review decisions (2026-09-29, after execution)
+
+| Item | Decision |
+|---|---|
+| R-9, CI trigger | Option (b): add only `workflow_dispatch` to `ci.yml` and `action-e2e.yml`. `types: [opened]` stays, so no frozen test changes. Applied |
+| R-10, RF-15 projection | Accepted: the projector declares the pinned policy's relationships (`STATICALLY_PROVEN`) and the trace verdicts guard them, because RS-02 keeps observed names inside the engine |
+| R-11, Cycle 022 timing test | Acknowledged; no action (a frozen, load-sensitive test that passes in isolation) |
+
