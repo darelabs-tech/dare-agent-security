@@ -96,6 +96,16 @@ source). Full documentation: the DARE Agent Security Book
 
 Contributors building from source, keep using the commands below.
 
+## Try it in one command
+
+```bash
+./demo/run-demo.sh   # offline: inventory, before/after attack paths, runtime traces
+```
+
+Writes `demo-output/report.html`. See [`demo/README.md`](demo/README.md); a
+presenter script and POC plan in Portuguese is in
+[`demo/ROTEIRO-POC.pt-BR.md`](demo/ROTEIRO-POC.pt-BR.md).
+
 ## Project status
 
 **Stage:** v1.0 release readiness (Cycle 011) — product UX over Cycles 001–010 core (feature freeze)

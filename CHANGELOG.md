@@ -10,6 +10,12 @@ still change between minor versions during the pre-1.0 cycles.
 
 ### Added
 
+- `demo/run-demo.sh` — one-command, offline demo: MCP inventory, a vulnerable and a
+  fixed configuration (ATTACK-PATH-LAB APL-001/APL-002) through the RAG and identity
+  engines, attack paths and blast radius, then recorded runtime traces. Every step
+  checks its expected exit code; `demo/render_report.py` writes `REPORT.md` and a
+  self-contained `report.html`. Pinned by `tests/demo_kit.rs`. Presenter script and
+  POC plan: `demo/ROTEIRO-POC.pt-BR.md`.
 - GitHub Action engine modes: `mode: runtime-telemetry`, `attack-paths` and
   `blast-radius` run the Cycle 023–025 engines in CI, with new inputs `traces`,
   `policy`, `artifacts`, `system-model`, `graph` and `compromise`. The new

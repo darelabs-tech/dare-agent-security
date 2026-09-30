@@ -14,3 +14,6 @@ _site/
 # run. Compiled artifacts of committed sources are never sources themselves.
 __pycache__/
 *.py[cod]
+
+# One-command demo output (demo/run-demo.sh).
+demo-output/
