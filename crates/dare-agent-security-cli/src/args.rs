@@ -139,7 +139,14 @@ pub struct CoazIntegrityArgs {
     pub output_dir: Option<PathBuf>,
 
     /// When used with `--output-dir`, exit non-zero on INCONCLUSIVE aggregate (default: true).
-    #[arg(long, default_value = "true", value_parser = BoolishValueParser::new())]
+    #[arg(
+        long,
+        action = clap::ArgAction::Set,
+        num_args = 0..=1,
+        default_value = "true",
+        default_missing_value = "true",
+        value_parser = BoolishValueParser::new()
+    )]
     pub fail_on_inconclusive: bool,
 }
 
@@ -193,7 +200,14 @@ pub struct DiscoverArgs {
     pub output_dir: Option<PathBuf>,
 
     /// When used with `--output-dir`, exit non-zero on INCONCLUSIVE aggregate (default: true).
-    #[arg(long, default_value = "true", value_parser = BoolishValueParser::new())]
+    #[arg(
+        long,
+        action = clap::ArgAction::Set,
+        num_args = 0..=1,
+        default_value = "true",
+        default_missing_value = "true",
+        value_parser = BoolishValueParser::new()
+    )]
     pub fail_on_inconclusive: bool,
 
     /// stdio executable and argv after `--`. Never interpolated by a shell.

@@ -107,3 +107,128 @@ jobs:
           test "${{ steps.gate.outcome }}" = "failure"
           test "${{ steps.gate.outputs.verdict }}" = "ERROR"
           test -f .dare-agent-security/error/ci-result.json
+
+  # Cycle 023–025 engines through the Action (one job: the image builds once).
+  action-engines:
+    name: Action E2E (runtime-telemetry, attack-paths, blast-radius)
+    runs-on: ubuntu-latest
+    env:
+      OTL: crates/dare-runtime-telemetry/tests/fixtures/otel-lab
+      BUNDLES: crates/dare-attack-path/tests/fixtures/bundles
+      OUT: .dare-agent-security
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: runtime-telemetry — recorded passing control (OTL-002)
+        uses: ./
+        id: rt_pass
+        with:
+          mode: runtime-telemetry
+          traces: ${{ env.OTL }}/OTL-002/trace-0.json
+          policy: ${{ env.OTL }}/OTL-002/policy.json
+          output-dir: ${{ env.OUT }}/rt-pass
+
+      - name: runtime-telemetry — recorded attack (OTL-001)
+        uses: ./
+        id: rt_fail
+        continue-on-error: true
+        with:
+          mode: runtime-telemetry
+          traces: ${{ env.OTL }}/OTL-001/trace-0.json
+          policy: ${{ env.OTL }}/OTL-001/policy.json
+          output-dir: ${{ env.OUT }}/rt-fail
+
+      - name: runtime-telemetry — doctored export is refused (OTL-055)
+        uses: ./
+        id: rt_refused
+        continue-on-error: true
+        with:
+          mode: runtime-telemetry
+          traces: ${{ env.OTL }}/OTL-055/trace-0.json
+          policy: ${{ env.OTL }}/OTL-055/policy.json
+          output-dir: ${{ env.OUT }}/rt-refused
+
+      - name: attack-paths — every control held (a2a bundle)
+        uses: ./
+        id: ap_pass
+        with:
+          mode: attack-paths
+          artifacts: ${{ env.BUNDLES }}/a2a
+          output-dir: ${{ env.OUT }}/ap-pass
+
+      - name: attack-paths — a failed control on a feasible path (rt + identity)
+        uses: ./
+        id: ap_fail
+        continue-on-error: true
+        with:
+          mode: attack-paths
+          artifacts: |
+            ${{ env.BUNDLES }}/rt
+            ${{ env.BUNDLES }}/identity
+          output-dir: ${{ env.OUT }}/ap-fail
+
+      - name: attack-paths — undecided control tolerated (identity, fail-on-inconclusive false)
+        uses: ./
+        id: ap_inconclusive
+        with:
+          mode: attack-paths
+          artifacts: ${{ env.BUNDLES }}/identity
+          fail-on-inconclusive: "false"
+          output-dir: ${{ env.OUT }}/ap-inconclusive
+
+      - name: blast-radius — nothing exposed (graph from ap-pass)
+        uses: ./
+        id: br_pass
+        with:
+          mode: blast-radius
+          graph: ${{ env.OUT }}/ap-pass/attack-graph.json
+          output-dir: ${{ env.OUT }}/br-pass
+
+      - name: blast-radius — a target exposed (graph from ap-fail)
+        uses: ./
+        id: br_fail
+        continue-on-error: true
+        with:
+          mode: blast-radius
+          graph: ${{ env.OUT }}/ap-fail/attack-graph.json
+          output-dir: ${{ env.OUT }}/br-fail
+
+      - name: hostile input — parent traversal is rejected before the CLI runs
+        uses: ./
+        id: hostile
+        continue-on-error: true
+        with:
+          mode: attack-paths
+          artifacts: ${{ env.BUNDLES }}/../../../../../etc
+          output-dir: ${{ env.OUT }}/hostile
+
+      - name: Assert outcomes, verdicts and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          check() { # id outcome verdict evidence summary want-outcome want-verdict
+            local id="$1" outcome="$2" verdict="$3" evidence="$4" summary="$5" want_outcome="$6" want_verdict="$7"
+            echo "$id: outcome=$outcome verdict=$verdict evidence=$evidence"
+            test "$outcome" = "$want_outcome"
+            test "$verdict" = "$want_verdict"
+            test -f "$summary"
+            if [ "$want_verdict" = "ERROR" ]; then
+              echo "$evidence" | grep -q '/\.none$'
+            else
+              test -f "$evidence"
+            fi
+          }
+          check rt-pass "${{ steps.rt_pass.outcome }}" "${{ steps.rt_pass.outputs.verdict }}" "${{ steps.rt_pass.outputs.evidence-path }}" "${{ steps.rt_pass.outputs.summary-path }}" success PASS
+          check rt-fail "${{ steps.rt_fail.outcome }}" "${{ steps.rt_fail.outputs.verdict }}" "${{ steps.rt_fail.outputs.evidence-path }}" "${{ steps.rt_fail.outputs.summary-path }}" failure FAIL
+          check rt-refused "${{ steps.rt_refused.outcome }}" "${{ steps.rt_refused.outputs.verdict }}" "${{ steps.rt_refused.outputs.evidence-path }}" "${{ steps.rt_refused.outputs.summary-path }}" failure ERROR
+          check ap-pass "${{ steps.ap_pass.outcome }}" "${{ steps.ap_pass.outputs.verdict }}" "${{ steps.ap_pass.outputs.evidence-path }}" "${{ steps.ap_pass.outputs.summary-path }}" success PASS
+          check ap-fail "${{ steps.ap_fail.outcome }}" "${{ steps.ap_fail.outputs.verdict }}" "${{ steps.ap_fail.outputs.evidence-path }}" "${{ steps.ap_fail.outputs.summary-path }}" failure FAIL
+          check ap-inconclusive "${{ steps.ap_inconclusive.outcome }}" "${{ steps.ap_inconclusive.outputs.verdict }}" "${{ steps.ap_inconclusive.outputs.evidence-path }}" "${{ steps.ap_inconclusive.outputs.summary-path }}" success INCONCLUSIVE
+          check br-pass "${{ steps.br_pass.outcome }}" "${{ steps.br_pass.outputs.verdict }}" "${{ steps.br_pass.outputs.evidence-path }}" "${{ steps.br_pass.outputs.summary-path }}" success PASS
+          check br-fail "${{ steps.br_fail.outcome }}" "${{ steps.br_fail.outputs.verdict }}" "${{ steps.br_fail.outputs.evidence-path }}" "${{ steps.br_fail.outputs.summary-path }}" failure FAIL
+          # The engine's own verdict agrees with the Action output.
+          test "$(python3 -c "import json; print(json.load(open('$OUT/rt-fail/runtime-telemetry-result.json'))['verdict'])")" = FAIL
+          # Hostile input: rejected by the entrypoint, no verdict, nothing written.
+          test "${{ steps.hostile.outcome }}" = failure
+          test -z "${{ steps.hostile.outputs.verdict }}"
+          test ! -e "$OUT/hostile"

@@ -13,12 +13,20 @@ PROFILE="${INPUT_PROFILE:-}"
 COVERAGE_FACTS="${INPUT_COVERAGE_FACTS:-}"
 MIN_REQUIRED_COVERAGE="${INPUT_MIN_REQUIRED_COVERAGE:-0}"
 FAIL_ON_REQUIRED_BLOCKED="${INPUT_FAIL_ON_REQUIRED_BLOCKED:-false}"
+# Cycle 023–025 engine inputs: workspace-relative paths, whitespace-separated
+# where a list is accepted.
+TRACES="${INPUT_TRACES:-}"
+POLICY="${INPUT_POLICY:-}"
+ARTIFACTS="${INPUT_ARTIFACTS:-}"
+SYSTEM_MODEL="${INPUT_SYSTEM_MODEL:-}"
+GRAPH="${INPUT_GRAPH:-}"
+COMPROMISE="${INPUT_COMPROMISE:-}"
 
 WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
 cd "$WORKSPACE"
 
 case "$MODE" in
-  discover|validate) ;;
+  discover|validate|runtime-telemetry|attack-paths|blast-radius) ;;
   *)
     echo "unsupported mode: $MODE" >&2
     exit 1
@@ -61,6 +69,90 @@ write_github_outputs() {
     cat "$SUMMARY_PATH" >> "$GITHUB_STEP_SUMMARY"
   fi
 }
+
+# A file input: workspace-relative, no parent traversal, never an option.
+check_input_path() {
+  case "$2" in
+    "")
+      echo "$1 must not be empty" >&2
+      exit 1
+      ;;
+    /*|-*|*..*)
+      echo "$1 must be a workspace-relative path without parent traversal: rejected" >&2
+      exit 1
+      ;;
+  esac
+}
+
+# Run one Cycle 023–025 engine with the argv built in "$@", then restate its
+# exit code and result document as the Action outputs (ci engine-outputs).
+run_engine() {
+  ENGINE="$1"
+  shift
+  set +e
+  dare-agent-security validate "$ENGINE" --output-dir "$OUTPUT_DIR" "$@"
+  ENGINE_EXIT=$?
+  # shellcheck disable=SC2086
+  dare-agent-security ci engine-outputs \
+    --engine "$ENGINE" \
+    --output-dir "$OUTPUT_DIR" \
+    --engine-exit "$ENGINE_EXIT" \
+    $FAIL_FLAG
+  EXIT=$?
+  set -e
+  write_github_outputs
+  exit "$EXIT"
+}
+
+engine_mode() {
+  if [ -n "$PROFILE" ]; then
+    echo "profile applies only to the discover and validate modes" >&2
+    exit 1
+  fi
+  # Split list inputs on whitespace only: no globbing, no eval.
+  set -f
+  set --
+  case "$MODE" in
+    runtime-telemetry)
+      [ -n "$TRACES" ] || { echo "traces is required for runtime-telemetry" >&2; exit 1; }
+      for item in $TRACES; do
+        check_input_path traces "$item"
+        set -- "$@" --traces "$item"
+      done
+      if [ -n "$POLICY" ]; then
+        check_input_path policy "$POLICY"
+        set -- "$@" --policy "$POLICY"
+      fi
+      ;;
+    attack-paths)
+      [ -n "$ARTIFACTS" ] || { echo "artifacts is required for attack-paths" >&2; exit 1; }
+      for item in $ARTIFACTS; do
+        check_input_path artifacts "$item"
+        set -- "$@" --artifacts "$item"
+      done
+      if [ -n "$SYSTEM_MODEL" ]; then
+        check_input_path system-model "$SYSTEM_MODEL"
+        set -- "$@" --system-model "$SYSTEM_MODEL"
+      fi
+      ;;
+    blast-radius)
+      check_input_path graph "$GRAPH"
+      set -- "$@" --graph "$GRAPH"
+      if [ -n "$COMPROMISE" ]; then
+        check_input_path compromise "$COMPROMISE"
+        set -- "$@" --compromise "$COMPROMISE"
+      else
+        set -- "$@" --seed-entry-points
+      fi
+      ;;
+  esac
+  set +f
+  run_engine "$MODE" "$@"
+}
+
+case "$MODE" in
+  runtime-telemetry|attack-paths|blast-radius) engine_mode ;;
+esac
 
 run_discover() {
   # shellcheck disable=SC2086

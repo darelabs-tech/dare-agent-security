@@ -10,6 +10,13 @@ still change between minor versions during the pre-1.0 cycles.
 
 ### Added
 
+- GitHub Action engine modes: `mode: runtime-telemetry`, `attack-paths` and
+  `blast-radius` run the Cycle 023–025 engines in CI, with new inputs `traces`,
+  `policy`, `artifacts`, `system-model`, `graph` and `compromise`. The new
+  `ci engine-outputs` subcommand restates the engine's exit code and result
+  document as the `verdict`, `evidence-path` and `summary-path` outputs (ERROR
+  when they disagree). E2E job `action-engines` covers PASS, FAIL, refusal,
+  tolerated INCONCLUSIVE, chained blast radius and a rejected traversal path.
 - `book/en` — mdBook user documentation site (installation, quickstart, commands,
   assessments, reports, privacy, CI, reference). Publishing pipeline via GitHub
   Pages (`.github/workflows/deploy-docs.yml`). `book/pt` scaffolded with the same
@@ -27,6 +34,10 @@ still change between minor versions during the pre-1.0 cycles.
 
 ### Fixed
 
+- `--fail-on-inconclusive false` was rejected by the CLI ("unexpected argument
+  'false'"), so the Action input `fail-on-inconclusive: "false"` always ended in
+  exit 1 with no outputs. The flag now takes an optional value (`true` when
+  bare, as before).
 - `scripts/release/package.sh` no longer silently skips `LICENSE` when staging a
   release archive (previous line copied `README.md` a second time instead).
   `scripts/release/package.ps1` now includes `LICENSE` as well.

@@ -4,11 +4,12 @@ author: DARE Labs
 
 inputs:
   mode:
-    description: Bounded operation mode — discover or validate
+    description: "Bounded operation mode — discover, validate, runtime-telemetry, attack-paths or blast-radius"
     required: true
   target:
-    description: Explicit target — stdio executable for discover, or COAZ-INTEGRITY fixture id / all for validate
-    required: true
+    description: "discover and validate only — stdio executable for discover, or COAZ-INTEGRITY fixture id / all for validate"
+    required: false
+    default: ""
   output-dir:
     description: Workspace-relative output directory for evidence and ci-result.json
     required: false
@@ -37,6 +38,30 @@ inputs:
     description: Fail when a REQUIRED property is BLOCKED. Used only when profile is set.
     required: false
     default: "false"
+  traces:
+    description: "runtime-telemetry only — OTLP/JSON trace exports, workspace-relative, whitespace-separated (1 to 64)"
+    required: false
+    default: ""
+  policy:
+    description: "runtime-telemetry only — runtime policy JSON; without one only the telemetry rules are judged"
+    required: false
+    default: ""
+  artifacts:
+    description: "attack-paths only — engine artifact directories, workspace-relative, whitespace-separated (1 to 64)"
+    required: false
+    default: ""
+  system-model:
+    description: "attack-paths only — optional system model JSON"
+    required: false
+    default: ""
+  graph:
+    description: "blast-radius only — attack-graph.json written by an attack-paths run"
+    required: false
+    default: ""
+  compromise:
+    description: "blast-radius only — compromise scenario JSON; without one every entry point is seeded"
+    required: false
+    default: ""
 
 outputs:
   verdict:
@@ -59,3 +84,9 @@ runs:
     INPUT_COVERAGE_FACTS: ${{ inputs.coverage-facts }}
     INPUT_MIN_REQUIRED_COVERAGE: ${{ inputs.min-required-coverage }}
     INPUT_FAIL_ON_REQUIRED_BLOCKED: ${{ inputs.fail-on-required-blocked }}
+    INPUT_TRACES: ${{ inputs.traces }}
+    INPUT_POLICY: ${{ inputs.policy }}
+    INPUT_ARTIFACTS: ${{ inputs.artifacts }}
+    INPUT_SYSTEM_MODEL: ${{ inputs.system-model }}
+    INPUT_GRAPH: ${{ inputs.graph }}
+    INPUT_COMPROMISE: ${{ inputs.compromise }}

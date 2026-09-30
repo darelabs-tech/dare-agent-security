@@ -106,6 +106,35 @@ The entrypoint and CLI must treat everything from the left of the CLI boundary a
 - Sanitize/escape user-controlled strings in summary rendering (task-006)
 - Task-009 tests with control characters and markdown metacharacters in target metadata
 
+### T9 — Engine-mode file inputs (Cycles 023–025)
+
+**Risk:** `traces`, `policy`, `artifacts`, `system-model`, `graph` or
+`compromise` smuggle an option into the engine argv, read outside the
+workspace, or expand into more paths than written.
+
+**Mitigations:**
+
+- Each path is one argv element after its flag; lists are split on whitespace
+  with globbing off (`set -f`), never through `eval` or a shell string
+- A path that is absolute, contains `..` or starts with `-` is rejected before
+  the CLI runs (exit 1, no outputs)
+- The engines bound their own inputs (1 to 64 files, schema admission, span and
+  path bounds) and refuse with exit 3 writing nothing
+- The engines write no attribute value, prompt or tool argument; the adapter
+  still runs the summary canary check and withholds a summary that fails it
+
+### T10 — Verdict laundering between engine and Action
+
+**Risk:** A crashed, refused or contradictory engine run is reported as PASS.
+
+**Mitigations:**
+
+- `verdict` is read from the engine's own result document, only when its exit
+  code agrees (0 with PASS, 2 with FAIL or INCONCLUSIVE); anything else is ERROR
+- A refusal replaces a stale `summary.md` from an earlier run with an ERROR one
+- `fail-on-inconclusive` defaults to `true`; `false` turns only INCONCLUSIVE
+  into a passing step, never ERROR or FAIL
+
 ## Out of scope (explicit non-goals)
 
 - Active adversarial mutation against production targets
@@ -120,6 +149,9 @@ The entrypoint and CLI must treat everything from the left of the CLI boundary a
 | `target='; rm -rf /'` | Treated as literal target string; no shell execution |
 | `output-dir='../../etc'` | Rejected or clamped to workspace |
 | Unknown `mode` | Validation error, non-zero exit |
+| `artifacts='bundles/../../etc'`, `graph='/etc/passwd'`, `traces='--help'` | Rejected by the entrypoint before the CLI runs |
+| `artifacts='*'` | Literal path (no globbing); the engine refuses a non-directory |
+| Engine refusal (exit 3) | `verdict=ERROR`, `evidence-path` ends `/.none`, step exits 3 |
 | Secret-like string in target | Not echoed to GITHUB_OUTPUT |
 | Redirect to new host (if applicable) | Fail closed per CLI policy |
 

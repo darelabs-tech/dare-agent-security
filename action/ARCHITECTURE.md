@@ -87,6 +87,20 @@ permissions:
 
 The Action does not call GitHub APIs and does not require write tokens.
 
+## Engine modes (Cycles 023–025 extension)
+
+`mode` also accepts `runtime-telemetry`, `attack-paths` and `blast-radius`. The
+entrypoint builds the engine argv from typed inputs (`traces`, `policy`,
+`artifacts`, `system-model`, `graph`, `compromise`) with `set --`, runs
+`dare-agent-security validate <engine>`, then `dare-agent-security ci
+engine-outputs --engine <engine> --engine-exit <code>` writes
+`github-output.env`. The mapping from exit code and result document to the
+`verdict` output lives in Rust (`crates/dare-agent-security-cli/src/ci_engine.rs`),
+not in shell: it re-reads the verdict the engine wrote, never re-judges, and
+reports ERROR when the exit code and the document disagree. An engine refusal
+leaves an ERROR summary in place of any stale one. `ci-result.json` stays
+`discover`/`validate` only (closed schema).
+
 ## Rejection criteria (why alternatives failed)
 
 1. **External binary download:** violates supply-chain invariant (BLUEPRINT § Supply-chain constraints).
@@ -101,6 +115,7 @@ The Action does not call GitHub APIs and does not require write tokens.
 | 006 | GITHUB_OUTPUT + STEP_SUMMARY integration |
 | 008 | E2E workflow `uses: ./` |
 | 009 | Hostile-input tests |
+| Engine modes | `ci engine-outputs`, engine inputs, `action-engines` E2E job |
 
 ## References
 

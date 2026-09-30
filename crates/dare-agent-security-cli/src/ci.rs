@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use clap::{Args, Subcommand};
 use dare_mcp_discovery::sanitize_stream;
 
+use crate::ci_engine::{write_engine_outputs, Engine};
 use crate::ci_output::CiAutomation;
 use crate::ci_result::ActionMode;
 use crate::exit_code::SCANNER_ERROR;
@@ -14,6 +15,33 @@ use crate::exit_code::SCANNER_ERROR;
 pub enum CiSubcommand {
     /// Write aggregate ci-result.json from the current evidence directory (or empty for INCONCLUSIVE).
     WriteResult(WriteResultArgs),
+    /// Restate a runtime-telemetry, attack-paths or blast-radius run as GitHub Action outputs.
+    EngineOutputs(EngineOutputsArgs),
+}
+
+/// Arguments for `ci engine-outputs`.
+#[derive(Debug, Args)]
+pub struct EngineOutputsArgs {
+    #[arg(long, value_enum)]
+    pub engine: Engine,
+
+    /// The engine's own output directory.
+    #[arg(long, value_name = "PATH")]
+    pub output_dir: PathBuf,
+
+    /// The exit code the engine ended with.
+    #[arg(long, value_name = "CODE", value_parser = clap::value_parser!(i32).range(0..=255))]
+    pub engine_exit: i32,
+
+    #[arg(
+        long,
+        action = clap::ArgAction::Set,
+        num_args = 0..=1,
+        default_value = "true",
+        default_missing_value = "true",
+        value_parser = clap::builder::BoolishValueParser::new()
+    )]
+    pub fail_on_inconclusive: bool,
 }
 
 /// Arguments for `ci write-result`.
@@ -25,7 +53,14 @@ pub struct WriteResultArgs {
     #[arg(long, value_name = "PATH")]
     pub output_dir: PathBuf,
 
-    #[arg(long, default_value = "true", value_parser = clap::builder::BoolishValueParser::new())]
+    #[arg(
+        long,
+        action = clap::ArgAction::Set,
+        num_args = 0..=1,
+        default_value = "true",
+        default_missing_value = "true",
+        value_parser = clap::builder::BoolishValueParser::new()
+    )]
     pub fail_on_inconclusive: bool,
 
     /// Safe target label included in the job summary (never raw credentials).
@@ -51,6 +86,22 @@ impl From<ActionModeArg> for ActionMode {
 pub fn run_ci(sub: CiSubcommand) -> i32 {
     match sub {
         CiSubcommand::WriteResult(args) => run_write_result(args),
+        CiSubcommand::EngineOutputs(args) => run_engine_outputs(args),
+    }
+}
+
+fn run_engine_outputs(args: EngineOutputsArgs) -> i32 {
+    match write_engine_outputs(
+        args.engine,
+        args.engine_exit,
+        &args.output_dir,
+        args.fail_on_inconclusive,
+    ) {
+        Ok(exit) => exit,
+        Err(message) => {
+            diagnostic(&message);
+            SCANNER_ERROR
+        }
     }
 }
 
