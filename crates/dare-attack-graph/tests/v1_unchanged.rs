@@ -6,6 +6,12 @@ use dare_attack_graph::{
 };
 use sha2::{Digest, Sha256};
 
+/// The engine version the goldens were recorded at. The graph stamps
+/// `CARGO_PKG_VERSION` into `engine.version`, and the graph id is a digest
+/// over it, so the test pins every other byte against this version: a
+/// release bump moves the stamp, never the rest of the output.
+const BASELINE_VERSION: &str = "1.0.0-rc1";
+
 const GOLDEN: [(&str, &str, &str, &str); 5] = [
     (
         "auth-mutation",
@@ -51,6 +57,8 @@ fn v1_output_is_byte_identical_to_the_baseline() {
     for (name, raw, graph_sha, paths_sha) in GOLDEN {
         let facts: GraphFactsInput = serde_json::from_str(raw).unwrap();
         let mut graph = build_attack_graph(&facts).unwrap();
+        assert_eq!(graph.engine.version, env!("CARGO_PKG_VERSION"), "{name}");
+        graph.engine.version = BASELINE_VERSION.into();
         graph.paths = derive_paths(&graph, &PathOptions::default()).unwrap();
         graph.id = format!("graph:{}", graph_digest(&graph).unwrap());
         validate_graph(&graph).unwrap();

@@ -44,6 +44,27 @@ fn v1_facts() -> serde_json::Value {
 /// (`a3d6c06`), for a fixture without an attack graph and for a v1 facts
 /// fixture. The new field must not move either.
 const NO_GRAPH_DIGEST: &str = "637257e99c32c220d8030f2965a524c48a820ea1c71961fd4ee4d8e466b6def7";
+/// The engine version `V1_FACTS_DIGEST` was recorded at. A v1 graph stamps
+/// `CARGO_PKG_VERSION` and its id is a digest over it; the check below pins
+/// every other byte against this version, so a release bump does not move it.
+const BASELINE_VERSION: &str = "1.0.0-rc1";
+
+/// The artifact's bytes as the baseline version would have written them:
+/// the version stamp set back, the id recomputed, serialized as the product
+/// writes it.
+fn at_baseline_version(path: &Path) -> String {
+    let mut graph: dare_attack_graph::AttackGraph =
+        serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    assert_eq!(graph.engine.version, env!("CARGO_PKG_VERSION"));
+    graph.engine.version = BASELINE_VERSION.into();
+    graph.id = format!("graph:{}", dare_attack_graph::graph_digest(&graph).unwrap());
+    let value = serde_json::to_value(&graph).unwrap();
+    format!(
+        "{:x}",
+        Sha256::digest(serde_json::to_vec_pretty(&value).unwrap())
+    )
+}
+
 const V1_FACTS_DIGEST: &str = "8f343a47aa85e5a4654bb01394f27d5397b92615d7571bc23516fef4a2921d57";
 
 #[test]
@@ -58,7 +79,10 @@ fn without_the_field_the_attack_graph_artifact_is_unchanged() {
         serde_json::json!({"attack_graph_facts": v1_facts()}),
     )
     .unwrap();
-    assert_eq!(sha256(&run.join("attack-graph.json")), V1_FACTS_DIGEST);
+    assert_eq!(
+        at_baseline_version(&run.join("attack-graph.json")),
+        V1_FACTS_DIGEST
+    );
 }
 
 #[test]

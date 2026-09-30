@@ -54,8 +54,15 @@ resolve_version() {
     fi
     info "resolving latest release for $REPO"
     api_url="https://api.github.com/repos/${REPO}/releases/latest"
-    tag="$(curl -fsSL "$api_url" | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')"
-    [ -n "$tag" ] || fail "could not resolve latest release tag from $api_url"
+    tag="$(curl -fsSL "$api_url" 2>/dev/null | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/' || true)"
+    if [ -z "$tag" ]; then
+        # releases/latest never returns a pre-release. Until a stable release
+        # exists, fall back to the newest release of any kind, and say so.
+        api_url="https://api.github.com/repos/${REPO}/releases?per_page=1"
+        tag="$(curl -fsSL "$api_url" 2>/dev/null | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/' || true)"
+        [ -n "$tag" ] || fail "no published release found for $REPO"
+        info "no stable release yet; using the newest pre-release"
+    fi
     VERSION="$tag"
     info "resolved latest version: $VERSION"
 }

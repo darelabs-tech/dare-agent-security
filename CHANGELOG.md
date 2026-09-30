@@ -10,6 +10,11 @@ still change between minor versions during the pre-1.0 cycles.
 
 ### Added
 
+- `discover --pass-env NAME` (repeatable, stdio only): copies a named variable from
+  the operator's environment into the MCP server process. The child still starts
+  from an empty environment, so real servers (`npx`, `uvx`, API keys in the
+  environment) could not start before. Names are validated; values are never
+  written to any output. Client test guide: `docs/guia-teste-mcp-cliente.pt-BR.md`.
 - `demo/run-demo.sh` — one-command, offline demo: MCP inventory, a vulnerable and a
   fixed configuration (ATTACK-PATH-LAB APL-001/APL-002) through the RAG and identity
   engines, attack paths and blast radius, then recorded runtime traces. Every step
@@ -40,6 +45,12 @@ still change between minor versions during the pre-1.0 cycles.
 
 ### Fixed
 
+- Release pipeline: Linux binaries are now static (musl), so they run on any
+  Ubuntu release instead of only glibc >= the runner's; the retired Intel macOS
+  runner is replaced by a cross-compile on Apple silicon; the packaged binary is
+  stripped (13 MB archive) and smoke-tested. Version bumped to `1.0.0-rc2`.
+- `installers/install.sh` fell over when only pre-releases exist
+  (`releases/latest` skips them); it now uses the newest pre-release and says so.
 - `--fail-on-inconclusive false` was rejected by the CLI ("unexpected argument
   'false'"), so the Action input `fail-on-inconclusive: "false"` always ended in
   exit 1 with no outputs. The flag now takes an optional value (`true` when

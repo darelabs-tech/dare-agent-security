@@ -20,6 +20,7 @@ dare-agent-security discover --url <HTTPS-URL> [--json] [OPTIONS]
 | `--url <HTTPS-URL>` | Target is a Streamable HTTP MCP server. HTTPS only — credentials in the URL are refused. |
 | `--json` | Write one Inventory v1 JSON object to stdout (diagnostics go to stderr). |
 | `--target-id <SAFE-ID>` | Explicit safe target identifier for evidence/output naming. |
+| `--pass-env <NAME>` | `--stdio` only, repeatable (at most 32). The server starts from an empty environment — not even `PATH` is inherited — so name each variable it needs, e.g. `--pass-env PATH --pass-env HOME --pass-env API_KEY`. The value is read from your environment and never written to any output. |
 | `--timeout <DURATION>` | e.g. `30`, `30s`, `5m`, `1h`, `500ms`. |
 | `--max-pages <N>` | Cap on paginated list requests. |
 | `--max-items <N>` | Cap on total discovered items. |
@@ -33,6 +34,9 @@ dare-agent-security discover --url <HTTPS-URL> [--json] [OPTIONS]
 dare-agent-security discover --stdio -- target/debug/synthetic-mcp
 dare-agent-security discover --stdio --json -- target/debug/synthetic-mcp
 dare-agent-security discover --url https://mcp.example.com --json
+# A real server started through npx that reads an API key from the environment:
+dare-agent-security discover --stdio --pass-env PATH --pass-env HOME --pass-env API_KEY \
+  -- npx -y @example/mcp-server
 ```
 
 ## Exit codes

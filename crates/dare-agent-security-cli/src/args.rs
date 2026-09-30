@@ -179,6 +179,12 @@ pub struct DiscoverArgs {
     #[arg(long, value_name = "SAFE-ID")]
     pub target_id: Option<String>,
 
+    /// stdio only: copy this variable from your environment into the server
+    /// process (repeatable, at most 32). Nothing else is inherited, not even
+    /// PATH. The value is never written to any output.
+    #[arg(long = "pass-env", value_name = "NAME")]
+    pub pass_env: Vec<String>,
+
     /// Overall discovery timeout (`30`, `30s`, `5m`, `1h`, or `500ms`).
     #[arg(long, value_name = "DURATION")]
     pub timeout: Option<String>,

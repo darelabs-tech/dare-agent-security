@@ -292,10 +292,15 @@ fn build_spec(args: &DiscoverArgs) -> Result<DiscoveryTargetSpec, DiscoverFailur
         }
         let program = &args.command[0];
         let argv = args.command[1..].to_vec();
-        DiscoveryTargetSpec::stdio(program, argv).map_err(map_adapter)?
+        DiscoveryTargetSpec::stdio(program, argv)
+            .and_then(|spec| spec.with_stdio_pass_env(&args.pass_env))
+            .map_err(map_adapter)?
     } else {
         if !args.command.is_empty() {
             return Err(usage("url mode does not accept a stdio command"));
+        }
+        if !args.pass_env.is_empty() {
+            return Err(usage("--pass-env applies only to --stdio targets"));
         }
         let url = args
             .url

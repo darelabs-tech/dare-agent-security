@@ -228,3 +228,98 @@ fn missing_executable_exits_scanner_error() {
     assert!(stdout_str(&output).trim().is_empty());
     assert!(!stderr_str(&output).trim().is_empty());
 }
+
+/// A stdio server that, like most real ones, needs a variable from the
+/// operator's environment: it refuses to start without it, then execs the lab.
+#[cfg(unix)]
+fn env_dependent_server(dir: &std::path::Path) -> PathBuf {
+    use std::os::unix::fs::PermissionsExt;
+    let script = dir.join("client-mcp.py");
+    std::fs::write(
+        &script,
+        "#!/usr/bin/env python3\nimport os, sys\n\
+         if not os.environ.get('CLIENT_API_KEY'):\n    sys.exit('CLIENT_API_KEY missing')\n\
+         os.execv(os.environ['MCP_BIN'], [os.environ['MCP_BIN']])\n",
+    )
+    .expect("write server");
+    std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).expect("chmod");
+    script
+}
+
+#[cfg(unix)]
+#[test]
+fn pass_env_hands_named_variables_to_the_server_and_writes_no_value() {
+    let lab = compile_dependent_lab();
+    let dir = tempfile::tempdir().expect("tempdir");
+    let server = env_dependent_server(dir.path());
+    let server = server.to_string_lossy();
+    let out = dir.path().join("out");
+    let discover = |pass: &[&str]| {
+        let mut args = vec!["discover", "--stdio", "--json", "--target-id", "client"];
+        for name in pass {
+            args.extend(["--pass-env", name]);
+        }
+        let out = out.to_string_lossy().into_owned();
+        Command::new(cli_bin())
+            .args(&args)
+            .args(["--output-dir", &out, "--", server.as_ref()])
+            .env("CLIENT_API_KEY", PLANTED)
+            .env("MCP_BIN", &lab)
+            .output()
+            .expect("spawn CLI")
+    };
+
+    // Nothing is inherited by default: the server cannot start.
+    let refused = discover(&[]);
+    assert_ne!(code(&refused), 0);
+
+    let output = discover(&["PATH", "MCP_BIN", "CLIENT_API_KEY"]);
+    assert_eq!(code(&output), 0, "stderr={}", stderr_str(&output));
+    let inventory: Value = serde_json::from_str(&stdout_str(&output)).expect("json");
+    assert_eq!(inventory["tools"].as_array().map(Vec::len), Some(8));
+
+    // The value is never written: not to stdout, stderr or any artifact.
+    let mut written = format!("{}{}", stdout_str(&output), stderr_str(&output));
+    for entry in walkdir(&out) {
+        written.push_str(&std::fs::read_to_string(entry).unwrap_or_default());
+    }
+    assert!(!written.contains(PLANTED), "the passed value leaked");
+}
+
+#[cfg(unix)]
+fn walkdir(dir: &std::path::Path) -> Vec<PathBuf> {
+    let mut files = Vec::new();
+    for entry in std::fs::read_dir(dir).into_iter().flatten().flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            files.extend(walkdir(&path));
+        } else {
+            files.push(path);
+        }
+    }
+    files
+}
+
+#[test]
+fn pass_env_is_refused_for_url_targets_and_bad_names() {
+    let output = run(&[
+        "discover",
+        "--url",
+        "https://mcp.example.test/mcp",
+        "--pass-env",
+        "PATH",
+    ]);
+    assert_eq!(code(&output), 3);
+    assert!(stderr_str(&output).contains("--pass-env applies only to --stdio"));
+    for bad in ["A=B", "1X", "PATH;id"] {
+        let output = run(&[
+            "discover",
+            "--stdio",
+            "--pass-env",
+            bad,
+            "--",
+            "synthetic-mcp",
+        ]);
+        assert_eq!(code(&output), 3, "{bad}");
+    }
+}

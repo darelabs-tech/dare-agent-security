@@ -58,6 +58,9 @@ Ser honesto sobre os limites gera confiança com time de segurança. Proponha a 
 
 ## 3. A POC (2 a 3 semanas)
 
+Primeiro passo na máquina do cliente: instalar e inventariar o servidor MCP dele,
+seguindo [`docs/guia-teste-mcp-cliente.pt-BR.md`](../docs/guia-teste-mcp-cliente.pt-BR.md).
+
 **Objetivo.** Rodar os mesmos engines sobre um agente real do cliente e entregar
 o relatório de caminhos de ataque dele, com o gate ligado em um repositório.
 

@@ -271,7 +271,8 @@ impl RmcpSession {
     ) -> Result<Self, AdapterError> {
         match &spec.target {
             DiscoveryTargetKind::Stdio { program, args } => {
-                let launch = StdioLaunch::new(program.clone(), args.clone())?;
+                let launch = StdioLaunch::new(program.clone(), args.clone())?
+                    .with_pass_env(&spec.stdio_pass_env)?;
                 let cmd = launch.to_tokio_command();
                 let transport = TokioChildProcess::new(cmd)
                     .map_err(|_| AdapterError::transport("stdio-spawn"))?;
@@ -533,6 +534,7 @@ mod tests {
             policy_profile: profile,
             max_response_bytes: 65_536,
             http_loopback_tests: false,
+            stdio_pass_env: Vec::new(),
         }
     }
 

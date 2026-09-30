@@ -174,6 +174,10 @@ pub struct DiscoveryTargetSpec {
     /// Production constructors ([`Self::http`], CLI `--url`) leave this `false`.
     /// Do not enable in production binaries: TLS remains required by default.
     pub http_loopback_tests: bool,
+    /// stdio only: variable names copied from the operator's environment into
+    /// the child (see [`StdioLaunch::with_pass_env`]). Names only; values are
+    /// read at spawn time and never stored.
+    pub stdio_pass_env: Vec<String>,
 }
 
 impl DiscoveryTargetSpec {
@@ -192,7 +196,21 @@ impl DiscoveryTargetSpec {
             policy_profile: PolicyProfile::Current2026_07_28,
             max_response_bytes: DEFAULT_MAX_RESPONSE_BYTES,
             http_loopback_tests: false,
+            stdio_pass_env: Vec::new(),
         })
+    }
+
+    /// Pass these variables, by name, to a stdio target. Refused for HTTP.
+    pub fn with_stdio_pass_env(mut self, names: &[String]) -> Result<Self, AdapterError> {
+        if names.is_empty() {
+            return Ok(self);
+        }
+        let DiscoveryTargetKind::Stdio { program, args } = &self.target else {
+            return Err(AdapterError::invalid_target("pass-env-http"));
+        };
+        let launch = StdioLaunch::new(program.clone(), args.clone())?.with_pass_env(names)?;
+        self.stdio_pass_env = launch.pass_env().to_vec();
+        Ok(self)
     }
 
     /// HTTPS Streamable HTTP target with current MCP profile and default bounds.
@@ -204,6 +222,7 @@ impl DiscoveryTargetSpec {
             policy_profile: PolicyProfile::Current2026_07_28,
             max_response_bytes: DEFAULT_MAX_RESPONSE_BYTES,
             http_loopback_tests: false,
+            stdio_pass_env: Vec::new(),
         })
     }
 
@@ -221,6 +240,7 @@ impl DiscoveryTargetSpec {
             policy_profile: PolicyProfile::Current2026_07_28,
             max_response_bytes: DEFAULT_MAX_RESPONSE_BYTES,
             http_loopback_tests: true,
+            stdio_pass_env: Vec::new(),
         })
     }
 

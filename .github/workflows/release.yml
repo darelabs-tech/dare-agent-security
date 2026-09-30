@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to release (e.g. v1.0.0-rc1); required for manual dispatch"
+        description: "Tag to release (e.g. v1.0.0-rc2); required for manual dispatch"
         required: true
 
 permissions:
@@ -24,12 +24,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Linux binaries are static (musl): they run on any distribution
+          # release, not only on glibc >= the runner's.
           - os: ubuntu-latest
             target: linux-x86_64
+            triple: x86_64-unknown-linux-musl
           - os: ubuntu-24.04-arm
             target: linux-aarch64
-          - os: macos-13
+            triple: aarch64-unknown-linux-musl
+          # The Intel macOS runner is retired: cross-compile on Apple silicon.
+          - os: macos-14
             target: macos-x86_64
+            triple: x86_64-apple-darwin
           - os: macos-14
             target: macos-aarch64
           - os: windows-latest
@@ -42,9 +48,25 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
 
+      - name: Add Rust target
+        if: matrix.triple != ''
+        run: rustup target add ${{ matrix.triple }}
+
+      - name: Install musl tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
       - name: Package (Unix)
         if: runner.os != 'Windows'
-        run: ./scripts/release/package.sh ${{ matrix.target }}
+        run: bash ./scripts/release/package.sh ${{ matrix.target }} ${{ matrix.triple }}
+
+      - name: Smoke-test the packaged binary
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          BIN=$(ls dist/*/dare-agent-security)
+          file "$BIN" | tee /dev/stderr | grep -q 'static'
+          "$BIN" --version
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
